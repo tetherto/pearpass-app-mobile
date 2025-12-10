@@ -77,7 +77,7 @@
     "pearpass-lib-ui-react-native-components": "file:packages/pearpass-lib-ui-react-native-components",
     "pearpass-lib-ui-theme-provider": "file:packages/pearpass-lib-ui-theme-provider",
     "pearpass-lib-vault": "file:packages/pearpass-lib-vault",
-    "pearpass-lib-vault-mobile": "file:packages/pearpass-lib-vault-mobile",
+    "pearpass-lib-vault-mobile": "file:packages/pearpass-lib-vault-core",
     "pearpass-utils-password-check": "file:packages/pearpass-utils-password-check",
     "pearpass-utils-password-generator": "file:packages/pearpass-utils-password-generator",
     "react": "19.0.0",

@@ -37,9 +37,6 @@
 [submodule "packages/pearpass-lib-vault"]
 	path = packages/pearpass-lib-vault
 	url = ../pearpass-lib-vault.git
-[submodule "packages/pearpass-lib-vault-mobile"]
-	path = packages/pearpass-lib-vault-mobile
-	url = ../pearpass-lib-vault-mobile.git
 [submodule "packages/pearpass-utils-password-check"]
 	path = packages/pearpass-utils-password-check
 	url = ../pearpass-utils-password-check.git
@@ -52,3 +49,6 @@
 [submodule "packages/tether-dev-docs"]
 	path = packages/tether-dev-docs
 	url = ../tether-dev-docs.git
+[submodule "packages/pearpass-lib-vault-core"]
+	path = packages/pearpass-lib-vault-core
+	url = git@github.com:tetherto/pearpass-lib-vault-core.git
