@@ -125,6 +125,10 @@ export const OnboardingContainer = ({
     switch (currentStep) {
       case 0:
         return (
+          <View
+            testID="onboarding_media_step_0"
+            accessibilityLabel="onboarding_media_step_0"
+          >
           <InitialVideo
             onStart={() => buttonFadeAnim.setValue(0)}
             onEnded={() => {
@@ -135,9 +139,14 @@ export const OnboardingContainer = ({
               }).start()
             }}
           />
+        </View>
         )
       case 1:
         return (
+          <View
+            testID="onboarding_media_step_1"
+            accessibilityLabel="onboarding_media_step_1"
+          >
           <Animated.Image
             source={require('../../../assets/images/intro/closeLock.png')}
             style={[
@@ -155,21 +164,48 @@ export const OnboardingContainer = ({
             ]}
             resizeMode="contain"
           />
+        </View>
         )
       case 2:
-        return <Rive resourceName="password" style={styles.riveAnimation} />
+        return (
+          <View
+            testID="onboarding_media_step_2"
+            accessibilityLabel="onboarding_media_step_2"
+          >
+            <Rive resourceName="password" style={styles.riveAnimation} />
+          </View>
+        )
+
       case 3:
-        return <Rive resourceName="category" style={styles.riveAnimation} />
+        return (
+          <View
+            testID="onboarding_media_step_3"
+            accessibilityLabel="onboarding_media_step_3"
+          >
+            <Rive resourceName="category" style={styles.riveAnimation} />
+          </View>
+  )
+
       case 4:
-        return <Rive resourceName="form" style={styles.riveAnimationForm} />
+        return (
+          <View
+            testID="onboarding_media_step_4"
+            accessibilityLabel="onboarding_media_step_4"
+          >
+            <Rive resourceName="form" style={styles.riveAnimationForm} />
+          </View>
+  )
       case 5:
         return (
-          <View style={styles.finalStepContainer}>
-            <View style={styles.iconContainer}>
-              <View style={styles.qrheaderContainer}>
-                <View style={styles.faceIdContainer}>
-                  <FaceIdIcon size="21" />
-                  <Text style={styles.faceIdText}>{t`Add a device`}</Text>
+          <View 
+            testID="onboarding_media_step_5"
+            accessibilityLabel="onboarding_media_step_5"
+            style={styles.finalStepContainer}>
+              <View style={styles.iconContainer}>
+                <View style={styles.qrheaderContainer}>
+                  <View style={styles.faceIdContainer}>
+                    <FaceIdIcon size="21" />
+                    <Text style={styles.faceIdText}>{t`Add a device`}</Text>
                 </View>
                 <TouchableOpacity style={styles.closeButton}>
                   <XIcon />
@@ -270,10 +306,15 @@ export const OnboardingContainer = ({
         }
       ]}
     >
-      <View style={styles.paginationContainer}>
+      <View 
+      testID="onboarding_progress_bar"
+      accessibilityLabel="onboarding_progress_bar"
+      style={styles.paginationContainer}>
         {SCREENS.map((step) => (
           <TouchableOpacity
             key={step}
+            testID={`onboarding_progress_step_${step}`}
+            accessibilityLabel={`onboarding_progress_step_${step}`}
             style={[
               styles.paginationDot,
               currentStep === step && styles.paginationDotActive
@@ -283,12 +324,18 @@ export const OnboardingContainer = ({
         ))}
       </View>
       <View style={styles.actionButtonsContainer}>
-        <TouchableOpacity onPress={onContinue} style={styles.continueButton}>
-          <Text style={styles.continueButtonText}>{t`Continue`}</Text>
+        <TouchableOpacity 
+        testID="onboarding_continue_button"
+        accessibilityLabel="onboarding_continue_button"
+        onPress={onContinue} style={styles.continueButton}>
+          <Text testID="onboarding_continue_text" style={styles.continueButtonText}>{t`Continue`}</Text>
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
-          <TouchableOpacity onPress={onSkip} style={styles.skipButton}>
-            <Text style={styles.skipButtonText}>{t`Skip`}</Text>
+          <TouchableOpacity 
+          testID="onboarding_skip_button"
+          accessibilityLabel="onboarding_skip_button"
+          onPress={onSkip} style={styles.skipButton}>
+            <Text testID="onboarding_skip_text" style={styles.skipButtonText}>{t`Skip`}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -315,18 +362,33 @@ export const OnboardingContainer = ({
 
       <View style={styles.contentWrapper}>
         <View style={styles.topSection}>
-          <View style={styles.logoContainer}>
+          <View
+          testID="onboarding_logo"
+          accessibilityLabel="onboarding_logo" 
+          style={styles.logoContainer}>
             <LogoTextWithLock width={170} height={50} />
           </View>
         </View>
 
-        <View style={styles.centerSection}>{renderCenterContent()}</View>
+        <View
+        testID="onboarding_center_section"
+        accessibilityLabel="onboarding_center_section"
+        style={styles.centerSection}>{renderCenterContent()}</View>
 
-        <View style={styles.bottomSection}>
-          <Text style={styles.descriptionText}>{mainDescription}</Text>
+        <View 
+        testID="onboarding_bottom_section"
+        accessibilityLabel="onboarding_bottom_section"
+        style={styles.bottomSection}>
+          <Text 
+          testID="onboarding_main_description"
+          accessibilityLabel="onboarding_main_description"
+          style={styles.descriptionText}>{mainDescription}</Text>
 
           {getSubDescriptionContent() && (
-            <View style={styles.subDescriptionWrapper}>
+            <View 
+            testID="onboarding_sub_description"
+            accessibilityLabel="onboarding_sub_description"   
+            style={styles.subDescriptionWrapper}>
               <Text style={styles.subDescriptionText}>
                 {getSubDescriptionContent()}
               </Text>
