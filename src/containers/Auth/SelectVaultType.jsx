@@ -30,7 +30,7 @@ export const SelectVaultType = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="select-vault-type-logo">
       <View style={styles.logoContainer}>
         <LogoTextWithLock width={170} height={50} />
       </View>
@@ -38,25 +38,26 @@ export const SelectVaultType = () => {
       <View style={styles.topSection}>
         {!vaultsData?.length ? (
           <View style={styles.textWrapper}>
-            <Text style={styles.headerText}>{t`Enter Master Password`}</Text>
-            <Text style={styles.subHeaderText}>
+            <Text style={styles.headerText} testID="select-vault-type-empty-title">{t`Enter Master Password`}</Text>
+            <Text style={styles.subHeaderText} testID="select-vault-type-empty-subtitle">
               {t`Now create a secure vault or load an existing one to get started.`}
             </Text>
           </View>
         ) : (
-          <View style={styles.vaultsSection}>
-            <Text style={styles.headerText}>
+          <View style={styles.vaultsSection} testID="select-vault-type-vaults-section">
+            <Text style={styles.headerText} testID="select-vault-type-list-title">
               {t`Select a vault, create a new one or load another one`}
             </Text>
 
             <ScrollView
+              testID="select-vault-type-vault-list"
               style={styles.vaultsList}
               showsVerticalScrollIndicator={false}
             >
               {vaultsData?.map((vault, index) => (
                 <View key={vault.id} style={styles.vaultItemWrapper}>
                   <ListItem
-                    testID={`vault-${index}`}
+                    testID={`select-vault-type-vault-item-${index}`}
                     onPress={() => handleVaultSelect(vault.id)}
                     name={vault.name ?? vault.id}
                     date={vault.createdAt}
@@ -69,11 +70,12 @@ export const SelectVaultType = () => {
       </View>
 
       <View style={styles.bottomSection}>
-        <ButtonPrimary stretch onPress={handleCreateVault}>
+        <ButtonPrimary testID="select-vault-type-create-new" stretch onPress={handleCreateVault}>
           {t`Create a new vault`}
         </ButtonPrimary>
 
         <ButtonSecondary
+          testID="select-vault-type-load-existing"
           stretch
           onPress={() => navigation.navigate('Welcome', { state: 'load' })}
         >
