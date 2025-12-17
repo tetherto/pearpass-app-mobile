@@ -58,7 +58,7 @@ export const CreateOrEditCreditCardContent = ({
     expireDate: Validator.string(),
     securityCode: Validator.string().numeric(t`Should contain only numbers`),
     pinCode: Validator.string().numeric(t`Should contain only numbers`),
-    note: Validator.string(),
+    comment: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
         note: Validator.string().required(t`Note is required`)
@@ -81,7 +81,7 @@ export const CreateOrEditCreditCardContent = ({
       expireDate: initialRecord?.data?.expireDate ?? '',
       securityCode: initialRecord?.data?.securityCode ?? '',
       pinCode: initialRecord?.data?.pinCode ?? '',
-      note: initialRecord?.data?.note ?? '',
+      comment: initialRecord?.data?.comment ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
@@ -119,7 +119,7 @@ export const CreateOrEditCreditCardContent = ({
         expireDate: values.expireDate,
         securityCode: values.securityCode,
         pinCode: values.pinCode,
-        note: values.note,
+        comment: values.comment,
         customFields: values.customFields,
         attachments: convertBase64FilesToUint8(values.attachments)
       }
@@ -290,7 +290,7 @@ export const CreateOrEditCreditCardContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote {...register('note')} />
+              <InputFieldNote {...register('comment')} />
             </FormGroup>
 
             <CustomFields

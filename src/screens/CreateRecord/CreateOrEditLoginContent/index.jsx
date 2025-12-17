@@ -62,7 +62,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
     title: Validator.string().required(t`Title is required`),
     username: Validator.string(),
     password: Validator.string(),
-    note: Validator.string(),
+    comment: Validator.string(),
     websites: Validator.array().items(
       Validator.object({
         website: Validator.string().website('Wrong format of website')
@@ -87,7 +87,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
       title: initialRecord?.data?.title ?? '',
       username: initialRecord?.data?.username ?? '',
       password: initialRecord?.data?.password ?? '',
-      note: initialRecord?.data?.note ?? '',
+      comment: initialRecord?.data?.comment ?? '',
       websites: initialRecord?.data?.websites?.length
         ? initialRecord?.data?.websites.map((website) => ({ website }))
         : [{ name: 'website' }],
@@ -126,7 +126,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
         title: values.title,
         username: values.username,
         password: values.password,
-        note: values.note,
+        comment: values.comment,
         websites: values.websites
           .map((website) => {
             if (!!website?.website?.trim().length) {
@@ -314,7 +314,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote isFirst isLast {...register('comment')} />
             </FormGroup>
 
             <CustomFields

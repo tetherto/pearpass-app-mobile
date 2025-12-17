@@ -32,7 +32,7 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     () => ({
       username: initialRecord?.data?.username ?? '',
       password: initialRecord?.data?.password ?? '',
-      note: initialRecord?.data?.note ?? '',
+      comment: initialRecord?.data?.comment ?? '',
       websites: initialRecord?.data?.websites?.length
         ? initialRecord?.data?.websites.map((website) => ({ website }))
         : [{ name: 'website', id: generateUniqueId() }],
@@ -71,7 +71,7 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
   const hasUsername = !!values?.username?.length
   const hasPassword = !!values?.password?.length
   const hasWebsites = !!websitesList?.length
-  const hasNote = !!values?.note?.length
+  const hasComment = !!values?.comment?.length
   const hasCustomFields = !!customFieldsList?.length
   const hasAttachments = !!values?.attachments?.length
 
@@ -147,12 +147,12 @@ Consider changing it to keep your account secure.`}
         </FormGroup>
       )}
 
-      {hasNote && (
+      {hasComment && (
         <FormGroup>
           <InputFieldNote
-            onClick={() => handleTapToCopy('note')}
+            onClick={() => handleTapToCopy('comment')}
             isDisabled
-            {...register('note')}
+            {...register('comment')}
           />
         </FormGroup>
       )}

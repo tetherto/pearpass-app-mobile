@@ -129,7 +129,7 @@ export const CreateOrEditIdentityContent = ({
     city: Validator.string(),
     region: Validator.string(),
     country: Validator.string(),
-    note: Validator.string(),
+    comment: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
         note: Validator.string().required(t`Note is required`)
@@ -189,7 +189,7 @@ export const CreateOrEditIdentityContent = ({
       city: initialRecord?.data?.city ?? '',
       region: initialRecord?.data?.region ?? '',
       country: initialRecord?.data?.country ?? '',
-      note: initialRecord?.data?.note ?? '',
+      comment: initialRecord?.data?.comment ?? '',
       customFields: initialRecord?.data?.customFields || [],
       folder: selectedFolder ?? initialRecord?.folder,
       passportFullName: initialRecord?.data?.passportFullName ?? '',
@@ -264,7 +264,7 @@ export const CreateOrEditIdentityContent = ({
         city: values.city,
         region: values.region,
         country: values.country,
-        note: values.note,
+        comment: values.comment,
         customFields: values.customFields,
         passportFullName: values.passportFullName,
         passportNumber: values.passportNumber,
@@ -613,7 +613,7 @@ export const CreateOrEditIdentityContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote {...register('note')} />
+              <InputFieldNote {...register('comment')} />
             </FormGroup>
 
             <CustomFields

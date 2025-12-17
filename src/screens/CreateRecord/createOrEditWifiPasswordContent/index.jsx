@@ -62,7 +62,7 @@ export const CreateOrEditWifiPasswordContent = ({
   const schema = Validator.object({
     title: Validator.string().required(t`Name is required`),
     password: Validator.string().required(t`Password is required`),
-    note: Validator.string(),
+    comment: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
         note: Validator.string().required(t`Note is required`)
@@ -75,7 +75,7 @@ export const CreateOrEditWifiPasswordContent = ({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       password: initialRecord?.data?.password ?? '',
-      note: initialRecord?.data?.note ?? '',
+      comment: initialRecord?.data?.comment ?? '',
       customFields: initialRecord?.data.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder
     },
@@ -94,7 +94,7 @@ export const CreateOrEditWifiPasswordContent = ({
       data: {
         title: values.title,
         password: values.password,
-        note: values.note,
+        comment: values.comment,
         customFields: values.customFields
       }
     }
@@ -185,7 +185,7 @@ export const CreateOrEditWifiPasswordContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote isFirst isLast {...register('comment')} />
             </FormGroup>
 
             <CustomFields

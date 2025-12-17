@@ -2,8 +2,8 @@
 
 exports[`InputFieldNote component renders correctly with default props 1`] = `
 <div
-  data-label="Note"
-  data-placeholder="Add note"
+  data-label="Comment"
+  data-placeholder="Add comment"
   data-testid="input-field"
   data-variant="outline"
   testID="input-field"

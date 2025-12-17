@@ -61,7 +61,7 @@ export const CreateOrEditPassphraseContent = ({
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
     passPhrase: Validator.string().required(t`Passphrase is required`),
-    note: Validator.string(),
+    comment: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
         note: Validator.string().required(t`Note is required`)
@@ -74,7 +74,7 @@ export const CreateOrEditPassphraseContent = ({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       passPhrase: initialRecord?.data?.passPhrase ?? '',
-      note: initialRecord?.data?.note ?? '',
+      comment: initialRecord?.data?.comment ?? '',
       customFields: initialRecord?.data.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder
     },
@@ -92,7 +92,7 @@ export const CreateOrEditPassphraseContent = ({
       data: {
         title: values.title,
         passPhrase: values.passPhrase,
-        note: values.note,
+        comment: values.comment,
         customFields: values.customFields
       }
     }
@@ -155,7 +155,7 @@ export const CreateOrEditPassphraseContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote isFirst isLast {...register('comment')} />
             </FormGroup>
 
             <CustomFields
