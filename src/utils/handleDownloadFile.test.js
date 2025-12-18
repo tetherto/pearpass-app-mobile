@@ -6,7 +6,7 @@ import { handleDownloadFile } from './handleDownloadFile'
 import { logger } from './logger'
 
 jest.mock('expo-file-system', () => ({
-  documentDirectory: 'file:///document/directory/',
+  cacheDirectory: 'file:///cache/directory/',
   writeAsStringAsync: jest.fn(),
   EncodingType: {
     Base64: 'base64'
@@ -42,13 +42,16 @@ describe('handleDownloadFile', () => {
 
     await handleDownloadFile(file)
 
-    const expectedPath = 'file:///document/directory/test-file.pdf'
+    const expectedPath = 'file:///cache/directory/test-file.pdf'
     expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
       expectedPath,
       'base64EncodedContent',
       { encoding: 'base64' }
     )
-    expect(shareAsync).toHaveBeenCalledWith(expectedPath)
+    expect(shareAsync).toHaveBeenCalledWith(expectedPath, {
+      mimeType: 'application/pdf',
+      dialogTitle: 'Share file'
+    })
   })
 
   it('should not share file on web platform', async () => {

@@ -5,6 +5,7 @@ import { ExitIcon, FullBodyIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { closeAllInstances, useVault, useVaults } from 'pearpass-lib-vault'
 import { ActivityIndicator } from 'react-native'
+import { NAVIGATION_ROUTES } from 'src/constants/navigation'
 
 import {
   ActionsContainer,
@@ -45,10 +46,7 @@ export const DrawerContent = ({ navigation }) => {
     refetch: refetchVault
   } = useVault()
 
-  const filteredVaults = useMemo(
-    () => vaultsData?.filter((vault) => vault?.id !== vaultData?.id),
-    [vaultsData, vaultData]
-  )
+  const allVaults = useMemo(() => vaultsData || [], [vaultsData])
 
   const addDevice = () => {
     openModal(<AddDeviceModalContent onClose={closeModal} />)
@@ -117,9 +115,26 @@ export const DrawerContent = ({ navigation }) => {
     }
   }
 
+  const handleCreateVault = () => {
+    const rootNavigation = navigation.getParent()?.getParent()
+    if (rootNavigation) {
+      rootNavigation.navigate('Welcome', {
+        state: NAVIGATION_ROUTES.CREDENTIALS
+      })
+    }
+    navigation.closeDrawer()
+  }
+
   return (
     <DrawerContainer>
-      <DrawerTitle>{t`Folder`}</DrawerTitle>
+      <DrawerTitle>{t`Folder & Vault`}</DrawerTitle>
+      <DropdownSwapVault
+        onVaultSwap={swapVault}
+        onCreateVault={handleCreateVault}
+        vaults={allVaults}
+        selectedVault={vaultData}
+      />
+
       <ScrollContainer>
         <ScrollView>
           <FolderList
@@ -138,11 +153,6 @@ export const DrawerContent = ({ navigation }) => {
         </ScrollView>
       </ScrollContainer>
       <ActionsContainer>
-        <DropdownSwapVault
-          onVaultSwap={swapVault}
-          vaults={filteredVaults}
-          selectedVault={vaultData}
-        />
         <ButtonThin onPress={addDevice} startIcon={FullBodyIcon}>
           {t`Add Device`}
         </ButtonThin>

@@ -1,4 +1,4 @@
-package com.pears.pass
+package com.noxtton.pearpass
 
 import android.app.Activity
 import android.content.ComponentName
@@ -8,7 +8,7 @@ import android.os.Build
 import android.provider.Settings
 import android.view.autofill.AutofillManager
 import com.facebook.react.bridge.*
-import com.pears.pass.autofill.utils.AutofillConstants
+import com.noxtton.pearpass.autofill.utils.AutofillConstants
 
 class AutofillModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext), ActivityEventListener {

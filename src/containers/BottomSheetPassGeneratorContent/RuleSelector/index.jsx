@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { View, Platform } from 'react-native'
+import { View } from 'react-native'
 
 import {
   LabelContainers,
@@ -20,6 +20,7 @@ import { AppSwitch } from '../../../components/AppSwitch/AppSwitch'
  *  }
  *  selectedRules: {[key: string]: any}
  *  setRules: ({[key: string]: any}) => void
+ *  onToggle?: (ruleName: string, newValue: boolean) => boolean
  *  switchFirst?: boolean
  * }} props
  */
@@ -27,6 +28,7 @@ export const RuleSelector = ({
   rules,
   selectedRules,
   setRules,
+  onToggle,
   switchFirst = false
 }) => {
   const isAllRuleSelected = useMemo(
@@ -34,24 +36,13 @@ export const RuleSelector = ({
     [selectedRules]
   )
 
-  const getSwitchStyle = () => {
-    if (Platform.OS === 'android') {
-      return {
-        transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
-        width: 32
-      }
-    }
-    if (Platform.OS === 'ios' && parseInt(Platform.Version, 10) >= 26) {
-      return {
-        width: 65,
-        padding: 1.5
-      }
-    }
-
-    return {}
-  }
-
   const handleSwitchToggle = (ruleName) => {
+    const currentValue = selectedRules[ruleName] || isAllRuleSelected
+    const newValue = !currentValue
+
+    // If onToggle callback exists and returns false, abort the toggle and prevent state update
+    if (onToggle && !onToggle(ruleName, newValue)) return
+
     const updatedRules = { ...selectedRules }
 
     if (ruleName === 'all') {
@@ -59,7 +50,7 @@ export const RuleSelector = ({
         updatedRules[rule] = !isAllRuleSelected
       })
     } else {
-      updatedRules[ruleName] = !updatedRules[ruleName]
+      updatedRules[ruleName] = newValue
     }
 
     setRules(updatedRules)
@@ -77,7 +68,6 @@ export const RuleSelector = ({
           </LabelContainers>
           <View>
             <AppSwitch
-              style={getSwitchStyle()}
               disabled={rule.disabled}
               value={selectedRules[rule.name] || isAllRuleSelected}
               onChange={() => handleSwitchToggle(rule.name)}

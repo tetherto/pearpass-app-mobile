@@ -1,6 +1,6 @@
-package com.pears.pass.autofill.ui;
+package com.noxtton.pearpass.autofill.ui;
 
-import com.pears.pass.autofill.data.CredentialItem;
+import com.noxtton.pearpass.autofill.data.CredentialItem;
 
 public interface NavigationListener {
     void navigateToMissingConfiguration();

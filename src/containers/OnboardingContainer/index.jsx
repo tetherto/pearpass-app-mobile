@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Trans, useLingui } from '@lingui/react/macro'
-import {
-  FaceIdIcon,
-  TimeIcon,
-  XIcon
-} from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   Animated,
@@ -49,17 +44,11 @@ export const OnboardingContainer = ({
 }) => {
   const { t } = useLingui()
   const insets = useSafeAreaInsets()
-  const [timeLeft, setTimeLeft] = useState(90)
+  const [, setTimeLeft] = useState(90)
   const intervalRef = useRef(null)
 
   const floatAnim = useRef(new Animated.Value(0)).current
   const buttonFadeAnim = useRef(new Animated.Value(0)).current
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
 
   useEffect(() => {
     if (currentStep === 1) {
@@ -197,43 +186,11 @@ export const OnboardingContainer = ({
   )
       case 5:
         return (
-          <View 
-            testID="onboarding-media-step-5"
-            accessibilityLabel="onboarding-media-step-5"
-            style={styles.finalStepContainer}>
-              <View style={styles.iconContainer}>
-                <View style={styles.qrheaderContainer}>
-                  <View style={styles.faceIdContainer}>
-                    <FaceIdIcon size="21" />
-                    <Text style={styles.faceIdText}>{t`Add a device`}</Text>
-                </View>
-                <TouchableOpacity style={styles.closeButton}>
-                  <XIcon />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.qrCodeImageCotainer}>
-                <Text style={styles.faceIdText}>{t`Scan this QR code`} </Text>
-                <View style={styles.qrCodeImageWrapper}>
-                  <Image
-                    source={require('../../../assets/images/intro/qr.png')}
-                    style={styles.finalIcon}
-                    resizeMode="contain"
-                  />
-                </View>
-              </View>
-              <View style={styles.timerContainer}>
-                <Text style={styles.timerText}>{t`Add a device`}</Text>
-                <Text style={[styles.timerText, styles.timerTextPrimary]}>
-                  {formatTime(timeLeft)}
-                </Text>
-                <TimeIcon
-                  color={colors.primary400.option1}
-                  width={18}
-                  height={18}
-                />
-              </View>
-            </View>
-          </View>
+          <Image
+            source={require('../../../assets/images/intro/linked_device.png')}
+            style={styles.centerImage}
+            resizeMode="contain"
+          />
         )
       default:
         return null

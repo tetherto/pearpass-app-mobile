@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.ui;
+package com.noxtton.pearpass.autofill.ui;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

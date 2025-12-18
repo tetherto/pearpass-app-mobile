@@ -1,4 +1,4 @@
-package com.pears.pass
+package com.noxtton.pearpass
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -16,6 +16,7 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
 
     companion object {
         const val TAG = "NativeClipboard"
+        private const val ALARM_REQUEST_CODE = 1001
         private var lastCopiedText: String? = null
         private var clearHandler: Handler? = null
         private var clearRunnable: Runnable? = null
@@ -121,6 +122,7 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
     private fun scheduleClearClipboard(text: String, delayMillis: Long) {
         cancelScheduledClear()
 
+        // 1. Handler for in-app clearing (fast, immediate response when app is open)
         clearHandler = Handler(Looper.getMainLooper())
         clearRunnable = Runnable {
             try {
@@ -150,19 +152,94 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
                     }
                     lastCopiedText = null
                 }
+
+                // Cancel alarm since Handler already cleared
+                cancelAlarm()
             } catch (e: Exception) {
-                // Silent fail
+                Log.e(TAG, "Failed to clear clipboard via Handler", e)
             }
         }
 
         clearHandler?.postDelayed(clearRunnable!!, delayMillis)
+
+        // 2. AlarmManager for when app is closed (survives app termination)
+        scheduleAlarm(text, delayMillis)
+    }
+
+    private fun scheduleAlarm(text: String, delayMillis: Long) {
+        try {
+            val context = reactApplicationContext
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            val intent = Intent("com.noxtton.pearpass.CLEAR_CLIPBOARD").apply {
+                setPackage(context.packageName)
+                putExtra("text_to_match", text)
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                ALARM_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val triggerTime = System.currentTimeMillis() + delayMillis
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // Android 12+: Check if exact alarms are allowed
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                } else {
+                    // Fallback to inexact alarm (might be slightly delayed)
+                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // Android 6+: Use setExactAndAllowWhileIdle for Doze mode
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            } else {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            }
+
+            Log.d(TAG, "Scheduled alarm to clear clipboard in ${delayMillis}ms")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to schedule alarm for clipboard clear", e)
+        }
+    }
+
+    private fun cancelAlarm() {
+        try {
+            val context = reactApplicationContext
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            val intent = Intent("com.noxtton.pearpass.CLEAR_CLIPBOARD").apply {
+                setPackage(context.packageName)
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                ALARM_REQUEST_CODE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            alarmManager.cancel(pendingIntent)
+            pendingIntent.cancel()
+
+            Log.d(TAG, "Cancelled clipboard clear alarm")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to cancel alarm", e)
+        }
     }
 
     private fun cancelScheduledClear() {
+        // Cancel Handler
         clearRunnable?.let {
             clearHandler?.removeCallbacks(it)
             clearRunnable = null
         }
         clearHandler = null
+
+        // Cancel Alarm
+        cancelAlarm()
     }
 }

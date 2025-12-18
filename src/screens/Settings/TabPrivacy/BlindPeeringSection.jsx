@@ -66,41 +66,43 @@ export const BlindPeeringSection = () => {
   }
 
   const handleBlindPeersConfirm = () => {
+    setBlindPeersRules({ blindPeers: true })
     collapse()
   }
 
-  const handleSetBlindPeersRules = async (newRules) => {
-    if (newRules.blindPeers === true) {
+  const removeBlindPeers = async () => {
+    try {
+      setIsLoadingContext(true)
+      await removeAllBlindMirrors()
+    } catch {
+      setBlindPeersRules({ blindPeers: true })
+      Toast.show({
+        type: 'baseToast',
+        text1: t`Error removing all Blind Peers`,
+        position: 'bottom',
+        bottomOffset: 100
+      })
+    } finally {
+      setIsLoadingContext(false)
+    }
+  }
+
+  const handleBlindPeersToggle = (ruleName, isToggled) => {
+    if (isToggled) {
       expand({
         children: (
           <BottomSheetBlindPeersContent
-            onClose={() => {
-              setBlindPeersRules({ blindPeers: false })
-              collapse()
-            }}
+            onClose={collapse}
             onConfirm={handleBlindPeersConfirm}
           />
         ),
         snapPoints: ['10%', '40%', '75%']
       })
+      return false
     }
 
-    if (newRules.blindPeers === false) {
-      try {
-        setIsLoadingContext(true)
-        await removeAllBlindMirrors()
-      } catch {
-        setBlindPeersRules({ blindPeers: true })
-        Toast.show({
-          type: 'baseToast',
-          text1: t`Error removing all Blind Peers`,
-          position: 'bottom',
-          bottomOffset: 100
-        })
-      } finally {
-        setIsLoadingContext(false)
-      }
-    }
+    removeBlindPeers()
+    return true
   }
 
   return (
@@ -122,7 +124,8 @@ export const BlindPeeringSection = () => {
             }
           ]}
           selectedRules={blindPeersRules}
-          setRules={handleSetBlindPeersRules}
+          setRules={setBlindPeersRules}
+          onToggle={handleBlindPeersToggle}
         />
         <Pressable
           style={styles.learnMoreButton}

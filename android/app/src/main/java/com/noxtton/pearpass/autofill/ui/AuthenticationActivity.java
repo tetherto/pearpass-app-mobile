@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.ui;
+package com.noxtton.pearpass.autofill.ui;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -20,9 +20,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.pears.pass.R;
-import com.pears.pass.autofill.data.CredentialItem;
-import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.noxtton.pearpass.R;
+import com.noxtton.pearpass.autofill.data.CredentialItem;
+import com.noxtton.pearpass.autofill.data.PearPassVaultClient;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;

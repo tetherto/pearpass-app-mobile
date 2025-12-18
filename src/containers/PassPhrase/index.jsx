@@ -14,6 +14,7 @@ import {
 } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import Toast from 'react-native-toast-message'
 
 import { PassPhraseSettings } from './PassPhraseSettings'
 import { BadgeTextItem } from '../../components/BadgeTextItem'
@@ -69,7 +70,15 @@ export const PassPhrase = ({ isCreateOrEdit, onChange, value, error }) => {
     const pastedText = await pasteFromClipboard()
     if (pastedText) {
       const words = parsePassphraseText(pastedText)
-
+      if (!isValidRange(words.length)) {
+        Toast.show({
+          type: 'error',
+          text1: t`Only 12 or 24 words are allowed`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
+        return
+      }
       setPassphraseWords(words)
       detectAndUpdateSettings(words)
       if (onChange) {
@@ -90,16 +99,11 @@ export const PassPhrase = ({ isCreateOrEdit, onChange, value, error }) => {
     <View style={styles.container}>
       <View style={styles.passPhraseHeader}>
         <PassPhraseIcon />
-        <Text style={styles.passPhraseHeaderText}>{t`PassPhrase`}</Text>
+        <Text style={styles.passPhraseHeaderText}>{t`Recovery phrase`}</Text>
       </View>
       <View style={styles.passPhraseContainer}>
         {passphraseWords.map((word, i) => (
-          <BadgeTextItem
-            key={`${word}-${i}`}
-            count={i + 1}
-            isNumberVisible={!withRandomWord || i < passphraseWords.length - 1}
-            word={word || ''}
-          />
+          <BadgeTextItem key={`${word}-${i}`} count={i + 1} word={word || ''} />
         ))}
       </View>
 

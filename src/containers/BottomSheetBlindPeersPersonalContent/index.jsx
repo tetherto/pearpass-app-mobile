@@ -103,13 +103,13 @@ export const BottomSheetBlindPeersPersonalContent = ({
       try {
         setIsLoadingContext(true)
         await addBlindMirrors(blindPeers)
-
         Toast.show({
           type: 'baseToast',
           text1: t`Manual Blind Peers enabled successfully`,
           position: 'bottom',
           bottomOffset: 100
         })
+        onConfirm({ blindPeerType: PERSONAL })
       } catch {
         Toast.show({
           type: 'baseToast',
@@ -117,9 +117,9 @@ export const BottomSheetBlindPeersPersonalContent = ({
           position: 'bottom',
           bottomOffset: 100
         })
+        onClose()
       } finally {
         setIsLoadingContext(false)
-        onConfirm({ blindPeerType: PERSONAL })
       }
     }
   }

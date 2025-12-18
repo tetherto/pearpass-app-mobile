@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.ui;
+package com.noxtton.pearpass.autofill.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,9 +14,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pears.pass.R;
-import com.pears.pass.autofill.data.CredentialItem;
-import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.noxtton.pearpass.R;
+import com.noxtton.pearpass.autofill.data.CredentialItem;
+import com.noxtton.pearpass.autofill.data.PearPassVaultClient;
 
 import java.util.ArrayList;
 import java.util.List;

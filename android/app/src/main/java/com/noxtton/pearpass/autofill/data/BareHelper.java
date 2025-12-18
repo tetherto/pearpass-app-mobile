@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.data;
+package com.noxtton.pearpass.autofill.data;
 
 import android.content.Context;
 import android.os.Handler;

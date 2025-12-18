@@ -53,17 +53,20 @@ exports[`PasswordField Component matches snapshot 1`] = `
   >
     <View
       style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "gap": 15,
-          "paddingBottom": 20,
-          "paddingLeft": 12,
-          "paddingRight": 10,
-          "paddingTop": 20,
-        }
+        [
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 15,
+          },
+          {
+            "paddingBottom": 20,
+            "paddingLeft": 12,
+            "paddingRight": 10,
+            "paddingTop": 20,
+          },
+        ]
       }
-      withBelowContent={false}
     >
       <View
         style={
@@ -129,10 +132,8 @@ exports[`PasswordField Component matches snapshot 1`] = `
       <View
         style={
           {
-            "flexBasis": 0,
+            "flex": 1,
             "flexDirection": "column",
-            "flexGrow": 1,
-            "flexShrink": 1,
           }
         }
       >
@@ -153,34 +154,37 @@ exports[`PasswordField Component matches snapshot 1`] = `
         <View
           style={
             {
-              "flexBasis": 0,
-              "flexGrow": 1,
-              "flexShrink": 1,
+              "flex": 1,
               "marginTop": 5,
               "minHeight": 29,
-              "position": "relative",
             }
           }
         >
           <TextInput
             accessible={true}
             editable={true}
-            isTransparent={false}
+            ellipsizeMode="tail"
             keyboardType="default"
+            numberOfLines={1}
             onBlur={[Function]}
             onChangeText={[Function]}
             onFocus={[Function]}
             onLayout={[MockFunction]}
             placeholder="Enter password"
             placeholderTextColor="#BABABA"
+            pointerEvents="auto"
             secureTextEntry={true}
             style={
-              {
-                "color": "#F6F6F6",
-                "fontFamily": "Inter",
-                "fontSize": 20,
-                "fontWeight": "700",
-              }
+              [
+                {
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "700",
+                },
+                {
+                  "color": "#F6F6F6",
+                },
+              ]
             }
             value="snapshot value"
           />
@@ -329,7 +333,7 @@ exports[`PasswordField Component matches snapshot 1`] = `
                 },
               ]
             }
-            vbHeight={19}
+            vbHeight={20}
             vbWidth={20}
             width="24"
             xmlns="http://www.w3.org/2000/svg"
@@ -343,10 +347,10 @@ exports[`PasswordField Component matches snapshot 1`] = `
               }
             >
               <RNSVGPath
-                d="M11.2328 1.25363C11.1166 1.02672 10.9399 0.836301 10.7224 0.70333C10.5049 0.57036 10.2549 0.5 9.99994 0.5C9.74499 0.5 9.49498 0.57036 9.27745 0.70333C9.05992 0.836301 8.88331 1.02672 8.76706 1.25363L1.14819 16.4914C1.04192 16.7023 0.991331 16.9368 1.00121 17.1727C1.0111 17.4087 1.08113 17.6381 1.20465 17.8394C1.32818 18.0406 1.5011 18.207 1.707 18.3226C1.91289 18.4382 2.14492 18.4993 2.38106 18.5H17.6188C17.8549 18.4993 18.087 18.4382 18.2929 18.3226C18.4988 18.207 18.6717 18.0406 18.7952 17.8394C18.9187 17.6381 18.9888 17.4087 18.9987 17.1727C19.0085 16.9368 18.958 16.7023 18.8517 16.4914L11.2328 1.25363Z"
+                d="M10 19C14.9706 19 19 14.9706 19 10C19 5.02944 14.9706 1 10 1C5.02944 1 1 5.02944 1 10C1 14.9706 5.02944 19 10 19Z"
                 fill={
                   {
-                    "payload": 4294097472,
+                    "payload": 4292238430,
                     "type": 0,
                   }
                 }
@@ -354,21 +358,17 @@ exports[`PasswordField Component matches snapshot 1`] = `
                   [
                     "fill",
                     "stroke",
-                    "strokeLinecap",
-                    "strokeLinejoin",
                   ]
                 }
                 stroke={
                   {
-                    "payload": 4294097472,
+                    "payload": 4291902269,
                     "type": 0,
                   }
                 }
-                strokeLinecap={1}
-                strokeLinejoin={1}
               />
               <RNSVGPath
-                d="M11.2986 5.41748L11.0615 12.7429H8.94271L8.70558 5.41748H11.2986ZM9.9995 16.1246C9.63177 16.1246 9.31559 15.994 9.05097 15.7328C8.78978 15.4716 8.65918 15.1554 8.65918 14.7843C8.65918 14.42 8.78978 14.109 9.05097 13.8512C9.31559 13.59 9.63177 13.4594 9.9995 13.4594C10.3535 13.4594 10.6645 13.59 10.9326 13.8512C11.2041 14.109 11.3398 14.42 11.3398 14.7843C11.3398 15.0317 11.2762 15.2568 11.1491 15.4596C11.0254 15.6624 10.8621 15.8239 10.6594 15.9442C10.46 16.0645 10.2401 16.1246 9.9995 16.1246Z"
+                d="M11.2984 4.64795L11.0613 11.97H8.94356L8.70653 4.64795H11.2984ZM9.99986 15.3502C9.6323 15.3502 9.31627 15.2196 9.05176 14.9585C8.79069 14.6975 8.66016 14.3814 8.66016 14.0104C8.66016 13.6463 8.79069 13.3354 9.05176 13.0778C9.31627 12.8167 9.6323 12.6862 9.99986 12.6862C10.3537 12.6862 10.6646 12.8167 10.9325 13.0778C11.2039 13.3354 11.3396 13.6463 11.3396 14.0104C11.3396 14.2578 11.276 14.4828 11.1489 14.6855C11.0253 14.8881 10.8621 15.0496 10.6594 15.1698C10.4602 15.29 10.2403 15.3502 9.99986 15.3502Z"
                 fill={
                   {
                     "payload": 4294375158,
@@ -384,9 +384,10 @@ exports[`PasswordField Component matches snapshot 1`] = `
             </RNSVGGroup>
           </RNSVGSvgView>
           <Text
+            strength="error"
             style={
               {
-                "color": "#FFAE00",
+                "color": "#F6F6F6",
                 "fontFamily": "Inter",
                 "fontSize": 8,
                 "fontWeight": "500",

@@ -1,11 +1,12 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
-import { renderHook, act, waitFor } from '@testing-library/react-native'
+import { act, renderHook, waitFor } from '@testing-library/react-native'
 import * as LocalAuthentication from 'expo-local-authentication'
 import * as SecureStore from 'expo-secure-store'
 import { getMasterEncryption } from 'pearpass-lib-vault'
 
 import { useBiometricsAuthentication } from './useBiometricsAuthentication'
+import { IOS_APP_GROUP_ID } from '../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
 import messages from '../locales/en/messages'
 import { logger } from '../utils/logger'
@@ -100,12 +101,12 @@ describe('useBiometricsAuthentication', () => {
         nonce: 'nonce',
         hashedPassword: 'hash'
       }),
-      { requireAuthentication: true }
+      { requireAuthentication: true, accessGroup: IOS_APP_GROUP_ID }
     )
     expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
       SECURE_STORAGE_KEYS.BIOMETRICS_ENABLED,
       JSON.stringify(true),
-      { accessGroup: undefined }
+      { accessGroup: IOS_APP_GROUP_ID }
     )
     expect(response).toEqual({ success: true })
     expect(result.current.isBiometricsEnabled).toBe(true)
@@ -178,7 +179,7 @@ describe('useBiometricsAuthentication', () => {
     expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
       SECURE_STORAGE_KEYS.BIOMETRICS_ENABLED,
       JSON.stringify(false),
-      { accessGroup: undefined }
+      { accessGroup: IOS_APP_GROUP_ID }
     )
     expect(response).toEqual({ success: true })
     expect(result.current.isBiometricsEnabled).toBe(false)

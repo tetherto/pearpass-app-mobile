@@ -71,6 +71,8 @@ exports[`Folder component renders active folder with check icon 1`] = `
       }
     >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           {
             "color": "#fff",
@@ -172,6 +174,8 @@ exports[`Folder component renders create new folder option without count 1`] = `
       }
     >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           {
             "color": "#fff",
@@ -259,6 +263,8 @@ exports[`Folder component renders folder correctly 1`] = `
       }
     >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           {
             "color": "#fff",

@@ -3,6 +3,7 @@ import { I18nProvider } from '@lingui/react'
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native'
 import { PASSPHRASE_WORD_COUNTS } from 'pearpass-lib-constants'
 import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import Toast from 'react-native-toast-message'
 
 import { PassPhrase } from '../'
 import messages from '../../../locales/en/messages'
@@ -32,6 +33,13 @@ jest.mock('pearpass-lib-ui-react-native-components', () => ({
   PassPhraseIcon: () => 'PassPhraseIcon',
   PasteFromClipboardIcon: () => 'PasteFromClipboardIcon',
   ErrorIcon: () => 'ErrorIcon'
+}))
+
+jest.mock('react-native-toast-message', () => ({
+  __esModule: true,
+  default: {
+    show: jest.fn()
+  }
 }))
 
 const renderWithProviders = (ui) =>
@@ -64,6 +72,7 @@ describe('PassPhrase component', () => {
     jest.clearAllMocks()
     mockCopyToClipboard.mockClear()
     mockPasteFromClipboard.mockClear()
+    Toast.show.mockClear()
   })
 
   describe('Basic rendering', () => {
@@ -72,7 +81,7 @@ describe('PassPhrase component', () => {
         <PassPhrase {...defaultProps} />
       )
 
-      expect(getByText('PassPhrase')).toBeTruthy()
+      expect(getByText('Recovery phrase')).toBeTruthy()
       expect(getByText('Copy')).toBeTruthy()
       expect(toJSON()).toMatchSnapshot()
     })
@@ -82,7 +91,7 @@ describe('PassPhrase component', () => {
         <PassPhrase {...defaultProps} isCreateOrEdit={true} />
       )
 
-      expect(getByText('PassPhrase')).toBeTruthy()
+      expect(getByText('Recovery phrase')).toBeTruthy()
       expect(getByText('Paste from clipboard')).toBeTruthy()
     })
 
@@ -247,21 +256,14 @@ describe('PassPhrase component', () => {
         (_, i) => `word${i + 1}`
       )
       const passphrase = words.join(' ')
-      const { getAllByText, queryByText } = renderWithProviders(
+      const { getAllByText } = renderWithProviders(
         <PassPhrase {...defaultProps} value={passphrase} />
       )
 
-      // The last word (word13) should not have a count number since it's random
       expect(getAllByText('word13')).toHaveLength(1)
-      expect(
-        queryByText(`#${PASSPHRASE_WORD_COUNTS.WITH_RANDOM_12}`)
-      ).toBeNull()
-      // All other words should have count numbers
-      for (let i = 1; i <= PASSPHRASE_WORD_COUNTS.STANDARD_12; i++) {
+      for (let i = 1; i <= PASSPHRASE_WORD_COUNTS.WITH_RANDOM_12; i++) {
         expect(getAllByText(`#${i}`)).toHaveLength(1)
       }
-      // The 13th word should not have a count (it's rendered as just the word)
-      // This test verifies that the random word doesn't show a count number
     })
 
     it('does not mark any word as random when withRandomWord is false', () => {
@@ -370,7 +372,9 @@ describe('PassPhrase component', () => {
     })
 
     it('calls pasteFromClipboard when paste button is pressed', async () => {
-      mockPasteFromClipboard.mockResolvedValue('pasted text')
+      const validPassphrase =
+        'word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12'
+      mockPasteFromClipboard.mockResolvedValue(validPassphrase)
 
       const mockOnChange = jest.fn()
       const { getByText } = renderWithProviders(
@@ -387,7 +391,7 @@ describe('PassPhrase component', () => {
 
       await waitFor(() => {
         expect(mockPasteFromClipboard).toHaveBeenCalled()
-        expect(mockOnChange).toHaveBeenCalledWith('pasted text')
+        expect(mockOnChange).toHaveBeenCalledWith(validPassphrase)
       })
     })
 
@@ -413,9 +417,41 @@ describe('PassPhrase component', () => {
       })
     })
 
+    it('shows error toast and does not call onChange when pasted recovery phrase has invalid word count', async () => {
+      const invalidPassphrase = 'word1 word2 word3 word4 word5'
+      mockPasteFromClipboard.mockResolvedValue(invalidPassphrase)
+
+      const mockOnChange = jest.fn()
+      const { getByText } = renderWithProviders(
+        <PassPhrase
+          {...defaultProps}
+          onChange={mockOnChange}
+          isCreateOrEdit={true}
+        />
+      )
+
+      await act(async () => {
+        fireEvent.press(getByText('Paste from clipboard'))
+      })
+
+      await waitFor(() => {
+        expect(mockPasteFromClipboard).toHaveBeenCalled()
+      })
+
+      await waitFor(() => {
+        expect(Toast.show).toHaveBeenCalledWith({
+          type: 'error',
+          text1: 'Only 12 or 24 words are allowed',
+          position: 'bottom',
+          bottomOffset: 100
+        })
+        expect(mockOnChange).not.toHaveBeenCalled()
+      })
+    })
+
     it('preserves exact input after paste and copy with complex passphrase', async () => {
       const complexPassphrase =
-        'Pizza8{-Jacket0_-Moon0^-Orange3.-Apple5%-Bicycle8;-Mountain7$-Lemon3}-Cat7+-House2+-Sunshine3|-Balloon9]-Star4|-Watch2%-Camera3_-Window0{-Plum3<-Guitar1[-Phone3&-Robot0|-Guava4#-Elephant2[-Pencil1^-Grape3*-Piano3{-Keyboard1}-River1$-Book3;-Chair4!-Dog5]-Glove2>-Computer9.-Tree0.-Lamp6[-Icecream5.-Mango5%'
+        'Pizza8{ Jacket0_ Moon0^ Orange3. Apple5% Bicycle8; Mountain7$ Lemon3} Cat7+ House2+ Sunshine3| Balloon9]'
 
       mockPasteFromClipboard.mockResolvedValue(complexPassphrase)
       mockCopyToClipboard.mockImplementation(() => Promise.resolve())

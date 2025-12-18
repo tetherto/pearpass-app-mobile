@@ -37,13 +37,13 @@ export const BottomSheetBlindPeersContent = ({ onClose, onConfirm }) => {
       try {
         setIsLoadingContext(true)
         await addDefaultBlindMirrors()
-
         Toast.show({
           type: 'baseToast',
           text1: t`Automatic Blind Peers enabled successfully`,
           position: 'bottom',
           bottomOffset: 100
         })
+        onConfirm({ blindPeerType: DEFAULT })
       } catch {
         Toast.show({
           type: 'baseToast',
@@ -51,9 +51,9 @@ export const BottomSheetBlindPeersContent = ({ onClose, onConfirm }) => {
           position: 'bottom',
           bottomOffset: 100
         })
+        onClose()
       } finally {
         setIsLoadingContext(false)
-        onConfirm({ blindPeerType: DEFAULT })
       }
     } else {
       setTimeout(() => {

@@ -1,4 +1,4 @@
-package com.pears.pass
+package com.noxtton.pearpass
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

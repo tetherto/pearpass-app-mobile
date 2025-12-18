@@ -1,5 +1,5 @@
 import * as FileSystem from 'expo-file-system'
-import { PearpassVaultClient } from 'pearpass-lib-vault-mobile'
+import { PearpassVaultClient } from 'pearpass-lib-vault-core'
 import { Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
 

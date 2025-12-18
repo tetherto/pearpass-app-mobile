@@ -1,4 +1,4 @@
-package com.pears.pass
+package com.noxtton.pearpass
 
 import android.content.BroadcastReceiver
 import android.content.ClipData
@@ -15,7 +15,7 @@ class ClipboardClearReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (context == null || intent?.action != "com.pears.pass.CLEAR_CLIPBOARD") {
+        if (context == null || intent?.action != "com.noxtton.pearpass.CLEAR_CLIPBOARD") {
             return
         }
 

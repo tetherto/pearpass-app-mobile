@@ -7,6 +7,7 @@ import {
   ShareIcon
 } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { ActivityIndicator } from 'react-native'
 
 import {
   SelectedListItemIconContainer,
@@ -27,6 +28,7 @@ import {
  *  onDeleteClick: () => void
  *  onPress: () => void
  *  isSelected?: boolean
+ *  isLoading?: boolean
  * }} props
  */
 export const ListItem = ({
@@ -37,11 +39,14 @@ export const ListItem = ({
   onDeleteClick,
   onPress,
   isSelected = false,
+  isLoading = false,
   ...restProps
 }) => (
   <ListItemContainer isSelected={isSelected} onPress={onPress} {...restProps}>
     <ListItemInfo>
-      {isSelected ? (
+      {isLoading ? (
+        <ActivityIndicator size="small" color={colors.primary400.mode1} />
+      ) : isSelected ? (
         <SelectedListItemIconContainer>
           <CheckIcon color={colors.black.mode1} size="21" />
         </SelectedListItemIconContainer>

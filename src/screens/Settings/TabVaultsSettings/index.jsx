@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { PROTECTED_VAULT_ENABLED } from 'pearpass-lib-constants'
 import { useVaults } from 'pearpass-lib-vault'
@@ -7,11 +9,14 @@ import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { ListItem } from '../../../components/ListItem'
 import { BottomSheetVaultAction } from '../../../containers/BottomSheetVaultAction'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
+import { sortAlphabetically } from '../../../utils/sortAlphabetically'
 
 export const TabVaultsSettings = () => {
   const { t } = useLingui()
   const { expand } = useBottomSheet()
   const { data } = useVaults()
+
+  const sortedVaults = useMemo(() => sortAlphabetically(data), [data])
 
   const handleVaultEditClick = (vaultId, vaultName) => {
     const snapPoints = PROTECTED_VAULT_ENABLED ? ['30%', '90%'] : ['20%', '90%']
@@ -27,7 +32,7 @@ export const TabVaultsSettings = () => {
   return (
     <CardSingleSetting title={t`Manage Vaults`}>
       <ManageVaultsContainer>
-        {data?.map((vault) => (
+        {sortedVaults?.map((vault) => (
           <ListItem
             key={vault.id}
             name={vault?.name ?? vault?.id}

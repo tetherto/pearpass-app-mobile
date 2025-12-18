@@ -65,13 +65,12 @@ export const AddDeviceModalContent = ({ onClose }) => {
     refetch: refetchVault
   } = useVault()
   const { createInvite, deleteInvite, data } = useInvite()
-  const { setShouldBypassAutoLock, shouldBypassAutoLock } = useAutoLockContext()
+  const { setShouldBypassAutoLock } = useAutoLockContext()
 
   const [svg, setSvg] = useState('')
   const [isProtected, setIsProtected] = useState(true)
 
   useEffect(() => {
-    
     const setup = async () => {
       setShouldBypassAutoLock(true)
       await createInvite()
@@ -80,7 +79,6 @@ export const AddDeviceModalContent = ({ onClose }) => {
     setup()
 
     return () => {
-      
       const cleanup = async () => {
         setShouldBypassAutoLock(false)
         await deleteInvite()

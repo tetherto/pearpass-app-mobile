@@ -1,4 +1,4 @@
-appId: com.pears.pass
+appId: com.noxtton.pearpass
 ---
 - runFlow: passwordEnter.yaml
 - assertVisible: 

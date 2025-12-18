@@ -1,6 +1,6 @@
 import { NativeModules } from 'react-native'
 
-import { getSharedDirectoryPath } from './appGroupHelper'
+import { getSharedDirectoryPath } from './AppGroupHelper'
 import { logger } from './logger'
 
 jest.mock('react-native', () => ({
