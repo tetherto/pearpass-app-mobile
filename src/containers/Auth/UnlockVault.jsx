@@ -119,13 +119,22 @@ export const UnlockVault = ({ vaultId }) => {
           </View>
 
           <View
-            testID="unlock-vault-actions-container" 
-            style={{ width: '100%', gap: 10 }}>
+            testID="unlock-vault-actions-container"
+            style={{ width: '100%', gap: 10 }}
+          >
             {isLoading ? (
-              <ActivityIndicator testID="unlock-vault-loading" size="small" color={colors.primary400.mode1} />
+              <ActivityIndicator
+                testID="unlock-vault-loading"
+                size="small"
+                color={colors.primary400.mode1}
+              />
             ) : (
               <>
-                <ButtonPrimary testID="unlock-vault-continue-button" stretch onPress={handleSubmit(onSubmit)}>
+                <ButtonPrimary
+                  testID="unlock-vault-continue-button"
+                  stretch
+                  onPress={handleSubmit(onSubmit)}
+                >
                   {t`Continue`}
                 </ButtonPrimary>
 

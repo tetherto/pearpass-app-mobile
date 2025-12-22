@@ -5,7 +5,6 @@ import { ExitIcon, FullBodyIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { closeAllInstances, useVault, useVaults } from 'pearpass-lib-vault'
 import { ActivityIndicator } from 'react-native'
-import { NAVIGATION_ROUTES } from 'src/constants/navigation'
 
 import {
   ActionsContainer,
@@ -21,9 +20,9 @@ import { useModal } from '../../context/ModalContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { ButtonThin } from '../../libComponents'
 import { clearAllFileCache } from '../../utils/filesCache'
+import { BottomSheetAddDeviceContent } from '../BottomSheetAddDeviceContent'
 import { BottomSheetFolderMenuContent } from '../BottomSheetFolderMenuContent'
 import { FolderList } from '../FolderList'
-import { AddDeviceModalContent } from '../Modal/AddDeviceModalContent'
 import { VaultPasswordFormModalContent } from '../Modal/VaultPasswordFormModalContent'
 
 /**
@@ -46,12 +45,17 @@ export const DrawerContent = ({ navigation }) => {
     refetch: refetchVault
   } = useVault()
 
-  const allVaults = useMemo(() => vaultsData || [], [vaultsData])
+  const filteredVaults = useMemo(
+    () => vaultsData?.filter((vault) => vault?.id !== vaultData?.id),
+    [vaultsData, vaultData]
+  )
 
   const addDevice = () => {
-    openModal(<AddDeviceModalContent onClose={closeModal} />)
-
     navigation.closeDrawer()
+    expand({
+      children: <BottomSheetAddDeviceContent />,
+      snapPoints: ['10%', '85%', '85%']
+    })
   }
 
   const handleUnlockVault = async ({ vault, password }) => {
@@ -115,26 +119,9 @@ export const DrawerContent = ({ navigation }) => {
     }
   }
 
-  const handleCreateVault = () => {
-    const rootNavigation = navigation.getParent()?.getParent()
-    if (rootNavigation) {
-      rootNavigation.navigate('Welcome', {
-        state: NAVIGATION_ROUTES.CREDENTIALS
-      })
-    }
-    navigation.closeDrawer()
-  }
-
   return (
     <DrawerContainer>
-      <DrawerTitle>{t`Folder & Vault`}</DrawerTitle>
-      <DropdownSwapVault
-        onVaultSwap={swapVault}
-        onCreateVault={handleCreateVault}
-        vaults={allVaults}
-        selectedVault={vaultData}
-      />
-
+      <DrawerTitle>{t`Folder`}</DrawerTitle>
       <ScrollContainer>
         <ScrollView>
           <FolderList
@@ -153,6 +140,11 @@ export const DrawerContent = ({ navigation }) => {
         </ScrollView>
       </ScrollContainer>
       <ActionsContainer>
+        <DropdownSwapVault
+          onVaultSwap={swapVault}
+          vaults={filteredVaults}
+          selectedVault={vaultData}
+        />
         <ButtonThin onPress={addDevice} startIcon={FullBodyIcon}>
           {t`Add Device`}
         </ButtonThin>

@@ -72,9 +72,13 @@ export const LoadVault = () => {
         >
           <View style={styles.formContainer}>
             <View style={{ marginBottom: 20, alignItems: 'center', gap: 10 }}>
-              <Text style={styles.title} testID="load-vault-title">{t`Load an existing Vault`}</Text>
               <Text
-                style={styles.subtitle} testID="load-vault-subtitle"
+                style={styles.title}
+                testID="load-vault-title"
+              >{t`Load an existing Vault`}</Text>
+              <Text
+                style={styles.subtitle}
+                testID="load-vault-subtitle"
               >{t`Open your vault with this code`}</Text>
             </View>
 
@@ -96,7 +100,11 @@ export const LoadVault = () => {
                     size="small"
                     color={colors.primary400.mode1}
                   />
-                  <ButtonSecondary testID="load-vault-cancel-pairing-button" stretch onPress={cancelPairActiveVault}>
+                  <ButtonSecondary
+                    testID="load-vault-cancel-pairing-button"
+                    stretch
+                    onPress={cancelPairActiveVault}
+                  >
                     {t`Cancel Pairing`}
                   </ButtonSecondary>
                 </>
