@@ -7,7 +7,7 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(getSharedDirectoryPath:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-  NSString *appGroupId = @"group.com.noxtton.pearpass";
+  NSString *appGroupId = @"group.com.pears.pass";
   NSURL *containerURL = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupId];
   
   if (containerURL) {

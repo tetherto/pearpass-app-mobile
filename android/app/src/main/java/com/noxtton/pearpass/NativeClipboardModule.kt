@@ -1,4 +1,4 @@
-package com.noxtton.pearpass
+package com.pears.pass
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -171,7 +171,7 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
             val context = reactApplicationContext
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            val intent = Intent("com.noxtton.pearpass.CLEAR_CLIPBOARD").apply {
+            val intent = Intent("com.pears.pass.CLEAR_CLIPBOARD").apply {
                 setPackage(context.packageName)
                 putExtra("text_to_match", text)
             }
@@ -211,7 +211,7 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
             val context = reactApplicationContext
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            val intent = Intent("com.noxtton.pearpass.CLEAR_CLIPBOARD").apply {
+            val intent = Intent("com.pears.pass.CLEAR_CLIPBOARD").apply {
                 setPackage(context.packageName)
             }
 

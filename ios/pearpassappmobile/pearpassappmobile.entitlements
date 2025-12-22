@@ -6,7 +6,7 @@
     <true/>
     <key>com.apple.security.application-groups</key>
     <array>
-      <string>group.com.noxtton.pearpass</string>
+      <string>group.com.pears.pass</string>
     </array>
   </dict>
 </plist>

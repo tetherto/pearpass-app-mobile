@@ -1,4 +1,4 @@
-package com.noxtton.pearpass.autofill.ui;
+package com.pears.pass.autofill.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,9 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.biometric.BiometricManager;
 import androidx.fragment.app.FragmentActivity;
 
-import com.noxtton.pearpass.R;
-import com.noxtton.pearpass.autofill.data.PearPassVaultClient;
-import com.noxtton.pearpass.autofill.utils.BiometricAuthHelper;
+import com.pears.pass.R;
+import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.BiometricAuthHelper;
 import android.util.Log;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.noxtton.pearpass.autofill.data;
+package com.pears.pass.autofill.data;
 
 public class VaultItem {
     private String id;

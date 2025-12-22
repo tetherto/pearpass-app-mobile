@@ -56,7 +56,7 @@
         android:name=".ClipboardClearReceiver"
         android:exported="false">
       <intent-filter>
-        <action android:name="com.noxtton.pearpass.CLEAR_CLIPBOARD" />
+        <action android:name="com.pears.pass.CLEAR_CLIPBOARD" />
       </intent-filter>
     </receiver>
   </application>
