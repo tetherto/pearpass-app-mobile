@@ -332,14 +332,14 @@ export const OnboardingContainer = ({
         testID="onboarding-continue-button"
         accessibilityLabel="onboarding-continue-button"
         onPress={onContinue} style={styles.continueButton}>
-          <Text testID="onboarding-continue-text" style={styles.continueButtonText}>{t`Continue`}</Text>
+          <Text testID="onboarding-continue-text" accessibilityLabel="onboarding-continue-text" style={styles.continueButtonText}>{t`Continue`}</Text>
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
           <TouchableOpacity 
           testID="onboarding-skip-button"
           accessibilityLabel="onboarding-skip-button"
           onPress={onSkip} style={styles.skipButton}>
-            <Text testID="onboarding-skip-text" style={styles.skipButtonText}>{t`Skip`}</Text>
+            <Text testID="onboarding-skip-text" accessibilityLabel="onboarding-skip-text" style={styles.skipButtonText}>{t`Skip`}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -387,17 +387,17 @@ export const OnboardingContainer = ({
         accessibilityLabel="onboarding-bottom-section"
         style={styles.bottomSection}>
           <Text 
-          testID="onboarding-main-description"
-          nativeID="onboarding-main-description"
-          accessibilityLabel="onboarding-main-description"
+          testID={`onboarding-main-description-${currentStep}`}
+          nativeID={`onboarding-main-description-${currentStep}`}
+          accessibilityLabel={`onboarding-main-description-${currentStep}`}
           style={styles.descriptionText}>{mainDescription}</Text>
 
           {getSubDescriptionContent() && (
             <View style={styles.subDescriptionWrapper}>
               <Text style={styles.subDescriptionText}
-                testID="onboarding-sub-description"
-                nativeID="onboarding-sub-description"
-                accessibilityLabel="onboarding-sub-description"
+                testID={`onboarding-sub-description-${currentStep}`}
+                nativeID={`onboarding-sub-description-${currentStep}`}
+                accessibilityLabel={`onboarding-sub-description-${currentStep}`}
               >
                 {getSubDescriptionContent()}
               </Text>

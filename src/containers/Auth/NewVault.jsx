@@ -96,6 +96,7 @@ export const NewVault = () => {
   return (
     <KeyboardAvoidingView
       testID="new-vault-screen"
+      accessibilityLabel="new-vault-screen"
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
@@ -114,15 +115,16 @@ export const NewVault = () => {
         >
           <View style={styles.formContainer}>
             <View style={styles.headerBlock}>
-              <Text style={styles.title}testID="new-vault-title">{t`Create New Vault`}</Text>
+              <Text style={styles.title} testID="new-vault-title" accessibilityLabel="new-vault-title">{t`Create New Vault`}</Text>
               <Text
-                style={styles.subtitle} testID="new-vault-subtitle"
+                style={styles.subtitle} testID="new-vault-subtitle" accessibilityLabel="new-vault-subtitle"
               >{t`Create your first vault by giving it a name. You can also add a password to secure this vault for extra protection.`}</Text>
             </View>
 
             <View style={styles.inputs}>
               <InputPasswordPearPass
                 testID="new-vault-name-input"
+                accessibilityLabel="new-vault-name-input"
                 placeholder={t`Enter Name`}
                 {...register('name')}
               />
@@ -147,6 +149,7 @@ export const NewVault = () => {
                   >
                     <ButtonLittle
                       testID="new-vault-toggle-password-section"
+                      accessibilityLabel="new-vault-toggle-password-section"
                       onPress={toggle}
                       variant="secondary"
                       borderRadius="lg"
@@ -164,6 +167,7 @@ export const NewVault = () => {
                 >
                   <InputPasswordPearPass
                     testID="new-vault-password-input"
+                    accessibilityLabel="new-vault-password-input"
                     placeholder={t`Enter Password`}
                     {...register('password')}
                     isPassword
@@ -173,6 +177,7 @@ export const NewVault = () => {
                     <Text style={styles.label}>{t`Repeat Vault password`}</Text>
                     <InputPasswordPearPass
                       testID="new-vault-confirm-password-input"
+                      accessibilityLabel="new-vault-confirm-password-input"
                       placeholder={t`Confirm Password`}
                       {...register('passwordConfirm')}
                       isPassword
@@ -185,22 +190,24 @@ export const NewVault = () => {
               {isLoading ? (
                 <ActivityIndicator
                   testID="new-vault-loading"
+                  accessibilityLabel="new-vault-loading"
                   size="small"
                   color={colors.primary400.mode1}
                 />
               ) : (
                 <>
-                  <ButtonPrimary testID="new-vault-continue-button" stretch onPress={handleSubmit(onSubmit)}>
-                    {t`Continue`}
+                  <ButtonPrimary testID="new-vault-continue-button" accessibilityLabel="new-vault-continue-button" stretch onPress={handleSubmit(onSubmit)}>
+                    <Text testID="new-vault-continue-text" accessibilityLabel="new-vault-continue-text">{t`Continue`}</Text>
                   </ButtonPrimary>
                   <ButtonSecondary
                     testID="new-vault-select-vaults-button"
+                    accessibilityLabel="new-vault-select-vaults-button"
                     stretch
                     onPress={() =>
                       navigation.navigate('Welcome', { state: 'selectOrLoad' })
                     }
                   >
-                    {t`Select Vaults`}
+                    <Text testID="new-vault-select-vaults-text" accessibilityLabel="new-vault-select-vaults-text">{t`Select Vaults`}</Text>
                   </ButtonSecondary>
                 </>
               )}
