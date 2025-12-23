@@ -1,0 +1,32 @@
+node_modules/
+
+# Local app files
+apps/**/*.apk
+apps/**/*.ipa
+
+# Logs
+logs/
+*.log
+
+# Screenshots
+screenshots/
+error-shots/
+
+# Allure results
+allure-results/
+allure-report/
+
+# Environment files
+.env
+*.env.local
+*.env.qa
+
+# TypeScript build caches
+*.tsbuildinfo
+
+# MacOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

@@ -83,7 +83,7 @@ describe('handleChooseFile', () => {
     })
 
     const onFileSelect = jest.fn()
-    await handleChooseFile(onFileSelect, true)
+    await handleChooseFile(onFileSelect, null, true)
 
     expect(DocumentPicker.getDocumentAsync).toHaveBeenCalledWith({
       type: 'image/*',

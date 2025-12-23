@@ -42,7 +42,7 @@ export const EmptyCollectionView = ({ selectedRecordType }) => {
           type: CREDIT_CARD
         },
         { text: t`Create a Wi-Fi password`, type: WIFI_PASSWORD },
-        { text: t`Save a PassPhrase`, type: PASS_PHRASE },
+        { text: t`Save a Recovery phrase`, type: PASS_PHRASE },
         { text: t`Create a note`, type: NOTE },
         { text: t`Create a custom element`, type: CUSTOM }
       ].filter(

@@ -39,9 +39,9 @@ export const useRecordMenuItems = ({ exclude } = {}) => {
           description: t`Keep your Wi-Fi name and password safe.`
         },
         {
-          name: t`PassPhrase`,
+          name: t`Recovery phrase`,
           type: RECORD_TYPES.PASS_PHRASE,
-          description: t`Securely store app passphrases.`
+          description: t`Securely store app recovery phrases.`
         },
         {
           name: t`Identities`,

@@ -15,7 +15,13 @@ i18n.activate('en')
 jest.mock('expo-camera', () => ({
   Camera: {
     requestCameraPermissionsAsync: jest.fn(),
+    getCameraPermissionsAsync: jest.fn(),
     scanFromURLAsync: jest.fn()
+  },
+  PermissionStatus: {
+    GRANTED: 'granted',
+    DENIED: 'denied',
+    UNDETERMINED: 'undetermined'
   }
 }))
 
@@ -38,6 +44,11 @@ describe('useQRScanner', () => {
     onError = jest.fn()
     jest.clearAllMocks()
     jest.useFakeTimers()
+    // Default mock for getCameraPermissionsAsync
+    Camera.getCameraPermissionsAsync.mockResolvedValue({
+      status: 'granted',
+      canAskAgain: true
+    })
   })
 
   afterEach(() => {
@@ -46,6 +57,10 @@ describe('useQRScanner', () => {
   })
 
   it('should request and grant camera permission', async () => {
+    Camera.getCameraPermissionsAsync.mockResolvedValue({
+      status: 'granted',
+      canAskAgain: true
+    })
     Camera.requestCameraPermissionsAsync.mockResolvedValue({
       status: 'granted',
       canAskAgain: true
@@ -66,6 +81,10 @@ describe('useQRScanner', () => {
   })
 
   it('should deny camera permission and show alert', async () => {
+    Camera.getCameraPermissionsAsync.mockResolvedValue({
+      status: 'denied',
+      canAskAgain: false
+    })
     Camera.requestCameraPermissionsAsync.mockResolvedValue({
       status: 'denied',
       canAskAgain: false

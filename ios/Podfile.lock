@@ -1,5 +1,5 @@
 PODS:
-  - "BareKit (0.9.2+2ec1e3)"
+  - "BareKit (0.9.2+8f94c6)"
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
   - EXAV (15.1.7):
@@ -1427,7 +1427,7 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - "react-native-bare-kit (0.9.2+2ec1e3)":
+  - "react-native-bare-kit (0.9.2+8f94c6)":
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2532,7 +2532,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  BareKit: ba1c208f9ce9082dc42686e0c196c0c6b16c13f5
+  BareKit: 1ff90c5896c0ddddf93570188699e97707d911f3
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   EXAV: ae28256069c4cdde93d185c007d8f68d92902c2e
@@ -2592,7 +2592,7 @@ SPEC CHECKSUMS:
   React-logger: 85fa3509931497c72ccd2547fcc91e7299d8591e
   React-Mapbuffer: 96a2f2a176268581733be182fa6eebab1c0193be
   React-microtasksnativemodule: bda561d2648e1e52bd9e5a87f8889836bdbde2e2
-  react-native-bare-kit: 55733fac78913b363c87e7474a352e77b1c131ad
+  react-native-bare-kit: 664ff8bc64fe4b4a4e5595f31207fcb694eb9cc0
   react-native-config: f1dde39f8468ad922fc7e8bd4308c8e6223d5ee8
   react-native-safe-area-context: 562163222d999b79a51577eda2ea8ad2c32b4d06
   react-native-slider: 5d7e61470399d2bfb0c9682a8d8ea10214e7eda1

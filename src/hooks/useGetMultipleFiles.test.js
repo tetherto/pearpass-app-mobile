@@ -2,6 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react-native'
 import { vaultGetFile } from 'pearpass-lib-vault'
 
 import { useGetMultipleFiles } from './useGetMultipleFiles'
+import { clearAllFileCache } from '../utils/filesCache'
 import { logger } from '../utils/logger'
 
 jest.mock('pearpass-lib-vault', () => ({
@@ -11,6 +12,19 @@ jest.mock('pearpass-lib-vault', () => ({
 jest.mock('../utils/logger', () => ({
   logger: { error: jest.fn() }
 }))
+
+const mockSetIsLoading = jest.fn()
+jest.mock('../context/LoadingContext', () => ({
+  useLoadingContext: () => ({
+    setIsLoading: mockSetIsLoading,
+    isLoading: false
+  })
+}))
+
+// Mock requestIdleCallback and cancelIdleCallback
+global.requestIdleCallback = (callback) =>
+  setTimeout(() => callback({ didTimeout: false, timeRemaining: () => 50 }), 0)
+global.cancelIdleCallback = (id) => clearTimeout(id)
 
 describe('useGetMultipleFiles', () => {
   const mockUpdateValues = jest.fn()
@@ -27,6 +41,8 @@ describe('useGetMultipleFiles', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSetIsLoading.mockClear()
+    clearAllFileCache() // Clear file cache between tests
   })
 
   it('fetches files for each field and calls updateValues', async () => {
@@ -72,6 +88,7 @@ describe('useGetMultipleFiles', () => {
 
   it('logs error if getFile throws', async () => {
     vaultGetFile.mockRejectedValueOnce(new Error('fail'))
+    vaultGetFile.mockRejectedValueOnce(new Error('fail2'))
 
     await renderHook(() =>
       useGetMultipleFiles({
@@ -82,11 +99,11 @@ describe('useGetMultipleFiles', () => {
     )
 
     await waitFor(() => {
+      // Promise.allSettled handles rejections per-file, logging each error individually
       expect(logger.error).toHaveBeenCalledWith(
-        'Error retrieving files:',
-        expect.any(Error)
+        expect.stringContaining('Error loading file'),
+        expect.anything()
       )
-      expect(mockUpdateValues).not.toHaveBeenCalled()
     })
   })
 

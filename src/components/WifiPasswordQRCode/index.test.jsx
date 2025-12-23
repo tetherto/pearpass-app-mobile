@@ -156,7 +156,7 @@ describe('WifiPasswordQRCode', () => {
       })
     })
 
-    it('URL encodes special characters in SSID and password', async () => {
+    it('uses special characters in SSID and password', async () => {
       const mockSvgString = '<svg>mock-qr-code</svg>'
       generateQRCodeSVG.mockResolvedValue(mockSvgString)
 
@@ -167,7 +167,7 @@ describe('WifiPasswordQRCode', () => {
 
       await waitFor(() => {
         expect(generateQRCodeSVG).toHaveBeenCalledWith(
-          'WIFI:T:WPA;S:WiFi%20Network%20%26%20More;P:pass%40word%23123;H:false;;',
+          'WIFI:T:WPA;S:WiFi Network & More;P:pass@word#123;H:false;;',
           { type: 'svg', margin: 0 }
         )
       })

@@ -1,5 +1,5 @@
 import * as FileSystem from 'expo-file-system'
-import { PearpassVaultClient } from 'pearpass-lib-vault-mobile'
+import { PearpassVaultClient } from 'pearpass-lib-vault-core'
 import { Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
 
@@ -18,7 +18,7 @@ jest.mock('react-native-bare-kit', () => ({
   }))
 }))
 
-jest.mock('pearpass-lib-vault-mobile', () => ({
+jest.mock('pearpass-lib-vault-core', () => ({
   PearpassVaultClient: jest.fn()
 }))
 
@@ -38,7 +38,7 @@ jest.mock(
     virtual: true
   }
 )
-jest.mock('../utils/appGroupHelper.js', () => ({
+jest.mock('../utils/AppGroupHelper.js', () => ({
   getSharedDirectoryPath: jest.fn().mockResolvedValue('/test-dir')
 }))
 

@@ -1,7 +1,7 @@
 import { useLingui } from '@lingui/react/macro'
 import { PASSPHRASE_TYPE_OPTIONS } from 'pearpass-lib-constants'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 
 import { AppSwitch } from '../../components/AppSwitch/AppSwitch'
 import { RadioSelect } from '../../components/RadioSelect'
@@ -24,22 +24,6 @@ export const PassPhraseSettings = ({
 }) => {
   const { t } = useLingui()
 
-  const getSwitchStyle = () => {
-    if (Platform.OS === 'android') {
-      return {
-        transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
-        width: 32
-      }
-    }
-    if (Platform.OS === 'ios' && parseInt(Platform.Version, 10) >= 26) {
-      return {
-        width: 65,
-        padding: 1.5
-      }
-    }
-
-    return {}
-  }
   return (
     <View style={styles.passPraseSettingsContainer}>
       <RadioSelect
@@ -65,7 +49,6 @@ export const PassPhraseSettings = ({
           value={withRandomWord}
           onChange={(value) => setWithRandomWord(value)}
           disabled={isDisabled}
-          style={getSwitchStyle()}
         />
       </View>
     </View>

@@ -1,45 +1,42 @@
 import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { APP_STORE_URL, PLAY_STORE_URL } from 'pearpass-lib-constants'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import { View, Text, StyleSheet, Platform, Linking } from 'react-native'
 
+import { VERSION_CHECK_CONFIG } from '../../../constants/versionCheck'
 import { ButtonPrimary } from '../../../libComponents'
 
 export const UpdateModalContent = ({}) => {
   const { t } = useLingui()
-  const [timeLeft, setTimeLeft] = useState(120)
+  const [timeLeft, setTimeLeft] = useState(
+    VERSION_CHECK_CONFIG.REDIRECT_TIMER_SECONDS
+  )
 
   const handleNavigation = () => {
-    // TODO: Add links once app is released in stores
     if (Platform.OS === 'ios') {
-      // iOS App Store link
-      //   Linking.openURL('')
+      Linking.openURL(APP_STORE_URL)
     } else {
-      // Android Google Play link
-      //   Linking.openURL('')
+      Linking.openURL(PLAY_STORE_URL)
     }
   }
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      handleNavigation()
-      return
-    }
-
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(timer)
           handleNavigation()
-          return 0
+          setTimeLeft(VERSION_CHECK_CONFIG.REDIRECT_TIMER_SECONDS)
+          return VERSION_CHECK_CONFIG.REDIRECT_TIMER_SECONDS
         }
         return prevTime - 1
       })
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [timeLeft])
+  }, [])
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60)

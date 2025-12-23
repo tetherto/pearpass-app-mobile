@@ -7,6 +7,7 @@ import {
   ButtonSecondary
 } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider'
+import { useUserData, useVaults } from 'pearpass-lib-vault/src'
 import { Text, View, StyleSheet } from 'react-native'
 
 import { ButtonBiometricLogin } from '../../components/ButtonBiometricLogin'
@@ -21,11 +22,14 @@ import { InputPasswordPearPass } from '../../libComponents/InputPasswordPearPass
 export const BottomSheetMasterPassword = ({ onClose, onConfirm }) => {
   const { t } = useLingui()
 
+  const { logIn } = useUserData()
+  const { initVaults } = useVaults()
+
   const schema = Validator.object({
     password: Validator.string().required(t`Password is required`)
   })
 
-  const { register, handleSubmit, setErrors } = useForm({
+  const { register, handleSubmit, setErrors, values } = useForm({
     initialValues: {
       password: ''
     },
@@ -34,7 +38,9 @@ export const BottomSheetMasterPassword = ({ onClose, onConfirm }) => {
 
   const submit = async (values) => {
     try {
-      await onConfirm({ password: values.password })
+      await logIn({ password: values.password })
+
+      await onConfirm()
     } catch (error) {
       setErrors({
         password: typeof error === 'string' ? error : t`Invalid password`
@@ -44,6 +50,13 @@ export const BottomSheetMasterPassword = ({ onClose, onConfirm }) => {
 
   const handleBiometricLogin = async (encryptionData) => {
     if (!encryptionData) {
+      return
+    }
+
+    try {
+      const { ciphertext, nonce, hashedPassword } = encryptionData
+      await initVaults({ ciphertext, nonce, hashedPassword })
+    } catch {
       return
     }
 
@@ -77,7 +90,11 @@ export const BottomSheetMasterPassword = ({ onClose, onConfirm }) => {
         <ButtonBiometricLogin onBiometricLogin={handleBiometricLogin} />
 
         <View style={styles.buttonContainer}>
-          <ButtonPrimary onPress={handleSubmit(submit)} stretch>
+          <ButtonPrimary
+            disabled={!values.password}
+            onPress={handleSubmit(submit)}
+            stretch
+          >
             {t`Export`}
           </ButtonPrimary>
           <ButtonSecondary onPress={handleCancel} stretch>

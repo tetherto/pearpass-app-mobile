@@ -28,30 +28,50 @@ export const ArrowIconWrapper = styled.View`
 
 export const DropdownWrapper = styled(Animated.View)`
   overflow: hidden;
-  position: absolute;
-  border-top-right-radius: 20px;
-  border-top-left-radius: 20px;
-  padding: 0 10px;
-  bottom: 100%;
-  width: 98%;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+
+  width: 100%;
   background-color: ${({ theme }) => theme.colors.black.mode1};
-  margin-bottom: -30px;
-  padding-bottom: 30px;
-  z-index: 1;
+  margin-top: -10px;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
 `
 
 export const Dropdown = styled.View`
-  padding: 5px;
-  max-height: 110px;
+  max-height: 143px;
   width: 100%;
+  margin-top: 10px;
 `
 
 export const DropdownItem = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  gap: 10px;
-  padding: 10px 15px;
-  border-top-width: 1px;
-  border-top-color: ${({ theme, isFirst }) =>
-    !isFirst ? theme.colors.grey100.mode1 : 'transparent'};
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background-color: ${({ theme }) => theme.colors.grey500.mode1};
+`
+
+export const DropdownItemText = styled.Text`
+  color: ${({ theme }) => theme.colors.white.mode1};
+  font-size: 16px;
+  font-weight: 700;
+`
+
+export const CreateVaultButton = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.colors.grey500.mode1};
+`
+
+export const CreateVaultText = styled.Text`
+  color: ${({ theme }) => theme.colors.primary400.mode1};
+  font-size: 14px;
+  font-weight: 700;
 `

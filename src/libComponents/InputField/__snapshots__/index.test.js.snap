@@ -41,25 +41,26 @@ exports[`InputField Component matches snapshot 1`] = `
 >
   <View
     style={
-      {
-        "alignItems": "center",
-        "flexDirection": "row",
-        "gap": 15,
-        "paddingBottom": 20,
-        "paddingLeft": 12,
-        "paddingRight": 10,
-        "paddingTop": 20,
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "gap": 15,
+        },
+        {
+          "paddingBottom": 20,
+          "paddingLeft": 12,
+          "paddingRight": 10,
+          "paddingTop": 20,
+        },
+      ]
     }
-    withBelowContent={false}
   >
     <View
       style={
         {
-          "flexBasis": 0,
+          "flex": 1,
           "flexDirection": "column",
-          "flexGrow": 1,
-          "flexShrink": 1,
         }
       }
     >
@@ -80,33 +81,36 @@ exports[`InputField Component matches snapshot 1`] = `
       <View
         style={
           {
-            "flexBasis": 0,
-            "flexGrow": 1,
-            "flexShrink": 1,
+            "flex": 1,
             "marginTop": 5,
             "minHeight": 29,
-            "position": "relative",
           }
         }
       >
         <TextInput
           accessible={true}
           editable={true}
-          isTransparent={true}
+          ellipsizeMode="tail"
           keyboardType="default"
+          numberOfLines={1}
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
           placeholder="Enter snapshot"
           placeholderTextColor="#BABABA"
+          pointerEvents="auto"
           secureTextEntry={true}
           style={
-            {
-              "color": "transparent",
-              "fontFamily": "Inter",
-              "fontSize": 20,
-              "fontWeight": "700",
-            }
+            [
+              {
+                "fontFamily": "Inter",
+                "fontSize": 20,
+                "fontWeight": "700",
+              },
+              {
+                "color": "transparent",
+              },
+            ]
           }
           value="snapshot value"
         />
@@ -114,12 +118,10 @@ exports[`InputField Component matches snapshot 1`] = `
           pointerEvents="none"
           style={
             {
-              "alignItems": "start",
+              "alignItems": "flex-start",
               "bottom": 0,
-              "flexBasis": 0,
+              "flex": 1,
               "flexDirection": "row",
-              "flexGrow": 1,
-              "flexShrink": 1,
               "left": 0,
               "overflow": "hidden",
               "position": "absolute",

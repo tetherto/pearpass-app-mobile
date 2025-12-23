@@ -50,3 +50,5 @@ yalc.lock
 .env
 
 bundles/
+
+src/locales/

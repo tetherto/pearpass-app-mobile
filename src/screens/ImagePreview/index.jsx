@@ -1,16 +1,19 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { shareAsync } from 'expo-sharing'
 import {
   BackIcon,
   DeleteIcon,
   ShareIcon
 } from 'pearpass-lib-ui-react-native-components'
-import { View, Platform, Share, Text, Image, StyleSheet } from 'react-native'
+import { View, Share, Text, Image, StyleSheet } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { useTheme } from 'styled-components/native'
 
 import { withAutoLockBypass } from '../../HOCs'
 import { ButtonLittle } from '../../libComponents'
+import { convertDataUriToFileUri } from '../../utils/convertDataUriToFileUri'
+import { getMimeType } from '../../utils/getMimeType'
 
 export const ImagePreview = withAutoLockBypass(({ route }) => {
   const { t } = useLingui()
@@ -27,35 +30,32 @@ export const ImagePreview = withAutoLockBypass(({ route }) => {
 
   const handleShare = async () => {
     try {
-      let shareOptions = {}
-
-      if (Platform.OS === 'ios') {
-        shareOptions = {
-          title: imageName || 'Share Image',
-          url: imageUri,
-          subject: imageName || 'Image'
-        }
+      if (imageUri?.startsWith('data:')) {
+        const fileUri = await convertDataUriToFileUri(
+          imageUri,
+          imageName || 'image.jpg'
+        )
+        await shareAsync(fileUri, {
+          mimeType: getMimeType(imageName),
+          dialogTitle: 'Share Image'
+        })
+      } else if (imageUri?.startsWith('file://')) {
+        await shareAsync(imageUri, {
+          mimeType: getMimeType(imageName),
+          dialogTitle: 'Share Image'
+        })
       } else {
-        shareOptions = {
+        await Share.share({
           title: imageName || 'Share Image',
-          message: `${imageName || 'Image'}\n\n`
-        }
-
-        if (imageUri.startsWith('http://') || imageUri.startsWith('https://')) {
-          shareOptions.message += imageUri
-        }
-      }
-
-      const result = await Share.share(shareOptions)
-
-      if (result.action === Share.sharedAction) {
-        Toast.show({
-          type: 'baseToast',
-          text1: t`Shared successfully!`,
-          position: 'bottom',
-          bottomOffset: 100
+          message: `${imageName || 'Image'}\n\n${imageUri}`
         })
       }
+      Toast.show({
+        type: 'baseToast',
+        text1: t`Shared successfully!`,
+        position: 'bottom',
+        bottomOffset: 100
+      })
     } catch {
       Toast.show({
         type: 'baseToast',

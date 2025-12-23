@@ -60,8 +60,8 @@ export const CreateOrEditPassphraseContent = ({
 
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
-    passPhrase: Validator.string().required(t`Passphrase is required`),
-    comment: Validator.string(),
+    passPhrase: Validator.string().required(t`Recovery phrase is required`),
+    note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
         note: Validator.string().required(t`Note is required`)

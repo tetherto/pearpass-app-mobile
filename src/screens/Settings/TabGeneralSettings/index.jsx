@@ -7,7 +7,6 @@ import {
   sendSlackFeedback
 } from 'pear-apps-lib-feedback'
 import { Platform } from 'react-native'
-import { logger } from 'react-native-reanimated/lib/typescript/logger'
 import Toast from 'react-native-toast-message'
 
 import { DeviceSection } from './DeviceSection'
@@ -25,6 +24,7 @@ import {
 import { ModifyMasterVaultModalContent } from '../../../containers/Modal/ModifyMasterVaultModalContent'
 import { useModal } from '../../../context/ModalContext'
 import { useLanguageOptions } from '../../../hooks/useLanguageOptions'
+import { logger } from '../../../utils/logger'
 
 export const TabGeneralSettings = () => {
   const { t } = useLingui()

@@ -33,7 +33,7 @@ exports[`PassPhrase component Basic rendering renders correctly with default pro
         }
       }
     >
-      PassPhrase
+      Recovery phrase
     </Text>
   </View>
   <View

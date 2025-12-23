@@ -20,9 +20,9 @@ import { useModal } from '../../context/ModalContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { ButtonThin } from '../../libComponents'
 import { clearAllFileCache } from '../../utils/filesCache'
+import { BottomSheetAddDeviceContent } from '../BottomSheetAddDeviceContent'
 import { BottomSheetFolderMenuContent } from '../BottomSheetFolderMenuContent'
 import { FolderList } from '../FolderList'
-import { AddDeviceModalContent } from '../Modal/AddDeviceModalContent'
 import { VaultPasswordFormModalContent } from '../Modal/VaultPasswordFormModalContent'
 
 /**
@@ -51,9 +51,11 @@ export const DrawerContent = ({ navigation }) => {
   )
 
   const addDevice = () => {
-    openModal(<AddDeviceModalContent onClose={closeModal} />)
-
     navigation.closeDrawer()
+    expand({
+      children: <BottomSheetAddDeviceContent />,
+      snapPoints: ['10%', '85%', '85%']
+    })
   }
 
   const handleUnlockVault = async ({ vault, password }) => {

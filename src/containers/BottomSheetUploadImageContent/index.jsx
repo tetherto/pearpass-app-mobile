@@ -58,6 +58,10 @@ export const BottomSheetUploadImageContent = withAutoLockBypass(
             return
           }
 
+          if (isFileSizeWarning) {
+            setIsFileSizeWarning(false)
+          }
+
           onFileSelect?.({
             name: file.fileName,
             base64: file.base64
@@ -77,6 +81,11 @@ export const BottomSheetUploadImageContent = withAutoLockBypass(
           })
 
           setCapturedPhoto(photo)
+
+          if (isFileSizeWarning) {
+            setIsFileSizeWarning(false)
+          }
+
           setMode('preview')
         } catch (e) {
           logger.error('Error taking photo:', e)
