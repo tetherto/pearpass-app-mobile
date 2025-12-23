@@ -102,15 +102,14 @@ export const EnterPassword = () => {
   }
 
   return (
-    <View style={styles.container} testID="enter-password-screen">
+    <View style={styles.container}>
       {!isKeyboardVisible && (
-        <View style={styles.logoContainer} testID="enter-password-logo">
+        <View style={styles.logoContainer}>
           <LogoTextWithLock width={170} height={50} />
         </View>
       )}
 
       <ScrollView
-        testID="enter-password-scroll"
         contentContainerStyle={[
           styles.scrollViewContent,
           { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 40 }
@@ -119,43 +118,30 @@ export const EnterPassword = () => {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
-        <View
-          style={styles.formContainer}
-          testID="enter-password-form-container"
-        >
+        <View style={styles.formContainer}>
           <View style={styles.headerContainer}>
-            <Text
-              style={styles.headerText}
-              testID="enter-password-title"
-            >{t`Enter Master Password`}</Text>
+            <Text style={styles.headerText}>{t`Enter Master Password`}</Text>
           </View>
 
           <View style={styles.inputContainer}>
             <InputPasswordPearPass
-              testID="enter-password-input"
               placeholder={t`Master password`}
               {...register('password')}
               isPassword
             />
           </View>
           <AppWarning
-            testID="enter-password-warning"
             warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
           />
-          <View
-            style={styles.buttonContainer}
-            testID="enter-password-actions-container"
-          >
+          <View style={styles.buttonContainer}>
             {isLoading ? (
               <ActivityIndicator
-                testID="enter-password-loading"
                 size="small"
                 color={colors.primary400.mode1}
               />
             ) : (
               <>
                 <ButtonPrimary
-                  testID="enter-password-continue-button"
                   stretch
                   onPress={handleSubmit(onSubmit)}
                 >
@@ -163,7 +149,6 @@ export const EnterPassword = () => {
                 </ButtonPrimary>
 
                 <ButtonBiometricLogin
-                  testID="enter-password-biometric-button"
                   onBiometricLogin={(encryptionData) =>
                     onPasswordlessLogin(
                       encryptionData,

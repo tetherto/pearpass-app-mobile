@@ -114,10 +114,7 @@ export const OnboardingContainer = ({
     switch (currentStep) {
       case 0:
         return (
-          <View
-            testID="onboarding-media-step-0"
-            accessibilityLabel="onboarding-media-step-0"
-          >
+          <View>
             <InitialVideo
               onStart={() => buttonFadeAnim.setValue(0)}
               onEnded={() => {
@@ -132,10 +129,7 @@ export const OnboardingContainer = ({
         )
       case 1:
         return (
-          <View
-            testID="onboarding-media-step-1"
-            accessibilityLabel="onboarding-media-step-1"
-          >
+          <View>
             <Animated.Image
               source={require('../../../assets/images/intro/closeLock.png')}
               style={[
@@ -157,30 +151,21 @@ export const OnboardingContainer = ({
         )
       case 2:
         return (
-          <View
-            testID="onboarding-media-step-2"
-            accessibilityLabel="onboarding-media-step-2"
-          >
+          <View>
             <Rive resourceName="password" style={styles.riveAnimation} />
           </View>
         )
 
       case 3:
         return (
-          <View
-            testID="onboarding-media-step-3"
-            accessibilityLabel="onboarding-media-step-3"
-          >
+          <View>
             <Rive resourceName="category" style={styles.riveAnimation} />
           </View>
         )
 
       case 4:
         return (
-          <View
-            testID="onboarding-media-step-4"
-            accessibilityLabel="onboarding-media-step-4"
-          >
+          <View>
             <Rive resourceName="form" style={styles.riveAnimationForm} />
           </View>
         )
@@ -263,16 +248,10 @@ export const OnboardingContainer = ({
         }
       ]}
     >
-      <View
-        testID="onboarding-progress-bar"
-        accessibilityLabel="onboarding-progress-bar"
-        style={styles.paginationContainer}
-      >
+      <View style={styles.paginationContainer}>
         {SCREENS.map((step) => (
           <TouchableOpacity
             key={step}
-            testID={`onboarding_progress_step_${step}`}
-            accessibilityLabel={`onboarding_progress_step_${step}`}
             style={[
               styles.paginationDot,
               currentStep === step && styles.paginationDotActive
@@ -282,28 +261,15 @@ export const OnboardingContainer = ({
         ))}
       </View>
       <View style={styles.actionButtonsContainer}>
-        <TouchableOpacity
-          testID="onboarding-continue-button"
-          accessibilityLabel="onboarding-continue-button"
-          onPress={onContinue}
-          style={styles.continueButton}
-        >
-          <Text
-            testID="onboarding-continue-text"
-            style={styles.continueButtonText}
+        <TouchableOpacity onPress={onContinue} style={styles.continueButton}>
+          <Text style={styles.continueButtonText}
           >{t`Continue`}</Text>
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
-          <TouchableOpacity
-            testID="onboarding-skip-button"
-            accessibilityLabel="onboarding-skip-button"
-            onPress={onSkip}
+          <TouchableOpacity onPress={onSkip}
             style={styles.skipButton}
           >
-            <Text
-              testID="onboarding-skip-text"
-              style={styles.skipButtonText}
-            >{t`Skip`}</Text>
+            <Text style={styles.skipButtonText}>{t`Skip`}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -330,42 +296,17 @@ export const OnboardingContainer = ({
 
       <View style={styles.contentWrapper}>
         <View style={styles.topSection}>
-          <View
-            testID="onboarding-logo"
-            accessibilityLabel="onboarding-logo"
-            style={styles.logoContainer}
-          >
+          <View style={styles.logoContainer}>
             <LogoTextWithLock width={170} height={50} />
           </View>
         </View>
 
-        <View
-          testID="onboarding-center-section"
-          accessibilityLabel="onboarding-center-section"
-          style={styles.centerSection}
-        >
-          {renderCenterContent()}
-        </View>
-
-        <View
-          testID="onboarding-bottom-section"
-          accessibilityLabel="onboarding-bottom-section"
-          style={styles.bottomSection}
-        >
-          <Text
-            testID="onboarding-main-description"
-            accessibilityLabel="onboarding-main-description"
-            style={styles.descriptionText}
-          >
-            {mainDescription}
-          </Text>
+        <View style={styles.centerSection}>{renderCenterContent()}</View>
+        <View style={styles.bottomSection}>
+          <Text style={styles.descriptionText}>{mainDescription}</Text>
 
           {getSubDescriptionContent() && (
-            <View
-              testID="onboarding-sub-description"
-              accessibilityLabel="onboarding-sub-description"
-              style={styles.subDescriptionWrapper}
-            >
+            <View style={styles.subDescriptionWrapper}>
               <Text style={styles.subDescriptionText}>
                 {getSubDescriptionContent()}
               </Text>
