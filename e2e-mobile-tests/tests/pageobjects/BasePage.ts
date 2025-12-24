@@ -24,6 +24,8 @@ interface SwipeCoordinates {
 }
 
 const SCREENSHOT_DIR = path.resolve(process.cwd(), 'screenshots');
+const DEFAULT_TIMEOUT_MS = Number(process.env.E2E_DEFAULT_TIMEOUT_MS || '3000');
+const WAIT_INTERVAL_MS = Number(process.env.E2E_WAIT_INTERVAL_MS || '200');
 
 export default abstract class BasePage {
   protected abstract selectors: Record<string, string>;
@@ -31,13 +33,21 @@ export default abstract class BasePage {
   protected readonly platform: DeviceType;
   protected readonly isAndroid: boolean;
   protected readonly isIOS: boolean;
+  protected readonly deviceName: string;
 
-  private readonly DEFAULT_TIMEOUT = 15_000;
+  private readonly DEFAULT_TIMEOUT: number;
+  private readonly WAIT_INTERVAL: number;
+
+  private readonly selectorCache: Map<string, string> = new Map();
 
   constructor() {
     this.platform = this.detectPlatform();
     this.isAndroid = this.platform === 'Android';
     this.isIOS = this.platform === 'iOS';
+    this.deviceName = process.env.ANDROID_DEVICE_NAME || process.env.IOS_DEVICE_NAME || 'unknown';
+    this.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT_MS;
+    this.WAIT_INTERVAL = WAIT_INTERVAL_MS;
+    this.cacheSelectors();
   }
 
   /* ==================== PLATFORM ==================== */
@@ -48,6 +58,15 @@ export default abstract class BasePage {
     if (platform === 'ios') return 'iOS';
 
     throw new Error('ENV PLATFORM must be "android" or "ios"');
+  }
+
+  /* ==================== SELECTOR CACHING ==================== */
+  private cacheSelectors(): void {
+    for (const key in this.selectors) {
+      if (Object.prototype.hasOwnProperty.call(this.selectors, key)) {
+        this.selectorCache.set(key, this.selectors[key]);
+      }
+    }
   }
 
   /* ==================== SELECTORS ==================== */
@@ -63,18 +82,25 @@ export default abstract class BasePage {
   }
 
   private resolveSelector(name: string): string {
-    const platformKey = `${name}${this.platform}`;
-    const selector = this.selectors[platformKey] ?? this.selectors[name];
-
-    if (!selector) {
-      throw new Error(
-        `Selector not found!\n` +
-          `  Key: "${name}" (tried "${platformKey}" and "${name}")\n` +
-          `  Platform: ${this.platform}\n` +
-          `  Available keys: ${Object.keys(this.selectors).join(', ')}`
-      );
+    const cached = this.selectorCache.get(name);
+    if (cached) {
+      return cached;
     }
-    return selector;
+
+    const selector = this.selectors[name];
+    if (selector) {
+      this.selectorCache.set(name, selector);
+      return selector;
+    }
+
+    const availableKeys = Array.from(this.selectorCache.keys()).join(', ');
+    throw new Error(
+      `Selector not found!\n` +
+        `  Key: "${name}"\n` +
+        `  Platform: ${this.platform}\n` +
+        `  Device: ${this.deviceName}\n` +
+        `  Available keys: ${availableKeys || 'none'}`
+    );
   }
 
   /* ==================== CHAIN HELPER ==================== */
@@ -91,9 +117,11 @@ export default abstract class BasePage {
   /* ==================== WAITING ==================== */
   async waitForDisplayed(name: string, timeout = this.DEFAULT_TIMEOUT): Promise<this> {
     const selector = this.resolveSelector(name);
+    // waitForDisplayed already checks existence, no need for separate waitForExist
     await $(selector).waitForDisplayed({
       timeout,
       timeoutMsg: `Element "${name}" is not displayed after ${timeout}ms\nSelector: ${selector}`,
+      interval: this.WAIT_INTERVAL,
     });
     return this;
   }
@@ -103,28 +131,50 @@ export default abstract class BasePage {
     await $(selector).waitForExist({
       timeout,
       timeoutMsg: `Element "${name}" does not exist after ${timeout}ms\nSelector: ${selector}`,
+      interval: this.WAIT_INTERVAL,
     });
     return this;
   }
 
   /* ==================== GETTERS ==================== */
   async getElement(name: string, timeout?: number): Promise<ChainablePromiseElement> {
-    await this.waitForDisplayed(name, timeout ?? this.DEFAULT_TIMEOUT);
-    return this.$(name);
+    try {
+      await this.waitForDisplayed(name, timeout ?? this.DEFAULT_TIMEOUT);
+      return this.$(name);
+    } catch (error: any) {
+      const selector = this.selectorCache.get(name) || 'unknown';
+      throw new Error(
+        `Failed to get element "${name}": ${error.message}\n` +
+        `  Selector: ${selector}\n` +
+        `  Platform: ${this.platform}`
+      );
+    }
   }
 
   protected raw(name: string): ChainablePromiseElement {
-    return this.$(name);
+    try {
+      return this.$(name);
+    } catch (error: any) {
+      throw new Error(`Failed to resolve selector "${name}": ${error.message}`);
+    }
   }
 
   async getText(name: string): Promise<string> {
-    const el = await this.getElement(name);
-    return (await el.getText()) || '';
+    try {
+      const el = await this.getElement(name);
+      return (await el.getText()) || '';
+    } catch (error: any) {
+      throw new Error(`Failed to get text from element "${name}": ${error.message}`);
+    }
   }
 
   async getAttribute(name: string, attr: string): Promise<string | null> {
-    const el = await this.getElement(name);
-    return el.getAttribute(attr);
+    try {
+      const el = await this.getElement(name);
+      return await el.getAttribute(attr);
+    } catch (error: any) {
+      throw new Error(`Failed to get attribute "${attr}" from element "${name}": ${error.message}`);
+    }
   }
 
   /* ==================== SCREENSHOTS ==================== */
@@ -144,52 +194,13 @@ export default abstract class BasePage {
   }
 
   /* ==================== CHECKS WITH ERRORS ==================== */
-  async expectText(
-    name: string,
-    expected: string,
-    options: { exact?: boolean; context?: string } = {}
-  ): Promise<this> {
-    const { exact = true, context = '' } = options;
-
-    let actual = '';
-    let selector = '';
-
-    try {
-      selector = this.resolveSelector(name);
-      const el = $(selector);
-      await el.waitForDisplayed({ timeout: 8_000 });
-      actual = await el.getText();
-    } catch {
-      actual = '<element not visible or not found>';
-    }
-
-    const normalize = (v: string) => v.trim();
-    const matcher = exact
-      ? (a: string, b: string) => normalize(a) === normalize(b)
-      : (a: string, b: string) => normalize(a).includes(normalize(b));
-
-    if (matcher(actual, expected)) {
-      return this;
-    }
-
-    const screenshotPath = await this.takeScreenshot('FAIL_text', name);
-
-    const errorMsg = [
-      `TEXT MISMATCH`,
-      `Element: "${name}"`,
-      `Platform: ${this.platform}`,
-      selector && `Selector: ${selector}`,
-      `Expected${exact ? '' : ' (contains)'}: "${expected}"`,
-      `Actual:   "${actual}"`,
-      context && `Context: ${context}`,
-      '',
-      `Fix the locator or update the expected text!`,
-      `Screenshot → ${screenshotPath}`,
-    ]
-      .filter(Boolean)
-      .join('\n   ');
-
-    throw new Error(errorMsg);
+  async isTextMatching(name: string, expectedText: string, exact = true): Promise<boolean> {
+    const attribute = this.isAndroid ? 'text' : 'label';
+    const actualText = await (await this.getElement(name)).getAttribute(attribute) ?? '';
+    
+    return exact 
+      ? actualText === expectedText
+      : actualText.includes(expectedText);
   }
 
   async expectDisplayed(
@@ -322,26 +333,58 @@ export default abstract class BasePage {
 
     const { startX, startY, endX, endY } = coordsMap[direction];
 
-    if (this.isAndroid) {
-      await browser.performActions([
-        {
-          type: 'pointer',
-          id: 'finger1',
-          parameters: { pointerType: 'touch' },
-          actions: [
-            { type: 'pointerMove', duration: 0, x: Math.round(startX), y: Math.round(startY) },
-            { type: 'pointerDown' },
-            { type: 'pause', duration: 100 },
-            { type: 'pointerMove', duration: 600, x: Math.round(endX), y: Math.round(endY) },
-            { type: 'pointerUp' },
-          ],
-        },
-      ]);
-    } else {
-      await browser.execute('mobile: swipe', {
-        direction,
-      });
-    }
+    await browser.performActions([
+      {
+        type: 'pointer',
+        id: 'finger1',
+        parameters: { pointerType: 'touch' },
+        actions: [
+          { type: 'pointerMove', duration: 0, x: Math.round(startX), y: Math.round(startY) },
+          { type: 'pointerDown' },
+          { type: 'pause', duration: 100 },
+          { type: 'pointerMove', duration: 600, x: Math.round(endX), y: Math.round(endY) },
+          { type: 'pointerUp' },
+        ],
+      },
+    ]);
+    
+    await browser.releaseActions();
     return this;
+  }
+
+  /* ==================== ORIENTATION ==================== */
+  async getOrientation(): Promise<'PORTRAIT' | 'LANDSCAPE'> {
+    try {
+      const orientation = await browser.getOrientation();
+      return orientation as 'PORTRAIT' | 'LANDSCAPE';
+    } catch (error: any) {
+      throw new Error(`Failed to get orientation: ${error.message}`);
+    }
+  }
+
+  async setOrientation(orientation: 'PORTRAIT' | 'LANDSCAPE'): Promise<this> {
+    try {
+      await browser.setOrientation(orientation);
+      await browser.pause(500);
+      return this;
+    } catch (error: any) {
+      throw new Error(`Failed to set orientation to ${orientation}: ${error.message}`);
+    }
+  }
+
+  /* ==================== NAVIGATION ==================== */
+  async pressBack(): Promise<this> {
+    try {
+      if (this.isAndroid) {
+        await (browser as any).pressKeyCode(4);
+        await browser.pause(300);
+      } else {
+        await browser.back();
+        await browser.pause(300);
+      }
+      return this;
+    } catch (error: any) {
+      throw new Error(`Failed to press back button: ${error.message}`);
+    }
   }
 }

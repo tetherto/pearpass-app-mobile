@@ -1,15 +1,15 @@
 {
   "name": "e2e-mobile-tests",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "End-to-end mobile automation tests for PearPass (Android & iOS, BrowserStack & local)",
   "main": "index.js",
   "scripts": {
     "wdio": "wdio run ./wdio.conf.ts",
-    "e2e:android:bs": "cross-env PLATFORM=Android RUN_TARGET=bs ENABLE_QASE=true npm run wdio",
-    "e2e:ios:bs": "cross-env PLATFORM=iOS RUN_TARGET=bs ENABLE_QASE=true npm run wdio",
-    "e2e:android:local": "cross-env PLATFORM=Android RUN_TARGET=local_real_android ENABLE_QASE=false npm run wdio",
-    "e2e:ios:local": "cross-env PLATFORM=iOS RUN_TARGET=local_real_ios ENABLE_QASE=false npm run wdio",
-    "e2e:android:emulator": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio"
+    "e2e:android:bs": "cross-env PLATFORM=Android RUN_TARGET=bs ENABLE_QASE=true npm run wdio -- --suite fullFlow",
+    "e2e:ios:bs": "cross-env PLATFORM=iOS RUN_TARGET=bs ENABLE_QASE=true npm run wdio -- --suite fullFlow",
+    "e2e:android:local": "cross-env PLATFORM=Android RUN_TARGET=local_real_android ENABLE_QASE=false npm run wdio -- --suite fullFlow",
+    "e2e:ios:local": "cross-env PLATFORM=iOS RUN_TARGET=local_real_ios ENABLE_QASE=false npm run wdio -- --suite fullFlow",
+    "e2e:android:emulator": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio -- --suite fullFlow"
   },
   "keywords": [],
   "author": "",

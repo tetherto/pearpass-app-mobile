@@ -49,4 +49,16 @@ describe('ButtonCreate Component', () => {
     )
     expect(toJSON()).toMatchSnapshot()
   })
+
+  test('passes testID to native button', () => {
+    const onPressMock = jest.fn()
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <ButtonCreate testID="button-create" onPress={onPressMock}>
+          Create
+        </ButtonCreate>
+      </ThemeProvider>
+    )
+    expect(getByTestId('button-create')).toBeTruthy()
+  })
 })

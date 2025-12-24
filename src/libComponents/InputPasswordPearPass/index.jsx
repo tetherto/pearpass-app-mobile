@@ -30,10 +30,14 @@ import {
  *  onClick?: () => void,
  *  type?: 'text' | 'password',
  *  isPassword: boolean,
- *  as?: AsTarget
+ *  as?: AsTarget,
+ *  testID?: string,
+ *  accessibilityLabel?: string,
+ *  nativeID?: string
  * }} props
  */
 export const InputPasswordPearPass = ({
+  testID,
   value,
   onChange,
   error,
@@ -44,7 +48,9 @@ export const InputPasswordPearPass = ({
   type = 'text',
   isPassword,
   onClick,
-  as
+  as,
+  accessibilityLabel,
+  nativeID
 }) => {
   const inputRef = useRef(null)
   const [isFocused, setIsFocused] = useState(false)
@@ -65,6 +71,7 @@ export const InputPasswordPearPass = ({
 
   return (
     <InputWrapper
+      testID={testID ? `${testID}-wrapper` : undefined}
       onPress={handleClick}
       isFirst={isFirst}
       isLast={isLast}
@@ -72,7 +79,7 @@ export const InputPasswordPearPass = ({
       isPassword={isPassword}
     >
       {isPassword && (
-        <IconWrapper>
+        <IconWrapper testID={testID ? `${testID}-lock-icon` : undefined}>
           <LockCircleIcon size="21" />
         </IconWrapper>
       )}
@@ -80,6 +87,9 @@ export const InputPasswordPearPass = ({
       <MainWrapper>
         <Input
           ref={inputRef}
+          testID={testID}
+          nativeID={nativeID ?? testID}
+          accessibilityLabel={accessibilityLabel ?? testID}
           value={value}
           onChangeText={handleChange}
           placeholder={placeholder}
@@ -97,7 +107,7 @@ export const InputPasswordPearPass = ({
         />
 
         {!!error?.length && (
-          <ErrorMessageWrapper>
+          <ErrorMessageWrapper testID={testID ? `${testID}-error` : undefined}>
             <ErrorIcon size="10" />
             <ErrorMessage> {error} </ErrorMessage>
           </ErrorMessageWrapper>
@@ -106,6 +116,7 @@ export const InputPasswordPearPass = ({
       {isPassword && (
         <AdditionalItems>
           <ButtonLittle
+            testID={testID ? `${testID}-toggle-visibility` : undefined}
             variant="secondary"
             borderRadius="md"
             onPress={() => setIsVisible(!isVisible)}

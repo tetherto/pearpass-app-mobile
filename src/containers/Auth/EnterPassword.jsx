@@ -102,14 +102,16 @@ export const EnterPassword = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="enter-password-screen" accessibilityLabel="enter-password-screen">
       {!isKeyboardVisible && (
-        <View style={styles.logoContainer}>
+        <View style={styles.logoContainer} testID="enter-password-logo" accessibilityLabel="enter-password-logo">
           <LogoTextWithLock width={170} height={50} />
         </View>
       )}
 
       <ScrollView
+        testID="enter-password-scroll"
+        accessibilityLabel="enter-password-scroll"
         contentContainerStyle={[
           styles.scrollViewContent,
           { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 40 }
@@ -118,31 +120,35 @@ export const EnterPassword = () => {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
-        <View style={styles.formContainer}>
+        <View style={styles.formContainer} testID="enter-password-form-container" accessibilityLabel="enter-password-form-container">
           <View style={styles.headerContainer}>
-            <Text style={styles.headerText}>{t`Enter Master Password`}</Text>
+            <Text style={styles.headerText} testID="enter-password-title" accessibilityLabel="enter-password-title">{t`Enter Master Password`}</Text>
           </View>
 
           <View style={styles.inputContainer}>
-            <InputPasswordPearPass
+            <InputPasswordPearPass testID="enter-password-input"
+              accessibilityLabel="enter-password-input"
               placeholder={t`Master password`}
               {...register('password')}
               isPassword
             />
           </View>
           <AppWarning
+            testID="enter-password-warning"
+            accessibilityLabel="enter-password-warning"
             warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
           />
-          <View style={styles.buttonContainer}>
+          <View style={styles.buttonContainer} testID="enter-password-actions-container" accessibilityLabel="enter-password-actions-container">
             {isLoading ? (
-              <ActivityIndicator size="small" color={colors.primary400.mode1} />
+              <ActivityIndicator testID="enter-password-loading" accessibilityLabel="enter-password-loading" size="small" color={colors.primary400.mode1} />
             ) : (
               <>
-                <ButtonPrimary stretch onPress={handleSubmit(onSubmit)}>
-                  {t`Continue`}
+                <ButtonPrimary testID="enter-password-continue-button" accessibilityLabel="enter-password-continue-button" stretch onPress={handleSubmit(onSubmit)}>
+                  <Text testID="enter-password-continue-text" accessibilityLabel="enter-password-continue-text">{t`Continue`}</Text>
                 </ButtonPrimary>
 
-                <ButtonBiometricLogin
+                <ButtonBiometricLogin testID="enter-password-biometric-button"
+                  accessibilityLabel="enter-password-biometric-button"
                   onBiometricLogin={(encryptionData) =>
                     onPasswordlessLogin(
                       encryptionData,

@@ -55,4 +55,16 @@ describe('ButtonPrimary Component', () => {
     )
     expect(toJSON()).toMatchSnapshot()
   })
+
+  test('passes testID to native button', () => {
+    const onPressMock = jest.fn()
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <ButtonPrimary testID="primary-btn" onPress={onPressMock} stretch={false}>
+          Primary Button
+        </ButtonPrimary>
+      </ThemeProvider>
+    )
+    expect(getByTestId('primary-btn')).toBeTruthy()
+  })
 })

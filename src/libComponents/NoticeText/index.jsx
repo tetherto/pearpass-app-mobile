@@ -10,9 +10,18 @@ import { NoticeTextComponent, NoticeTextWrapper } from './styles'
  * @param {{
  *  text: string;
  *  type: 'success' | 'error' | 'warning';
+ *  testID?: string;
+ *  accessibilityLabel?: string;
+ *  nativeID?: string;
  * }} props
  */
-export const NoticeText = ({ text, type = 'success' }) => {
+export const NoticeText = ({ 
+  text, 
+  type = 'success',
+  testID,
+  accessibilityLabel,
+  nativeID
+}) => {
   const getIconByType = () => {
     switch (type) {
       case 'success':
@@ -27,7 +36,11 @@ export const NoticeText = ({ text, type = 'success' }) => {
   }
 
   return (
-    <NoticeTextWrapper>
+    <NoticeTextWrapper
+      testID={testID}
+      accessibilityLabel={accessibilityLabel ?? testID}
+      nativeID={nativeID ?? testID}
+    >
       {getIconByType()}
       <NoticeTextComponent type={type}>{text}</NoticeTextComponent>
     </NoticeTextWrapper>

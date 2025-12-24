@@ -82,4 +82,16 @@ describe('ButtonFilter Component', () => {
     )
     expect(toJSON()).toMatchSnapshot()
   })
+
+  test('passes testID to native button', () => {
+    const onPressMock = jest.fn()
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <ButtonFilter testID="button-filter" onPress={onPressMock}>
+          Filter Me
+        </ButtonFilter>
+      </ThemeProvider>
+    )
+    expect(getByTestId('button-filter')).toBeTruthy()
+  })
 })
