@@ -4,12 +4,27 @@ import { TouchableOpacity } from 'react-native'
 
 import { TextAreaComponent } from './styles'
 
+/**
+ * @param {{
+ *  value?: string
+ *  onChange?: (text: string) => void
+ *  placeholder?: string
+ *  isDisabled?: boolean
+ *  onClick?: () => void
+ *  testID?: string
+ *  accessibilityLabel?: string
+ *  nativeID?: string
+ * }} props
+ */
 export const TextAreaReport = ({
   value,
   onChange,
   placeholder,
   isDisabled,
-  onClick
+  onClick,
+  testID,
+  accessibilityLabel,
+  nativeID
 }) => {
   const [isFocused, setIsFocused] = useState(false)
 
@@ -25,8 +40,16 @@ export const TextAreaReport = ({
   }
 
   return (
-    <TouchableOpacity onPress={handleClick}>
+    <TouchableOpacity 
+      onPress={handleClick}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      nativeID={nativeID ?? testID}
+    >
       <TextAreaComponent
+        testID={testID ? `${testID}-input` : undefined}
+        nativeID={testID ? `${testID}-input` : undefined}
+        accessibilityLabel={testID ? `${testID}-input` : undefined}
         value={value}
         onChangeText={handleChangeText}
         placeholder={placeholder}

@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Trans, useLingui } from '@lingui/react/macro'
+import {
+  FaceIdIcon,
+  TimeIcon,
+  XIcon
+} from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   Animated,
@@ -44,11 +49,17 @@ export const OnboardingContainer = ({
 }) => {
   const { t } = useLingui()
   const insets = useSafeAreaInsets()
-  const [, setTimeLeft] = useState(90)
+  const [timeLeft, setTimeLeft] = useState(90)
   const intervalRef = useRef(null)
 
   const floatAnim = useRef(new Animated.Value(0)).current
   const buttonFadeAnim = useRef(new Animated.Value(0)).current
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
 
   useEffect(() => {
     if (currentStep === 1) {
@@ -114,7 +125,7 @@ export const OnboardingContainer = ({
     switch (currentStep) {
       case 0:
         return (
-          <View>
+          <View style={styles.centerContentWrapper}>
             <InitialVideo
               onStart={() => buttonFadeAnim.setValue(0)}
               onEnded={() => {
@@ -124,12 +135,15 @@ export const OnboardingContainer = ({
                   useNativeDriver: true
                 }).start()
               }}
+              testID="onboarding-media-step-0"
+              accessibilityLabel="onboarding-media-step-0"
+              nativeID="onboarding-media-step-0"
             />
           </View>
         )
       case 1:
         return (
-          <View>
+          <View style={styles.centerContentWrapper}>
             <Animated.Image
               source={require('../../../assets/images/intro/closeLock.png')}
               style={[
@@ -146,36 +160,84 @@ export const OnboardingContainer = ({
                 }
               ]}
               resizeMode="contain"
+              testID="onboarding-media-step-1"
+              accessibilityLabel="onboarding-media-step-1"
+              nativeID="onboarding-media-step-1"
             />
           </View>
         )
       case 2:
         return (
-          <View>
-            <Rive resourceName="password" style={styles.riveAnimation} />
-          </View>
+          <Rive
+            resourceName="password"
+            style={styles.riveAnimation}
+            testID="onboarding-media-step-2"
+            accessibilityLabel="onboarding-media-step-2"
+            nativeID="onboarding-media-step-2"
+          />
         )
 
       case 3:
         return (
-          <View>
-            <Rive resourceName="category" style={styles.riveAnimation} />
-          </View>
+          <Rive
+            resourceName="category"
+            style={styles.riveAnimation}
+            testID="onboarding-media-step-3"
+            accessibilityLabel="onboarding-media-step-3"
+            nativeID="onboarding-media-step-3"
+          />
         )
 
       case 4:
         return (
-          <View>
-            <Rive resourceName="form" style={styles.riveAnimationForm} />
-          </View>
+          <Rive
+            resourceName="form"
+            style={styles.riveAnimationForm}
+            testID="onboarding-media-step-4"
+            accessibilityLabel="onboarding-media-step-4"
+            nativeID="onboarding-media-step-4"
+          />
         )
       case 5:
         return (
-          <Image
-            source={require('../../../assets/images/intro/linked_device.png')}
-            style={styles.centerImage}
-            resizeMode="contain"
-          />
+          <View 
+            testID="onboarding-media-step-5"
+            accessibilityLabel="onboarding-media-step-5"
+            nativeID="onboarding-media-step-5"
+            style={styles.finalStepContainer}>
+              <View style={styles.iconContainer}>
+                <View style={styles.qrheaderContainer}>
+                  <View style={styles.faceIdContainer}>
+                    <FaceIdIcon size="21" />
+                    <Text style={styles.faceIdText}>{t`Add a device`}</Text>
+                </View>
+                <TouchableOpacity style={styles.closeButton}>
+                  <XIcon />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.qrCodeImageCotainer}>
+                <Text style={styles.faceIdText}>{t`Scan this QR code`} </Text>
+                <View style={styles.qrCodeImageWrapper}>
+                  <Image
+                    source={require('../../../assets/images/intro/qr.png')}
+                    style={styles.finalIcon}
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
+              <View style={styles.timerContainer}>
+                <Text style={styles.timerText}>{t`Add a device`}</Text>
+                <Text style={[styles.timerText, styles.timerTextPrimary]}>
+                  {formatTime(timeLeft)}
+                </Text>
+                <TimeIcon
+                  color={colors.primary400.option1}
+                  width={18}
+                  height={18}
+                />
+              </View>
+            </View>
+          </View>
         )
       default:
         return null
@@ -248,10 +310,15 @@ export const OnboardingContainer = ({
         }
       ]}
     >
-      <View style={styles.paginationContainer}>
+      <View 
+      testID="onboarding-progress-bar"
+      accessibilityLabel="onboarding-progress-bar"
+      style={styles.paginationContainer}>
         {SCREENS.map((step) => (
           <TouchableOpacity
             key={step}
+            testID={`onboarding-progress-step-${step}`}
+            accessibilityLabel={`onboarding-progress-step-${step}`}
             style={[
               styles.paginationDot,
               currentStep === step && styles.paginationDotActive
@@ -261,12 +328,18 @@ export const OnboardingContainer = ({
         ))}
       </View>
       <View style={styles.actionButtonsContainer}>
-        <TouchableOpacity onPress={onContinue} style={styles.continueButton}>
-          <Text style={styles.continueButtonText}>{t`Continue`}</Text>
+        <TouchableOpacity 
+        testID="onboarding-continue-button"
+        accessibilityLabel="onboarding-continue-button"
+        onPress={onContinue} style={styles.continueButton}>
+          <Text testID="onboarding-continue-text" accessibilityLabel="onboarding-continue-text" style={styles.continueButtonText}>{t`Continue`}</Text>
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
-          <TouchableOpacity onPress={onSkip} style={styles.skipButton}>
-            <Text style={styles.skipButtonText}>{t`Skip`}</Text>
+          <TouchableOpacity 
+          testID="onboarding-skip-button"
+          accessibilityLabel="onboarding-skip-button"
+          onPress={onSkip} style={styles.skipButton}>
+            <Text testID="onboarding-skip-text" accessibilityLabel="onboarding-skip-text" style={styles.skipButtonText}>{t`Skip`}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -294,17 +367,38 @@ export const OnboardingContainer = ({
       <View style={styles.contentWrapper}>
         <View style={styles.topSection}>
           <View style={styles.logoContainer}>
-            <LogoTextWithLock width={170} height={50} />
+            <LogoTextWithLock 
+              width={170} 
+              height={50}
+              testID="onboarding-logo"
+              accessibilityLabel="onboarding-logo"
+              nativeID="onboarding-logo"
+            />
           </View>
         </View>
 
-        <View style={styles.centerSection}>{renderCenterContent()}</View>
-        <View style={styles.bottomSection}>
-          <Text style={styles.descriptionText}>{mainDescription}</Text>
+        <View
+        testID="onboarding-center-section"
+        accessibilityLabel="onboarding-center-section"
+        style={styles.centerSection}>{renderCenterContent()}</View>
+
+        <View 
+        testID="onboarding-bottom-section"
+        accessibilityLabel="onboarding-bottom-section"
+        style={styles.bottomSection}>
+          <Text 
+          testID={`onboarding-main-description-${currentStep}`}
+          nativeID={`onboarding-main-description-${currentStep}`}
+          accessibilityLabel={`onboarding-main-description-${currentStep}`}
+          style={styles.descriptionText}>{mainDescription}</Text>
 
           {getSubDescriptionContent() && (
             <View style={styles.subDescriptionWrapper}>
-              <Text style={styles.subDescriptionText}>
+              <Text style={styles.subDescriptionText}
+                testID={`onboarding-sub-description-${currentStep}`}
+                nativeID={`onboarding-sub-description-${currentStep}`}
+                accessibilityLabel={`onboarding-sub-description-${currentStep}`}
+              >
                 {getSubDescriptionContent()}
               </Text>
             </View>
@@ -362,6 +456,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 10
+  },
+  centerContentWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   centerImage: {
     width: '80%',

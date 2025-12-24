@@ -90,4 +90,20 @@ describe('TextArea Component', () => {
     )
     expect(toJSON()).toMatchSnapshot()
   })
+
+  test('passes testID to native component', () => {
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <TextArea
+          testID="text-area"
+          value="test"
+          placeholder="Enter text"
+          onChange={() => {}}
+          isDisabled={false}
+          onClick={() => {}}
+        />
+      </ThemeProvider>
+    )
+    expect(getByTestId('text-area')).toBeTruthy()
+  })
 })

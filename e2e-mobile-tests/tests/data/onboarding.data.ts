@@ -41,3 +41,12 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       'No servers. No middlemen. PearPass syncs directly across your devices using peer-to-peer technology, powered by Pear Runtime.',
   },
 ] as const;
+
+/* =====================================================
+        BUTTONS DATA
+  ===================================================== */
+
+export const ONBOARDING_BUTTONS = {
+  continue: 'Continue',
+  skip: 'Skip',
+} as const;

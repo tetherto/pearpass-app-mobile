@@ -1,36 +1,18 @@
 jest.mock('pearpass-utils-password-check', () => ({
   checkPassphraseStrength: jest.fn(),
-  checkPasswordStrength: jest.fn(),
-  PASSWORD_STRENGTH: {
-    SAFE: 'SAFE',
-    VULNERABLE: 'VULNERABLE',
-    WEAK: 'WEAK'
-  }
+  checkPasswordStrength: jest.fn()
 }))
 
-import { i18n } from '@lingui/core'
-import { I18nProvider } from '@lingui/react'
-import { fireEvent, render } from '@testing-library/react-native'
+import { render, fireEvent } from '@testing-library/react-native'
 import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
 import { checkPasswordStrength } from 'pearpass-utils-password-check'
 import { Text } from 'react-native'
 
 import { PasswordField } from './index'
-import messages from '../../locales/en/messages'
-
-i18n.load('en', messages)
-i18n.activate('en')
 
 const DummyAdditionalItem = () => (
   <Text testID="dummy-additional">Additional</Text>
 )
-
-const renderWithProviders = (ui) =>
-  render(
-    <I18nProvider i18n={i18n}>
-      <ThemeProvider>{ui}</ThemeProvider>
-    </I18nProvider>
-  )
 
 describe('PasswordField Component', () => {
   const defaultProps = {
@@ -58,12 +40,14 @@ describe('PasswordField Component', () => {
   })
 
   test('renders label, placeholder, and error correctly', () => {
-    const { getByText, getByPlaceholderText } = renderWithProviders(
-      <PasswordField
-        {...defaultProps}
-        value="test value"
-        error="Error occurred"
-      />
+    const { getByText, getByPlaceholderText } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          value="test value"
+          error="Error occurred"
+        />
+      </ThemeProvider>
     )
     expect(getByText('Password')).toBeTruthy()
     expect(getByPlaceholderText('Enter password')).toBeTruthy()
@@ -72,8 +56,10 @@ describe('PasswordField Component', () => {
 
   test('calls onChange when text changes', () => {
     const onChangeMock = jest.fn()
-    const { getByPlaceholderText } = renderWithProviders(
-      <PasswordField {...defaultProps} onChange={onChangeMock} value="" />
+    const { getByPlaceholderText } = render(
+      <ThemeProvider>
+        <PasswordField {...defaultProps} onChange={onChangeMock} value="" />
+      </ThemeProvider>
     )
     const input = getByPlaceholderText('Enter password')
     fireEvent.changeText(input, 'new password')
@@ -83,13 +69,15 @@ describe('PasswordField Component', () => {
   test('triggers onFocus and onBlur events', () => {
     const onFocusMock = jest.fn()
     const onBlurMock = jest.fn()
-    const { getByPlaceholderText } = renderWithProviders(
-      <PasswordField
-        {...defaultProps}
-        onFocus={onFocusMock}
-        onBlur={onBlurMock}
-        value=""
-      />
+    const { getByPlaceholderText } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          onFocus={onFocusMock}
+          onBlur={onBlurMock}
+          value=""
+        />
+      </ThemeProvider>
     )
     const input = getByPlaceholderText('Enter password')
     fireEvent(input, 'focus')
@@ -100,12 +88,14 @@ describe('PasswordField Component', () => {
 
   test('calls onClick when outer container is pressed', () => {
     const onClickMock = jest.fn()
-    const { getByPlaceholderText } = renderWithProviders(
-      <PasswordField
-        {...defaultProps}
-        onClick={onClickMock}
-        value="click test"
-      />
+    const { getByPlaceholderText } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          onClick={onClickMock}
+          value="click test"
+        />
+      </ThemeProvider>
     )
     const input = getByPlaceholderText('Enter password')
     fireEvent.press(input)
@@ -113,72 +103,96 @@ describe('PasswordField Component', () => {
   })
 
   test('renders password strongness as "Strong" when safe', () => {
-    checkPasswordStrength.mockReturnValue({
-      isSafe: true,
-      success: true,
-      strengthType: 'success',
-      strengthText: 'Strong'
-    })
-    const { getByText } = renderWithProviders(
-      <PasswordField
-        {...defaultProps}
-        value="safePass"
-        hasStrongness
-        passType="password"
-      />
+    checkPasswordStrength.mockReturnValue({ isSafe: true })
+    const { getByText } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          value="safePass"
+          hasStrongness
+          passType="password"
+        />
+      </ThemeProvider>
     )
     expect(getByText('Strong')).toBeTruthy()
   })
 
   test('renders password strongness as "Weak" when not safe', () => {
-    checkPasswordStrength.mockReturnValue({
-      isSafe: false,
-      success: true,
-      strengthType: 'error',
-      strengthText: 'Weak'
-    })
-    const { getByText } = renderWithProviders(
-      <PasswordField
-        {...defaultProps}
-        value="weakPass"
-        hasStrongness
-        passType="password"
-      />
+    checkPasswordStrength.mockReturnValue({ isSafe: false })
+    const { getByText } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          value="weakPass"
+          hasStrongness
+          passType="password"
+        />
+      </ThemeProvider>
     )
     expect(getByText('Weak')).toBeTruthy()
   })
 
   test('renders additionalItems if provided', () => {
-    const { getByTestId } = renderWithProviders(
-      <PasswordField
-        {...defaultProps}
-        additionalItems={<DummyAdditionalItem />}
-      />
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          additionalItems={<DummyAdditionalItem />}
+        />
+      </ThemeProvider>
     )
     expect(getByTestId('dummy-additional')).toBeTruthy()
   })
 
   test('matches snapshot', () => {
-    const { toJSON } = renderWithProviders(
-      <PasswordField
-        {...defaultProps}
-        value="snapshot value"
-        label="Snapshot Label"
-        error="Snapshot error"
-        isSecure={true}
-        hasStrongness={true}
-      />
+    const { toJSON } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          value="snapshot value"
+          label="Snapshot Label"
+          error="Snapshot error"
+          isSecure={true}
+          hasStrongness={true}
+        />
+      </ThemeProvider>
     )
     expect(toJSON()).toMatchSnapshot()
   })
 
   test('toggles password visibility when toggle button is pressed', () => {
-    const { getByPlaceholderText } = renderWithProviders(
-      <PasswordField {...defaultProps} value="secret" />
+    const { getByPlaceholderText } = render(
+      <ThemeProvider>
+        <PasswordField {...defaultProps} value="secret" />
+      </ThemeProvider>
     )
 
     const input = getByPlaceholderText('Enter password')
 
     expect(input.props.secureTextEntry).toBe(true)
+  })
+
+  test('passes inputTestID to password input', () => {
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          inputTestID="password-input"
+        />
+      </ThemeProvider>
+    )
+    expect(getByTestId('password-input')).toBeTruthy()
+  })
+
+  test('renders visibility toggle with testID', () => {
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <PasswordField
+          {...defaultProps}
+          toggleTestID="password-toggle"
+        />
+      </ThemeProvider>
+    )
+    expect(getByTestId('password-toggle')).toBeTruthy()
   })
 })

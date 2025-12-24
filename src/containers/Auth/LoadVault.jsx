@@ -53,13 +53,15 @@ export const LoadVault = () => {
 
   return (
     <KeyboardAvoidingView
+      testID="load-vault-screen"
+      accessibilityLabel="load-vault-screen"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <View style={{ flex: 1 }}>
         {!isKeyboardVisible && (
-          <View style={styles.logoContainer}>
+          <View style={styles.logoContainer} testID="load-vault-logo" accessibilityLabel="load-vault-logo">
             <LogoTextWithLock width={170} height={50} />
           </View>
         )}
@@ -71,14 +73,16 @@ export const LoadVault = () => {
         >
           <View style={styles.formContainer}>
             <View style={{ marginBottom: 20, alignItems: 'center', gap: 10 }}>
-              <Text style={styles.title}>{t`Load an existing Vault`}</Text>
+              <Text style={styles.title} testID="load-vault-title" accessibilityLabel="load-vault-title">{t`Load an existing Vault`}</Text>
               <Text
-                style={styles.subtitle}
+                style={styles.subtitle} testID="load-vault-subtitle" accessibilityLabel="load-vault-subtitle"
               >{t`Open your vault with this code`}</Text>
             </View>
 
             <View style={{ width: '100%', gap: 15 }}>
               <InputPasswordPearPass
+                testID="load-vault-invite-code-input"
+                accessibilityLabel="load-vault-invite-code-input"
                 placeholder={t`Insert your vault's code...`}
                 value={inviteCode}
                 onChange={setInviteCode}
@@ -90,16 +94,20 @@ export const LoadVault = () => {
               {isLoading ? (
                 <>
                   <ActivityIndicator
+                    testID="load-vault-loading"
+                    accessibilityLabel="load-vault-loading"
                     size="small"
                     color={colors.primary400.mode1}
                   />
-                  <ButtonSecondary stretch onPress={cancelPairActiveVault}>
+                  <ButtonSecondary testID="load-vault-cancel-pairing-button" accessibilityLabel="load-vault-cancel-pairing-button" stretch onPress={cancelPairActiveVault}>
                     {t`Cancel Pairing`}
                   </ButtonSecondary>
                 </>
               ) : (
                 <>
                   <ButtonPrimary
+                    testID="load-vault-open-button"
+                    accessibilityLabel="load-vault-open-button"
                     onPress={() => pairWithCode(inviteCode)}
                     stretch
                     disabled={!inviteCode.length || isLoading}
@@ -108,6 +116,8 @@ export const LoadVault = () => {
                   </ButtonPrimary>
 
                   <ButtonSecondary
+                    testID="load-vault-select-vaults-button"
+                    accessibilityLabel="load-vault-select-vaults-button"
                     stretch
                     onPress={() =>
                       navigation.navigate('Welcome', { state: 'selectOrLoad' })
@@ -117,6 +127,8 @@ export const LoadVault = () => {
                   </ButtonSecondary>
 
                   <Pressable
+                    testID="load-vault-scan-qr-button"
+                    accessibilityLabel="load-vault-scan-qr-button"
                     style={styles.qrCodeButton}
                     onPress={() =>
                       expand({

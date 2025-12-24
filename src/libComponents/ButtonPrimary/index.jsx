@@ -7,6 +7,9 @@ import { ButtonText, Button } from './styles'
  *  size?: 'sm' | 'md'
  *  stretch: boolean
  *  onPress: () => void
+ *  testID?: string
+ *  accessibilityLabel?: string
+ *  nativeID?: string
  * }} props
  */
 export const ButtonPrimary = ({
@@ -14,9 +17,16 @@ export const ButtonPrimary = ({
   onPress,
   size = 'md',
   stretch,
-  disabled
+  disabled,
+  testID,
+  accessibilityLabel,
+  nativeID
 }) => (
   <Button
+    testID={testID}
+    nativeID={nativeID ?? testID}
+    accessibilityLabel={accessibilityLabel ?? testID}
+    accessibilityRole="button"
     size={size}
     onPress={disabled ? undefined : onPress}
     stretch={stretch}

@@ -37,4 +37,15 @@ describe('CompoundField Component', () => {
     )
     expect(toJSON()).toMatchSnapshot()
   })
+
+  test('passes testID to wrapper', () => {
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <CompoundField testID="compound-field">
+          <Text>Child Content</Text>
+        </CompoundField>
+      </ThemeProvider>
+    )
+    expect(getByTestId('compound-field')).toBeTruthy()
+  })
 })

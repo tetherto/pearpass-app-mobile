@@ -200,9 +200,9 @@ export const CreatePassword = () => {
   )
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="create-password-screen" accessibilityLabel="create-password-screen">
       {!isKeyboardVisible && (
-        <View style={styles.logoContainer}>
+        <View style={styles.logoContainer} testID="create-password-logo" accessibilityLabel="create-password-logo">
           <LogoTextWithLock width={170} height={50} />
         </View>
       )}
@@ -217,15 +217,17 @@ export const CreatePassword = () => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.formContainer}>
+          <View style={styles.formContainer} testID="create-password-form-container" accessibilityLabel="create-password-form-container">
             <View style={styles.headerContainer}>
-              <Text style={styles.headerText}>{t`Create Master Password`}</Text>
+              <Text style={styles.headerText} testID="create-password-title" accessibilityLabel="create-password-title">{t`Create Master Password`}</Text>
             </View>
             <Text
-              style={styles.boldText}
-            >{t`The first thing to do is create a Master password to secure your account.  You’ll use this password to access PearPass. `}</Text>
-            <View style={styles.inputContainer}>
+              style={styles.boldText} testID="create-password-description" accessibilityLabel="create-password-description"
+            >{t`The first thing to do is create a Master password to secure your account.  You'll use this password to access PearPass. `}</Text>
+            <View style={styles.inputContainer} testID="create-password-inputs-container" accessibilityLabel="create-password-inputs-container">
               <InputPasswordPearPass
+                testID="create-password-input"
+                accessibilityLabel="create-password-input"
                 placeholder={t`Enter Password`}
                 {...passwordRegisterProps}
                 onChange={handlePasswordChange}
@@ -233,71 +235,100 @@ export const CreatePassword = () => {
               />
 
               <InputPasswordPearPass
+                testID="create-password-confirm-input"
+                accessibilityLabel="create-password-confirm-input"
                 placeholder={t`Confirm Password`}
                 {...register('passwordConfirm')}
                 isPassword
               />
             </View>
 
-            <View style={styles.requirementsContainer}>
-              <Text style={styles.requirementsText}>
+            <View style={styles.requirementsContainer} testID="create-password-requirements-container" accessibilityLabel="create-password-requirements-container">
+              <Text style={styles.requirementsText} testID="create-password-requirements-text" accessibilityLabel="create-password-requirements-text">
                 {t`Your password must be at least 8 characters long and include at least one of each:`}
               </Text>
-              <View style={styles.bulletList}>
-                <Text style={styles.bulletItem}>
+              <View style={styles.bulletList} testID="create-password-requirements-list" accessibilityLabel="create-password-requirements-list">
+                <Text style={styles.bulletItem} testID="create-password-requirement-uppercase" accessibilityLabel="create-password-requirement-uppercase">
                   {`${bulletUnicode} ${t`Uppercase Letter (A-Z)`}`}
                 </Text>
-                <Text style={styles.bulletItem}>
+                <Text style={styles.bulletItem} testID="create-password-requirement-lowercase" accessibilityLabel="create-password-requirement-lowercase">
                   {`${bulletUnicode} ${t`Lowercase Letter (a-z)`}`}
                 </Text>
-                <Text style={styles.bulletItem}>
+                <Text style={styles.bulletItem} testID="create-password-requirement-number" accessibilityLabel="create-password-requirement-number">
                   {`${bulletUnicode} ${t`Number (0-9)`}`}
                 </Text>
-                <Text style={styles.bulletItem}>
+                <Text style={styles.bulletItem} testID="create-password-requirement-special" accessibilityLabel="create-password-requirement-special">
                   {`${bulletUnicode} ${t`Special Character (! @ # $...)`}`}
                 </Text>
               </View>
-              <Text style={styles.noteText}>
+              <Text style={styles.noteText} testID="create-password-requirement-note" accessibilityLabel="create-password-requirement-note">
                 {t`Note: Avoid common words and personal information.`}
               </Text>
             </View>
 
-            <View style={styles.termsContainer}>
-              <AppWarning
+            <View style={styles.termsContainer} testID="create-password-terms-container" accessibilityLabel="create-password-terms-container">
+              <AppWarning testID="create-password-warning" accessibilityLabel="create-password-warning"
                 warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
                 textStyles={{ flex: 0 }}
               />
-              <Text style={styles.termsTitle}>{t`PearPass Terms of Use`}</Text>
+              <Text style={styles.termsTitle} testID="create-password-terms-title" accessibilityLabel="create-password-terms-title">{t`PearPass Terms of Use`}</Text>
 
-              <View style={styles.checkboxContainer}>
-                <TouchableOpacity onPress={() => setAccepted(!accepted)}>
+              <View style={styles.checkboxContainer} testID="create-password-terms-checkbox-row" accessibilityLabel="create-password-terms-checkbox-row">
+                <TouchableOpacity 
+                testID="create-password-terms-checkbox"
+                accessibilityLabel="create-password-terms-checkbox"
+                onPress={() => setAccepted(!accepted)}>
                   {accepted ? (
-                    <View style={styles.checkboxOuter}>
+                    <View style={styles.checkboxOuter} testID="create-password-terms-checkbox-checked" accessibilityLabel="create-password-terms-checkbox-checked">
                       <View style={styles.checkboxInner} />
                     </View>
                   ) : (
-                    <View style={styles.checkboxEmpty} />
+                    <View style={styles.checkboxEmpty} testID="create-password-terms-checkbox-unchecked" accessibilityLabel="create-password-terms-checkbox-unchecked" />
                   )}
                 </TouchableOpacity>
-                <View style={styles.textContainer}>
-                  <Text style={styles.bottomText}>
-                    {t`I have read and agree to the`}{' '}
-                    <Text style={styles.linkText} onPress={handleTermsPress}>
+                  <View style={styles.textContainer}>
+                    <View
+                      style={styles.termsTextRow}
+                      testID="create-password-terms-text-row"
+                      nativeID="create-password-terms-text-row"
+                      accessibilityLabel="create-password-terms-text-row"
+                    >
+                    <Text
+                      style={styles.bottomText}
+                      testID="create-password-terms-text"
+                      nativeID="create-password-terms-text"
+                      accessibilityLabel="create-password-terms-text"
+                    >
+                      {t`I have read and agree to the`}{' '}
+                    </Text>
+
+                    <Text
+                      style={[styles.bottomText, styles.linkText, { flexShrink: 1 }]}
+                      onPress={handleTermsPress}
+                      testID="create-password-terms-link"
+                      nativeID="create-password-terms-link"
+                      accessibilityLabel="create-password-terms-link"
+                    >
                       {t`PearPass Application Terms of Use`}
                     </Text>
-                    .
-                  </Text>
+
+                    <Text style={styles.bottomText}>.</Text>
+                  </View>
                 </View>
               </View>
             </View>
-            <View style={styles.buttonContainer}>
+            <View style={styles.buttonContainer} testID="create-password-actions-container" accessibilityLabel="create-password-actions-container">
               {isLoading ? (
                 <ActivityIndicator
+                  testID="create-password-loading"
+                  accessibilityLabel="create-password-loading"
                   size="small"
                   color={colors.primary400.mode1}
                 />
               ) : (
                 <ButtonPrimary
+                  testID="create-password-continue-button"
+                  accessibilityLabel="create-password-continue-button"
                   stretch
                   onPress={handleSubmit(onSubmit)}
                   disabled={!accepted}
@@ -446,5 +477,10 @@ const styles = StyleSheet.create({
     color: colors.grey100.mode1,
     fontSize: 14,
     fontFamily: 'Inter'
+  },
+  termsTextRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start'
   }
 })

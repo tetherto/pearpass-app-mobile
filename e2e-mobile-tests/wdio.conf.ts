@@ -36,25 +36,28 @@ const APP_VERSION = process.env.APP_VERSION || 'unknown';
 
 const BROWSERSTACK_APP_UPLOAD_URL = 'https://api-cloud.browserstack.com/app-automate/upload';
 
-// Additional environment variables with defaults
 const {
-  // Timeouts
-  WDIO_WAITFOR_TIMEOUT = '20000',
-  WDIO_CONNECTION_RETRY_TIMEOUT = '120000',
-  WDIO_CONNECTION_RETRY_COUNT = '3',
-  MOCHA_TIMEOUT = '180000',
+  WDIO_WAITFOR_TIMEOUT = '5000', // Reduced from 10000 for faster element detection
+  WDIO_CONNECTION_RETRY_TIMEOUT = '30000',
+  WDIO_CONNECTION_RETRY_COUNT = '2',
+  MOCHA_TIMEOUT = '90000',
+  APPIUM_NEW_COMMAND_TIMEOUT = '120',
 
-  // Appium settings
-  APPIUM_NO_RESET = 'false',
+  APPIUM_NO_RESET = 'true',
   APPIUM_FULL_RESET = 'false',
   APPIUM_AUTO_GRANT_PERMISSIONS = 'true',
   APPIUM_AUTO_ACCEPT_ALERTS = 'true',
+  APPIUM_SKIP_UNLOCK = 'true',
+  APPIUM_SKIP_SERVER_INSTALLATION = 'false',
 
-  // Debug and logging
   DEBUG = 'false',
   LOG_LEVEL = 'info',
   CAPTURE_SCREENSHOTS_ON_FAIL = 'true',
+  ENABLE_REALTIME_REPORTING = 'false',
+  QASE_UPLOAD_ATTACHMENTS = 'false',
 } = process.env;
+
+const VERBOSE_TESTS = process.env.VERBOSE_TESTS === 'true';
 
 // ===============================================
 // HELPER FUNCTIONS
@@ -102,11 +105,42 @@ export const config: WdioConfig = {
   runner: 'local',
 
   // Test Specs
+  // NOTE: By default, each spec file runs in its own session (app restarts between files).
+  // To run all tests in one session without app restart, use suites (see below).
+  // Example: npm run wdio -- --suite fullFlow
   specs: ['./tests/specs/**/*.ts'],
 
-  maxInstances: IS_BS ? 4 : 1,
+  // Suites: Group test files to run in the same session
+  // This allows tests to run sequentially in one app session without restarting
+  // IMPORTANT: When using suites, all spec files in the suite share ONE session.
+  // The app will NOT restart between spec files within the same suite.
+  suites: {
+    // Full flow suite: all tests run in one session (recommended for E2E flow)
+    fullFlow: [
+      './tests/specs/OnboardingTests.ts',
+      './tests/specs/SignUpTests.ts',
+    ],
+    // Individual suites for running tests separately if needed
+    onboarding: [
+      './tests/specs/OnboardingTests.ts',
+    ],
+    signup: [
+      './tests/specs/SignUpTests.ts',
+    ],
+  },
 
-  logLevel: LOG_LEVEL as WebdriverIO.LogLevel,
+  maxInstances: IS_BS ? 4 : 1,
+  maxInstancesPerCapability: 1,
+
+  logLevel: (LOG_LEVEL as 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'silent'),
+  outputDir: './logs',
+  logLevels: {
+  webdriver: VERBOSE_TESTS ? 'info' : 'warn',
+  '@wdio/appium-service': VERBOSE_TESTS ? 'info' : 'warn',
+  '@wdio/local-runner': 'warn',
+  '@wdio/cli': 'warn',
+  '@wdio/utils': 'warn',
+  },
   bail: 0,
   waitforTimeout: Number(WDIO_WAITFOR_TIMEOUT),
   connectionRetryTimeout: Number(WDIO_CONNECTION_RETRY_TIMEOUT),
@@ -115,22 +149,25 @@ export const config: WdioConfig = {
   framework: 'mocha',
 
   reporters: [
-    'spec',
+    ['spec', {
+      showPreface: true,
+      realtimeReporting: ENABLE_REALTIME_REPORTING === 'true',
+    }],
     ['qase', {
       enabled: ENABLE_QASE,
       projectCode: QASE_PROJECT_CODE,
       runId: QASE_RUN_ID,
       logging: DEBUG === 'true',
-      uploadAttachments: true,
+      uploadAttachments: QASE_UPLOAD_ATTACHMENTS === 'true',
     }],
   ],
 
   mochaOpts: {
     ui: 'bdd',
     timeout: Number(MOCHA_TIMEOUT),
+    grep: process.env.MOCHA_GREP || undefined,
   },
 
-  // BrowserStack / Local Appium / Grid
   hostname: IS_BS ? 'hub.browserstack.com' : undefined,
   port: IS_BS ? 443 : undefined,
   path: IS_BS ? '/wd/hub' : undefined,
@@ -143,7 +180,21 @@ export const config: WdioConfig = {
         args: {
           log: './logs/appium.log',
           relaxedSecurity: true,
-          logTimestamp: true
+          logTimestamp: true,
+          logLevel: VERBOSE_TESTS ? 'info' : 'warn',
+          logNoColors: true,
+          sessionOverride: true,
+          keepAliveTimeout: 600,
+          address: '127.0.0.1',
+          port: 4723,
+          basePath: '/',
+        },
+        logPath: './logs',
+        command: process.env.APPIUM_COMMAND || 'appium',
+        waitStartup: 20000, // Increased for slow machines and first-time startup
+        env: {
+          ...process.env,
+          NO_RESET: APPIUM_NO_RESET === 'true' ? 'true' : 'false',
         }
       }]],
 
@@ -160,7 +211,10 @@ export const config: WdioConfig = {
           'appium:noReset': APPIUM_NO_RESET === 'true',
           'appium:fullReset': APPIUM_FULL_RESET === 'true',
           'appium:autoGrantPermissions': APPIUM_AUTO_GRANT_PERMISSIONS === 'true',
-          'appium:newCommandTimeout': 300,
+          'appium:newCommandTimeout': Number(APPIUM_NEW_COMMAND_TIMEOUT),
+          'appium:skipUnlock': APPIUM_SKIP_UNLOCK === 'true',
+          'appium:skipServerInstallation': APPIUM_SKIP_SERVER_INSTALLATION === 'true',
+          'appium:uiautomator2ServerLaunchTimeout': 30000,
         }
       : RUN_TARGET === 'local_real_ios'
       ? {
@@ -184,7 +238,10 @@ export const config: WdioConfig = {
           'appium:fullReset': APPIUM_FULL_RESET === 'true',
           'appium:autoGrantPermissions': APPIUM_AUTO_GRANT_PERMISSIONS === 'true',
           'appium:autoAcceptAlerts': APPIUM_AUTO_ACCEPT_ALERTS === 'true',
-          'appium:newCommandTimeout': 300,
+          'appium:newCommandTimeout': Number(APPIUM_NEW_COMMAND_TIMEOUT),
+          'appium:skipUnlock': APPIUM_SKIP_UNLOCK === 'true',
+          'appium:skipServerInstallation': APPIUM_SKIP_SERVER_INSTALLATION === 'true',
+          'appium:uiautomator2ServerLaunchTimeout': 30000,
           ...(process.env.ANDROID_UDID ? { 'appium:udid': process.env.ANDROID_UDID } : {}),
         }
       : IS_ANDROID
@@ -224,16 +281,36 @@ export const config: WdioConfig = {
     requiredDirs.forEach(dir => {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
-        console.log(`Created directory: ${dir}`);
       }
     });
 
-    console.log(`\n🚀 Running platform: ${PLATFORM}`);
+    console.log('\n' + '='.repeat(60));
+    console.log('🚀 E2E TEST RUN STARTING');
+    console.log('='.repeat(60));
+    console.log(`📱 Platform: ${PLATFORM}`);
     console.log(`🎯 Target: ${RUN_TARGET}`);
     console.log(`📊 Qase: ${ENABLE_QASE ? 'ENABLED' : 'DISABLED'}`);
-
+    console.log(`⏱️  Timeouts (current values):`);
+    console.log(`   - WaitFor: ${WDIO_WAITFOR_TIMEOUT}ms${process.env.WDIO_WAITFOR_TIMEOUT ? ' (from env)' : ' (default)'}`);
+    console.log(`   - Mocha: ${MOCHA_TIMEOUT}ms${process.env.MOCHA_TIMEOUT ? ' (from env)' : ' (default)'}`);
+    console.log(`   - Connection retry: ${WDIO_CONNECTION_RETRY_TIMEOUT}ms (${WDIO_CONNECTION_RETRY_COUNT} attempts)${process.env.WDIO_CONNECTION_RETRY_TIMEOUT ? ' (from env)' : ' (default)'}`);
+    console.log(`   - Appium command: ${APPIUM_NEW_COMMAND_TIMEOUT}s${process.env.APPIUM_NEW_COMMAND_TIMEOUT ? ' (from env)' : ' (default)'}`);
+    
+    if (process.env.WDIO_WAITFOR_TIMEOUT || process.env.MOCHA_TIMEOUT || process.env.WDIO_CONNECTION_RETRY_TIMEOUT) {
+      console.log(`\n⚠️  Note: Some timeout values are overridden by environment variables.`);
+      console.log(`   To use optimized defaults, remove these from .env or system environment:`);
+      if (process.env.WDIO_WAITFOR_TIMEOUT) console.log(`   - WDIO_WAITFOR_TIMEOUT=${process.env.WDIO_WAITFOR_TIMEOUT}`);
+      if (process.env.MOCHA_TIMEOUT) console.log(`   - MOCHA_TIMEOUT=${process.env.MOCHA_TIMEOUT}`);
+      if (process.env.WDIO_CONNECTION_RETRY_TIMEOUT) console.log(`   - WDIO_CONNECTION_RETRY_TIMEOUT=${process.env.WDIO_CONNECTION_RETRY_TIMEOUT}`);
+      if (process.env.WDIO_CONNECTION_RETRY_COUNT) console.log(`   - WDIO_CONNECTION_RETRY_COUNT=${process.env.WDIO_CONNECTION_RETRY_COUNT}`);
+    }
+    
     const localAppPath = getLocalAppPath();
-    console.log(`📱 App path: ${localAppPath}`);
+    console.log(`📦 App: ${path.basename(localAppPath)}`);
+    if (!IS_BS) {
+      console.log(`🔧 Appium: ${process.env.APPIUM_COMMAND || 'appium'} (check logs/appium.log if connection fails)`);
+    }
+    console.log('='.repeat(60) + '\n');
 
     if (IS_BS) {
       const appUrl = await uploadAppToBS(localAppPath);
@@ -259,24 +336,90 @@ export const config: WdioConfig = {
     }
   },
 
-  afterTest: async (test, _context, { passed }) => {
+  beforeTest: async (test, _context) => {
+    const testTitle = test.title || 'Unknown test';
+    const suiteTitle = test.parent || 'Unknown suite';
+    console.log(`\n🧪 Running: ${suiteTitle} → ${testTitle}`);
+  },
+
+  afterTest: async (test, _context, { passed, duration }) => {
+    const status = passed ? '✅ PASSED' : '❌ FAILED';
+    const durationSec = (duration / 1000).toFixed(2);
+    console.log(`   ${status} (${durationSec}s)`);
+    
     if (!passed && CAPTURE_SCREENSHOTS_ON_FAIL === 'true') {
       const safeTitle = test.title.replace(/[^a-zA-Z0-9]/g, '_');
       const filename = `FAIL_${safeTitle}_${Date.now()}.png`;
       try {
         await browser.saveScreenshot(`./error-shots/${filename}`);
-        console.log(`📸 Error screenshot saved: ./error-shots/${filename}`);
+        console.log(`   📸 Error screenshot saved: ./error-shots/${filename}`);
       } catch (e: any) {
-        console.error('Failed to save screenshot:', e.message);
+        console.error(`   ⚠️  Failed to save screenshot: ${e.message}`);
       }
     }
   },
 
-  onComplete: async () => {
-    console.log('\n🏁 E2E run finished');
-    if (ENABLE_QASE && QASE_RUN_ID) {
-      console.log(`📤 Qase results sent to Run ID: ${QASE_RUN_ID}`);
+  beforeCommand: function (_commandName, _args) {
+  },
+
+  afterCommand: function (_commandName, _args, _result, error) {
+    if (error) {
+      if (DEBUG === 'true') {
+        console.log(`[CMD_ERR] ${_commandName}: ${error.message}`);
+      }
+      
+      if (error.message && error.message.includes('Unable to connect')) {
+        console.error('\n' + '='.repeat(60));
+        console.error('❌ APPIUM CONNECTION ERROR');
+        console.error('='.repeat(60));
+        console.error('Unable to connect to Appium server.');
+        console.error(`\nError: ${error.message}`);
+        console.error('\n📋 Troubleshooting Steps:');
+        console.error('   1. Check if Appium is installed globally:');
+        console.error('      npm list -g appium');
+        console.error('   2. If not installed, install it:');
+        console.error('      npm install -g appium');
+        console.error('   3. Check Appium logs for details:');
+        console.error('      Check logs/appium.log file');
+        console.error('   4. Verify Appium can start manually:');
+        console.error('      appium --version');
+        console.error('   5. Check if port 4723 is available:');
+        console.error('      netstat -ano | findstr :4723 (Windows)');
+        console.error('   6. If using custom Appium path, set:');
+        console.error('      APPIUM_COMMAND="path/to/appium"');
+        console.error('   7. For more verbose logging, set:');
+        console.error('      VERBOSE_TESTS=true');
+        console.error('='.repeat(60) + '\n');
+      }
     }
+  },
+
+
+  onComplete: async (_exitCode, _config, _capabilities, results) => {
+    console.log('\n' + '='.repeat(60));
+    console.log('🏁 E2E TEST RUN COMPLETED');
+    console.log('='.repeat(60));
+    
+    if (results) {
+      const total = results.finished;
+      const passed = results.passed;
+      const failed = results.failed;
+      const duration = results.duration || 0;
+      const durationMin = Math.floor(duration / 60000);
+      const durationSec = Math.floor((duration % 60000) / 1000);
+      
+      console.log(`📊 Results:`);
+      console.log(`   ✅ Passed: ${passed}`);
+      console.log(`   ❌ Failed: ${failed}`);
+      console.log(`   📝 Total:  ${total}`);
+      console.log(`   ⏱️  Duration: ${durationMin}m ${durationSec}s`);
+    }
+    
+    if (ENABLE_QASE && QASE_RUN_ID) {
+      console.log(`\n📤 Qase results sent to Run ID: ${QASE_RUN_ID}`);
+    }
+    
+    console.log('='.repeat(60) + '\n');
   },
 
   autoCompileOpts: {

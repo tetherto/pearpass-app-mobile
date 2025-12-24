@@ -89,4 +89,20 @@ describe('TextAreaReport Component', () => {
     )
     expect(toJSON()).toMatchSnapshot()
   })
+
+  test('passes testID to native component', () => {
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <TextAreaReport
+          testID="text-area-report"
+          value="test"
+          placeholder="Enter report text"
+          onChange={() => {}}
+          isDisabled={false}
+          onClick={() => {}}
+        />
+      </ThemeProvider>
+    )
+    expect(getByTestId('text-area-report')).toBeTruthy()
+  })
 })

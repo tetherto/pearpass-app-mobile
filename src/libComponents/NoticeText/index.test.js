@@ -50,4 +50,13 @@ describe('NoticeText Component', () => {
     )
     expect(toJSON()).toMatchSnapshot()
   })
+
+  test('passes testID to native component', () => {
+    const { getByTestId } = render(
+      <ThemeProvider>
+        <NoticeText testID="notice-text" text="Test message" type="success" />
+      </ThemeProvider>
+    )
+    expect(getByTestId('notice-text')).toBeTruthy()
+  })
 })
