@@ -13,7 +13,7 @@ import {
 } from 'pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
-import { Description, ExportButton, ExportFormat, VaultsList } from './styles'
+import { ExportButton, ExportFormat, VaultsList } from './styles'
 import { Container } from './styles'
 import {
   handleExportCSVPerVault,
@@ -235,9 +235,6 @@ export const TabExport = () => {
   return (
     <CardSingleSetting title={t`Export`}>
       <Container>
-        <Description>
-          {t`Choose which Vaults do you want to export and select if you want the file encrypted`}
-        </Description>
         <VaultsList>
           {data?.map((vault) => (
             <ListItem
