@@ -37,7 +37,7 @@ export const BottomSheetBlindPeersContent = ({ onClose, onConfirm, isEditMode = 
     if (isEditMode && blindMirrorsData.length > 0) {
       setSelectedOption(blindMirrorsData[0].isDefault ? DEFAULT : PERSONAL)
     }
-  }, [])
+  }, [isEditMode, blindMirrorsData.length])
 
   const handleConfirm = async () => {
     if (selectedOption === DEFAULT) {
