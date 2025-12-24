@@ -381,6 +381,8 @@ jobs:
   mobile_release:
     name: Create unified Mobile release (IPA & AAB)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs: [android, ios]
     if: github.ref == 'refs/heads/main'
     steps:
