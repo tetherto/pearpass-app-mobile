@@ -248,10 +248,16 @@ export const OnboardingContainer = ({
         }
       ]}
     >
-      <View style={styles.paginationContainer}>
+      <View
+        testID="onboarding-progress-bar"
+        accessibilityLabel="onboarding-progress-bar"
+        style={styles.paginationContainer}
+      >
         {SCREENS.map((step) => (
           <TouchableOpacity
             key={step}
+            testID={`onboarding_progress_step_${step}`}
+            accessibilityLabel={`onboarding_progress_step_${step}`}
             style={[
               styles.paginationDot,
               currentStep === step && styles.paginationDotActive
@@ -261,12 +267,28 @@ export const OnboardingContainer = ({
         ))}
       </View>
       <View style={styles.actionButtonsContainer}>
-        <TouchableOpacity onPress={onContinue} style={styles.continueButton}>
-          <Text style={styles.continueButtonText}>{t`Continue`}</Text>
+        <TouchableOpacity
+          testID="onboarding-continue-button"
+          accessibilityLabel="onboarding-continue-button"
+          onPress={onContinue}
+          style={styles.continueButton}
+        >
+          <Text
+            testID="onboarding-continue-text"
+            style={styles.continueButtonText}
+          >{t`Continue`}</Text>
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
-          <TouchableOpacity onPress={onSkip} style={styles.skipButton}>
-            <Text style={styles.skipButtonText}>{t`Skip`}</Text>
+          <TouchableOpacity
+            testID="onboarding-skip-button"
+            accessibilityLabel="onboarding-skip-button"
+            onPress={onSkip}
+            style={styles.skipButton}
+          >
+            <Text
+              testID="onboarding-skip-text"
+              style={styles.skipButtonText}
+            >{t`Skip`}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -293,7 +315,11 @@ export const OnboardingContainer = ({
 
       <View style={styles.contentWrapper}>
         <View style={styles.topSection}>
-          <View style={styles.logoContainer}>
+          <View
+            testID="onboarding-logo"
+            accessibilityLabel="onboarding-logo"
+            style={styles.logoContainer}
+          >
             <LogoTextWithLock width={170} height={50} />
           </View>
         </View>
@@ -303,7 +329,11 @@ export const OnboardingContainer = ({
           <Text style={styles.descriptionText}>{mainDescription}</Text>
 
           {getSubDescriptionContent() && (
-            <View style={styles.subDescriptionWrapper}>
+            <View
+              testID="onboarding-sub-description"
+              accessibilityLabel="onboarding-sub-description"
+              style={styles.subDescriptionWrapper}
+            >
               <Text style={styles.subDescriptionText}>
                 {getSubDescriptionContent()}
               </Text>
