@@ -150,25 +150,13 @@ export const OnboardingContainer = ({
           </View>
         )
       case 2:
-        return (
-          <View>
-            <Rive resourceName="password" style={styles.riveAnimation} />
-          </View>
-        )
+        return <Rive resourceName="password" style={styles.riveAnimation} />
 
       case 3:
-        return (
-          <View>
-            <Rive resourceName="category" style={styles.riveAnimation} />
-          </View>
-        )
+        return <Rive resourceName="category" style={styles.riveAnimation} />
 
       case 4:
-        return (
-          <View>
-            <Rive resourceName="form" style={styles.riveAnimationForm} />
-          </View>
-        )
+        return <Rive resourceName="form" style={styles.riveAnimationForm} />
       case 5:
         return (
           <Image
