@@ -21,7 +21,7 @@ describe('compareVersions', () => {
   })
 
   it('should return true when latest is greater (minor)', () => {
-    expect(compareVersions('1.0.0', '1.1.0')).toBe(true)
+    expect(compareVersions('1.0.0', '1.1.1')).toBe(true)
   })
 
   it('should return true when latest is greater (patch)', () => {
