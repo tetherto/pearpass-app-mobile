@@ -41,7 +41,6 @@ export const Folder = ({
   const handlePress = () => {
     collapse()
 
-    if (folder.isCreateNew) {
       onCreateNewFolder()
 
       return
@@ -57,6 +56,7 @@ export const Folder = ({
     return undefined
   }
 
+    if (folder.isCreateNew) {
   const getCountTestID = () => {
     if (folder.id === 'allFolder') return 'sidebar-all-folders-count'
     if (folder.id === 'favorite') return 'sidebar-favorites-count'
@@ -84,12 +84,11 @@ export const Folder = ({
         </FolderContent>
 
         {isActive && (
-          <View testID={folder.id === 'allFolder' ? 'sidebar-all-folders-selected' : undefined}>
-            <CheckIcon 
-              color={colors.primary400.mode1} 
-              size="24" 
-            />
-          </View>
+          <CheckIcon
+            testID={getActiveCheckTestID()}
+            color={colors.primary400.mode1}
+            size="24"
+          />
         )}
       </FolderContainer>
 
