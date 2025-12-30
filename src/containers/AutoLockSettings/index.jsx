@@ -1,7 +1,10 @@
 import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { AUTO_LOCK_TIMEOUT_OPTIONS, DEFAULT_AUTO_LOCK_TIMEOUT } from 'pearpass-lib-constants'
+import {
+  AUTO_LOCK_TIMEOUT_OPTIONS,
+  DEFAULT_AUTO_LOCK_TIMEOUT
+} from 'pearpass-lib-constants'
 import { ArrowDownIcon } from 'pearpass-lib-ui-react-native-components'
 
 import { BottomSheetAutoLockContent } from './BottomSheetContent'
@@ -17,6 +20,9 @@ import { AppSwitch } from '../../components/AppSwitch/AppSwitch'
 import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 
+/**
+ * @returns {JSX.Element}
+ */
 export const AutoLockSettings = () => {
   const { t } = useLingui()
   const { expand, collapse } = useBottomSheet()
@@ -31,9 +37,7 @@ export const AutoLockSettings = () => {
   }, [autoLockTimeout, t])
 
   const handleToggleAutoLock = (enabled) => {
-    setAutoLockTimeout(
-      enabled ? DEFAULT_AUTO_LOCK_TIMEOUT : null
-    )
+    setAutoLockTimeout(enabled ? DEFAULT_AUTO_LOCK_TIMEOUT : null)
   }
 
   const handleTimeoutSelect = (value) => {

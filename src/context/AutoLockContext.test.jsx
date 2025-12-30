@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react-native'
+import { DEFAULT_AUTO_LOCK_TIMEOUT } from 'pearpass-lib-constants'
 
 import { AutoLockProvider, useAutoLockContext } from './AutoLockContext'
-import { DEFAULT_AUTO_LOCK_TIMEOUT } from 'pearpass-lib-constants'
 
 jest.mock('pearpass-lib-constants', () => ({
   DEFAULT_AUTO_LOCK_TIMEOUT: 15 * 60 * 1000
@@ -107,4 +107,3 @@ describe('AutoLockContext', () => {
     expect(result.current.autoLockTimeout).toBe(null)
   })
 })
-

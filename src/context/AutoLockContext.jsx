@@ -15,9 +15,9 @@ import { logger } from '../utils/logger'
 
 const AutoLockContext = createContext({
   shouldBypassAutoLock: false,
-  setShouldBypassAutoLock: () => { },
+  setShouldBypassAutoLock: () => {},
   autoLockTimeout: DEFAULT_AUTO_LOCK_TIMEOUT,
-  setAutoLockTimeout: () => { },
+  setAutoLockTimeout: () => {},
   isAutoLockEnabled: true
 })
 

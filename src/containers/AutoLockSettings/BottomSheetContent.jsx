@@ -11,6 +11,12 @@ const Container = styled.View`
   padding: 20px;
 `
 
+/**
+ * @param {object} props
+ * @param {number} props.selectedValue
+ * @param {(value: number) => void} props.onSelect
+ * @returns {JSX.Element}
+ */
 export const BottomSheetAutoLockContent = ({ selectedValue, onSelect }) => {
   const { t } = useLingui()
 

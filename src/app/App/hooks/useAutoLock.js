@@ -4,11 +4,11 @@ import { useNavigation } from '@react-navigation/native'
 import { closeAllInstances, useUserData, useVaults } from 'pearpass-lib-vault'
 import { AppState } from 'react-native'
 
+import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
 import { clearAllFileCache } from '../../../utils/filesCache'
-import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 
 export const useAutoLock = () => {
   const appState = useRef(AppState.currentState)
@@ -47,7 +47,9 @@ export const useAutoLock = () => {
           closeModal()
           closeAllInstances()
           clearAllFileCache()
-          navigation.navigate('Welcome', { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD })
+          navigation.navigate('Welcome', {
+            state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD
+          })
           resetState()
         }
       }
