@@ -40,21 +40,38 @@ const { PERSONAL } = BLIND_PEER_TYPE
  * @param {Object} props
  * @param {Function} props.onClose
  * @param {Function} props.onConfirm
+ * @param {boolean} props.isEditMode
  */
 export const BottomSheetBlindPeersPersonalContent = ({
   onClose,
-  onConfirm
+  onConfirm,
+  isEditMode = false
 }) => {
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
   const { setIsLoading: setIsLoadingContext } = useLoadingContext()
-  const { addBlindMirrors } = useBlindMirrors()
+  const { addBlindMirrors, removeBlindMirror, removeAllBlindMirrors, data: blindMirrorsData } = useBlindMirrors()
   const [keyboardHeight, setKeyboardHeight] = useState(0)
 
-  const { registerArray } = useForm({
-    initialValues: {
+
+  const getInitialValues = () => {
+    const manualPeers = blindMirrorsData.filter((item) => !item.isDefault)
+
+    if (manualPeers.length > 0) {
+      return {
+        blindPeers: manualPeers.map((item) => ({
+          name: BLIND_PEER_FORM_NAME,
+          blindPeer: item.key
+        }))
+      }
+    }
+    return {
       blindPeers: [{ name: BLIND_PEER_FORM_NAME }]
     }
+  }
+
+  const { registerArray } = useForm({
+    initialValues: getInitialValues()
   })
 
   const {
@@ -102,6 +119,11 @@ export const BottomSheetBlindPeersPersonalContent = ({
     if (blindPeers.length) {
       try {
         setIsLoadingContext(true)
+
+        if (isEditMode && blindMirrorsData?.[0]?.isDefault) {
+          await removeAllBlindMirrors()
+        }
+
         await addBlindMirrors(blindPeers)
         Toast.show({
           type: 'baseToast',
@@ -141,9 +163,9 @@ export const BottomSheetBlindPeersPersonalContent = ({
         contentContainerStyle={[
           styles.scrollViewContent,
           Platform.OS === 'android' &&
-            keyboardHeight > 0 && {
-              paddingBottom: keyboardHeight + 20
-            }
+          keyboardHeight > 0 && {
+            paddingBottom: keyboardHeight + 20
+          }
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={true}
