@@ -12,6 +12,7 @@ import { setPearpassVaultClient, VaultProvider } from 'pearpass-lib-vault'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { App } from './app/App'
+import { AutoLockHandler } from './components/AutoLockHandler'
 import { AutoLockProvider } from './context/AutoLockContext'
 import { BottomSheetProvider } from './context/BottomSheetContext'
 import { LoadingProvider } from './context/LoadingContext'
@@ -62,7 +63,9 @@ export const Main = () => {
                     <AutoLockProvider>
                       <ModalProvider>
                         <BottomSheetProvider>
-                          <App />
+                          <AutoLockHandler>
+                            <App />
+                          </AutoLockHandler>
                         </BottomSheetProvider>
                       </ModalProvider>
                     </AutoLockProvider>

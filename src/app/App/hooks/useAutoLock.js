@@ -8,6 +8,7 @@ import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
 import { clearAllFileCache } from '../../../utils/filesCache'
+import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 
 export const useAutoLock = () => {
   const appState = useRef(AppState.currentState)
@@ -46,7 +47,7 @@ export const useAutoLock = () => {
           closeModal()
           closeAllInstances()
           clearAllFileCache()
-          navigation.navigate('Welcome', { state: 'enterMasterPassword' })
+          navigation.navigate('Welcome', { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD })
           resetState()
         }
       }
