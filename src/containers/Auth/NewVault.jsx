@@ -7,7 +7,7 @@ import { Validator } from 'pear-apps-utils-validator'
 import { PROTECTED_VAULT_ENABLED } from 'pearpass-lib-constants'
 import { SmallArrowIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useCreateVault, useVault } from 'pearpass-lib-vault'
+import { useCreateVault, useVault, useVaults } from 'pearpass-lib-vault'
 import {
   ActivityIndicator,
   Platform,
@@ -93,6 +93,9 @@ export const NewVault = () => {
     setIsPasswordVisible(!isPasswordVisible)
   }
 
+  const { data: vaultsData } = useVaults()
+  const hasVaults = vaultsData && vaultsData.length > 0
+
   return (
     <KeyboardAvoidingView
       style={styles.flex}
@@ -116,7 +119,7 @@ export const NewVault = () => {
               <Text style={styles.title}>{t`Create New Vault`}</Text>
               <Text
                 style={styles.subtitle}
-              >{t`Create your first vault by giving it a name. You can also add a password to secure this vault for extra protection.`}</Text>
+              >{t`Create your ${!hasVaults ? 'first vault' : 'vault'} by giving it a name.${PROTECTED_VAULT_ENABLED ? ' You can also add a password to secure this vault for extra protection.' : ''}`}</Text>
             </View>
 
             <View style={styles.inputs}>

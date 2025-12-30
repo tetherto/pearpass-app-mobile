@@ -51,4 +51,4 @@
 	url = ../tether-dev-docs.git
 [submodule "packages/pearpass-lib-vault-core"]
 	path = packages/pearpass-lib-vault-core
-	url = git@github.com:tetherto/pearpass-lib-vault-core.git
+	url = ../pearpass-lib-vault-core.git

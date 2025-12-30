@@ -20,15 +20,19 @@ const ModalContext = createContext()
 export const ModalProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [content, setContent] = useState(null)
+  const [preventClose, setPreventClose] = useState(false)
 
-  const openModal = (content) => {
+  const openModal = (content, options = {}) => {
     setIsOpen(true)
     setContent(content)
+    setPreventClose(options.preventClose || false)
   }
 
   const closeModal = () => {
+    if (preventClose) return
     setIsOpen(false)
     setContent(null)
+    setPreventClose(false)
   }
 
   return (

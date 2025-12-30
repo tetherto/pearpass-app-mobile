@@ -3,7 +3,6 @@ import { I18nProvider } from '@lingui/react'
 import { renderHook, act } from '@testing-library/react-native'
 import * as Clipboard from 'expo-clipboard'
 import * as SecureStore from 'expo-secure-store'
-import { AppState } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
@@ -42,10 +41,18 @@ jest.mock('pearpass-lib-ui-theme-provider/native', () => ({
 }))
 
 jest.mock('react-native', () => ({
-  AppState: {
-    addEventListener: jest.fn(() => ({
-      remove: jest.fn()
-    }))
+  NativeModules: {
+    NativeClipboard: null
+  }
+}))
+
+jest.mock('../native-modules/NativeClipboard', () => ({
+  __esModule: true,
+  default: {
+    isAvailable: jest.fn().mockResolvedValue(false),
+    setStringWithExpiration: jest.fn(),
+    clearClipboard: jest.fn(),
+    clearIfCurrentMatches: jest.fn()
   }
 }))
 
@@ -277,7 +284,7 @@ describe('useCopyToClipboard', () => {
       expect(Clipboard.setStringAsync).toHaveBeenCalledTimes(1)
     })
 
-    it('should continue running clipboard clear timer even after unmount', async () => {
+    it('should cancel clipboard clear timer on unmount', async () => {
       SecureStore.getItemAsync.mockResolvedValue('true')
       Clipboard.getStringAsync.mockResolvedValue('sensitive password')
 
@@ -294,78 +301,9 @@ describe('useCopyToClipboard', () => {
         jest.advanceTimersByTime(30000)
       })
 
-      expect(Clipboard.getStringAsync).toHaveBeenCalled()
-      expect(Clipboard.setStringAsync).toHaveBeenCalledWith('')
-    })
-  })
-
-  describe('AppState background clearing', () => {
-    let appStateCallback
-
-    beforeEach(() => {
-      AppState.addEventListener.mockImplementation((event, callback) => {
-        if (event === 'change') {
-          appStateCallback = callback
-        }
-        return { remove: jest.fn() }
-      })
-    })
-
-    it('should clear clipboard when app goes to background', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
-      Clipboard.getStringAsync.mockResolvedValue('sensitive password')
-
-      const { result } = renderWithI18n()
-      await act(async () => {})
-
-      await act(async () => {
-        await result.current.copyToClipboard('sensitive password')
-      })
-
-      await act(async () => {
-        appStateCallback('background')
-      })
-
-      expect(Clipboard.getStringAsync).toHaveBeenCalled()
-      expect(Clipboard.setStringAsync).toHaveBeenCalledWith('')
-    })
-
-    it('should clear clipboard when app becomes inactive', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
-      Clipboard.getStringAsync.mockResolvedValue('sensitive password')
-
-      const { result } = renderWithI18n()
-      await act(async () => {})
-
-      await act(async () => {
-        await result.current.copyToClipboard('sensitive password')
-      })
-
-      await act(async () => {
-        appStateCallback('inactive')
-      })
-
-      expect(Clipboard.getStringAsync).toHaveBeenCalled()
-      expect(Clipboard.setStringAsync).toHaveBeenCalledWith('')
-    })
-
-    it('should not clear clipboard on background if value has changed', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
-      Clipboard.getStringAsync.mockResolvedValue('different value')
-
-      const { result } = renderWithI18n()
-      await act(async () => {})
-
-      await act(async () => {
-        await result.current.copyToClipboard('sensitive password')
-      })
-
-      await act(async () => {
-        appStateCallback('background')
-      })
-
-      expect(Clipboard.getStringAsync).toHaveBeenCalled()
-      expect(Clipboard.setStringAsync).not.toHaveBeenCalledWith('')
+      // Timer is cancelled on unmount, so clipboard should NOT be cleared
+      expect(Clipboard.getStringAsync).not.toHaveBeenCalled()
+      expect(Clipboard.setStringAsync).toHaveBeenCalledTimes(1) // Only the initial copy
     })
   })
 })

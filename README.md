@@ -185,7 +185,7 @@ For more information, refer to the [Maestro documentation](https://maestro.mobil
 - [pearpass-lib-ui-react-components](https://github.com/tetherto/pearpass-lib-ui-react-components) - A library of React UI components for PearPass
 - [tether-dev-docs](https://github.com/tetherto/tether-dev-docs) - Documentations and guides for developers
 - [pearpass-lib-vault](https://github.com/tetherto/pearpass-lib-vault) - A library for managing password vaults
-- [pearpass-lib-vault-mobile](https://github.com/tetherto/pearpass-lib-vault-mobile) - A bare wrapper for Autopass and Corestore for password storage and encryption
+- [pearpass-lib-vault-core](https://github.com/tetherto/pearpass-lib-vault-core) - A bare wrapper for Autopass and Corestore for password storage and encryption
 
 ## License
 

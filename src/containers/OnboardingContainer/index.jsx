@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Trans, useLingui } from '@lingui/react/macro'
-import {
-  FaceIdIcon,
-  TimeIcon,
-  XIcon
-} from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   Animated,
@@ -49,17 +44,11 @@ export const OnboardingContainer = ({
 }) => {
   const { t } = useLingui()
   const insets = useSafeAreaInsets()
-  const [timeLeft, setTimeLeft] = useState(90)
+  const [, setTimeLeft] = useState(90)
   const intervalRef = useRef(null)
 
   const floatAnim = useRef(new Animated.Value(0)).current
   const buttonFadeAnim = useRef(new Animated.Value(0)).current
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
 
   useEffect(() => {
     if (currentStep === 1) {
@@ -125,79 +114,56 @@ export const OnboardingContainer = ({
     switch (currentStep) {
       case 0:
         return (
-          <InitialVideo
-            onStart={() => buttonFadeAnim.setValue(0)}
-            onEnded={() => {
-              Animated.timing(buttonFadeAnim, {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true
-              }).start()
-            }}
-          />
+          <View>
+            <InitialVideo
+              onStart={() => buttonFadeAnim.setValue(0)}
+              onEnded={() => {
+                Animated.timing(buttonFadeAnim, {
+                  toValue: 1,
+                  duration: 500,
+                  useNativeDriver: true
+                }).start()
+              }}
+            />
+          </View>
         )
       case 1:
         return (
-          <Animated.Image
-            source={require('../../../assets/images/intro/closeLock.png')}
-            style={[
-              styles.centerImage,
-              {
-                transform: [
-                  {
-                    translateY: floatAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -20]
-                    })
-                  }
-                ]
-              }
-            ]}
-            resizeMode="contain"
-          />
+          <View>
+            <Animated.Image
+              source={require('../../../assets/images/intro/closeLock.png')}
+              style={[
+                styles.centerImage,
+                {
+                  transform: [
+                    {
+                      translateY: floatAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -20]
+                      })
+                    }
+                  ]
+                }
+              ]}
+              resizeMode="contain"
+            />
+          </View>
         )
       case 2:
         return <Rive resourceName="password" style={styles.riveAnimation} />
+
       case 3:
         return <Rive resourceName="category" style={styles.riveAnimation} />
+
       case 4:
         return <Rive resourceName="form" style={styles.riveAnimationForm} />
       case 5:
         return (
-          <View style={styles.finalStepContainer}>
-            <View style={styles.iconContainer}>
-              <View style={styles.qrheaderContainer}>
-                <View style={styles.faceIdContainer}>
-                  <FaceIdIcon size="21" />
-                  <Text style={styles.faceIdText}>{t`Add a device`}</Text>
-                </View>
-                <TouchableOpacity style={styles.closeButton}>
-                  <XIcon />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.qrCodeImageCotainer}>
-                <Text style={styles.faceIdText}>{t`Scan this QR code`} </Text>
-                <View style={styles.qrCodeImageWrapper}>
-                  <Image
-                    source={require('../../../assets/images/intro/qr.png')}
-                    style={styles.finalIcon}
-                    resizeMode="contain"
-                  />
-                </View>
-              </View>
-              <View style={styles.timerContainer}>
-                <Text style={styles.timerText}>{t`Add a device`}</Text>
-                <Text style={[styles.timerText, styles.timerTextPrimary]}>
-                  {formatTime(timeLeft)}
-                </Text>
-                <TimeIcon
-                  color={colors.primary400.option1}
-                  width={18}
-                  height={18}
-                />
-              </View>
-            </View>
-          </View>
+          <Image
+            source={require('../../../assets/images/intro/linked_device.png')}
+            style={styles.centerImage}
+            resizeMode="contain"
+          />
         )
       default:
         return null
@@ -321,7 +287,6 @@ export const OnboardingContainer = ({
         </View>
 
         <View style={styles.centerSection}>{renderCenterContent()}</View>
-
         <View style={styles.bottomSection}>
           <Text style={styles.descriptionText}>{mainDescription}</Text>
 

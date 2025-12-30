@@ -2,9 +2,15 @@ import * as DocumentPicker from 'expo-document-picker'
 import * as FileSystem from 'expo-file-system'
 
 export const readFileContent = async (acceptedTypes) => {
-  const type = acceptedTypes.map((type) =>
-    type === '.csv' ? 'text/csv' : type === '.json' ? 'application/json' : type
-  )
+  const type = acceptedTypes.flatMap((type) => {
+    if (type === '.csv') {
+      return ['text/csv', 'text/comma-separated-values']
+    } else if (type === '.json') {
+      return ['application/json']
+    } else {
+      return [type]
+    }
+  })
 
   const result = await DocumentPicker.getDocumentAsync({ type })
 

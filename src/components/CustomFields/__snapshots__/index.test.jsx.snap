@@ -65,17 +65,20 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
       >
         <View
           style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "gap": 15,
-              "paddingBottom": 20,
-              "paddingLeft": 12,
-              "paddingRight": 10,
-              "paddingTop": 20,
-            }
+            [
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 15,
+              },
+              {
+                "paddingBottom": 20,
+                "paddingLeft": 12,
+                "paddingRight": 10,
+                "paddingTop": 20,
+              },
+            ]
           }
-          withBelowContent={false}
         >
           <View
             style={
@@ -141,10 +144,8 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
           <View
             style={
               {
-                "flexBasis": 0,
+                "flex": 1,
                 "flexDirection": "column",
-                "flexGrow": 1,
-                "flexShrink": 1,
               }
             }
           >
@@ -165,33 +166,36 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
             <View
               style={
                 {
-                  "flexBasis": 0,
-                  "flexGrow": 1,
-                  "flexShrink": 1,
+                  "flex": 1,
                   "marginTop": 5,
                   "minHeight": 29,
-                  "position": "relative",
                 }
               }
             >
               <TextInput
                 accessible={true}
                 editable={true}
-                isTransparent={false}
+                ellipsizeMode="tail"
                 keyboardType="default"
+                numberOfLines={1}
                 onBlur={[Function]}
                 onChangeText={[Function]}
                 onFocus={[Function]}
                 placeholder="Add note"
                 placeholderTextColor="#BABABA"
+                pointerEvents="auto"
                 secureTextEntry={false}
                 style={
-                  {
-                    "color": "#F6F6F6",
-                    "fontFamily": "Inter",
-                    "fontSize": 20,
-                    "fontWeight": "700",
-                  }
+                  [
+                    {
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                    },
+                    {
+                      "color": "#F6F6F6",
+                    },
+                  ]
                 }
                 value="test-note-value"
               />
@@ -380,17 +384,20 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
       >
         <View
           style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "gap": 15,
-              "paddingBottom": 20,
-              "paddingLeft": 12,
-              "paddingRight": 10,
-              "paddingTop": 20,
-            }
+            [
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 15,
+              },
+              {
+                "paddingBottom": 20,
+                "paddingLeft": 12,
+                "paddingRight": 10,
+                "paddingTop": 20,
+              },
+            ]
           }
-          withBelowContent={false}
         >
           <View
             style={
@@ -456,10 +463,8 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
           <View
             style={
               {
-                "flexBasis": 0,
+                "flex": 1,
                 "flexDirection": "column",
-                "flexGrow": 1,
-                "flexShrink": 1,
               }
             }
           >
@@ -480,33 +485,36 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
             <View
               style={
                 {
-                  "flexBasis": 0,
-                  "flexGrow": 1,
-                  "flexShrink": 1,
+                  "flex": 1,
                   "marginTop": 5,
                   "minHeight": 29,
-                  "position": "relative",
                 }
               }
             >
               <TextInput
                 accessible={true}
                 editable={true}
-                isTransparent={false}
+                ellipsizeMode="tail"
                 keyboardType="default"
+                numberOfLines={1}
                 onBlur={[Function]}
                 onChangeText={[Function]}
                 onFocus={[Function]}
                 placeholder="Add note"
                 placeholderTextColor="#BABABA"
+                pointerEvents="auto"
                 secureTextEntry={false}
                 style={
-                  {
-                    "color": "#F6F6F6",
-                    "fontFamily": "Inter",
-                    "fontSize": 20,
-                    "fontWeight": "700",
-                  }
+                  [
+                    {
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                    },
+                    {
+                      "color": "#F6F6F6",
+                    },
+                  ]
                 }
                 value="test-note-value"
               />

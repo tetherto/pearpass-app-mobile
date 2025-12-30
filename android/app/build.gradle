@@ -93,7 +93,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "0.0.35"
+        versionName "1.1.1"
     }
     signingConfigs {
         debug {
@@ -152,7 +152,7 @@ tasks.register("packAutofillBundle", Exec) {
         "--preset", "android",
         "--linked",
         "--out", "android/app/src/main/assets/extension.bundle",
-        "node_modules/pearpass-lib-vault-mobile/src/worklet/app-ipc.js"
+        "node_modules/pearpass-lib-vault-core/src/worklet/app-ipc.js"
     ])
 }
 

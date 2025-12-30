@@ -1,0 +1,36 @@
+{
+  "name": "e2e-mobile-tests",
+  "version": "1.1.1",
+  "description": "End-to-end mobile automation tests for PearPass (Android & iOS, BrowserStack & local)",
+  "main": "index.js",
+  "scripts": {
+    "wdio": "wdio run ./wdio.conf.ts",
+    "e2e:android:bs": "cross-env PLATFORM=Android RUN_TARGET=bs ENABLE_QASE=true npm run wdio",
+    "e2e:ios:bs": "cross-env PLATFORM=iOS RUN_TARGET=bs ENABLE_QASE=true npm run wdio",
+    "e2e:android:local": "cross-env PLATFORM=Android RUN_TARGET=local_real_android ENABLE_QASE=false npm run wdio",
+    "e2e:ios:local": "cross-env PLATFORM=iOS RUN_TARGET=local_real_ios ENABLE_QASE=false npm run wdio",
+    "e2e:android:emulator": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.0.0",
+    "@wdio/appium-service": "^9.21.0",
+    "@wdio/cli": "^9.21.1",
+    "@wdio/globals": "^9.17.0",
+    "@wdio/local-runner": "^9.21.0",
+    "@wdio/mocha-framework": "^9.21.0",
+    "@wdio/spec-reporter": "^9.20.0",
+    "appium-uiautomator2-driver": "^6.7.0",
+    "chai": "^6.2.1",
+    "cross-env": "^7.0.3",
+    "dotenv": "^17.2.3",
+    "expect-webdriverio": "^5.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "wdio-qase-reporter": "^1.1.4"
+  }
+}

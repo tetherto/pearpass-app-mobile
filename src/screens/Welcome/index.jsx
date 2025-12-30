@@ -12,8 +12,6 @@ import { LockedScreen } from '../../containers/Auth/LockedScreen'
 import { NewVault } from '../../containers/Auth/NewVault'
 import { SelectVaultType } from '../../containers/Auth/SelectVaultType'
 import { UnlockVault } from '../../containers/Auth/UnlockVault'
-import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
-import { useModal } from '../../context/ModalContext'
 import { useBackHandler } from '../../hooks/useBackHandler'
 import { logger } from '../../utils/logger'
 
@@ -39,16 +37,6 @@ const getWelcomeScreenContent = (state, vaultId) => {
 }
 
 export const Welcome = ({ route }) => {
-  const { openModal } = useModal()
-  const [shouldOpenModal, setShouldOpenModal] = useState(false)
-
-  useEffect(() => {
-    if (shouldOpenModal) {
-      openModal(<UpdateModalContent />)
-      setShouldOpenModal(false)
-    }
-  }, [shouldOpenModal])
-
   useBackHandler({
     shouldNotGoBack: true
   })
