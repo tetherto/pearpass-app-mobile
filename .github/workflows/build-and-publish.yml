@@ -60,15 +60,6 @@ jobs:
           registry-url: "https://npm.pkg.github.com"
           scope: "@tetherto"
 
-      - name: Install worker dependencies
-        run: |
-          git config --global url."https://github.com/".insteadOf git@github.com:
-          git config --global url."https://".insteadOf ssh://
-          git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-          npm install --install-links --legacy-peer-deps
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
-
       - name: Generate worklet bundle for Android
         run: npm run bundle:android
 
