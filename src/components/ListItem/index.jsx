@@ -22,13 +22,14 @@ import {
 /**
  * @param {{
  *  name: string
- *  date; string
+ *  date: string
  *  onShareClick: () => void
  *  onEditClick: () => void
  *  onDeleteClick: () => void
  *  onPress: () => void
  *  isSelected?: boolean
  *  isLoading?: boolean
+ *  testID?: string
  * }} props
  */
 export const ListItem = ({
@@ -40,9 +41,15 @@ export const ListItem = ({
   onPress,
   isSelected = false,
   isLoading = false,
+  testID,
   ...restProps
 }) => (
-  <ListItemContainer isSelected={isSelected} onPress={onPress} {...restProps}>
+  <ListItemContainer
+    isSelected={isSelected}
+    onPress={onPress}
+    testID={testID}
+    {...restProps}
+  >
     <ListItemInfo>
       {isLoading ? (
         <ActivityIndicator size="small" color={colors.primary400.mode1} />

@@ -31,6 +31,9 @@ import {
  *  type?: 'text' | 'password',
  *  isPassword: boolean,
  *  as?: AsTarget
+ *  testID?: string
+ *  toggleVisibilityTestID?: string
+ *  errorTestID?: string
  * }} props
  */
 export const InputPasswordPearPass = ({
@@ -44,7 +47,10 @@ export const InputPasswordPearPass = ({
   type = 'text',
   isPassword,
   onClick,
-  as
+  as,
+  testID,
+  toggleVisibilityTestID,
+  errorTestID
 }) => {
   const inputRef = useRef(null)
   const [isFocused, setIsFocused] = useState(false)
@@ -70,6 +76,7 @@ export const InputPasswordPearPass = ({
       isLast={isLast}
       isFocused={isFocused}
       isPassword={isPassword}
+      testID={testID}
     >
       {isPassword && (
         <IconWrapper>
@@ -97,7 +104,7 @@ export const InputPasswordPearPass = ({
         />
 
         {!!error?.length && (
-          <ErrorMessageWrapper>
+          <ErrorMessageWrapper testID={errorTestID}>
             <ErrorIcon size="10" />
             <ErrorMessage> {error} </ErrorMessage>
           </ErrorMessageWrapper>
@@ -110,6 +117,7 @@ export const InputPasswordPearPass = ({
             borderRadius="md"
             onPress={() => setIsVisible(!isVisible)}
             startIcon={isVisible ? EyeClosedIcon : EyeIcon}
+            testID={toggleVisibilityTestID}
           />
         </AdditionalItems>
       )}

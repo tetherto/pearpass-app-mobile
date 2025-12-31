@@ -143,19 +143,19 @@ export const EnterPassword = () => {
           <View style={styles.inputContainer}>
             <InputPasswordPearPass
               testID="enter-password-input"
+              errorTestID="enter-password-input-error"
               placeholder={t`Master password`}
               {...register('password')}
               isPassword
             />
           </View>
+
           <AppWarning
             testID="enter-password-warning"
             warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
           />
-          <View
-            style={styles.buttonContainer}
-            testID="enter-password-actions-container"
-          >
+
+          <View style={styles.buttonContainer}>
             {isLoading ? (
               <ActivityIndicator
                 testID="enter-password-loading"

@@ -2,15 +2,32 @@ import { colors } from 'pearpass-lib-ui-theme-provider/native'
 
 import { Button, ButtonText } from './styles'
 
+/**
+ * @param {{
+ *  children?: ReactNode
+ *  startIcon?: ElementType
+ *  variant?: 'primary' | 'secondary'
+ *  onPress: () => void
+ *  testID?: string
+ *  textTestID?: string
+ * }} props
+ */
 export const ButtonFilter = ({
   children,
   startIcon,
   variant = 'primary',
-  onPress
+  onPress,
+  testID,
+  textTestID
 }) => {
   const Icon = startIcon
   return (
-    <Button activeOpacity={0.8} variant={variant} onPress={onPress}>
+    <Button
+      activeOpacity={0.8}
+      variant={variant}
+      onPress={onPress}
+      testID={testID}
+    >
       {Icon && (
         <Icon
           size="21"
@@ -21,7 +38,11 @@ export const ButtonFilter = ({
           }
         />
       )}
-      {children && <ButtonText variant={variant}>{children}</ButtonText>}
+      {children && (
+        <ButtonText variant={variant} testID={textTestID}>
+          {children}
+        </ButtonText>
+      )}
     </Button>
   )
 }

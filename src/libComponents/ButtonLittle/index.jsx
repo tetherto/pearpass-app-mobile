@@ -2,12 +2,25 @@ import { colors } from 'pearpass-lib-ui-theme-provider/native'
 
 import { Button, ButtonText } from './styles'
 
+/**
+ * @param {{
+ *  children?: ReactNode
+ *  startIcon?: ElementType
+ *  variant?: 'primary' | 'secondary'
+ *  borderRadius?: 'sm' | 'md' | 'lg'
+ *  onPress: () => void
+ *  testID?: string
+ *  textTestID?: string
+ * }} props
+ */
 export const ButtonLittle = ({
   children,
   startIcon,
   variant = 'primary',
   borderRadius = 'sm',
-  onPress
+  onPress,
+  testID,
+  textTestID
 }) => {
   const Icon = startIcon
   return (
@@ -16,6 +29,7 @@ export const ButtonLittle = ({
       variant={variant}
       onPress={onPress}
       borderRadius={borderRadius}
+      testID={testID}
     >
       {Icon && (
         <Icon
@@ -25,7 +39,11 @@ export const ButtonLittle = ({
           }
         />
       )}
-      {children && <ButtonText variant={variant}>{children}</ButtonText>}
+      {children && (
+        <ButtonText variant={variant} testID={textTestID}>
+          {children}
+        </ButtonText>
+      )}
     </Button>
   )
 }

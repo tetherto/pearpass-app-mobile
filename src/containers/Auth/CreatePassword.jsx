@@ -242,13 +242,11 @@ export const CreatePassword = () => {
             <Text
               style={styles.boldText}
               testID="create-password-description"
-            >{t`The first thing to do is create a Master password to secure your account.  You’ll use this password to access PearPass. `}</Text>
-            <View
-              style={styles.inputContainer}
-              testID="create-password-inputs-container"
-            >
+            >{t`The first thing to do is create a Master password to secure your account.  You'll use this password to access PearPass. `}</Text>
+            <View style={styles.inputContainer}>
               <InputPasswordPearPass
                 testID="create-password-input"
+                errorTestID="create-password-input-error"
                 placeholder={t`Enter Password`}
                 {...passwordRegisterProps}
                 onChange={handlePasswordChange}
@@ -257,6 +255,7 @@ export const CreatePassword = () => {
 
               <InputPasswordPearPass
                 testID="create-password-confirm-input"
+                errorTestID="create-password-confirm-input-error"
                 placeholder={t`Confirm Password`}
                 {...register('passwordConfirm')}
                 isPassword
@@ -273,10 +272,7 @@ export const CreatePassword = () => {
               >
                 {t`Your password must be at least 8 characters long and include at least one of each:`}
               </Text>
-              <View
-                style={styles.bulletList}
-                testID="create-password-requirements-list"
-              >
+              <View style={styles.bulletList}>
                 <Text
                   style={styles.bulletItem}
                   testID="create-password-requirement-uppercase"
@@ -310,10 +306,7 @@ export const CreatePassword = () => {
               </Text>
             </View>
 
-            <View
-              style={styles.termsContainer}
-              testID="create-password-terms-container"
-            >
+            <View style={styles.termsContainer}>
               <AppWarning
                 testID="create-password-warning"
                 warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
@@ -354,7 +347,6 @@ export const CreatePassword = () => {
                       style={styles.linkText}
                       onPress={handleTermsPress}
                       testID="create-password-terms-link"
-                      accessibilityLabel="create-password-terms-link"
                     >
                       {t`PearPass Application Terms of Use`}
                     </Text>

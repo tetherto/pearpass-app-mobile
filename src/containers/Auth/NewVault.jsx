@@ -123,6 +123,7 @@ export const NewVault = () => {
               >{t`Create New Vault`}</Text>
               <Text
                 style={styles.subtitle}
+                testID="new-vault-subtitle"
               >{t`Create your ${!hasVaults ? 'first vault' : 'vault'} by giving it a name.${PROTECTED_VAULT_ENABLED ? ' You can also add a password to secure this vault for extra protection.' : ''}`}</Text>
             </View>
 

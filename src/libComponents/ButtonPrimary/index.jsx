@@ -7,6 +7,9 @@ import { ButtonText, Button } from './styles'
  *  size?: 'sm' | 'md'
  *  stretch: boolean
  *  onPress: () => void
+ *  disabled?: boolean
+ *  testID?: string
+ *  textTestID?: string
  * }} props
  */
 export const ButtonPrimary = ({
@@ -14,14 +17,19 @@ export const ButtonPrimary = ({
   onPress,
   size = 'md',
   stretch,
-  disabled
+  disabled,
+  testID,
+  textTestID
 }) => (
   <Button
     size={size}
     onPress={disabled ? undefined : onPress}
     stretch={stretch}
     disabled={disabled}
+    testID={testID}
   >
-    <ButtonText size={size}>{children}</ButtonText>
+    <ButtonText size={size} testID={textTestID}>
+      {children}
+    </ButtonText>
   </Button>
 )

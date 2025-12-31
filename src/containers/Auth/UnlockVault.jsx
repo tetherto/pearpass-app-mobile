@@ -124,9 +124,9 @@ export const UnlockVault = ({ vaultId }) => {
           >
             {isLoading ? (
               <ActivityIndicator
-                testID="unlock-vault-loading"
                 size="small"
                 color={colors.primary400.mode1}
+                testID="unlock-vault-loading"
               />
             ) : (
               <>

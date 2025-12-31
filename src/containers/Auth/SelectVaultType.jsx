@@ -49,8 +49,8 @@ export const SelectVaultType = () => {
   }
 
   return (
-    <View style={styles.container} testID="select-vault-type-logo">
-      <View style={styles.logoContainer}>
+    <View style={styles.container}>
+      <View style={styles.logoContainer} testID="select-vault-type-logo">
         <LogoTextWithLock width={170} height={50} />
       </View>
 
@@ -72,6 +72,7 @@ export const SelectVaultType = () => {
           <View style={styles.vaultsSection}>
             <Text
               style={styles.headerText}
+              testID="select-vault-type-list-title"
             >{t`Select a vault, create a new one or load another one`}</Text>
 
             <ScrollView
