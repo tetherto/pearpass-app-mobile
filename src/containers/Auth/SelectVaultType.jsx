@@ -57,8 +57,14 @@ export const SelectVaultType = () => {
       <View style={styles.topSection}>
         {!vaultsData?.length ? (
           <View style={styles.textWrapper}>
-            <Text style={styles.headerText} testID="select-vault-type-empty-title">{t`Enter Master Password`}</Text>
-            <Text style={styles.subHeaderText} testID="select-vault-type-empty-subtitle">
+            <Text
+              style={styles.headerText}
+              testID="select-vault-type-empty-title"
+            >{t`Enter Master Password`}</Text>
+            <Text
+              style={styles.subHeaderText}
+              testID="select-vault-type-empty-subtitle"
+            >
               {t`Now create a secure vault or load an existing one to get started.`}
             </Text>
           </View>
@@ -89,19 +95,21 @@ export const SelectVaultType = () => {
       </View>
 
       <View style={styles.bottomSection}>
-          <ButtonPrimary 
-            testID="select-vault-type-create-new"
-            stretch onPress={handleCreateVault}>
-            {t`Create a new vault`}
-          </ButtonPrimary>
+        <ButtonPrimary
+          testID="select-vault-type-create-new"
+          stretch
+          onPress={handleCreateVault}
+        >
+          {t`Create a new vault`}
+        </ButtonPrimary>
 
-          <ButtonSecondary
-            testID="select-vault-type-load-existing"
-            stretch
-            onPress={() => navigation.navigate('Welcome', { state: 'load' })}
-          >
-            {t`Load a vault`}
-          </ButtonSecondary>
+        <ButtonSecondary
+          testID="select-vault-type-load-existing"
+          stretch
+          onPress={() => navigation.navigate('Welcome', { state: 'load' })}
+        >
+          {t`Load a vault`}
+        </ButtonSecondary>
       </View>
     </View>
   )

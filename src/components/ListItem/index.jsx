@@ -44,7 +44,12 @@ export const ListItem = ({
   testID,
   ...restProps
 }) => (
-  <ListItemContainer isSelected={isSelected} onPress={onPress} testID={testID} {...restProps}>
+  <ListItemContainer
+    isSelected={isSelected}
+    onPress={onPress}
+    testID={testID}
+    {...restProps}
+  >
     <ListItemInfo>
       {isLoading ? (
         <ActivityIndicator size="small" color={colors.primary400.mode1} />

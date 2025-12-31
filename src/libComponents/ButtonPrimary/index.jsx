@@ -28,6 +28,8 @@ export const ButtonPrimary = ({
     disabled={disabled}
     testID={testID}
   >
-    <ButtonText size={size} testID={textTestID}>{children}</ButtonText>
+    <ButtonText size={size} testID={textTestID}>
+      {children}
+    </ButtonText>
   </Button>
 )

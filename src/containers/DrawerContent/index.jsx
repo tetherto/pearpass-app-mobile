@@ -145,11 +145,21 @@ export const DrawerContent = ({ navigation }) => {
           vaults={filteredVaults}
           selectedVault={vaultData}
         />
-        <ButtonThin onPress={addDevice} startIcon={FullBodyIcon} testID="sidebar-add-device-button" textTestID="sidebar-add-device-text">
+        <ButtonThin
+          onPress={addDevice}
+          startIcon={FullBodyIcon}
+          testID="sidebar-add-device-button"
+          textTestID="sidebar-add-device-text"
+        >
           {t`Add Device`}
         </ButtonThin>
 
-        <ButtonThin onPress={closeVault} startIcon={ExitIcon} testID="sidebar-close-vault-button" textTestID="sidebar-close-vault-text">
+        <ButtonThin
+          onPress={closeVault}
+          startIcon={ExitIcon}
+          testID="sidebar-close-vault-button"
+          textTestID="sidebar-close-vault-text"
+        >
           {t`Close Vault`}
         </ButtonThin>
       </ActionsContainer>

@@ -11,7 +11,13 @@ import { Button, ButtonText } from './styles'
  *  textTestID?: string
  * }} props
  */
-export const ButtonThin = ({ children, startIcon, onPress, testID, textTestID }) => {
+export const ButtonThin = ({
+  children,
+  startIcon,
+  onPress,
+  testID,
+  textTestID
+}) => {
   const Icon = startIcon
   return (
     <Button activeOpacity={0.8} onPress={onPress} testID={testID}>

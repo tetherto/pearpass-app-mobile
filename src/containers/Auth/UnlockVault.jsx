@@ -110,34 +110,40 @@ export const UnlockVault = ({ vaultId }) => {
           </Text>
 
           <View style={{ width: '100%' }}>
-              <InputPasswordPearPass
-                testID="unlock-vault-password-input"
-                placeholder={t`Vault password`}
-                {...register('password')}
-                isPassword
-              />
+            <InputPasswordPearPass
+              testID="unlock-vault-password-input"
+              placeholder={t`Vault password`}
+              {...register('password')}
+              isPassword
+            />
           </View>
 
           <View style={{ width: '100%', gap: 10 }}>
             {isLoading ? (
-              <ActivityIndicator size="small" color={colors.primary400.mode1} testID="unlock-vault-loading" />
+              <ActivityIndicator
+                size="small"
+                color={colors.primary400.mode1}
+                testID="unlock-vault-loading"
+              />
             ) : (
               <>
-                  <ButtonPrimary 
-                    testID="unlock-vault-continue-button"
-                    stretch onPress={handleSubmit(onSubmit)}>
-                    {t`Continue`}
-                  </ButtonPrimary>
+                <ButtonPrimary
+                  testID="unlock-vault-continue-button"
+                  stretch
+                  onPress={handleSubmit(onSubmit)}
+                >
+                  {t`Continue`}
+                </ButtonPrimary>
 
-                  <ButtonSecondary
-                    testID="unlock-vault-select-vaults-button"
-                    stretch
-                    onPress={() =>
-                      navigation.navigate('Welcome', { state: 'selectOrLoad' })
-                    }
-                  >
-                    {t`Select Vaults`}
-                  </ButtonSecondary>
+                <ButtonSecondary
+                  testID="unlock-vault-select-vaults-button"
+                  stretch
+                  onPress={() =>
+                    navigation.navigate('Welcome', { state: 'selectOrLoad' })
+                  }
+                >
+                  {t`Select Vaults`}
+                </ButtonSecondary>
               </>
             )}
           </View>

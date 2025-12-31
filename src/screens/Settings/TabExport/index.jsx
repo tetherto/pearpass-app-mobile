@@ -12,12 +12,7 @@ import {
 } from 'pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
-import {
-  Container,
-  ExportButton,
-  ExportFormat,
-  VaultsList
-} from './styles'
+import { Container, ExportButton, ExportFormat, VaultsList } from './styles'
 import {
   handleExportCSVPerVault,
   handleExportJsonPerVault
