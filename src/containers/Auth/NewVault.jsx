@@ -98,7 +98,6 @@ export const NewVault = () => {
 
   return (
     <KeyboardAvoidingView
-      testID="new-vault-screen"
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
@@ -153,7 +152,6 @@ export const NewVault = () => {
                     }}
                   >
                     <ButtonLittle
-                      testID="new-vault-toggle-password-section"
                       onPress={toggle}
                       variant="secondary"
                       borderRadius="lg"
@@ -170,7 +168,6 @@ export const NewVault = () => {
                   }}
                 >
                   <InputPasswordPearPass
-                    testID="new-vault-password-input"
                     placeholder={t`Enter Password`}
                     {...register('password')}
                     isPassword
@@ -179,7 +176,6 @@ export const NewVault = () => {
                   <View style={{ gap: 10 }}>
                     <Text style={styles.label}>{t`Repeat Vault password`}</Text>
                     <InputPasswordPearPass
-                      testID="new-vault-confirm-password-input"
                       placeholder={t`Confirm Password`}
                       {...register('passwordConfirm')}
                       isPassword
@@ -191,7 +187,6 @@ export const NewVault = () => {
             <View style={styles.buttons}>
               {isLoading ? (
                 <ActivityIndicator
-                  testID="new-vault-loading"
                   size="small"
                   color={colors.primary400.mode1}
                 />

@@ -229,10 +229,7 @@ export const CreatePassword = () => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View
-            style={styles.formContainer}
-            testID="create-password-form-container"
-          >
+          <View style={styles.formContainer}>
             <View style={styles.headerContainer}>
               <Text
                 style={styles.headerText}
@@ -317,15 +314,8 @@ export const CreatePassword = () => {
                 testID="create-password-terms-title"
               >{t`PearPass Terms of Use`}</Text>
 
-              <View
-                style={styles.checkboxContainer}
-                testID="create-password-terms-checkbox-row"
-              >
-                <TouchableOpacity
-                  testID="create-password-terms-checkbox"
-                  accessibilityLabel="create-password-terms-checkbox"
-                  onPress={() => setAccepted(!accepted)}
-                >
+              <View style={styles.checkboxContainer}>
+                <TouchableOpacity onPress={() => setAccepted(!accepted)}>
                   {accepted ? (
                     <View
                       style={styles.checkboxOuter}
@@ -355,15 +345,12 @@ export const CreatePassword = () => {
                 </View>
               </View>
             </View>
-            <View
-              style={styles.buttonContainer}
-              testID="create-password-actions-container"
-            >
+            <View style={styles.buttonContainer}>
               {isLoading ? (
                 <ActivityIndicator
-                  testID="create-password-loading"
                   size="small"
                   color={colors.primary400.mode1}
+                  testID="create-password-loading"
                 />
               ) : (
                 <ButtonPrimary

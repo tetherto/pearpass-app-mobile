@@ -1,22 +1,25 @@
 package com.noxtton.pearpass
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.ClipDescription
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PersistableBundle
 import android.util.Log
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.facebook.react.bridge.*
+import java.util.concurrent.TimeUnit
 
 class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
     companion object {
         const val TAG = "NativeClipboard"
-        private const val ALARM_REQUEST_CODE = 1001
+        private const val CLEAR_CLIPBOARD_WORK_NAME = "ClearClipboard"
         private var lastCopiedText: String? = null
         private var clearHandler: Handler? = null
         private var clearRunnable: Runnable? = null
@@ -33,6 +36,14 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
             val clip = ClipData.newPlainText("", text)
+
+            // Mark as sensitive on Android 13+ to hide from previews/history
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                clip.description.extras = PersistableBundle().apply {
+                    putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+            }
+
             clipboard.setPrimaryClip(clip)
 
             lastCopiedText = text
@@ -123,111 +134,78 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
         cancelScheduledClear()
 
         // 1. Handler for in-app clearing (fast, immediate response when app is open)
+        // Only works when app is in foreground; WorkManager handles background clearing
         clearHandler = Handler(Looper.getMainLooper())
         clearRunnable = Runnable {
+            // Check if app is in foreground - on Android 10+, clipboard operations
+            // silently fail when in background (no exception thrown)
+            val currentActivity = currentActivity
+            val isInForeground = currentActivity?.hasWindowFocus() == true
+
+            if (!isInForeground) {
+                Log.d(TAG, "App not in foreground, deferring clipboard clear to WorkManager")
+                return@Runnable
+            }
+
+            // Clear unconditionally - no need to read/verify clipboard content because:
+            // 1. ExistingWorkPolicy.REPLACE resets the timer when user copies something new
+            // 2. Reading clipboard adds unnecessary complexity and potential failures
             try {
                 val context = reactApplicationContext
                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-                var shouldClear = true
-                try {
-                    if (clipboard.hasPrimaryClip()) {
-                        val clipData = clipboard.primaryClip
-                        if (clipData != null && clipData.itemCount > 0) {
-                            val currentText = clipData.getItemAt(0).text?.toString()
-                            shouldClear = currentText == text
-                        }
-                    }
-                } catch (e: Exception) {
-                    // Android 10+ restriction
-                    shouldClear = lastCopiedText == text
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    clipboard.clearPrimaryClip()
+                } else {
+                    val clip = ClipData.newPlainText("", "")
+                    clipboard.setPrimaryClip(clip)
                 }
+                lastCopiedText = null
+                Log.d(TAG, "Clipboard cleared via Handler")
 
-                if (shouldClear) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        clipboard.clearPrimaryClip()
-                    } else {
-                        val clip = ClipData.newPlainText("", "")
-                        clipboard.setPrimaryClip(clip)
-                    }
-                    lastCopiedText = null
-                }
-
-                // Cancel alarm since Handler already cleared
-                cancelAlarm()
+                // Handler succeeded, cancel WorkManager
+                cancelWorkManager()
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to clear clipboard via Handler", e)
+                // Clipboard access failed - let WorkManager handle it
+                Log.d(TAG, "Handler clipboard clear failed, deferring to WorkManager", e)
             }
         }
 
         clearHandler?.postDelayed(clearRunnable!!, delayMillis)
 
-        // 2. AlarmManager for when app is closed (survives app termination)
-        scheduleAlarm(text, delayMillis)
+        // 2. WorkManager for when app is closed (survives app termination)
+        // WorkManager provides proper execution context that can access clipboard
+        // even on Android 10+ where background clipboard access is restricted
+        scheduleWorkManager(delayMillis)
     }
 
-    private fun scheduleAlarm(text: String, delayMillis: Long) {
+    private fun scheduleWorkManager(delayMillis: Long) {
         try {
             val context = reactApplicationContext
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            val intent = Intent("com.noxtton.pearpass.CLEAR_CLIPBOARD").apply {
-                setPackage(context.packageName)
-                putExtra("text_to_match", text)
-            }
+            val clearClipboardRequest = OneTimeWorkRequestBuilder<ClearClipboardWorker>()
+                .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+                .build()
 
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                ALARM_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                CLEAR_CLIPBOARD_WORK_NAME,
+                ExistingWorkPolicy.REPLACE,
+                clearClipboardRequest,
             )
 
-            val triggerTime = System.currentTimeMillis() + delayMillis
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                // Android 12+: Check if exact alarms are allowed
-                if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-                } else {
-                    // Fallback to inexact alarm (might be slightly delayed)
-                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-                }
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                // Android 6+: Use setExactAndAllowWhileIdle for Doze mode
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-            } else {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-            }
-
-            Log.d(TAG, "Scheduled alarm to clear clipboard in ${delayMillis}ms")
+            Log.d(TAG, "Scheduled WorkManager to clear clipboard in ${delayMillis}ms")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to schedule alarm for clipboard clear", e)
+            Log.e(TAG, "Failed to schedule WorkManager for clipboard clear", e)
         }
     }
 
-    private fun cancelAlarm() {
+    private fun cancelWorkManager() {
         try {
             val context = reactApplicationContext
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-            val intent = Intent("com.noxtton.pearpass.CLEAR_CLIPBOARD").apply {
-                setPackage(context.packageName)
-            }
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                ALARM_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            alarmManager.cancel(pendingIntent)
-            pendingIntent.cancel()
-
-            Log.d(TAG, "Cancelled clipboard clear alarm")
+            WorkManager.getInstance(context).cancelUniqueWork(CLEAR_CLIPBOARD_WORK_NAME)
+            Log.d(TAG, "Cancelled clipboard clear WorkManager")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to cancel alarm", e)
+            Log.e(TAG, "Failed to cancel WorkManager", e)
         }
     }
 
@@ -239,7 +217,7 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
         }
         clearHandler = null
 
-        // Cancel Alarm
-        cancelAlarm()
+        // Cancel WorkManager
+        cancelWorkManager()
     }
 }

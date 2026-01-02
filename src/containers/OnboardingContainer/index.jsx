@@ -257,13 +257,12 @@ export const OnboardingContainer = ({
         {SCREENS.map((step) => (
           <TouchableOpacity
             key={step}
-            testID={`onboarding_progress_step_${step}`}
-            accessibilityLabel={`onboarding_progress_step_${step}`}
             style={[
               styles.paginationDot,
               currentStep === step && styles.paginationDotActive
             ]}
             onPress={() => onStepSelect && onStepSelect(step)}
+            testID={`onboarding-progress-step-${step}`}
           />
         ))}
       </View>

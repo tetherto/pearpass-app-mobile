@@ -40,7 +40,7 @@ export const AutoLockProvider = ({ children }) => {
           setAutoLockTimeoutState(parsedTimeout)
         }
       } catch (error) {
-        console.error('Error loading auto-lock timeout:', error)
+        logger.error('Error loading auto-lock timeout:', error)
       } finally {
         setIsLoaded(true)
       }

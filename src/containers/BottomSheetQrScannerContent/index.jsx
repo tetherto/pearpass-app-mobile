@@ -11,11 +11,13 @@ import {
   GrantPermissionText,
   Title
 } from './styles'
+import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useQRScanner } from '../../hooks/useQRScanner'
 import { ButtonPrimary, ButtonSecondary } from '../../libComponents'
 
 export const BottomSheetQrScannerContent = ({ onScanned }) => {
   const { t } = useLingui()
+  const { setShouldBypassAutoLock } = useAutoLockContext()
 
   const {
     hasPermission,
@@ -34,9 +36,18 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
     scanDelay: 1500
   })
 
+  const handleRequestPermission = async () => {
+    setShouldBypassAutoLock(true)
+    try {
+      await requestPermission()
+    } finally {
+      setShouldBypassAutoLock(false)
+    }
+  }
+
   useEffect(() => {
-    requestPermission()
-  }, [requestPermission])
+    handleRequestPermission()
+  }, [])
 
   return (
     <BottomSheetScrollView
@@ -54,7 +65,7 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
             <GrantPermissionText>{t`We need your permission to show the camera`}</GrantPermissionText>
             <ButtonPrimary
               stretch
-              onPress={requestPermission}
+              onPress={handleRequestPermission}
             >{t`Grant Permission`}</ButtonPrimary>
           </GrantPermissionContainer>
         ) : (
@@ -77,8 +88,13 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
               <CameraSpot />
             </CameraView>
             <ButtonSecondary
-              onPress={() => {
-                pickImageForScan()
+              onPress={async () => {
+                setShouldBypassAutoLock(true)
+                try {
+                  await pickImageForScan()
+                } finally {
+                  setShouldBypassAutoLock(false)
+                }
               }}
               stretch
             >

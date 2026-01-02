@@ -6,9 +6,8 @@ import {
   DEFAULT_AUTO_LOCK_TIMEOUT
 } from 'pearpass-lib-constants'
 import { ArrowDownIcon } from 'pearpass-lib-ui-react-native-components'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { BottomSheetAutoLockContent } from './BottomSheetContent'
 import { AppSwitch } from '../../components/AppSwitch/AppSwitch'
@@ -109,4 +108,3 @@ const styles = StyleSheet.create({
     fontWeight: '700'
   }
 })
-

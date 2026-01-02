@@ -69,13 +69,12 @@ export const UnlockVault = ({ vaultId }) => {
 
   return (
     <KeyboardAvoidingView
-      testID="unlock-vault-screen"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      testID="unlock-vault-screen"
     >
       <ScrollView
-        testID="unlock-vault-scroll"
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: 'center',
@@ -85,18 +84,18 @@ export const UnlockVault = ({ vaultId }) => {
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        testID="unlock-vault-scroll"
       >
         <View
-          testID="unlock-vault-form-container"
           style={{
             width: '100%',
             maxWidth: 400,
             alignItems: 'center',
             gap: 20
           }}
+          testID="unlock-vault-form-container"
         >
           <Text
-            testID="unlock-vault-title"
             style={{
               fontSize: 16,
               fontWeight: '500',
@@ -105,8 +104,11 @@ export const UnlockVault = ({ vaultId }) => {
               marginBottom: 10,
               paddingHorizontal: 20
             }}
+            testID="unlock-vault-title"
           >
-            {t`Unlock with the ${selectedVault?.name ?? selectedVault?.id} Vault password`}
+            {t`Unlock with the ${
+              selectedVault?.name ?? selectedVault?.id
+            } Vault password`}
           </Text>
 
           <View style={{ width: '100%' }}>
@@ -118,10 +120,7 @@ export const UnlockVault = ({ vaultId }) => {
             />
           </View>
 
-          <View
-            testID="unlock-vault-actions-container"
-            style={{ width: '100%', gap: 10 }}
-          >
+          <View style={{ width: '100%', gap: 10 }}>
             {isLoading ? (
               <ActivityIndicator
                 size="small"

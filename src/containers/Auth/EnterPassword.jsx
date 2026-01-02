@@ -120,7 +120,6 @@ export const EnterPassword = () => {
       )}
 
       <ScrollView
-        testID="enter-password-scroll"
         contentContainerStyle={[
           styles.scrollViewContent,
           { paddingBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 40 }
@@ -129,10 +128,7 @@ export const EnterPassword = () => {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
-        <View
-          style={styles.formContainer}
-          testID="enter-password-form-container"
-        >
+        <View style={styles.formContainer}>
           <View style={styles.headerContainer}>
             <Text
               style={styles.headerText}
@@ -157,11 +153,7 @@ export const EnterPassword = () => {
 
           <View style={styles.buttonContainer}>
             {isLoading ? (
-              <ActivityIndicator
-                testID="enter-password-loading"
-                size="small"
-                color={colors.primary400.mode1}
-              />
+              <ActivityIndicator size="small" color={colors.primary400.mode1} />
             ) : (
               <>
                 <ButtonPrimary
@@ -173,7 +165,6 @@ export const EnterPassword = () => {
                 </ButtonPrimary>
 
                 <ButtonBiometricLogin
-                  testID="enter-password-biometric-button"
                   onBiometricLogin={(encryptionData) =>
                     onPasswordlessLogin(
                       encryptionData,

@@ -83,6 +83,7 @@
       "expo-video"
     ],
     "extra": {
+      "appVersion": "1.1.1",
       "eas": {
         "projectId": "28facb62-e2a2-4b6c-bc3f-0f5469e79415"
       }

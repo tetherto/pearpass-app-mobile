@@ -53,14 +53,13 @@ export const LoadVault = () => {
 
   return (
     <KeyboardAvoidingView
-      testID="load-vault-screen"
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <View style={{ flex: 1 }}>
         {!isKeyboardVisible && (
-          <View style={styles.logoContainer} testID="load-vault-logo">
+          <View style={styles.logoContainer}>
             <LogoTextWithLock width={170} height={50} />
           </View>
         )}
@@ -96,15 +95,10 @@ export const LoadVault = () => {
               {isLoading ? (
                 <>
                   <ActivityIndicator
-                    testID="load-vault-loading"
                     size="small"
                     color={colors.primary400.mode1}
                   />
-                  <ButtonSecondary
-                    testID="load-vault-cancel-pairing-button"
-                    stretch
-                    onPress={cancelPairActiveVault}
-                  >
+                  <ButtonSecondary stretch onPress={cancelPairActiveVault}>
                     {t`Cancel Pairing`}
                   </ButtonSecondary>
                 </>
@@ -130,8 +124,6 @@ export const LoadVault = () => {
                   </ButtonSecondary>
 
                   <Pressable
-                    testID="load-vault-scan-qr-button"
-                    accessibilityLabel="load-vault-scan-qr-button"
                     style={styles.qrCodeButton}
                     onPress={() =>
                       expand({
@@ -146,6 +138,7 @@ export const LoadVault = () => {
                         snapPoints: ['10%', '75%', '75%']
                       })
                     }
+                    testID="load-vault-scan-qr-button"
                   >
                     <QrCodeIcon size="21" color={colors.primary400.mode1} />
                     <Text style={styles.qrCodeText}>{t`Scan QR Code`}</Text>

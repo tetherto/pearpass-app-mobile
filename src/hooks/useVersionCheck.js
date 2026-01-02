@@ -90,7 +90,9 @@ export const useVersionCheck = () => {
 
     const checkVersion = async (retryCount = 0) => {
       try {
-        const currentVersion = Constants.expoConfig?.version || '1.0.0'
+        const currentVersion =
+          Constants.expoConfig?.version ||
+          Constants.expoConfig?.extra?.appVersion
 
         const latestVersion =
           Platform.OS === 'ios'
