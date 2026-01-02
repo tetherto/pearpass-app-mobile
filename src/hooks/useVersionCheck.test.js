@@ -45,6 +45,11 @@ describe('compareVersions', () => {
     expect(compareVersions('1.9.0', '1.10.0')).toBe(true)
     expect(compareVersions('1.10.0', '1.9.0')).toBe(false)
   })
+
+  it('should handle non-numeric characters in current version', () => {
+    expect(compareVersions('v1.0.0', '1.0.1')).toBe(true)
+    expect(compareVersions('1.0.0-beta', '1.0.1')).toBe(true)
+  })
 })
 
 describe('useVersionCheck', () => {
