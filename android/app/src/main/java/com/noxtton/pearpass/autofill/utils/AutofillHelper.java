@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.utils;
+package com.noxtton.pearpass.autofill.utils;
 
 import android.app.assist.AssistStructure;
 import android.os.Build;

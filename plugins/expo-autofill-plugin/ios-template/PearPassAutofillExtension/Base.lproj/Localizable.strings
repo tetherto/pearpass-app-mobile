@@ -1,0 +1,68 @@
+/* 
+  Localizable.strings
+  PearPassAutofillExtension
+
+  Localized strings for the PearPass Autofill Extension
+*/
+
+/* Common */
+"Continue" = "Continue";
+"Loading..." = "Loading...";
+"Cancel" = "Cancel";
+"Go Back" = "Go Back";
+
+/* Master Password View */
+"Enter Master Password" = "Enter Master Password";
+"Authenticating..." = "Authenticating...";
+"Invalid password" = "Invalid password";
+"Vault client not initialized" = "Vault client not initialized";
+"Failed to get master password encryption data" = "Failed to get master password encryption data";
+"Error decrypting vault key" = "Error decrypting vault key";
+"Password is required" = "Password is required";
+
+/* Missing Configuration View */
+"Setup Required" = "Setup Required";
+"PearPass is not configured" = "PearPass is not configured";
+"To use the autofill extension, please:" = "To use the autofill extension, please:";
+"Open the PearPass app" = "Open the PearPass app";
+"Set up your master password" = "Set up your master password";
+"Create or import a vault" = "Create or import a vault";
+
+/* Vault Selection View */
+"Select a vault" = "Select a vault";
+"No vaults available" = "No vaults available";
+
+/* Vault Password View */
+"Unlock with the %@ Vault password" = "Unlock with the %@ Vault password";
+"Select Vaults" = "Select Vaults";
+"Invalid vault password" = "Invalid vault password";
+
+/* Credentials List View */
+"Search in all folders..." = "Search in all folders...";
+"Search credentials" = "Search credentials";
+"No credentials found" = "No credentials found";
+"Error loading credentials" = "Error loading credentials";
+
+/* Biometric Authentication */
+"Use Face ID" = "Use Face ID";
+"Use Touch ID" = "Use Touch ID";
+"Authenticate with Face ID" = "Authenticate with Face ID";
+"Authenticate with Touch ID" = "Authenticate with Touch ID";
+"Biometric authentication failed" = "Biometric authentication failed";
+"Biometric authentication not available" = "Biometric authentication not available";
+
+/* Error Messages */
+"An error occurred" = "An error occurred";
+"Failed to initialize" = "Failed to initialize";
+"Failed to decrypt vault" = "Failed to decrypt vault";
+"Failed to load vaults" = "Failed to load vaults";
+"Failed to get master password encryption data" = "Failed to get master password encryption data";
+"Vaults already initialized" = "Vaults already initialized";
+"Error decrypting vault key" = "Error decrypting vault key";
+"Failed to decrypt with biometrics" = "Failed to decrypt with biometrics";
+"Authentication canceled" = "Authentication canceled";
+"Face ID authentication failed" = "Face ID authentication failed";
+"Failed to retrieve encryption data" = "Failed to retrieve encryption data";
+"Use Biometrics" = "Use Biometrics";
+"Vault is locked. Please try again." = "Vault is locked. Please try again.";
+"Failed to unlock vault. Please check your password and try again." = "Failed to unlock vault. Please check your password and try again.";

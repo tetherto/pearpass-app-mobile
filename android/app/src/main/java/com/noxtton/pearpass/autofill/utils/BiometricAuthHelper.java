@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.utils;
+package com.noxtton.pearpass.autofill.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<autofill-service
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity=".MainActivity"
+    android:supportsInlineSuggestions="true">
+    <compatibility-package android:name="com.android.chrome" />
+    <compatibility-package android:name="org.mozilla.firefox" />
+    <compatibility-package android:name="com.opera.browser" />
+    <compatibility-package android:name="com.microsoft.emmx" />
+</autofill-service>

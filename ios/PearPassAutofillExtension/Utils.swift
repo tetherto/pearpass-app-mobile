@@ -14,7 +14,7 @@ enum Utils {
         
         // Otherwise, get the app group shared directory path
         guard let sharedContainerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: "group.com.pears.pass"
+            forSecurityApplicationGroupIdentifier: "group.com.noxtton.pearpass"
         ) else {
             print("[Utils] Failed to get shared container URL")
             return nil
@@ -27,7 +27,7 @@ enum Utils {
     }
     
     /// App group identifier used for sharing data between the main app and extensions
-    static let appGroupIdentifier = "group.com.pears.pass"
+    static let appGroupIdentifier = "group.com.noxtton.pearpass"
     
     /// Gets the shared container URL for the app group
     static var sharedContainerURL: URL? {

@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.anonymous.expoautofillplugin"
+  },
+  "ios": {
+    "bundleIdentifier": "com.anonymous.expoautofillplugin"
+  }
+}

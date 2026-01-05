@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.anonymous.withcustomsplashscreen"
+  },
+  "ios": {
+    "bundleIdentifier": "com.anonymous.withcustomsplashscreen"
+  }
+}

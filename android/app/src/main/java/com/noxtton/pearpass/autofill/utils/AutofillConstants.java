@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.utils;
+package com.noxtton.pearpass.autofill.utils;
 
 /**
  * Constants used throughout the autofill extension.

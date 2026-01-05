@@ -1,4 +1,4 @@
-package com.pears.pass
+package com.noxtton.pearpass
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

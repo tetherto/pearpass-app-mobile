@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.ui;
+package com.noxtton.pearpass.autofill.ui;
 
 import android.os.Bundle;
 import android.view.Gravity;
@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.pears.pass.R;
+import com.noxtton.pearpass.R;
 
 public class LoadingFragment extends Fragment {
     @Nullable

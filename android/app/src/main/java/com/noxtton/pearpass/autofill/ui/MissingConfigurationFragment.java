@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.ui;
+package com.noxtton.pearpass.autofill.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.pears.pass.R;
+import com.noxtton.pearpass.R;
 
 public class MissingConfigurationFragment extends BaseAutofillFragment {
 

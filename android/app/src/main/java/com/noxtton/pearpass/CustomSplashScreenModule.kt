@@ -1,4 +1,4 @@
-package com.pears.pass
+package com.noxtton.pearpass
 
 import android.app.Activity
 import android.app.Dialog

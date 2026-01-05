@@ -1,5 +1,6 @@
-package com.pears.pass
+package com.noxtton.pearpass
 import com.facebook.react.common.assets.ReactFontManager
+import com.noxtton.pearpass.CustomSplashScreenPackage
 
 import android.app.Application
 import android.content.res.Configuration
@@ -16,7 +17,6 @@ import com.facebook.soloader.SoLoader
 
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
-import com.pears.pass.CustomSplashScreenPackage
 
 class MainApplication : Application(), ReactApplication {
 
@@ -25,11 +25,12 @@ class MainApplication : Application(), ReactApplication {
         object : DefaultReactNativeHost(this) {
           override fun getPackages(): List<ReactPackage> {
             val packages = PackageList(this).packages
-            // Packages that cannot be autolinked yet can be added manually here, for example:
-            // packages.add(MyReactNativePackage())
+            // Added by withAppConfig plugin
             packages.add(CustomSplashScreenPackage())
             packages.add(AutofillPackage())
             packages.add(NativeClipboardPackage())
+            // Packages that cannot be autolinked yet can be added manually here, for example:
+            // packages.add(MyReactNativePackage())
             return packages
           }
 

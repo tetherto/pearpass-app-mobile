@@ -13,7 +13,7 @@ install! 'cocoapods',
 
 prepare_react_native_project!
 
-target 'pearpassappmobile' do
+target 'PearPass' do
   use_expo_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
@@ -61,8 +61,43 @@ target 'pearpassappmobile' do
       end
     end
   end
-end
+  require 'fileutils'
 
-target 'PearPassAutoFillExtension' do
-  pod 'BareKit', :path => '../node_modules/react-native-bare-kit/ios'
+  # Post-integration fixes for AutoFill extension and custom splash screen
+  post_integrate do |installer|
+    # Fix 1: Replace Expo autolinking files for the extension target
+    extension_dir = File.join(__dir__, 'Pods/Target Support Files/Pods-PearPassAutoFillExtension')
+    if File.directory?(extension_dir)
+      # Replace expo-configure-project.sh with no-op
+      script_path = File.join(extension_dir, 'expo-configure-project.sh')
+      if File.exist?(script_path)
+        File.write(script_path, "#!/usr/bin/env bash\n# No-op for AutoFill extension\nexit 0\n")
+        File.chmod(0755, script_path)
+      end
+
+      # Replace ExpoModulesProvider.swift with empty implementation
+      provider_path = File.join(extension_dir, 'ExpoModulesProvider.swift')
+      if File.exist?(provider_path)
+        File.write(provider_path, "import Foundation\n\n@objc(ExpoModulesProvider)\npublic class ExpoModulesProvider: NSObject {\n}\n")
+      end
+    end
+
+    # Fix 2: Copy custom splash screen storyboard (Expo's base mod corrupts XML)
+    template_path = File.join(__dir__, '.splash-storyboard-template.xml')
+    storyboard_path = File.join(__dir__, 'PearPass/SplashScreen.storyboard')
+    if File.exist?(template_path) && File.exist?(storyboard_path)
+      FileUtils.cp(template_path, storyboard_path)
+      File.delete(template_path) # Clean up temp file
+    end
+
+    # Note: Extension source files are now handled automatically via PBXFileSystemSynchronizedRootGroup
+    # Xcode automatically syncs and compiles all files in the extension folder
+  end
+
+
+
+  target 'PearPassAutoFillExtension' do
+    inherit! :search_paths
+    pod 'BareKit', :path => '../node_modules/react-native-bare-kit/ios'
+  end
 end

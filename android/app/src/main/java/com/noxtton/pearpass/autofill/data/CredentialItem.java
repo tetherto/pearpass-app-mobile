@@ -1,4 +1,4 @@
-package com.pears.pass.autofill.data;
+package com.noxtton.pearpass.autofill.data;
 
 import java.util.List;
 import java.util.ArrayList;

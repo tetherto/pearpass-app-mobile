@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.pears.pass'
+    namespace 'com.noxtton.pearpass'
     defaultConfig {
-        applicationId 'com.pears.pass'
+        applicationId 'com.noxtton.pearpass'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -125,38 +125,7 @@ android {
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
-
-    // sourceSets {
-    //     main {
-    //         jniLibs.srcDirs "src/main/addons", "../../node_modules/react-native-bare-kit/android/libs/jni"
-    //     }
-    // }
 }
-
-// tasks.register("linkBareKit", Exec) {
-//     workingDir "../.."
-
-//     commandLine([
-//         "npx", "bare-link",
-//         "--preset", "android",
-//         "--needs", "libbare-kit.so",
-//         "--out", "android/app/src/main/addons"
-//     ])
-// }
-
-tasks.register("packAutofillBundle", Exec) {
-    workingDir "../.."
-
-    commandLine([
-        "npx", "bare-pack",
-        "--preset", "android",
-        "--linked",
-        "--out", "android/app/src/main/assets/extension.bundle",
-        "node_modules/pearpass-lib-vault-core/src/worklet/app-ipc.js"
-    ])
-}
-
-preBuild.dependsOn packAutofillBundle //, linkBareKit
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
 // Accepts values in comma delimited lists, example:
@@ -178,24 +147,30 @@ preBuild.dependsOn packAutofillBundle //, linkBareKit
     }
 }
 
+
+// Copy autofill extension bundle before build
+tasks.register("copyAutofillBundle", Copy) {
+    from "../bundles/autofill.bundle"
+    into "src/main/assets"
+    rename { "extension.bundle" }
+    doFirst {
+        if (!file("../bundles/autofill.bundle").exists()) {
+            logger.warn("Extension bundle not found at bundles/autofill.bundle")
+            logger.warn("Run 'npm run bundle:autofill' to generate it")
+        }
+    }
+}
+
+preBuild.dependsOn copyAutofillBundle
+
 dependencies {
+    // Added by withAppConfig plugin
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.autofill:autofill:1.3.0")
+    implementation("androidx.biometric:biometric:1.1.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-
-    // BareKit dependency
-    // api fileTree(dir: "../../node_modules/react-native-bare-kit/android/libs", include: ["classes.jar"])
-
-    // RecyclerView dependency for autofill extension
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-
-    // AndroidX Autofill for Samsung keyboard compatibility
-    implementation("androidx.autofill:autofill:1.3.0")
-
-    // AndroidX Biometric for fingerprint/face authentication
-    implementation("androidx.biometric:biometric:1.1.0")
-
-    // WorkManager for reliable background task scheduling (clipboard clearing)
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

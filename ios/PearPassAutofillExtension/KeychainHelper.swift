@@ -11,7 +11,7 @@ class KeychainHelper {
     private let biometricEnabledKey = "biometricsEnabled"
     private let passkeyEnabledKey = "passkeyEnabled"
     private let encryptionDataKey = "encryptionData"
-    private let accessGroup = "group.com.pears.pass"
+    private let accessGroup = "group.com.noxtton.pearpass"
     
     private init() {}
     
