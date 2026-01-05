@@ -13,7 +13,10 @@ import { logger } from '../utils/logger'
  * @returns {boolean} True if latest > current
  */
 export const compareVersions = (current, latest) => {
-  const currentParts = current.split('.').map(Number)
+  const currentParts = current
+    .replace(/[^\d.]/g, '')
+    .split('.')
+    .map(Number)
   const latestParts = latest.split('.').map(Number)
 
   for (let i = 0; i < Math.max(currentParts.length, latestParts.length); i++) {
@@ -90,7 +93,9 @@ export const useVersionCheck = () => {
 
     const checkVersion = async (retryCount = 0) => {
       try {
-        const currentVersion = Constants.expoConfig?.version || '1.0.0'
+        const currentVersion =
+          Constants.expoConfig?.version ||
+          Constants.expoConfig?.extra?.appVersion
 
         const latestVersion =
           Platform.OS === 'ios'

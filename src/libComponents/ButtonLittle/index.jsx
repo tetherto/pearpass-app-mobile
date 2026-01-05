@@ -39,7 +39,11 @@ export const ButtonLittle = ({
           }
         />
       )}
-      {children && <ButtonText variant={variant} testID={textTestID}>{children}</ButtonText>}
+      {children && (
+        <ButtonText variant={variant} testID={textTestID}>
+          {children}
+        </ButtonText>
+      )}
     </Button>
   )
 }

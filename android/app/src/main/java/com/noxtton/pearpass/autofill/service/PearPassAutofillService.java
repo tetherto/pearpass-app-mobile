@@ -22,7 +22,7 @@ import android.view.autofill.AutofillValue;
 import android.widget.RemoteViews;
 import android.widget.inline.InlinePresentationSpec;
 
-// AndroidX Autofill imports (same as Bitwarden uses for Samsung keyboard compatibility)
+// AndroidX Autofill imports
 import androidx.autofill.inline.UiVersions;
 import androidx.autofill.inline.v1.InlineSuggestionUi;
 

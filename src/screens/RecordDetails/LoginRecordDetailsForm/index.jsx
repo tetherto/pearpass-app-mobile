@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { useFocusEffect } from '@react-navigation/native'
 import { useForm } from 'pear-apps-lib-ui-react-hooks'
 import { isBefore, subtractDateUnits } from 'pear-apps-utils-date'
 import { generateUniqueId } from 'pear-apps-utils-generate-unique-id'
@@ -52,11 +53,17 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
   const { value: customFieldsList, registerItem: registerCustomFieldItem } =
     registerArray('customFields')
 
-  useGetMultipleFiles({
+  const { refetch } = useGetMultipleFiles({
     fieldNames: ['attachments'],
     updateValues: setValue,
     initialRecord
   })
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch()
+    }, [refetch])
+  )
 
   useEffect(() => {
     setValues(initialValues)

@@ -156,7 +156,7 @@ export const OnboardingContainer = ({
             style={styles.riveAnimation}
             testID="onboarding-media-step-2"
           />
-        );
+        )
       case 3:
         return (
           <Rive
@@ -164,7 +164,7 @@ export const OnboardingContainer = ({
             style={styles.riveAnimation}
             testID="onboarding-media-step-3"
           />
-        );
+        )
       case 4:
         return (
           <Rive
@@ -172,7 +172,7 @@ export const OnboardingContainer = ({
             style={styles.riveAnimationForm}
             testID="onboarding-media-step-4"
           />
-        );
+        )
       case 5:
         return (
           <Image
@@ -267,20 +267,26 @@ export const OnboardingContainer = ({
         ))}
       </View>
       <View style={styles.actionButtonsContainer}>
-        <TouchableOpacity 
-          onPress={onContinue} 
-          style={styles.continueButton} 
+        <TouchableOpacity
+          onPress={onContinue}
+          style={styles.continueButton}
           testID="onboarding-continue-button"
         >
-          <Text style={styles.continueButtonText} testID="onboarding-continue-text">{t`Continue`}</Text>
+          <Text
+            style={styles.continueButtonText}
+            testID="onboarding-continue-text"
+          >{t`Continue`}</Text>
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
-          <TouchableOpacity 
-            onPress={onSkip} 
-            style={styles.skipButton} 
+          <TouchableOpacity
+            onPress={onSkip}
+            style={styles.skipButton}
             testID="onboarding-skip-button"
           >
-            <Text style={styles.skipButtonText} testID="onboarding-skip-text">{t`Skip`}</Text>
+            <Text
+              style={styles.skipButtonText}
+              testID="onboarding-skip-text"
+            >{t`Skip`}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -314,8 +320,8 @@ export const OnboardingContainer = ({
 
         <View style={styles.centerSection}>{renderCenterContent()}</View>
         <View style={styles.bottomSection}>
-          <Text 
-            style={styles.descriptionText} 
+          <Text
+            style={styles.descriptionText}
             testID={`onboarding-main-description-${currentStep}`}
           >
             {mainDescription}
@@ -323,8 +329,8 @@ export const OnboardingContainer = ({
 
           {getSubDescriptionContent() && (
             <View style={styles.subDescriptionWrapper}>
-              <Text 
-                style={styles.subDescriptionText} 
+              <Text
+                style={styles.subDescriptionText}
                 testID={`onboarding-sub-description-${currentStep}`}
               >
                 {getSubDescriptionContent()}

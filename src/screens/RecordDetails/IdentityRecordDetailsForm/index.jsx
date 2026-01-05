@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { useFocusEffect } from '@react-navigation/native'
 import { useForm } from 'pear-apps-lib-ui-react-hooks'
 import { DATE_FORMAT } from 'pearpass-lib-constants'
 import {
@@ -76,7 +77,7 @@ export const IdentityRecordDetailsForm = ({
 
   const { value: list, registerItem } = registerArray('customFields')
 
-  useGetMultipleFiles({
+  const { refetch } = useGetMultipleFiles({
     fieldNames: [
       'attachments',
       'passportPicture',
@@ -87,6 +88,12 @@ export const IdentityRecordDetailsForm = ({
     initialRecord,
     currentValues: values
   })
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch()
+    }, [refetch])
+  )
 
   useEffect(() => {
     // Preserve image fields that already have base64 data to prevent flickering/disappearing

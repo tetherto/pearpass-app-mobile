@@ -22,7 +22,12 @@ export const ButtonFilter = ({
 }) => {
   const Icon = startIcon
   return (
-    <Button activeOpacity={0.8} variant={variant} onPress={onPress} testID={testID}>
+    <Button
+      activeOpacity={0.8}
+      variant={variant}
+      onPress={onPress}
+      testID={testID}
+    >
       {Icon && (
         <Icon
           size="21"
@@ -33,7 +38,11 @@ export const ButtonFilter = ({
           }
         />
       )}
-      {children && <ButtonText variant={variant} testID={textTestID}>{children}</ButtonText>}
+      {children && (
+        <ButtonText variant={variant} testID={textTestID}>
+          {children}
+        </ButtonText>
+      )}
     </Button>
   )
 }

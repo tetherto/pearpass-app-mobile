@@ -120,34 +120,39 @@ export const EnterPassword = () => {
       >
         <View style={styles.formContainer}>
           <View style={styles.headerContainer}>
-            <Text style={styles.headerText} testID="enter-password-title">{t`Enter Master Password`}</Text>
+            <Text
+              style={styles.headerText}
+              testID="enter-password-title"
+            >{t`Enter Master Password`}</Text>
           </View>
 
           <View style={styles.inputContainer}>
-              <InputPasswordPearPass
-                testID="enter-password-input"
-                errorTestID="enter-password-input-error"
-                placeholder={t`Master password`}
-                {...register('password')}
-                isPassword
-              />
-          </View>
-      
-            <AppWarning
-              testID="enter-password-warning"
-              warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
+            <InputPasswordPearPass
+              testID="enter-password-input"
+              errorTestID="enter-password-input-error"
+              placeholder={t`Master password`}
+              {...register('password')}
+              isPassword
             />
-          
+          </View>
+
+          <AppWarning
+            testID="enter-password-warning"
+            warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
+          />
+
           <View style={styles.buttonContainer}>
             {isLoading ? (
               <ActivityIndicator size="small" color={colors.primary400.mode1} />
             ) : (
               <>
-                  <ButtonPrimary
-                    testID="enter-password-continue-button"
-                    stretch onPress={handleSubmit(onSubmit)}>
-                    {t`Continue`}
-                  </ButtonPrimary>
+                <ButtonPrimary
+                  testID="enter-password-continue-button"
+                  stretch
+                  onPress={handleSubmit(onSubmit)}
+                >
+                  {t`Continue`}
+                </ButtonPrimary>
 
                 <ButtonBiometricLogin
                   onBiometricLogin={(encryptionData) =>

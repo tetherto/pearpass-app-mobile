@@ -157,9 +157,7 @@ export const BlindPeeringSection = () => {
           <Text style={styles.yourPeersTitle}>{t`Your Blind Peers`}</Text>
           <View style={styles.peerTypeCard}>
             <Text style={styles.peerTypeText}>
-              {blindMirrorsData[0].isDefault
-                ? t`Automatic`
-                : t`Personal`}
+              {blindMirrorsData[0].isDefault ? t`Automatic` : t`Personal`}
             </Text>
             <View style={styles.activeIndicator}>
               <View style={styles.activeDot} />
@@ -288,6 +286,6 @@ const styles = StyleSheet.create({
     color: colors.grey500.mode1,
     fontSize: 14,
     fontWeight: '700',
-    fontFamily: 'Inter',
+    fontFamily: 'Inter'
   }
 })

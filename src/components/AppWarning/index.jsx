@@ -12,10 +12,18 @@ import { View, Text, StyleSheet } from 'react-native'
  * }} props
  * @returns
  */
-export const AppWarning = ({ warning, containerStyles, textStyles, testID, textTestID }) => (
+export const AppWarning = ({
+  warning,
+  containerStyles,
+  textStyles,
+  testID,
+  textTestID
+}) => (
   <View style={[styles.warningContainer, containerStyles]} testID={testID}>
     <YellowErrorIcon width={14} height={14} />
-    <Text testID={textTestID} style={[styles.warningText, textStyles]}>{warning}</Text>
+    <Text testID={textTestID} style={[styles.warningText, textStyles]}>
+      {warning}
+    </Text>
   </View>
 )
 const styles = StyleSheet.create({
