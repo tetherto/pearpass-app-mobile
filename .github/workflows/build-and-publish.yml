@@ -37,10 +37,9 @@ jobs:
           docker builder prune -af || true
           df -h
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          submodules: true
-          token: ${{ secrets.PAT_TOKEN }}
+          submodules: true          
 
       - uses: actions/setup-node@v4
         with:
@@ -62,10 +61,10 @@ jobs:
 
       - name: Install worker dependencies
         run: |
-          git config --global url."https://github.com/".insteadOf git@github.com:
-          git config --global url."https://".insteadOf ssh://
+          git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
           git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-          npm install --install-links --legacy-peer-deps
+          npm install --install-links --legacy-peer-deps 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
@@ -145,32 +144,40 @@ jobs:
           # CHANGED: add branch-aware profile
           eas build --platform android --profile ${{ steps.branch_profile.outputs.PROFILE }} --local --non-interactive
 
-      - name: Build APK for GitHub release (only when production profile)
-        if: steps.branch_profile.outputs.PROFILE == 'production'
+      - name: Build APK for GitHub release
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           eas build --platform android --profile preview --local --non-interactive
 
-      - name: Find and rename Android artifact
+      - name: Find and rename Android artifacts
         id: find_android
         run: |
           set -euo pipefail
+          VERSION="${{ steps.meta.outputs.VERSION }}"
+
           AAB_PATH=$(find "$GITHUB_WORKSPACE" -name "*.aab" -type f | head -n 1 || true)
           echo "Original AAB: $AAB_PATH"
-
           if [ -n "$AAB_PATH" ]; then
-            VERSION="${{ steps.meta.outputs.VERSION }}"
-            NEW_NAME="PearPass-Mobile-Android-v${VERSION}.aab"
-            NEW_PATH="$GITHUB_WORKSPACE/$NEW_NAME"
-
-            mv "$AAB_PATH" "$NEW_PATH"
-            echo "Renamed AAB to: $NEW_PATH"
-
-            echo "AAB_PATH=$NEW_PATH" >> "$GITHUB_OUTPUT"
+            NEW_AAB="PearPass-Mobile-Android-v${VERSION}.aab"
+            NEW_AAB_PATH="$GITHUB_WORKSPACE/$NEW_AAB"
+            mv "$AAB_PATH" "$NEW_AAB_PATH"
+            echo "AAB_PATH=$NEW_AAB_PATH" >> "$GITHUB_OUTPUT"
           else
             echo "No .aab file found."
             echo "AAB_PATH=" >> "$GITHUB_OUTPUT"
+          fi
+
+          APK_PATH=$(find "$GITHUB_WORKSPACE" -name "*.apk" -type f | head -n 1 || true)
+          echo "Original APK: $APK_PATH"
+          if [ -n "$APK_PATH" ]; then
+            NEW_APK="PearPass-Mobile-Android-v${VERSION}.apk"
+            NEW_APK_PATH="$GITHUB_WORKSPACE/$NEW_APK"
+            mv "$APK_PATH" "$NEW_APK_PATH"
+            echo "APK_PATH=$NEW_APK_PATH" >> "$GITHUB_OUTPUT"
+          else
+            echo "No .apk file found."
+            echo "APK_PATH=" >> "$GITHUB_OUTPUT"
           fi
 
           VERSION_CODE=$(jq -r '.expo.android.versionCode' app.json)
@@ -178,12 +185,20 @@ jobs:
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "TIMESTAMP=$TIMESTAMP" >> "$GITHUB_OUTPUT"
 
-      - name: Upload Android artifacts
+      - name: Upload Android AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: PearPass-Mobile-Android-v${{ steps.meta.outputs.VERSION }}.aab
           path: ${{ steps.find_android.outputs.AAB_PATH }}
           if-no-files-found: ignore
+      
+      - name: Upload Android APK artifact
+        if: steps.find_android.outputs.APK_PATH != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: PearPass-Mobile-Android-v${{ steps.meta.outputs.VERSION }}.apk
+          path: ${{ steps.find_android.outputs.APK_PATH }}
+          if-no-files-found: error
 
       - name: Submit to Google play via EAS
         env:
@@ -220,10 +235,9 @@ jobs:
   ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
-          token: ${{ secrets.PAT_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -238,8 +252,8 @@ jobs:
 
       - name: Install worker dependencies
         run: |
-          git config --global url."https://github.com/".insteadOf git@github.com:
-          git config --global url."https://".insteadOf ssh://
+          git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
           git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
           npm install --install-links --legacy-peer-deps
         env:
@@ -386,10 +400,17 @@ jobs:
     needs: [android, ios]
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Download Android artifacts
+      - name: Download Android AAB artifact
         uses: actions/download-artifact@v4
         with:
           name: PearPass-Mobile-Android-v${{ needs.android.outputs.version }}.aab
+          path: ./dist
+        continue-on-error: false
+
+      - name: Download Android APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: PearPass-Mobile-Android-v${{ needs.android.outputs.version }}.apk
           path: ./dist
         continue-on-error: false
 
@@ -415,6 +436,7 @@ jobs:
           files: |
             dist/**/*.ipa
             dist/**/*.aab
+            dist/**/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           

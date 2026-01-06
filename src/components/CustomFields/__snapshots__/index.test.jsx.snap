@@ -62,6 +62,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
             "width": "100%",
           }
         }
+        testID="note-0"
       >
         <View
           style={
@@ -197,6 +198,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                     },
                   ]
                 }
+                testID="note-0-input"
                 value="test-note-value"
               />
             </View>
@@ -381,6 +383,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
             "width": "100%",
           }
         }
+        testID="note-1"
       >
         <View
           style={
@@ -516,6 +519,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                     },
                   ]
                 }
+                testID="note-1-input"
                 value="test-note-value"
               />
             </View>

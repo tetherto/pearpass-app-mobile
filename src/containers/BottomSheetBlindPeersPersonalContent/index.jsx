@@ -50,9 +50,12 @@ export const BottomSheetBlindPeersPersonalContent = ({
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
   const { setIsLoading: setIsLoadingContext } = useLoadingContext()
-  const { addBlindMirrors, removeBlindMirror, removeAllBlindMirrors, data: blindMirrorsData } = useBlindMirrors()
+  const {
+    addBlindMirrors,
+    removeAllBlindMirrors,
+    data: blindMirrorsData
+  } = useBlindMirrors()
   const [keyboardHeight, setKeyboardHeight] = useState(0)
-
 
   const getInitialValues = () => {
     const manualPeers = blindMirrorsData.filter((item) => !item.isDefault)
@@ -163,9 +166,9 @@ export const BottomSheetBlindPeersPersonalContent = ({
         contentContainerStyle={[
           styles.scrollViewContent,
           Platform.OS === 'android' &&
-          keyboardHeight > 0 && {
-            paddingBottom: keyboardHeight + 20
-          }
+            keyboardHeight > 0 && {
+              paddingBottom: keyboardHeight + 20
+            }
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={true}

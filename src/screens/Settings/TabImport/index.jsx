@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
+import { MAX_IMPORT_RECORDS } from 'pearpass-lib-constants'
 import {
   parse1PasswordData,
   parseBitwardenData,
@@ -94,13 +95,13 @@ export const TabImport = () => {
     let result = []
     setShouldBypassAutoLock(true)
 
-    const { fileContent, fileType } = await readFileContent(accepts)
-
-    if (!isAllowedType(fileType, accepts)) {
-      throw new Error('Invalid file type')
-    }
-
     try {
+      const { fileContent, fileType } = await readFileContent(accepts)
+
+      if (!isAllowedType(fileType, accepts)) {
+        throw new Error('Invalid file type')
+      }
+
       switch (type) {
         case '1password':
           result = await parse1PasswordData(fileContent, fileType)
@@ -136,7 +137,35 @@ export const TabImport = () => {
         return
       }
 
-      await Promise.all(result.map((record) => createRecord(record)))
+      if (result.length > MAX_IMPORT_RECORDS) {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Too many records. Maximum is ${MAX_IMPORT_RECORDS}.`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
+        return
+      }
+
+      const BATCH_SIZE = 100
+      const totalRecords = result.length
+      let importedCount = 0
+
+      for (let i = 0; i < totalRecords; i += BATCH_SIZE) {
+        const batch = result.slice(i, i + BATCH_SIZE)
+        await Promise.all(batch.map((record) => createRecord(record)))
+
+        importedCount += batch.length
+        const progress = Math.round((importedCount / totalRecords) * 100)
+
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Importing... ${importedCount}/${totalRecords} (${progress}%)`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
+      }
+
       Toast.show({
         type: 'baseToast',
         text1: t`Vaults imported successfully!`,
@@ -144,13 +173,15 @@ export const TabImport = () => {
         bottomOffset: 100
       })
     } catch (error) {
+      const isFileError = error.message?.includes('File too large')
+
       Toast.show({
         type: 'baseToast',
-        text1: t`Vaults import failed!`,
+        text1: isFileError ? error.message : t`Vaults import failed!`,
         position: 'bottom',
         bottomOffset: 100
       })
-      logger.error('Error reading file:', error.message || error)
+      logger.error('Error importing:', error.message || error)
     } finally {
       setShouldBypassAutoLock(false)
     }

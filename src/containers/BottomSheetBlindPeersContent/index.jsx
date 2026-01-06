@@ -26,7 +26,11 @@ const { DEFAULT, PERSONAL } = BLIND_PEER_TYPE
  * @param {Function} props.onConfirm
  * @param {boolean} props.isEditMode
  */
-export const BottomSheetBlindPeersContent = ({ onClose, onConfirm, isEditMode = false }) => {
+export const BottomSheetBlindPeersContent = ({
+  onClose,
+  onConfirm,
+  isEditMode = false
+}) => {
   const { t } = useLingui()
   const { expand } = useBottomSheet()
   const { setIsLoading: setIsLoadingContext } = useLoadingContext()
