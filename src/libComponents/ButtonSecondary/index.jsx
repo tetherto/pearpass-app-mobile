@@ -8,6 +8,8 @@ import { Button, ButtonText } from './styles'
  *  stretch: boolean
  *  onPress: () => void
  *  disabled?: boolean
+ *  testID?: string
+ *  textTestID?: string
  * }} props
  */
 export const ButtonSecondary = ({
@@ -15,14 +17,19 @@ export const ButtonSecondary = ({
   onPress,
   size = 'md',
   stretch,
-  disabled = false
+  disabled = false,
+  testID,
+  textTestID
 }) => (
   <Button
     size={size}
     onPress={disabled ? undefined : onPress}
     stretch={stretch}
     disabled={disabled}
+    testID={testID}
   >
-    <ButtonText size={size}>{children}</ButtonText>
+    <ButtonText size={size} testID={textTestID}>
+      {children}
+    </ButtonText>
   </Button>
 )

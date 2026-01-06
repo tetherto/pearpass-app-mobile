@@ -8,14 +8,22 @@ import { Button, ButtonText } from './styles'
  *  children: ReactNode
  *  startIcon?: ElementType
  *  onPress: () => void
+ *  testID?: string
+ *  textTestID?: string
  * }} props
  */
-export const ButtonCreate = ({ children, startIcon, onPress }) => {
+export const ButtonCreate = ({
+  children,
+  startIcon,
+  onPress,
+  testID,
+  textTestID
+}) => {
   const Icon = startIcon
   return (
-    <Button activeOpacity={0.8} onPress={onPress}>
+    <Button activeOpacity={0.8} onPress={onPress} testID={testID}>
       {Icon && <Icon size="21" color={colors.black.mode1} />}
-      {children && <ButtonText>{children}</ButtonText>}
+      {children && <ButtonText testID={textTestID}>{children}</ButtonText>}
       <View></View>
     </Button>
   )

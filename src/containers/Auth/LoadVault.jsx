@@ -71,12 +71,19 @@ export const LoadVault = () => {
         >
           <View style={styles.formContainer}>
             <View style={{ marginBottom: 20, alignItems: 'center', gap: 10 }}>
-              <Text style={styles.title}>{t`Load an existing Vault`}</Text>
-              <Text style={styles.subtitle}>{t`Open your vault with this code`}</Text>
+              <Text
+                style={styles.title}
+                testID="load-vault-title"
+              >{t`Load an existing Vault`}</Text>
+              <Text
+                style={styles.subtitle}
+                testID="load-vault-subtitle"
+              >{t`Open your vault with this code`}</Text>
             </View>
 
             <View style={{ width: '100%', gap: 15 }}>
               <InputPasswordPearPass
+                testID="load-vault-invite-code-input"
                 placeholder={t`Insert your vault's code...`}
                 value={inviteCode}
                 onChange={setInviteCode}
@@ -91,16 +98,14 @@ export const LoadVault = () => {
                     size="small"
                     color={colors.primary400.mode1}
                   />
-                  <ButtonSecondary
-                    stretch
-                    onPress={cancelPairActiveVault}
-                  >
+                  <ButtonSecondary stretch onPress={cancelPairActiveVault}>
                     {t`Cancel Pairing`}
                   </ButtonSecondary>
                 </>
               ) : (
                 <>
                   <ButtonPrimary
+                    testID="load-vault-open-button"
                     onPress={() => pairWithCode(inviteCode)}
                     stretch
                     disabled={!inviteCode.length || isLoading}
@@ -109,6 +114,7 @@ export const LoadVault = () => {
                   </ButtonPrimary>
 
                   <ButtonSecondary
+                    testID="load-vault-select-vaults-button"
                     stretch
                     onPress={() =>
                       navigation.navigate('Welcome', { state: 'selectOrLoad' })
@@ -132,6 +138,7 @@ export const LoadVault = () => {
                         snapPoints: ['10%', '75%', '75%']
                       })
                     }
+                    testID="load-vault-scan-qr-button"
                   >
                     <QrCodeIcon size="21" color={colors.primary400.mode1} />
                     <Text style={styles.qrCodeText}>{t`Scan QR Code`}</Text>

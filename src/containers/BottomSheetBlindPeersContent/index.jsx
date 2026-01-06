@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
@@ -24,13 +24,24 @@ const { DEFAULT, PERSONAL } = BLIND_PEER_TYPE
  * @param {Object} props
  * @param {Function} props.onClose
  * @param {Function} props.onConfirm
+ * @param {boolean} props.isEditMode
  */
-export const BottomSheetBlindPeersContent = ({ onClose, onConfirm }) => {
+export const BottomSheetBlindPeersContent = ({
+  onClose,
+  onConfirm,
+  isEditMode = false
+}) => {
   const { t } = useLingui()
   const { expand } = useBottomSheet()
   const { setIsLoading: setIsLoadingContext } = useLoadingContext()
-  const { addDefaultBlindMirrors } = useBlindMirrors()
+  const { addDefaultBlindMirrors, data: blindMirrorsData } = useBlindMirrors()
   const [selectedOption, setSelectedOption] = useState(DEFAULT)
+
+  useEffect(() => {
+    if (isEditMode && blindMirrorsData.length > 0) {
+      setSelectedOption(blindMirrorsData[0].isDefault ? DEFAULT : PERSONAL)
+    }
+  }, [isEditMode, blindMirrorsData.length])
 
   const handleConfirm = async () => {
     if (selectedOption === DEFAULT) {
@@ -62,6 +73,7 @@ export const BottomSheetBlindPeersContent = ({ onClose, onConfirm }) => {
             <BottomSheetBlindPeersPersonalContent
               onClose={onClose}
               onConfirm={onConfirm}
+              isEditMode={isEditMode}
             />
           ),
           snapPoints: ['80%', '80%'],

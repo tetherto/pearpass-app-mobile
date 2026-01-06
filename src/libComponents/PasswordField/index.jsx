@@ -48,6 +48,8 @@ const PASSWORD_STRENGTH_ICONS = {
  *  type?: 'numeric' | 'default',
  *  belowInputContent?: React.ReactNode,
  *  shouldDisplayCustomPlaceholder?: boolean,
+ *  testID?: string
+ *  toggleVisibilityTestID?: string
  * }} props
  */
 export const PasswordField = ({
@@ -71,7 +73,9 @@ export const PasswordField = ({
   type = 'default',
   icon,
   belowInputContent,
-  shouldDisplayCustomPlaceholder = false
+  shouldDisplayCustomPlaceholder = false,
+  testID,
+  toggleVisibilityTestID
 }) => {
   const { t } = useLingui()
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -139,6 +143,7 @@ export const PasswordField = ({
         type={type}
         belowInputContent={belowInputContent}
         shouldDisplayCustomPlaceholder={shouldDisplayCustomPlaceholder}
+        testID={testID}
         additionalItems={
           <>
             {!!hasStrongness && getPasswordStrength()}
@@ -148,6 +153,7 @@ export const PasswordField = ({
               borderRadius="md"
               startIcon={isPasswordVisible ? EyeClosedIcon : EyeIcon}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+              testID={toggleVisibilityTestID}
             />
           </>
         }

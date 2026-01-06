@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { BLIND_PEERS_LEARN_MORE } from 'pearpass-lib-constants'
 import {
+  EditIcon,
   RedirectIcon,
   TooltipIcon
 } from 'pearpass-lib-ui-react-native-components'
@@ -87,6 +88,19 @@ export const BlindPeeringSection = () => {
     }
   }
 
+  const handleEditPress = () => {
+    expand({
+      children: (
+        <BottomSheetBlindPeersContent
+          onClose={collapse}
+          onConfirm={handleBlindPeersConfirm}
+          isEditMode={true}
+        />
+      ),
+      snapPoints: ['10%', '40%', '75%']
+    })
+  }
+
   const handleBlindPeersToggle = (ruleName, isToggled) => {
     if (isToggled) {
       expand({
@@ -137,6 +151,33 @@ export const BlindPeeringSection = () => {
           >{t`Learn more about blind peering.`}</Text>
         </Pressable>
       </View>
+
+      {blindMirrorsData.length > 0 && (
+        <View style={styles.yourPeersSection}>
+          <Text style={styles.yourPeersTitle}>{t`Your Blind Peers`}</Text>
+          <View style={styles.peerTypeCard}>
+            <Text style={styles.peerTypeText}>
+              {blindMirrorsData[0].isDefault ? t`Automatic` : t`Personal`}
+            </Text>
+            <View style={styles.activeIndicator}>
+              <View style={styles.activeDot} />
+              <Text style={styles.activeText}>{t`Active`}</Text>
+              {!blindMirrorsData[0].isDefault && (
+                <>
+                  <View style={styles.peerCountDivider} />
+                  <Text style={styles.peerCountText}>
+                    {blindMirrorsData.length} {t`peers`}
+                  </Text>
+                </>
+              )}
+            </View>
+          </View>
+          <Pressable style={styles.editButton} onPress={handleEditPress}>
+            <EditIcon color={colors.grey500.mode1} />
+            <Text style={styles.editButtonText}>{t`Edit`}</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   )
 }
@@ -178,5 +219,73 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontFamily: 'Inter',
     marginLeft: 5
+  },
+  yourPeersSection: {
+    marginTop: 20
+  },
+  yourPeersTitle: {
+    color: colors.white.mode1,
+    fontSize: 14,
+    fontWeight: '700',
+    fontFamily: 'Inter',
+    marginBottom: 10
+  },
+  peerTypeCard: {
+    backgroundColor: colors.grey400.mode1,
+    borderRadius: 10,
+    paddingVertical: 12.5,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 15
+  },
+  peerTypeText: {
+    color: colors.white.mode1,
+    fontSize: 14,
+    fontWeight: '700',
+    fontFamily: 'Inter'
+  },
+  activeIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  activeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.primary400.mode1,
+    marginRight: 5
+  },
+  activeText: {
+    color: colors.white.mode1,
+    fontSize: 12,
+    fontFamily: 'Inter'
+  },
+  peerCountDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: colors.grey100.mode1,
+    marginHorizontal: 10
+  },
+  peerCountText: {
+    color: colors.white.mode1,
+    fontSize: 12,
+    fontFamily: 'Inter'
+  },
+  editButton: {
+    backgroundColor: colors.primary400.mode1,
+    borderRadius: 10,
+    paddingVertical: 9,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10
+  },
+  editButtonText: {
+    color: colors.grey500.mode1,
+    fontSize: 14,
+    fontWeight: '700',
+    fontFamily: 'Inter'
   }
 })

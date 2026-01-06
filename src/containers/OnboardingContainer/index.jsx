@@ -114,7 +114,7 @@ export const OnboardingContainer = ({
     switch (currentStep) {
       case 0:
         return (
-          <View>
+          <View testID="onboarding-media-step-0">
             <InitialVideo
               onStart={() => buttonFadeAnim.setValue(0)}
               onEnded={() => {
@@ -129,7 +129,7 @@ export const OnboardingContainer = ({
         )
       case 1:
         return (
-          <View>
+          <View testID="onboarding-media-step-1">
             <Animated.Image
               source={require('../../../assets/images/intro/closeLock.png')}
               style={[
@@ -151,23 +151,27 @@ export const OnboardingContainer = ({
         )
       case 2:
         return (
-          <View>
-            <Rive resourceName="password" style={styles.riveAnimation} />
-          </View>
+          <Rive
+            resourceName="password"
+            style={styles.riveAnimation}
+            testID="onboarding-media-step-2"
+          />
         )
-
       case 3:
         return (
-          <View>
-            <Rive resourceName="category" style={styles.riveAnimation} />
-          </View>
+          <Rive
+            resourceName="category"
+            style={styles.riveAnimation}
+            testID="onboarding-media-step-3"
+          />
         )
-
       case 4:
         return (
-          <View>
-            <Rive resourceName="form" style={styles.riveAnimationForm} />
-          </View>
+          <Rive
+            resourceName="form"
+            style={styles.riveAnimationForm}
+            testID="onboarding-media-step-4"
+          />
         )
       case 5:
         return (
@@ -175,6 +179,7 @@ export const OnboardingContainer = ({
             source={require('../../../assets/images/intro/linked_device.png')}
             style={styles.centerImage}
             resizeMode="contain"
+            testID="onboarding-media-step-5"
           />
         )
       default:
@@ -248,7 +253,7 @@ export const OnboardingContainer = ({
         }
       ]}
     >
-      <View style={styles.paginationContainer}>
+      <View style={styles.paginationContainer} testID="onboarding-progress-bar">
         {SCREENS.map((step) => (
           <TouchableOpacity
             key={step}
@@ -257,19 +262,31 @@ export const OnboardingContainer = ({
               currentStep === step && styles.paginationDotActive
             ]}
             onPress={() => onStepSelect && onStepSelect(step)}
+            testID={`onboarding-progress-step-${step}`}
           />
         ))}
       </View>
       <View style={styles.actionButtonsContainer}>
-        <TouchableOpacity onPress={onContinue} style={styles.continueButton}>
-          <Text style={styles.continueButtonText}
+        <TouchableOpacity
+          onPress={onContinue}
+          style={styles.continueButton}
+          testID="onboarding-continue-button"
+        >
+          <Text
+            style={styles.continueButtonText}
+            testID="onboarding-continue-text"
           >{t`Continue`}</Text>
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
-          <TouchableOpacity onPress={onSkip}
+          <TouchableOpacity
+            onPress={onSkip}
             style={styles.skipButton}
+            testID="onboarding-skip-button"
           >
-            <Text style={styles.skipButtonText}>{t`Skip`}</Text>
+            <Text
+              style={styles.skipButtonText}
+              testID="onboarding-skip-text"
+            >{t`Skip`}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -296,18 +313,26 @@ export const OnboardingContainer = ({
 
       <View style={styles.contentWrapper}>
         <View style={styles.topSection}>
-          <View style={styles.logoContainer}>
+          <View style={styles.logoContainer} testID="onboarding-logo">
             <LogoTextWithLock width={170} height={50} />
           </View>
         </View>
 
         <View style={styles.centerSection}>{renderCenterContent()}</View>
         <View style={styles.bottomSection}>
-          <Text style={styles.descriptionText}>{mainDescription}</Text>
+          <Text
+            style={styles.descriptionText}
+            testID={`onboarding-main-description-${currentStep}`}
+          >
+            {mainDescription}
+          </Text>
 
           {getSubDescriptionContent() && (
             <View style={styles.subDescriptionWrapper}>
-              <Text style={styles.subDescriptionText}>
+              <Text
+                style={styles.subDescriptionText}
+                testID={`onboarding-sub-description-${currentStep}`}
+              >
                 {getSubDescriptionContent()}
               </Text>
             </View>

@@ -200,9 +200,9 @@ export const CreatePassword = () => {
   )
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="create-password-screen">
       {!isKeyboardVisible && (
-        <View style={styles.logoContainer}>
+        <View style={styles.logoContainer} testID="create-password-logo">
           <LogoTextWithLock width={170} height={50} />
         </View>
       )}
@@ -219,13 +219,19 @@ export const CreatePassword = () => {
         >
           <View style={styles.formContainer}>
             <View style={styles.headerContainer}>
-              <Text style={styles.headerText}>{t`Create Master Password`}</Text>
+              <Text
+                style={styles.headerText}
+                testID="create-password-title"
+              >{t`Create Master Password`}</Text>
             </View>
-            <Text style={styles.boldText}
-            >{t`The first thing to do is create a Master password to secure your account.  You’ll use this password to access PearPass. `}</Text>
-            <View
-              style={styles.inputContainer}>
+            <Text
+              style={styles.boldText}
+              testID="create-password-description"
+            >{t`The first thing to do is create a Master password to secure your account.  You'll use this password to access PearPass. `}</Text>
+            <View style={styles.inputContainer}>
               <InputPasswordPearPass
+                testID="create-password-input"
+                errorTestID="create-password-input-error"
                 placeholder={t`Enter Password`}
                 {...passwordRegisterProps}
                 onChange={handlePasswordChange}
@@ -233,6 +239,8 @@ export const CreatePassword = () => {
               />
 
               <InputPasswordPearPass
+                testID="create-password-confirm-input"
+                errorTestID="create-password-confirm-input-error"
                 placeholder={t`Confirm Password`}
                 {...register('passwordConfirm')}
                 isPassword
@@ -240,45 +248,74 @@ export const CreatePassword = () => {
             </View>
 
             <View
-              style={styles.requirementsContainer}>
-              <Text style={styles.requirementsText}>
+              style={styles.requirementsContainer}
+              testID="create-password-requirements-container"
+            >
+              <Text
+                style={styles.requirementsText}
+                testID="create-password-requirements-text"
+              >
                 {t`Your password must be at least 8 characters long and include at least one of each:`}
               </Text>
               <View style={styles.bulletList}>
-                <Text style={styles.bulletItem}>
+                <Text
+                  style={styles.bulletItem}
+                  testID="create-password-requirement-uppercase"
+                >
                   {`${bulletUnicode} ${t`Uppercase Letter (A-Z)`}`}
                 </Text>
-                <Text style={styles.bulletItem}>
+                <Text
+                  style={styles.bulletItem}
+                  testID="create-password-requirement-lowercase"
+                >
                   {`${bulletUnicode} ${t`Lowercase Letter (a-z)`}`}
                 </Text>
-                <Text style={styles.bulletItem}>
+                <Text
+                  style={styles.bulletItem}
+                  testID="create-password-requirement-number"
+                >
                   {`${bulletUnicode} ${t`Number (0-9)`}`}
                 </Text>
-                <Text style={styles.bulletItem}>
+                <Text
+                  style={styles.bulletItem}
+                  testID="create-password-requirement-special"
+                >
                   {`${bulletUnicode} ${t`Special Character (! @ # $...)`}`}
                 </Text>
               </View>
-              <Text style={styles.noteText}>
+              <Text
+                style={styles.noteText}
+                testID="create-password-requirement-note"
+              >
                 {t`Note: Avoid common words and personal information.`}
               </Text>
             </View>
 
             <View style={styles.termsContainer}>
               <AppWarning
+                testID="create-password-warning"
                 warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
                 textStyles={{ flex: 0 }}
               />
-              <Text style={styles.termsTitle}>{t`PearPass Terms of Use`}</Text>
+              <Text
+                style={styles.termsTitle}
+                testID="create-password-terms-title"
+              >{t`PearPass Terms of Use`}</Text>
 
               <View style={styles.checkboxContainer}>
                 <TouchableOpacity onPress={() => setAccepted(!accepted)}>
                   {accepted ? (
-                    <View style={styles.checkboxOuter}>
+                    <View
+                      style={styles.checkboxOuter}
+                      testID="create-password-terms-checkbox-checked"
+                    >
                       <View style={styles.checkboxInner} />
                     </View>
                   ) : (
                     <View
-                      style={styles.checkboxEmpty}/>
+                      style={styles.checkboxEmpty}
+                      testID="create-password-terms-checkbox-unchecked"
+                    />
                   )}
                 </TouchableOpacity>
                 <View style={styles.textContainer}>
@@ -287,6 +324,7 @@ export const CreatePassword = () => {
                     <Text
                       style={styles.linkText}
                       onPress={handleTermsPress}
+                      testID="create-password-terms-link"
                     >
                       {t`PearPass Application Terms of Use`}
                     </Text>
@@ -300,9 +338,11 @@ export const CreatePassword = () => {
                 <ActivityIndicator
                   size="small"
                   color={colors.primary400.mode1}
+                  testID="create-password-loading"
                 />
               ) : (
                 <ButtonPrimary
+                  testID="create-password-continue-button"
                   stretch
                   onPress={handleSubmit(onSubmit)}
                   disabled={!accepted}

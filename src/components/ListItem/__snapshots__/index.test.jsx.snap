@@ -34,7 +34,6 @@ exports[`ListItem renders correctly with provided vault data 1`] = `
       "opacity": 1,
     }
   }
-  testID="vault-container"
 >
   <View
     testID="vault-info"

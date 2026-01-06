@@ -54,7 +54,7 @@ export const FolderList = ({
     if (isFilter) {
       return [
         {
-          name: t`All Folders`,
+          name: t`All Items`,
           id: 'allFolder',
           count: recordCountsByType?.all,
           icon: <LogoLock width="26" height="36" />

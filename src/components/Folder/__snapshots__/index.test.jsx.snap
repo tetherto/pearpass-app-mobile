@@ -145,6 +145,7 @@ exports[`Folder component renders create new folder option without count 1`] = `
       "paddingBottom": 16,
     }
   }
+  testID="sidebar-create-new"
 >
   <View
     style={

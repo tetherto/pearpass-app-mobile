@@ -42,11 +42,30 @@ export const Folder = ({
 
     if (folder.isCreateNew) {
       onCreateNewFolder()
-
       return
     }
 
     onFolderSelect(folder)
+  }
+
+  const getTestID = () => {
+    if (folder.id === 'allFolder') return 'sidebar-all-folders'
+    if (folder.id === 'favorite') return 'sidebar-favorites'
+    if (folder.isCreateNew) return 'sidebar-create-new'
+    return undefined
+  }
+
+  const getCountTestID = () => {
+    if (folder.id === 'allFolder') return 'sidebar-all-folders-count'
+    if (folder.id === 'favorite') return 'sidebar-favorites-count'
+    return undefined
+  }
+
+  const getActiveCheckTestID = () => {
+    if (folder.id === 'allFolder') return 'sidebar-all-folders-active'
+    if (folder.id === 'favorite') return 'sidebar-favorites-active'
+    if (folder.isCreateNew) return 'sidebar-create-new-active'
+    return `sidebar-folder-${folder.id}-active`
   }
 
   return (
@@ -54,6 +73,7 @@ export const Folder = ({
       last={isLast}
       onLongPress={onLongPress}
       onPress={handlePress}
+      testID={getTestID()}
     >
       <FolderContainer>
         {folder.icon}
@@ -62,13 +82,19 @@ export const Folder = ({
           <FolderText>{folder.name}</FolderText>
 
           {!folder.isCreateNew && (
-            <FolderCount>
+            <FolderCount testID={getCountTestID()}>
               {folder.count ?? 0} {t`items`}
             </FolderCount>
           )}
         </FolderContent>
 
-        {isActive && <CheckIcon color={colors.primary400.mode1} size="24" />}
+        {isActive && (
+          <CheckIcon
+            testID={getActiveCheckTestID()}
+            color={colors.primary400.mode1}
+            size="24"
+          />
+        )}
       </FolderContainer>
 
       <KebabMenuIcon size="21" />
