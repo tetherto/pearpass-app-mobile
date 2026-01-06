@@ -11,6 +11,7 @@ import { Button, ButtonText } from './styles'
  *  onPress: () => void
  *  testID?: string
  *  textTestID?: string
+ *  accessibilityLabel?: string
  * }} props
  */
 export const ButtonLittle = ({
@@ -20,7 +21,8 @@ export const ButtonLittle = ({
   borderRadius = 'sm',
   onPress,
   testID,
-  textTestID
+  textTestID,
+  accessibilityLabel
 }) => {
   const Icon = startIcon
   return (
@@ -30,6 +32,7 @@ export const ButtonLittle = ({
       onPress={onPress}
       borderRadius={borderRadius}
       testID={testID}
+      accessibilityLabel={accessibilityLabel}
     >
       {Icon && (
         <Icon

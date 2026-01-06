@@ -52,12 +52,31 @@ export const Folder = ({
     if (folder.id === 'allFolder') return 'sidebar-all-folders'
     if (folder.id === 'favorite') return 'sidebar-favorites'
     if (folder.isCreateNew) return 'sidebar-create-new'
+    if (folder.id || folder.name) {
+      const folderId = folder.id || folder.name
+      return `sidebar-folder-${folderId}`
+    }
+    return undefined
+  }
+
+  const getAccessibilityLabel = () => {
+    if (folder.id === 'allFolder') return 'sidebar-all-folders'
+    if (folder.id === 'favorite') return 'sidebar-favorites'
+    if (folder.isCreateNew) return 'sidebar-create-new'
+    if (folder.id || folder.name) {
+      const folderId = folder.id || folder.name
+      return `sidebar-folder-${folderId}`
+    }
     return undefined
   }
 
   const getCountTestID = () => {
     if (folder.id === 'allFolder') return 'sidebar-all-folders-count'
     if (folder.id === 'favorite') return 'sidebar-favorites-count'
+    if (folder.id || folder.name) {
+      const folderId = folder.id || folder.name
+      return `sidebar-folder-${folderId}-count`
+    }
     return undefined
   }
 
@@ -65,7 +84,11 @@ export const Folder = ({
     if (folder.id === 'allFolder') return 'sidebar-all-folders-active'
     if (folder.id === 'favorite') return 'sidebar-favorites-active'
     if (folder.isCreateNew) return 'sidebar-create-new-active'
-    return `sidebar-folder-${folder.id}-active`
+    if (folder.id || folder.name) {
+      const folderId = folder.id || folder.name
+      return `sidebar-folder-${folderId}-active`
+    }
+    return undefined
   }
 
   return (
@@ -74,6 +97,7 @@ export const Folder = ({
       onLongPress={onLongPress}
       onPress={handlePress}
       testID={getTestID()}
+      accessibilityLabel={getAccessibilityLabel()}
     >
       <FolderContainer>
         {folder.icon}

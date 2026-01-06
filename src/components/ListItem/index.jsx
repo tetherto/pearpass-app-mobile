@@ -30,6 +30,8 @@ import {
  *  isSelected?: boolean
  *  isLoading?: boolean
  *  testID?: string
+ *  nameTestID?: string
+ *  nameAccessibilityLabel?: string
  * }} props
  */
 export const ListItem = ({
@@ -42,6 +44,8 @@ export const ListItem = ({
   isSelected = false,
   isLoading = false,
   testID,
+  nameTestID,
+  nameAccessibilityLabel,
   ...restProps
 }) => (
   <ListItemContainer
@@ -62,7 +66,7 @@ export const ListItem = ({
       )}
 
       <ListItemDescription>
-        <ListItemName>{name}</ListItemName>
+        <ListItemName testID={nameTestID} accessibilityLabel={nameAccessibilityLabel}>{name}</ListItemName>
         {!!date && (
           <ListItemDate>{formatDate(date, 'dd-mm-yyyy', '/')}</ListItemDate>
         )}

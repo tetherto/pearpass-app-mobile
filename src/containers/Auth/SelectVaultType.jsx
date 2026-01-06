@@ -79,16 +79,21 @@ export const SelectVaultType = () => {
               style={styles.vaultsList}
               showsVerticalScrollIndicator={false}
             >
-              {sortedVaults?.map((vault) => (
-                <View key={vault.id} style={styles.vaultItemWrapper}>
-                  <ListItem
-                    onPress={() => handleVaultSelect(vault.id)}
-                    name={vault.name ?? vault.id}
-                    date={vault.createdAt}
-                    isLoading={loadingVaultId === vault.id}
-                  />
-                </View>
-              ))}
+              {sortedVaults?.map((vault) => {
+                const vaultTestID = `select-vault-${vault.id}`
+                return (
+                  <View key={vault.id} style={styles.vaultItemWrapper}>
+                    <ListItem
+                      onPress={() => handleVaultSelect(vault.id)}
+                      name={vault.name ?? vault.id}
+                      date={vault.createdAt}
+                      isLoading={loadingVaultId === vault.id}
+                      nameTestID={vaultTestID}
+                      nameAccessibilityLabel={vaultTestID}
+                    />
+                  </View>
+                )
+              })}
             </ScrollView>
           </View>
         )}

@@ -40,6 +40,7 @@ export const FolderList = ({
   const filteredFolderList = useMemo(() => {
     const customFolders =
       otherFolders?.map((folder) => ({
+        id: folder.name,
         name: folder.name,
         count: folder.records.filter((record) => !!record.data).length,
         icon: <FolderIcon size="26" color={colors.primary400.mode1} />

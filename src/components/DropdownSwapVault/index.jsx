@@ -85,6 +85,8 @@ export const DropdownSwapVault = ({
   }
 
   const displayVault = switchingVault || selectedVault
+  const vaultName = displayVault?.name ?? displayVault?.id
+  const vaultTestID = `sidebar-vault-${displayVault?.id}`
 
   return (
     <Wrapper>
@@ -102,8 +104,10 @@ export const DropdownSwapVault = ({
           }}
           numberOfLines={1}
           ellipsizeMode="tail"
+          testID={vaultTestID}
+          accessibilityLabel={vaultTestID}
         >
-          {displayVault?.name ?? displayVault?.id}
+          {vaultName}
         </Text>
         <ArrowIconWrapper>
           {isOpen ? (
@@ -123,13 +127,19 @@ export const DropdownSwapVault = ({
             keyExtractor={(vault) => vault?.id}
             renderItem={({ item }) => {
               const isSelected = item?.id === selectedVault?.id
+              const itemVaultTestID = `sidebar-vault-${item?.id}`
 
               return (
                 <DropdownItem
                   onPress={() => !isSelected && handleVaultSwap(item)}
                   activeOpacity={0.7}
                 >
-                  <DropdownItemText numberOfLines={1} ellipsizeMode="tail">
+                  <DropdownItemText 
+                    numberOfLines={1} 
+                    ellipsizeMode="tail"
+                    testID={itemVaultTestID}
+                    accessibilityLabel={itemVaultTestID}
+                  >
                     {item?.name ?? item?.id}
                   </DropdownItemText>
                   {isSelected && (

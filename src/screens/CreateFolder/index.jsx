@@ -67,7 +67,7 @@ export const CreateFolder = ({ route }) => {
   }
 
   return (
-    <Container>
+    <Container testID="create-folder-screen" accessibilityLabel="create-folder-screen">
       <FolderFormHeader>
         <FolderFormHeaderGoBack
           activeOpacity={0.5}
@@ -76,6 +76,8 @@ export const CreateFolder = ({ route }) => {
               ? navigation.goBack()
               : navigation.navigate('MainTabNavigator')
           }
+          testID="create-folder-close-button"
+          accessibilityLabel="create-folder-close-button"
         >
           <XIcon size="21" color={colors.primary400.mode1} />
         </FolderFormHeaderGoBack>
@@ -85,6 +87,8 @@ export const CreateFolder = ({ route }) => {
             startIcon={FolderIcon}
             activeOpacity={0.5}
             onPress={handleSubmit(onSubmit)}
+            testID={initialValues?.title ? "create-folder-save-button" : "create-folder-create-button"}
+            accessibilityLabel={initialValues?.title ? "create-folder-save-button" : "create-folder-create-button"}
           >
             {initialValues?.title ? t`Save` : t`Create new folder`}
           </ButtonLittle>
@@ -97,6 +101,8 @@ export const CreateFolder = ({ route }) => {
             label={t`Title`}
             placeholder={t`No title`}
             variant="outline"
+            testID="create-folder-title-input"
+            accessibilityLabel="create-folder-title-input"
             {...register('title')}
           />
         </FormGroup>
