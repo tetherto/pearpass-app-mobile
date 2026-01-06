@@ -37,10 +37,9 @@ jobs:
           docker builder prune -af || true
           df -h
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          submodules: true
-          token: ${{ secrets.PAT_TOKEN }}
+          submodules: true          
 
       - uses: actions/setup-node@v4
         with:
@@ -145,8 +144,7 @@ jobs:
           # CHANGED: add branch-aware profile
           eas build --platform android --profile ${{ steps.branch_profile.outputs.PROFILE }} --local --non-interactive
 
-      - name: Build APK for GitHub release (only when production profile)
-        if: steps.branch_profile.outputs.PROFILE == 'production'
+      - name: Build APK for GitHub release
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
