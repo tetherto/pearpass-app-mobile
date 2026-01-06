@@ -9,7 +9,12 @@
     "e2e:ios:bs": "cross-env PLATFORM=iOS RUN_TARGET=bs ENABLE_QASE=true npm run wdio",
     "e2e:android:local": "cross-env PLATFORM=Android RUN_TARGET=local_real_android ENABLE_QASE=false npm run wdio",
     "e2e:ios:local": "cross-env PLATFORM=iOS RUN_TARGET=local_real_ios ENABLE_QASE=false npm run wdio",
-    "e2e:android:emulator": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio"
+    "e2e:android:emulator": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio",
+    "test:signup": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio -- --suite signup",
+    "test:onboarding": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio -- --suite onboarding",
+    "test:sidebar": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio -- --suite sidebar",
+    "test:sidebar-only": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio -- --suite sidebarOnly",
+    "test:all": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio -- --suite all"
   },
   "keywords": [],
   "author": "",

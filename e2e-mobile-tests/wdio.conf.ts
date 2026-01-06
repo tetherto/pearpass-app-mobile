@@ -4,286 +4,307 @@ import * as path from 'node:path';
 import axios from 'axios';
 import * as FormData from 'form-data';
 
-type WdioConfig = WebdriverIO.Config & {
-  autoCompileOpts?: {
-    autoCompile: boolean;
-    tsNodeOpts: {
-      transpileOnly: boolean;
-      project: string;
-    };
-  };
-};
+import type { Options } from '@wdio/types';
+// @ts-ignore - JS module without type declarations
+import qaseHook from './tests/helpers/qase-hook.js';
 
-// ===============================================
-// ENVIRONMENT VARIABLES & CONSTANTS
-// ===============================================
-const PLATFORM = (process.env.PLATFORM || 'Android') as 'Android' | 'iOS';
-const RUN_TARGET = (process.env.RUN_TARGET || 'local_emulator') as
-  | 'bs'
-  | 'local_real_android'
-  | 'local_real_ios'
-  | 'local_emulator';
-
-const IS_BS = RUN_TARGET === 'bs';
-const IS_ANDROID = PLATFORM === 'Android';
-
+/* ===============================================
+   PLATFORM SETTINGS
+================================================= */
+type Platform = 'Android' | 'iOS';
+type RunTarget = 'bs' | 'local_real_android' | 'local_real_ios' | 'local_emulator';
+const PLATFORM = (process.env.PLATFORM || 'Android') as Platform;
+const RUN_TARGET = (process.env.RUN_TARGET || 'bs') as RunTarget;
 const ENABLE_QASE = process.env.ENABLE_QASE === 'true';
-const QASE_RUN_ID = Number(process.env.QASE_TEST_RUN_ID || '0');
-const QASE_PROJECT_CODE = process.env.QASE_PROJECT_CODE || 'PAS';
+const QASE_RUN_ID = Number(process.env.QASE_RUN_ID || '1');
 
-const BUILD_PREFIX = process.env.BUILD_PREFIX || 'PearPass E2E';
-const APP_VERSION = process.env.APP_VERSION || 'unknown';
+const BUILD_PREFIX = process.env.BUILD_PREFIX || 'WDK E2E';
 
-const BROWSERSTACK_APP_UPLOAD_URL = 'https://api-cloud.browserstack.com/app-automate/upload';
-
-// Additional environment variables with defaults
-const {
-  // Timeouts
-  WDIO_WAITFOR_TIMEOUT = '20000',
-  WDIO_CONNECTION_RETRY_TIMEOUT = '120000',
-  WDIO_CONNECTION_RETRY_COUNT = '3',
-  MOCHA_TIMEOUT = '180000',
-
-  // Appium settings
-  APPIUM_NO_RESET = 'false',
-  APPIUM_FULL_RESET = 'false',
-  APPIUM_AUTO_GRANT_PERMISSIONS = 'true',
-  APPIUM_AUTO_ACCEPT_ALERTS = 'true',
-
-  // Debug and logging
-  DEBUG = 'false',
-  LOG_LEVEL = 'info',
-  CAPTURE_SCREENSHOTS_ON_FAIL = 'true',
-} = process.env;
-
-// ===============================================
-// HELPER FUNCTIONS
-// ===============================================
+/* ===============================================
+   HELPERS
+================================================= */
 function requiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing required environment variable: ${name}`);
-  return value;
+  const v = process.env[name];
+  if (!v) throw new Error(`❌ Missing env var: ${name}`);
+  return v;
 }
 
-async function uploadAppToBS(localPath: string): Promise<string> {
-  if (!fs.existsSync(localPath)) {
-    throw new Error(`App not found: ${localPath}`);
+async function uploadToBS(appPath: string): Promise<string> {
+  if (!fs.existsSync(appPath)) {
+    throw new Error(`❌ App not found: ${appPath}`);
   }
 
-  const form = new (FormData as any)();
-  form.append('file', fs.createReadStream(localPath));
+  const form = new FormData();
+  form.append('file', fs.createReadStream(appPath));
 
-  const { data } = await axios.post(
-    BROWSERSTACK_APP_UPLOAD_URL,
+  const res = await axios.post(
+    'https://api-cloud.browserstack.com/app-automate/upload',
     form,
     {
       auth: {
         username: requiredEnv('BROWSERSTACK_USERNAME'),
-        password: requiredEnv('BROWSERSTACK_ACCESS_KEY'),
+        password: requiredEnv('BROWSERSTACK_ACCESS_KEY')
       },
-      headers: form.getHeaders(),
+      headers: form.getHeaders()
     }
   );
 
-  return data.app_url;
+  return res.data?.app_url;
 }
 
-function getLocalAppPath(): string {
-  const base = path.resolve(__dirname, 'apps');
-  return IS_ANDROID
-    ? path.join(base, 'android', process.env.ANDROID_APP || 'PearPass.apk')
-    : path.join(base, 'ios', process.env.IOS_APP || 'PearPass.ipa');
+async function resolveApp(platform: Platform): Promise<string> {
+  if (platform === 'Android' && process.env.ANDROID_APP) return process.env.ANDROID_APP;
+  if (platform === 'iOS' && process.env.IOS_APP) return process.env.IOS_APP;
+
+  const local = platform === 'iOS'
+    ? path.resolve(__dirname, 'apps/ios/YourApp.ipa')
+    : path.resolve(__dirname, 'apps/android/testtask.apk');
+
+  return uploadToBS(local);
 }
 
-// ===============================================
-// WDIO CONFIGURATION
-// ===============================================
-export const config: WdioConfig = {
+function getVersion(p: string): string | undefined {
+  const m = path.basename(p).match(/(\d+\.\d+\.\d+)/);
+  return m ? m[1] : undefined;
+}
+
+const isBS = RUN_TARGET === 'bs';
+const isAndroid = PLATFORM === 'Android';
+
+// Ensure logs directory exists and clean up old log file
+const logsDir = path.resolve(__dirname, 'logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
+const appiumLogPath = path.join(logsDir, 'appium.log');
+// Remove old log file if it exists to avoid permission issues
+if (fs.existsSync(appiumLogPath)) {
+  try {
+    fs.unlinkSync(appiumLogPath);
+  } catch (err) {
+    // Ignore errors if file is locked
+    console.warn('Could not delete old appium.log file:', err);
+  }
+}
+
+/* ===============================================
+   WDIO CONFIG
+================================================= */
+export const config: Options.Testrunner & {
+  capabilities: WebdriverIO.Capabilities[];
+  autoCompileOpts?: any;
+} = {
+
   runner: 'local',
 
-  // Test Specs
-  specs: ['./tests/specs/**/*.ts'],
+  specs: [
+    './tests/specs/OnboardingTests.ts',
+    './tests/specs/SignUpTests.ts',
+  ],
 
-  maxInstances: IS_BS ? 4 : 1,
+  suites: {
+    // Full flow suite: all tests run in one session (recommended for E2E flow)
+    // This is the DEFAULT suite when no suite is specified
+    fullFlow: [
+      './tests/specs/OnboardingTests.ts',
+      './tests/specs/SignUpTests.ts',
+    ],
+    // Individual suites for running tests separately if needed
+    onboarding: [
+      './tests/specs/OnboardingTests.ts',
+    ],
+    signup: [
+      './tests/specs/SignUpTests.ts',
+    ],
+    // Sidebar tests require app to be fully set up (after onboarding + signup)
+    sidebar: [
+      './tests/specs/OnboardingTests.ts',
+      './tests/specs/SignUpTests.ts',
+      './tests/specs/SidebarTests.ts',
+    ],
+    // Sidebar only - run only SidebarTests.ts (requires app to be already set up)
+    sidebarOnly: [
+      './tests/specs/SidebarTests.ts',
+    ],
+    // Run all tests in order (full flow + sidebar)
+    all: [
+      './tests/specs/OnboardingTests.ts',
+      './tests/specs/SignUpTests.ts',
+      './tests/specs/SidebarTests.ts',
+    ],
+  },
 
-  logLevel: LOG_LEVEL as WebdriverIO.LogLevel,
-  bail: 0,
-  waitforTimeout: Number(WDIO_WAITFOR_TIMEOUT),
-  connectionRetryTimeout: Number(WDIO_CONNECTION_RETRY_TIMEOUT),
-  connectionRetryCount: Number(WDIO_CONNECTION_RETRY_COUNT),
+  maxInstances: 1,
+
+  /* ---------------- BrowserStack ---------------- */
+  user: isBS ? requiredEnv('BROWSERSTACK_USERNAME') : undefined,
+  key: isBS ? requiredEnv('BROWSERSTACK_ACCESS_KEY') : undefined,
+  hostname: isBS ? 'hub.browserstack.com' : undefined,
+  port: isBS ? 443 : undefined,
+  path: isBS ? '/wd/hub' : undefined,
+
+  services: isBS
+    ? [
+        [
+          'browserstack',
+          {
+            browserstackLocal: process.env.BSTACK_LOCAL === 'true',
+            buildIdentifier: process.env.BUILD_NUMBER
+          }
+        ]
+      ]
+    : [
+        [
+          'appium',
+          {
+            command: process.env.APPIUM_PATH || 'appium',
+            args: {
+              // Use console logging instead of file to avoid permission issues
+              // log: appiumLogPath,
+              logLevel: 'info',
+              logTimestamp: true
+            }
+          }
+        ]
+      ],
+
+  /* ---------------- Capabilities ---------------- */
+  capabilities:
+    RUN_TARGET === 'local_real_android'
+      ? [
+          {
+            platformName: 'Android',
+            'appium:automationName': 'UiAutomator2',
+            'appium:udid': requiredEnv('ANDROID_UDID'),
+            'appium:app': path.resolve(__dirname, 'apps/android/testtask.apk'),
+            'appium:noReset': true,
+            'appium:autoGrantPermissions': true
+          }
+        ]
+
+      : RUN_TARGET === 'local_real_ios'
+      ? [
+          {
+            platformName: 'iOS',
+            'appium:automationName': 'XCUITest',
+            'appium:udid': requiredEnv('IOS_UDID'),
+            'appium:app': path.resolve(__dirname, 'apps/ios/YourApp.ipa'),
+            'appium:noReset': true,
+            'appium:xcodeOrgId': requiredEnv('XCODE_ORG_ID'),
+            'appium:xcodeSigningId': 'iPhone Developer'
+          }
+        ]
+      : RUN_TARGET === 'local_emulator'
+      ? [
+          {
+            platformName: 'Android',
+            'appium:automationName': 'UiAutomator2',
+            'appium:deviceName': process.env.EMULATOR_NAME || 'emulator-5554',
+            'appium:platformVersion': process.env.EMULATOR_VERSION || '13',
+            // Использовать уже установленное приложение вместо установки APK
+            // 'appium:app': path.resolve(__dirname, 'apps/android/PearPass.apk'),
+            'appium:appPackage': 'com.pears.pass',
+            'appium:noReset': true,  // Не сбрасывать данные приложения
+            'appium:fullReset': false,  // Не переустанавливать приложение
+            'appium:autoGrantPermissions': true,
+            'appium:newCommandTimeout': 300
+          }
+        ]
+
+      : [
+          isAndroid
+            ? {
+                platformName: 'Android',
+                'appium:automationName': 'UiAutomator2',
+                'bstack:options': {
+                  deviceName: process.env.BS_ANDROID_DEVICE || 'Samsung Galaxy S23 Ultra',
+                  platformVersion: process.env.BS_ANDROID_VERSION || '13.0',
+                  projectName: 'WDK E2E',
+                  buildName: `${BUILD_PREFIX} - ${new Date().toISOString().split('T')[0]}`,
+                  sessionName: 'Android E2E Test',
+                  debug: true,
+                  networkLogs: true
+                }
+              }
+            : {
+                platformName: 'iOS',
+                'appium:automationName': 'XCUITest',
+                'bstack:options': {
+                  deviceName: process.env.BS_IOS_DEVICE || 'iPhone 14 Pro Max',
+                  platformVersion: process.env.BS_IOS_VERSION || '16.0',
+                  projectName: 'WDK E2E',
+                  buildName: `${BUILD_PREFIX} - ${new Date().toISOString().split('T')[0]}`,
+                  sessionName: 'iOS E2E Test',
+                  debug: true,
+                  networkLogs: true
+                }
+              }
+        ],
+
+  /* ---------------- Settings ---------------- */
+  logLevel: 'info',
+  waitforTimeout: 21000,
+  connectionRetryTimeout: 240000,
+  connectionRetryCount: 3,
 
   framework: 'mocha',
-
-  reporters: [
-    'spec',
-    ['qase', {
-      enabled: ENABLE_QASE,
-      projectCode: QASE_PROJECT_CODE,
-      runId: QASE_RUN_ID,
-      logging: DEBUG === 'true',
-      uploadAttachments: true,
-    }],
-  ],
+  reporters: ['spec'],
 
   mochaOpts: {
     ui: 'bdd',
-    timeout: Number(MOCHA_TIMEOUT),
+    timeout: 180000
   },
 
-  // BrowserStack / Local Appium / Grid
-  hostname: IS_BS ? 'hub.browserstack.com' : undefined,
-  port: IS_BS ? 443 : undefined,
-  path: IS_BS ? '/wd/hub' : undefined,
-  user: IS_BS ? requiredEnv('BROWSERSTACK_USERNAME') : undefined,
-  key: IS_BS ? requiredEnv('BROWSERSTACK_ACCESS_KEY') : undefined,
-
-  services: IS_BS
-    ? [['browserstack', { browserstackLocal: process.env.BSTACK_LOCAL === 'true' }]]
-    : [['appium', {
-        args: {
-          log: './logs/appium.log',
-          relaxedSecurity: true,
-          logTimestamp: true
-        }
-      }]],
-
-  // ===============================================
-  // CAPABILITIES
-  // ===============================================
-  capabilities: [
-    RUN_TARGET === 'local_real_android'
-      ? {
-          platformName: 'Android',
-          'appium:automationName': 'UiAutomator2',
-          'appium:udid': process.env.ANDROID_UDID || requiredEnv('ANDROID_UDID'),
-          'appium:app': getLocalAppPath(),
-          'appium:noReset': APPIUM_NO_RESET === 'true',
-          'appium:fullReset': APPIUM_FULL_RESET === 'true',
-          'appium:autoGrantPermissions': APPIUM_AUTO_GRANT_PERMISSIONS === 'true',
-          'appium:newCommandTimeout': 300,
-        }
-      : RUN_TARGET === 'local_real_ios'
-      ? {
-          platformName: 'iOS',
-          'appium:automationName': 'XCUITest',
-          'appium:udid': process.env.IOS_UDID || requiredEnv('IOS_UDID'),
-          'appium:app': getLocalAppPath(),
-          'appium:noReset': APPIUM_NO_RESET === 'true',
-          'appium:fullReset': APPIUM_FULL_RESET === 'true',
-          'appium:xcodeOrgId': process.env.XCODE_ORG_ID,
-          'appium:xcodeSigningId': 'iPhone Developer',
-        }
-      : RUN_TARGET === 'local_emulator'
-      ? {
-          platformName: 'Android',
-          'appium:automationName': 'UiAutomator2',
-          'appium:deviceName': process.env.ANDROID_DEVICE_NAME || 'Pixel_7',
-          'appium:platformVersion': process.env.ANDROID_PLATFORM_VERSION || '13',
-          'appium:app': getLocalAppPath(),
-          'appium:noReset': APPIUM_NO_RESET === 'true',
-          'appium:fullReset': APPIUM_FULL_RESET === 'true',
-          'appium:autoGrantPermissions': APPIUM_AUTO_GRANT_PERMISSIONS === 'true',
-          'appium:autoAcceptAlerts': APPIUM_AUTO_ACCEPT_ALERTS === 'true',
-          'appium:newCommandTimeout': 300,
-          ...(process.env.ANDROID_UDID ? { 'appium:udid': process.env.ANDROID_UDID } : {}),
-        }
-      : IS_ANDROID
-      ? {
-          platformName: 'Android',
-          'appium:automationName': 'UiAutomator2',
-          'bstack:options': {
-            deviceName: process.env.BS_ANDROID_DEVICE || 'Samsung Galaxy S24',
-            osVersion: process.env.BS_ANDROID_VERSION || '14.0',
-            projectName: 'PearPass Mobile',
-            sessionName: 'Android E2E',
-            debug: DEBUG === 'true',
-            networkLogs: DEBUG === 'true',
-            appiumVersion: '2.0.0',
-          },
-        }
-      : {
-          platformName: 'iOS',
-          'appium:automationName': 'XCUITest',
-          'bstack:options': {
-            deviceName: process.env.BS_IOS_DEVICE || 'iPhone 15 Pro',
-            osVersion: process.env.BS_IOS_VERSION || '17',
-            projectName: 'PearPass Mobile',
-            sessionName: 'iOS E2E',
-            debug: DEBUG === 'true',
-            networkLogs: DEBUG === 'true',
-            appiumVersion: '2.0.0',
-          },
-        }
-  ],
-
-  // ===============================================
-  // HOOKS
-  // ===============================================
-  async beforeSession(_config, capabilities: WebdriverIO.Capabilities) {
-    const requiredDirs = ['./error-shots', './logs', './screenshots'];
-    requiredDirs.forEach(dir => {
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-        console.log(`Created directory: ${dir}`);
-      }
-    });
-
+  /* ---------------- Hooks ---------------- */
+  async beforeSession(_config, capabilities) {
     console.log(`\n🚀 Running platform: ${PLATFORM}`);
     console.log(`🎯 Target: ${RUN_TARGET}`);
     console.log(`📊 Qase: ${ENABLE_QASE ? 'ENABLED' : 'DISABLED'}`);
 
-    const localAppPath = getLocalAppPath();
-    console.log(`📱 App path: ${localAppPath}`);
+    if (!isBS) return;
 
-    if (IS_BS) {
-      const appUrl = await uploadAppToBS(localAppPath);
-      console.log(`📤 App uploaded to BrowserStack: ${appUrl}`);
+    const platformName = (capabilities as any).platformName as Platform;
 
-      const appVersion =
-        APP_VERSION !== 'unknown'
-          ? APP_VERSION
-          : fs.existsSync(localAppPath)
-          ? path.basename(localAppPath).match(/\d+\.\d+\.\d+/)?.[0] || 'unknown'
-          : 'unknown';
+    const appUrl = await resolveApp(platformName);
+    (capabilities as any)['appium:app'] = appUrl;
 
-      const buildName = `${BUILD_PREFIX} v${appVersion} • ${new Date()
-        .toISOString()
-        .slice(0, 10)}`;
+    const localPath =
+      platformName === 'iOS'
+        ? path.resolve(__dirname, 'apps/ios/YourApp.ipa')
+        : path.resolve(__dirname, 'apps/android/PearPass.apk');
 
-      (capabilities as any)['appium:app'] = appUrl;
+    const version = getVersion(localPath);
 
-      const bstackOptions = (capabilities as any)['bstack:options'];
-      if (bstackOptions) {
-        bstackOptions.buildName = buildName;
-      }
+    const opt = (capabilities as any)['bstack:options'];
+    opt['buildName'] = `${BUILD_PREFIX} v${version || 'N/A'}`;
+  },
+
+  async beforeTest(test) {
+    console.log(`🔍 ${test.title}`);
+    if (ENABLE_QASE) {
+      await qaseHook.beforeTest(test);
     }
   },
 
-  afterTest: async (test, _context, { passed }) => {
-    if (!passed && CAPTURE_SCREENSHOTS_ON_FAIL === 'true') {
-      const safeTitle = test.title.replace(/[^a-zA-Z0-9]/g, '_');
-      const filename = `FAIL_${safeTitle}_${Date.now()}.png`;
-      try {
-        await browser.saveScreenshot(`./error-shots/${filename}`);
-        console.log(`📸 Error screenshot saved: ./error-shots/${filename}`);
-      } catch (e: any) {
-        console.error('Failed to save screenshot:', e.message);
-      }
+  async afterTest(test, context, result) {
+    if (ENABLE_QASE) {
+      await qaseHook.afterTest(test, context, { passed: result.passed, error: result.error });
     }
   },
 
-  onComplete: async () => {
-    console.log('\n🏁 E2E run finished');
-    if (ENABLE_QASE && QASE_RUN_ID) {
+  async onComplete() {
+    console.log('\n🏁 E2E Completed.');
+    if (ENABLE_QASE) {
       console.log(`📤 Qase results sent to Run ID: ${QASE_RUN_ID}`);
     }
   },
 
+  /* -------------- TypeScript ---------------- */
   autoCompileOpts: {
     autoCompile: true,
     tsNodeOpts: {
       transpileOnly: true,
-      project: './tsconfig.json',
-    },
-  },
+      project: './tsconfig.json'
+    }
+  }
 };

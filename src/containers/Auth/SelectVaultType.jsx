@@ -50,15 +50,15 @@ export const SelectVaultType = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.logoContainer} testID="select-vault-type-logo">
+      <View style={styles.logoContainer} testID="select-vault-type-logo" accessibilityLabel="select-vault-type-logo">
         <LogoTextWithLock width={170} height={50} />
       </View>
 
       <View style={styles.topSection}>
         {!vaultsData?.length ? (
           <View style={styles.textWrapper}>
-            <Text style={styles.headerText} testID="select-vault-type-empty-title">{t`Enter Master Password`}</Text>
-            <Text style={styles.subHeaderText} testID="select-vault-type-empty-subtitle">
+            <Text style={styles.headerText} testID="select-vault-type-empty-title" accessibilityLabel="select-vault-type-empty-title">{t`Enter Master Password`}</Text>
+            <Text style={styles.subHeaderText} testID="select-vault-type-empty-subtitle" accessibilityLabel="select-vault-type-empty-subtitle">
               {t`Now create a secure vault or load an existing one to get started.`}
             </Text>
           </View>
@@ -67,6 +67,7 @@ export const SelectVaultType = () => {
             <Text
               style={styles.headerText}
               testID="select-vault-type-list-title"
+              accessibilityLabel="select-vault-type-list-title"
             >{t`Select a vault, create a new one or load another one`}</Text>
 
             <ScrollView
@@ -91,12 +92,14 @@ export const SelectVaultType = () => {
       <View style={styles.bottomSection}>
           <ButtonPrimary 
             testID="select-vault-type-create-new"
+            accessibilityLabel="Create a new vault"
             stretch onPress={handleCreateVault}>
             {t`Create a new vault`}
           </ButtonPrimary>
 
           <ButtonSecondary
             testID="select-vault-type-load-existing"
+            accessibilityLabel="Load a vault"
             stretch
             onPress={() => navigation.navigate('Welcome', { state: 'load' })}
           >

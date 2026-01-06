@@ -102,9 +102,9 @@ export const EnterPassword = () => {
   }
 
   return (
-    <View style={styles.container} testID="enter-password-screen">
+    <View style={styles.container} testID="enter-password-screen" accessibilityLabel="enter-password-screen">
       {!isKeyboardVisible && (
-        <View style={styles.logoContainer} testID="enter-password-logo">
+        <View style={styles.logoContainer} testID="enter-password-logo" accessibilityLabel="enter-password-logo">
           <LogoTextWithLock width={170} height={50} />
         </View>
       )}
@@ -120,12 +120,13 @@ export const EnterPassword = () => {
       >
         <View style={styles.formContainer}>
           <View style={styles.headerContainer}>
-            <Text style={styles.headerText} testID="enter-password-title">{t`Enter Master Password`}</Text>
+            <Text style={styles.headerText} testID="enter-password-title" accessibilityLabel="enter-password-title">{t`Enter Master Password`}</Text>
           </View>
 
           <View style={styles.inputContainer}>
               <InputPasswordPearPass
                 testID="enter-password-input"
+                accessibilityLabel="enter-password-input"
                 errorTestID="enter-password-input-error"
                 placeholder={t`Master password`}
                 {...register('password')}
@@ -135,6 +136,7 @@ export const EnterPassword = () => {
       
             <AppWarning
               testID="enter-password-warning"
+              accessibilityLabel="enter-password-warning"
               warning={t`Don't forget your master password. It's the only way to access your vault. We can't help recover it. Back it up securely.`}
             />
           
@@ -145,6 +147,7 @@ export const EnterPassword = () => {
               <>
                   <ButtonPrimary
                     testID="enter-password-continue-button"
+                    accessibilityLabel="Continue"
                     stretch onPress={handleSubmit(onSubmit)}>
                     {t`Continue`}
                   </ButtonPrimary>

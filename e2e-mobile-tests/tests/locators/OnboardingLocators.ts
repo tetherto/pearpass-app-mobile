@@ -2,77 +2,60 @@ const onboardingLocators = {
   /* ============================
         HEADER
   ============================ */
-  onboardingLogoAndroid: '~onboarding_logo',
-  onboardingLogoiOS: '~onboarding_logo',
+  onboardingLogo: '~onboarding-logo',
 
   /* ============================
         PROGRESS BAR
   ============================ */
-  onboardingProgressBarAndroid: '~onboarding_progress_bar',
-  onboardingProgressBariOS: '~onboarding_progress_bar',
+  onboardingProgressBar: '~onboarding-progress-bar',
 
   /* ============================
         PROGRESS STEPS (0–5)
   ============================ */
-  onboardingProgressStep0Android: '~onboarding_progress_step_0',
-  onboardingProgressStep0iOS: '~onboarding_progress_step_0',
-
-  onboardingProgressStep1Android: '~onboarding_progress_step_1',
-  onboardingProgressStep1iOS: '~onboarding_progress_step_1',
-
-  onboardingProgressStep2Android: '~onboarding_progress_step_2',
-  onboardingProgressStep2iOS: '~onboarding_progress_step_2',
-
-  onboardingProgressStep3Android: '~onboarding_progress_step_3',
-  onboardingProgressStep3iOS: '~onboarding_progress_step_3',
-
-  onboardingProgressStep4Android: '~onboarding_progress_step_4',
-  onboardingProgressStep4iOS: '~onboarding_progress_step_4',
-
-  onboardingProgressStep5Android: '~onboarding_progress_step_5',
-  onboardingProgressStep5iOS: '~onboarding_progress_step_5',
+  onboardingProgressStep0: '~onboarding-progress-step-0',
+  onboardingProgressStep1: '~onboarding-progress-step-1',
+  onboardingProgressStep2: '~onboarding-progress-step-2',
+  onboardingProgressStep3: '~onboarding-progress-step-3',
+  onboardingProgressStep4: '~onboarding-progress-step-4',
+  onboardingProgressStep5: '~onboarding-progress-step-5',
 
   /* ============================
-        MAIN DESCRIPTION
+        MAIN DESCRIPTION (per step)
   ============================ */
-  onboardingMainDescriptionAndroid: '~onboarding_main_description',
-  onboardingMainDescriptioniOS: '~onboarding_main_description',
+  onboardingMainDescription0: '~onboarding-main-description-0',
+  onboardingMainDescription1: '~onboarding-main-description-1',
+  onboardingMainDescription2: '~onboarding-main-description-2',
+  onboardingMainDescription3: '~onboarding-main-description-3',
+  onboardingMainDescription4: '~onboarding-main-description-4',
+  onboardingMainDescription5: '~onboarding-main-description-5',
 
   /* ============================
-        SUB DESCRIPTION
+        SUB DESCRIPTION (per step)
   ============================ */
-  onboardingSubDescriptionAndroid: '~onboarding_sub_description',
-  onboardingSubDescriptioniOS: '~onboarding_sub_description',
+  onboardingSubDescription0: '~onboarding-sub-description-0',
+  onboardingSubDescription1: '~onboarding-sub-description-1',
+  onboardingSubDescription2: '~onboarding-sub-description-2',
+  onboardingSubDescription3: '~onboarding-sub-description-3',
+  onboardingSubDescription4: '~onboarding-sub-description-4',
+  onboardingSubDescription5: '~onboarding-sub-description-5',
 
   /* ============================
         MEDIA CONTENT FOR EACH STEP
   ============================ */
-  onboardingMediaStep0Android: '~onboarding_media_step_0',
-  onboardingMediaStep0iOS: '~onboarding_media_step_0',
-
-  onboardingMediaStep1Android: '~onboarding_media_step_1',
-  onboardingMediaStep1iOS: '~onboarding_media_step_1',
-
-  onboardingMediaStep2Android: '~onboarding_media_step_2',
-  onboardingMediaStep2iOS: '~onboarding_media_step_2',
-
-  onboardingMediaStep3Android: '~onboarding_media_step_3',
-  onboardingMediaStep3iOS: '~onboarding_media_step_3',
-
-  onboardingMediaStep4Android: '~onboarding_media_step_4',
-  onboardingMediaStep4iOS: '~onboarding_media_step_4',
-
-  onboardingMediaStep5Android: '~onboarding_media_step_5',
-  onboardingMediaStep5iOS: '~onboarding_media_step_5',
+  onboardingMediaStep0: '~onboarding-media-step-0',
+  onboardingMediaStep1: '~onboarding-media-step-1',
+  onboardingMediaStep2: '~onboarding-media-step-2',
+  onboardingMediaStep3: '~onboarding-media-step-3',
+  onboardingMediaStep4: '~onboarding-media-step-4',
+  onboardingMediaStep5: '~onboarding-media-step-5',
 
   /* ============================
         BUTTONS
   ============================ */
-  onboardingContinueButtonAndroid: '~onboarding_continue_button',
-  onboardingContinueButtoniOS: '~onboarding_continue_button',
-
-  onboardingSkipButtonAndroid: '~onboarding_skip_button',
-  onboardingSkipButtoniOS: '~onboarding_skip_button',
+  onboardingContinueButton: '~Continue',
+  onboardingSkipButton: '~Skip',
+  onboardingContinueText: '~onboarding-continue-text',
+  onboardingSkipText: '~onboarding-skip-text',
 }
 
 export default onboardingLocators

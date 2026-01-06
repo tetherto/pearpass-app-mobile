@@ -71,16 +71,18 @@ export const LoadVault = () => {
         >
           <View style={styles.formContainer}>
             <View style={{ marginBottom: 20, alignItems: 'center', gap: 10 }}>
-              <Text style={styles.title} testID="load-vault-title">{t`Load an existing Vault`}</Text>
+              <Text style={styles.title} testID="load-vault-title" accessibilityLabel="load-vault-title">{t`Load an existing Vault`}</Text>
               <Text
                 style={styles.subtitle}
                 testID="load-vault-subtitle"
+                accessibilityLabel="load-vault-subtitle"
               >{t`Open your vault with this code`}</Text>
             </View>
 
             <View style={{ width: '100%', gap: 15 }}>
                 <InputPasswordPearPass
                   testID="load-vault-invite-code-input"
+                  accessibilityLabel="load-vault-invite-code-input"
                   placeholder={t`Insert your vault's code...`}
                   value={inviteCode}
                   onChange={setInviteCode}
@@ -103,6 +105,7 @@ export const LoadVault = () => {
                 <>
                     <ButtonPrimary
                       testID="load-vault-open-button"
+                      accessibilityLabel="Open Vault"
                       onPress={() => pairWithCode(inviteCode)}
                       stretch
                       disabled={!inviteCode.length || isLoading}
@@ -112,6 +115,7 @@ export const LoadVault = () => {
 
                     <ButtonSecondary
                       testID="load-vault-select-vaults-button"
+                      accessibilityLabel="Select Vaults"
                       stretch
                       onPress={() =>
                         navigation.navigate('Welcome', { state: 'selectOrLoad' })
@@ -136,6 +140,7 @@ export const LoadVault = () => {
                       })
                     }
                     testID="load-vault-scan-qr-button"
+                    accessibilityLabel="Scan QR Code"
                   >
                     <QrCodeIcon size="21" color={colors.primary400.mode1} />
                     <Text style={styles.qrCodeText}>{t`Scan QR Code`}</Text>
