@@ -11,7 +11,7 @@ import { logger } from '../utils/logger'
  * @param {string} value - The version string to parse
  * @returns {number[]|null} An array of numbers, or null if the string is invalid
  */
-const parseParts = (value) => {
+export const parseParts = (value) => {
   if (typeof value !== 'string') return null
 
   const cleaned = value.replace(/[^\d.]/g, '').trim()
