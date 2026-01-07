@@ -10,10 +10,11 @@ PearPass Mobile App is a secure and user-friendly password management solution d
 
 - [Features](#features)
 - [Installation](#installation)
+- [Project Architecture](#project-architecture)
 - [Starting the Application](#starting-the-application)
-- [Usage Examples](#usage-examples)
-- [Dependencies](#dependencies)
+- [Prebuild Instructions](#prebuild-instructions)
 - [Testing](#testing)
+- [Dependencies](#dependencies)
 - [Related Projects](#related-projects)
 
 ## Features
@@ -45,7 +46,7 @@ cd pearpass-app-mobile
 # Initialize and update submodules
 git submodule update --init --recursive
 
-# To update all submodules to the latest `main` branch, use the provided script. 
+# To update all submodules to the latest `main` branch, use the provided script.
 npm run update-submodules
 
 # In case of specific remote use:
@@ -61,7 +62,20 @@ npm run lingui:compile
 
 # Generate worklet bundles
 npm run bundle-bare
+
+# Generate native iOS and Android directories (see Prebuild Instructions below)
+npx expo prebuild --clean
 ```
+
+## Project Architecture
+
+This project uses **Expo Plugins** to manage native iOS and Android configurations. The `ios/` and `android/` directories are **not tracked in git** and are generated dynamically using Expo's prebuild system.
+
+### Key Points:
+- Native directories (`ios/` and `android/`) are gitignored
+- All native configurations are managed through Expo plugins in the `plugins/` directory
+- Running `npx expo prebuild --clean` generates the native directories with all necessary configurations
+
 
 ## Starting the Application
 
