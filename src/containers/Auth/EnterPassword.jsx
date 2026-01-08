@@ -127,7 +127,6 @@ export const EnterPassword = () => {
               <InputPasswordPearPass
                 testID="enter-password-input"
                 accessibilityLabel="enter-password-input"
-                errorTestID="enter-password-input-error"
                 placeholder={t`Master password`}
                 {...register('password')}
                 isPassword
