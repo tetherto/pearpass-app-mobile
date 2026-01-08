@@ -1,4 +1,4 @@
-package com.noxtton.pearpass.autofill.service;
+package com.pears.pass.autofill.service;
 
 import android.app.PendingIntent;
 import android.app.assist.AssistStructure;
@@ -29,10 +29,10 @@ import androidx.autofill.inline.v1.InlineSuggestionUi;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.noxtton.pearpass.R;
-import com.noxtton.pearpass.autofill.ui.AuthenticationActivity;
-import com.noxtton.pearpass.autofill.utils.AutofillHelper;
-import com.noxtton.pearpass.autofill.utils.AutofillConstants;
+import com.pears.pass.R;
+import com.pears.pass.autofill.ui.AuthenticationActivity;
+import com.pears.pass.autofill.utils.AutofillHelper;
+import com.pears.pass.autofill.utils.AutofillConstants;
 
 import java.util.ArrayList;
 import java.util.List;

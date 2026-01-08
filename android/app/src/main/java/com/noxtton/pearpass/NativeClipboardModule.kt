@@ -1,4 +1,4 @@
-package com.noxtton.pearpass
+package com.pears.pass
 
 import android.content.ClipData
 import android.content.ClipboardManager

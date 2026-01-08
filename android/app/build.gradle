@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.noxtton.pearpass'
+    namespace 'com.pears.pass'
     defaultConfig {
-        applicationId 'com.noxtton.pearpass'
+        applicationId 'com.pears.pass'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

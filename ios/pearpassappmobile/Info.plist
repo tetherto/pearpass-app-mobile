@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>pearpassappmobile</string>
-          <string>com.noxtton.pearpass</string>
+          <string>com.pears.pass</string>
         </array>
       </dict>
     </array>

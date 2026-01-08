@@ -5,7 +5,7 @@
     "icon": "./assets/images/appIcons/app-icon.png",
     "version": "1.1.2",
     "android": {
-      "package": "com.noxtton.pearpass",
+      "package": "com.pears.pass",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -18,7 +18,7 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.noxtton.pearpass",
+      "bundleIdentifier": "com.pears.pass",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to allow you to select and upload photos.",
         "ITSAppUsesNonExemptEncryption": false

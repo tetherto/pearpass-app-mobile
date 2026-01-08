@@ -1,4 +1,4 @@
-package com.noxtton.pearpass
+package com.pears.pass
 import com.facebook.react.common.assets.ReactFontManager
 
 import android.app.Application
@@ -16,7 +16,7 @@ import com.facebook.soloader.SoLoader
 
 import expo.modules.ApplicationLifecycleDispatcher
 import expo.modules.ReactNativeHostWrapper
-import com.noxtton.pearpass.CustomSplashScreenPackage
+import com.pears.pass.CustomSplashScreenPackage
 
 class MainApplication : Application(), ReactApplication {
 

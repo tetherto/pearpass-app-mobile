@@ -1,4 +1,4 @@
-package com.noxtton.pearpass.autofill.ui;
+package com.pears.pass.autofill.ui;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.noxtton.pearpass.R;
-import com.noxtton.pearpass.autofill.data.CredentialItem;
+import com.pears.pass.R;
+import com.pears.pass.autofill.data.CredentialItem;
 
 import java.util.List;
 
