@@ -230,7 +230,6 @@ export const CreatePassword = () => {
                 <InputPasswordPearPass
                   testID="create-password-input"
                   accessibilityLabel="create-password-input"
-                  errorTestID="create-password-input-error"
                   placeholder={t`Enter Password`}
                   {...passwordRegisterProps}
                   onChange={handlePasswordChange}
@@ -240,7 +239,6 @@ export const CreatePassword = () => {
                 <InputPasswordPearPass
                   testID="create-password-confirm-input"
                   accessibilityLabel="create-password-confirm-input"
-                  errorTestID="create-password-confirm-input-error"
                   placeholder={t`Confirm Password`}
                   {...register('passwordConfirm')}
                   isPassword
