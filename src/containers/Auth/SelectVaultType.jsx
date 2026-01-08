@@ -93,7 +93,8 @@ export const SelectVaultType = () => {
           <ButtonPrimary 
             testID="select-vault-type-create-new"
             accessibilityLabel="Create a new vault"
-            stretch onPress={handleCreateVault}>
+            stretch 
+            onPress={handleCreateVault}>
             {t`Create a new vault`}
           </ButtonPrimary>
 
