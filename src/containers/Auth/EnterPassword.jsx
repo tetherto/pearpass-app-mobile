@@ -154,7 +154,8 @@ export const EnterPassword = () => {
                   <ButtonPrimary
                     testID="enter-password-continue-button"
                     accessibilityLabel="Continue"
-                    stretch onPress={handleSubmit(onSubmit)}>
+                    stretch 
+                    onPress={handleSubmit(onSubmit)}>
                     {t`Continue`}
                   </ButtonPrimary>
 
