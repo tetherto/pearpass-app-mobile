@@ -3,7 +3,7 @@
     "name": "PearPass",
     "slug": "pearpass",
     "icon": "./assets/images/appIcons/app-icon.png",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "android": {
       "package": "com.noxtton.pearpass",
       "permissions": [
@@ -83,7 +83,7 @@
       "expo-video"
     ],
     "extra": {
-      "appVersion": "1.1.1",
+      "appVersion": "1.1.2",
       "eas": {
         "projectId": "28facb62-e2a2-4b6c-bc3f-0f5469e79415"
       }

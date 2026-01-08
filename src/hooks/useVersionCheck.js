@@ -7,14 +7,35 @@ import { VERSION_CHECK_CONFIG } from '../constants/versionCheck'
 import { logger } from '../utils/logger'
 
 /**
+ * Parses a version string into an array of numbers
+ * @param {string} value - The version string to parse
+ * @returns {number[]|null} An array of numbers, or null if the string is invalid
+ */
+export const parseParts = (value) => {
+  if (typeof value !== 'string') return null
+
+  const cleaned = value.replace(/[^\d.]/g, '').trim()
+  if (!cleaned) return []
+
+  const parts = cleaned.split('.').map((segment) => {
+    const num = Number(segment)
+    return Number.isFinite(num) ? num : null
+  })
+
+  return parts.every((part) => part !== null) ? parts : null
+}
+
+/**
  * Compares two semver version strings
  * @param {string} current - Current app version
  * @param {string} latest - Latest store version
  * @returns {boolean} True if latest > current
  */
 export const compareVersions = (current, latest) => {
-  const currentParts = current.split('.').map(Number)
-  const latestParts = latest.split('.').map(Number)
+  const currentParts = parseParts(current)
+  const latestParts = parseParts(latest)
+
+  if (!currentParts || !latestParts) return false
 
   for (let i = 0; i < Math.max(currentParts.length, latestParts.length); i++) {
     const currentPart = currentParts[i] || 0
