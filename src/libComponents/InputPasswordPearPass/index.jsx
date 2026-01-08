@@ -94,6 +94,8 @@ export const InputPasswordPearPass = ({
           secureTextEntry={!isVisible}
           isPassword
           type={type}
+          testID={testID ? `${testID}-field` : undefined}
+          accessibilityLabel={testID ? `${testID}-field` : undefined}
           onFocus={() => {
             setIsFocused(true)
           }}
