@@ -39,7 +39,8 @@ jobs:
 
       - uses: actions/checkout@v6
         with:
-          submodules: true          
+          submodules: true
+          token: ${{ secrets.PAT_TOKEN }}          
 
       - uses: actions/setup-node@v4
         with:
@@ -64,7 +65,7 @@ jobs:
           git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
           git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
           git config --global url."https://${{ secrets.PAT_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-          npm install --install-links --legacy-peer-deps 
+          npm install --install-links --legacy-peer-deps
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
@@ -144,11 +145,21 @@ jobs:
           # CHANGED: add branch-aware profile
           eas build --platform android --profile ${{ steps.branch_profile.outputs.PROFILE }} --local --non-interactive
 
+      - name: Resolve APK profile by branch
+        id: apk_profile
+        run: |
+          if [ "${GITHUB_REF##*/}" = "main" ]; then
+            APK_PROFILE=production-apk
+          else
+            APK_PROFILE=preview-apk
+          fi
+          echo "APK_PROFILE=$APK_PROFILE" >> "$GITHUB_OUTPUT" 
+
       - name: Build APK for GitHub release
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          eas build --platform android --profile preview --local --non-interactive
+          eas build --platform android --profile ${{ steps.apk_profile.outputs.APK_PROFILE }} --local --non-interactive
 
       - name: Find and rename Android artifacts
         id: find_android
@@ -238,6 +249,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: true
+          token: ${{ secrets.PAT_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
