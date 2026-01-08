@@ -194,7 +194,8 @@ export const NewVault = () => {
                     <ButtonPrimary 
                       testID="new-vault-continue-button"
                       accessibilityLabel="Continue"
-                      stretch onPress={handleSubmit(onSubmit)}>
+                      stretch 
+                      onPress={handleSubmit(onSubmit)}>
                       {t`Continue`}
                     </ButtonPrimary>
                     <ButtonSecondary
