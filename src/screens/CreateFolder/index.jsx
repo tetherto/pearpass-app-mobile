@@ -97,6 +97,8 @@ export const CreateFolder = ({ route }) => {
             label={t`Title`}
             placeholder={t`No title`}
             variant="outline"
+            testID="create-folder-title-input"
+            accessibilityLabel="create-folder-title-input"
             {...register('title')}
           />
         </FormGroup>
