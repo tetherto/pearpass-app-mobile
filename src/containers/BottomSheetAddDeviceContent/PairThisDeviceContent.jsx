@@ -70,7 +70,7 @@ export const PairThisDeviceContent = ({ tabs }) => {
       </View>
       <View style={styles.expireContainer}>
         <Text style={styles.expireText}>
-          {t`This QR code expires in`} {expireTime}
+          {t`Expires in`} {expireTime}
         </Text>
         <TimeIcon size={14} color={colors.primary400.mode1} />
       </View>

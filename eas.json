@@ -13,12 +13,24 @@
       "autoIncrement": true,
       "node": "22.12.0"
     },
+    "preview-apk": {
+      "extends": "preview",
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "production": {
       "autoIncrement": true,
       "ios": {
         "scheme": "pearpassappmobile"
       },
       "android": {
+      }
+    },
+    "production-apk": {
+      "extends": "production",
+      "android": {
+        "buildType": "apk"
       }
     }
   },

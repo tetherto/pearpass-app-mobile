@@ -1,4 +1,7 @@
 {
-  "compilerOptions": {},
+  "compilerOptions": {
+    "baseUrl": ".",
+  },
+  "exclude": ["node_modules", "android", "ios", "build", "dist"],
   "extends": "expo/tsconfig.base"
 }

@@ -7,6 +7,10 @@ import { Validator } from 'pear-apps-utils-validator'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { useUserData, useVaults } from 'pearpass-lib-vault'
 import {
+  clearBuffer,
+  stringToBuffer
+} from 'pearpass-lib-vault/src/utils/buffer'
+import {
   ActivityIndicator,
   ScrollView,
   View,
@@ -45,15 +49,15 @@ export const EnterPassword = () => {
   const { initVaults } = useVaults()
 
   const onSubmit = async (value) => {
+    const passwordBuffer = stringToBuffer(value.password)
+
     try {
       setIsLoading(true)
-      await logIn({ password: value.password })
-      await initVaults({ password: value.password })
-      // Refresh master password status after successful login to clear any stale
-      // lock state in Redux. This prevents the Welcome screen from showing
-      // a false lock due to race conditions during initialization.
-      await refreshMasterPasswordStatus()
-      navigation.replace('Welcome', { state: NAVIGATION_ROUTES.SELECT_OR_LOAD })
+      await logIn({ password: passwordBuffer })
+      await initVaults({ password: passwordBuffer })
+      navigation.replace('Welcome', {
+        state: NAVIGATION_ROUTES.SELECT_OR_LOAD
+      })
       setIsLoading(false)
     } catch (error) {
       const status = await refreshMasterPasswordStatus()
@@ -72,6 +76,8 @@ export const EnterPassword = () => {
             : t`Incorrect password. You have ${status?.remainingAttempts} attempts before the app locks for 5 minutes.`
       })
       setIsLoading(false)
+    } finally {
+      clearBuffer(passwordBuffer)
     }
   }
 

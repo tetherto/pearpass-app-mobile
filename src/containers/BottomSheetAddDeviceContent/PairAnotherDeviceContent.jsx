@@ -150,7 +150,7 @@ export const PairAnotherDeviceContent = ({
               style={[styles.inputText, inviteCode && styles.inputTextFilled]}
               value={inviteCode}
               onChangeText={setInviteCode}
-              placeholder={t`Add vault key...`}
+              placeholder={t`Insert vault key...`}
               placeholderTextColor={colors.grey200.mode1}
               numberOfLines={1}
             />

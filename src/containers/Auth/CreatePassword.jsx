@@ -7,6 +7,10 @@ import { Validator } from 'pear-apps-utils-validator'
 import { TERMS_OF_USE } from 'pearpass-lib-constants'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { closeAllInstances, useUserData, useVaults } from 'pearpass-lib-vault'
+import {
+  clearBuffer,
+  stringToBuffer
+} from 'pearpass-lib-vault/src/utils/buffer'
 import { checkPasswordStrength } from 'pearpass-utils-password-check'
 import {
   ActivityIndicator,
@@ -117,9 +121,11 @@ export const CreatePassword = () => {
   }
 
   const enableBiometricAuthentication = async (password) => {
+    const passwordBuffer = stringToBuffer(password)
+
     try {
-      await logIn({ password })
-      await initVaults({ password })
+      await logIn({ password: passwordBuffer })
+      await initVaults({ password: passwordBuffer })
       const { error } = await enableBiometrics()
       await closeAllInstances()
       resetState()
@@ -138,6 +144,8 @@ export const CreatePassword = () => {
     } catch (error) {
       logger.error('Error while enabling biometric authentication:', error)
       navigateToLogin()
+    } finally {
+      clearBuffer(passwordBuffer)
     }
   }
 
@@ -174,10 +182,12 @@ export const CreatePassword = () => {
       return
     }
 
+    const passwordBuffer = stringToBuffer(values.password)
+
     try {
       setIsLoading(true)
 
-      await createMasterPassword(values.password)
+      await createMasterPassword(passwordBuffer)
 
       setIsLoading(false)
 
@@ -189,6 +199,8 @@ export const CreatePassword = () => {
     } catch (error) {
       logger.error(error)
       setIsLoading(false)
+    } finally {
+      clearBuffer(passwordBuffer)
     }
   }
 

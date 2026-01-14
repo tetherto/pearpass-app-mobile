@@ -4,7 +4,11 @@ import { useLingui } from '@lingui/react/macro'
 import { useForm } from 'pear-apps-lib-ui-react-hooks'
 import { Validator } from 'pear-apps-utils-validator'
 import { useUserData } from 'pearpass-lib-vault'
-import { checkPasswordStrength } from 'pearpass-utils-password-check'
+import {
+  clearBuffer,
+  stringToBuffer
+} from 'pearpass-lib-vault/src/utils/buffer'
+import { validatePasswordChange } from 'pearpass-utils-password-check'
 
 import { useModal } from '../../../context/ModalContext'
 import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
@@ -40,30 +44,37 @@ export const ModifyMasterVaultModalContent = () => {
   })
 
   const onSubmit = async (values) => {
-    const result = checkPasswordStrength(values.newPassword, { errors })
+    const { currentPassword, newPassword, repeatPassword } = values
+    const result = validatePasswordChange({
+      currentPassword,
+      newPassword,
+      repeatPassword,
+      messages: {
+        newPasswordMustDiffer: t`New password must be different from the current password`,
+        passwordsDontMatch: t`Passwords do not match`
+      },
+      config: { errors }
+    })
 
     if (!result.success) {
       setErrors({
-        newPassword: result.errors[0]
+        [result.field]: result.error
       })
 
-      setValue('repeatPassword', '')
+      if (result.field === 'newPassword') {
+        setValue('repeatPassword', '')
+      }
       return
     }
 
-    if (values.newPassword !== values.repeatPassword) {
-      setErrors({
-        repeatPassword: t`Passwords do not match`
-      })
-
-      return
-    }
+    const newPasswordBuffer = stringToBuffer(values.newPassword)
+    const currentPasswordBuffer = stringToBuffer(values.currentPassword)
 
     try {
       setIsLoading(true)
       await updateMasterPassword({
-        newPassword: values.newPassword,
-        currentPassword: values.currentPassword
+        newPassword: newPasswordBuffer,
+        currentPassword: currentPasswordBuffer
       })
 
       setIsLoading(false)
@@ -74,6 +85,9 @@ export const ModifyMasterVaultModalContent = () => {
       setErrors({
         currentPassword: t`Invalid password`
       })
+    } finally {
+      clearBuffer(newPasswordBuffer)
+      clearBuffer(currentPasswordBuffer)
     }
   }
 

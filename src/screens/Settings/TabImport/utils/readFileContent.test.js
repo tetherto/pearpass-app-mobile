@@ -28,7 +28,7 @@ describe('readFileContent', () => {
     const result = await readFileContent(['.csv'])
 
     expect(DocumentPicker.getDocumentAsync).toHaveBeenCalledWith({
-      type: ['text/csv']
+      type: ['text/csv', 'text/comma-separated-values']
     })
     expect(FileSystem.readAsStringAsync).toHaveBeenCalledWith(
       'file://test.csv',
@@ -72,7 +72,12 @@ describe('readFileContent', () => {
     const result = await readFileContent(['.csv', '.json', 'text/plain'])
 
     expect(DocumentPicker.getDocumentAsync).toHaveBeenCalledWith({
-      type: ['text/csv', 'application/json', 'text/plain']
+      type: [
+        'text/csv',
+        'text/comma-separated-values',
+        'application/json',
+        'text/plain'
+      ]
     })
     expect(result).toEqual({
       fileContent: 'plain text',

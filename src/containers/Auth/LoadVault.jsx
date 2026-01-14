@@ -74,17 +74,17 @@ export const LoadVault = () => {
               <Text
                 style={styles.title}
                 testID="load-vault-title"
-              >{t`Load an existing Vault`}</Text>
+              >{t`Import an existing vault`}</Text>
               <Text
                 style={styles.subtitle}
                 testID="load-vault-subtitle"
-              >{t`Open your vault with this code`}</Text>
+              >{t`Using PearPass on your other device, use "Add Device" to generate a QR or connection code to pair your vault. This method keeps your vault secure.`}</Text>
             </View>
 
             <View style={{ width: '100%', gap: 15 }}>
               <InputPasswordPearPass
                 testID="load-vault-invite-code-input"
-                placeholder={t`Insert your vault's code...`}
+                placeholder={t`Insert vault key...`}
                 value={inviteCode}
                 onChange={setInviteCode}
                 error={error}
@@ -110,7 +110,7 @@ export const LoadVault = () => {
                     stretch
                     disabled={!inviteCode.length || isLoading}
                   >
-                    {t`Open Vault`}
+                    {t`Import vault`}
                   </ButtonPrimary>
 
                   <ButtonSecondary

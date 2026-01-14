@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - staging
 
 
 jobs:
@@ -145,11 +146,21 @@ jobs:
           # CHANGED: add branch-aware profile
           eas build --platform android --profile ${{ steps.branch_profile.outputs.PROFILE }} --local --non-interactive
 
+      - name: Resolve APK profile by branch
+        id: apk_profile
+        run: |
+          if [ "${GITHUB_REF##*/}" = "main" ]; then
+            APK_PROFILE=production-apk
+          else
+            APK_PROFILE=preview-apk
+          fi
+          echo "APK_PROFILE=$APK_PROFILE" >> "$GITHUB_OUTPUT" 
+
       - name: Build APK for GitHub release
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          eas build --platform android --profile preview --local --non-interactive
+          eas build --platform android --profile ${{ steps.apk_profile.outputs.APK_PROFILE }} --local --non-interactive
 
       - name: Find and rename Android artifacts
         id: find_android

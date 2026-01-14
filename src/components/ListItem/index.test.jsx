@@ -11,7 +11,7 @@ jest.mock('./styles', () => {
 
   return {
     ListItemContainer: (props) => (
-      <TouchableOpacity testID="vault-container" {...props}>
+      <TouchableOpacity {...props} testID="vault-container">
         {props.children}
       </TouchableOpacity>
     ),
@@ -29,15 +29,27 @@ jest.mock('./styles', () => {
         {props.children}
       </Text>
     ),
-    ListItemActions: (props) => <View testID="vault-actions" {...props} />
+    ListItemActions: (props) => <View testID="vault-actions" {...props} />,
+    SelectedListItemIconContainer: (props) => (
+      <View testID="selected-icon-container" {...props} />
+    )
   }
 })
 
 jest.mock('pearpass-lib-ui-react-native-components', () => ({
   BrushIcon: () => 'BrushIcon',
+  CheckIcon: () => 'CheckIcon',
   DeleteIcon: () => 'DeleteIcon',
   LockCircleIcon: () => 'LockCircleIcon',
   ShareIcon: () => 'ShareIcon'
+}))
+
+jest.mock('pearpass-lib-ui-theme-provider/native', () => ({
+  colors: {
+    primary400: { mode1: '#000000' },
+    black: { mode1: '#000000' },
+    white: { mode1: '#ffffff' }
+  }
 }))
 
 describe('ListItem', () => {
@@ -65,15 +77,13 @@ describe('ListItem', () => {
     expect(mockProps.onPress).toHaveBeenCalled()
   })
 
-  it('renders actions when showActions is true', () => {
-    const { getByTestId } = render(
-      <ListItem {...mockProps} showActions={true} />
-    )
+  it('renders actions when action callbacks are provided', () => {
+    const { getByTestId } = render(<ListItem {...mockProps} />)
 
     expect(getByTestId('vault-actions')).toBeTruthy()
   })
 
-  it('does not render actions when showActions is false', () => {
+  it('does not render action icons when callbacks are not provided', () => {
     const mockWithoutActionsProps = {
       name: 'Test Vault',
       date: '2023-01-01',
@@ -82,8 +92,31 @@ describe('ListItem', () => {
 
     const { queryByTestId } = render(<ListItem {...mockWithoutActionsProps} />)
 
-    expect(queryByTestId('vault-actions')?.props.children[0]).toBeUndefined()
-    expect(queryByTestId('vault-actions')?.props.children[1]).toBeUndefined()
-    expect(queryByTestId('vault-actions')?.props.children[2]).toBeUndefined()
+    const actionsContainer = queryByTestId('vault-actions')
+    expect(actionsContainer).toBeTruthy()
+    // When no callbacks are provided, the actions container should have no meaningful children
+    // React filters out falsy values, so children should be undefined, null, or an array of falsy values
+    const children = actionsContainer.props.children
+    const hasNoChildren =
+      !children ||
+      (Array.isArray(children) && children.every((child) => !child)) ||
+      children === null
+    expect(hasNoChildren).toBeTruthy()
+  })
+
+  it('renders CheckIcon when isSelected is true', () => {
+    const { getByTestId } = render(
+      <ListItem {...mockProps} isSelected={true} />
+    )
+
+    expect(getByTestId('selected-icon-container')).toBeTruthy()
+  })
+
+  it('renders correctly when isLoading is true', () => {
+    const { getByTestId } = render(<ListItem {...mockProps} isLoading={true} />)
+
+    // Component should still render name and date when loading
+    expect(getByTestId('vault-name').props.children).toBe('Test Vault')
+    expect(getByTestId('vault-date')).toBeTruthy()
   })
 })

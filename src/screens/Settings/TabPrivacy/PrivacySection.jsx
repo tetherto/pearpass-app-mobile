@@ -7,6 +7,7 @@ import { Container, Description } from './styles'
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { IOS_APP_GROUP_ID } from '../../../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../../../constants/secureStorageKeys'
+import { AutoLockSettings } from '../../../containers/AutoLockSettings'
 import { RuleSelector } from '../../../containers/BottomSheetPassGeneratorContent/RuleSelector'
 import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
@@ -116,6 +117,7 @@ export const PrivacySection = () => {
           selectedRules={selectedRules}
           setRules={handleSetRules}
         />
+        <AutoLockSettings />
       </Container>
     </CardSingleSetting>
   )

@@ -8,6 +8,10 @@ import {
 } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider'
 import { useUserData, useVaults } from 'pearpass-lib-vault/src'
+import {
+  clearBuffer,
+  stringToBuffer
+} from 'pearpass-lib-vault/src/utils/buffer'
 import { Text, View, StyleSheet } from 'react-native'
 
 import { ButtonBiometricLogin } from '../../components/ButtonBiometricLogin'
@@ -37,14 +41,18 @@ export const BottomSheetMasterPassword = ({ onClose, onConfirm }) => {
   })
 
   const submit = async (values) => {
+    const passwordBuffer = stringToBuffer(values.password)
+
     try {
-      await logIn({ password: values.password })
+      await logIn({ password: passwordBuffer })
 
       await onConfirm()
     } catch (error) {
       setErrors({
         password: typeof error === 'string' ? error : t`Invalid password`
       })
+    } finally {
+      clearBuffer(passwordBuffer)
     }
   }
 

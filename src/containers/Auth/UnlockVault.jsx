@@ -106,7 +106,9 @@ export const UnlockVault = ({ vaultId }) => {
             }}
             testID="unlock-vault-title"
           >
-            {t`Unlock with the ${selectedVault?.name ?? selectedVault?.id} Vault password`}
+            {t`Unlock with the ${
+              selectedVault?.name ?? selectedVault?.id
+            } Vault password`}
           </Text>
 
           <View style={{ width: '100%' }}>
