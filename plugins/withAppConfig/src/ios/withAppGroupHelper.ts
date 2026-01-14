@@ -14,7 +14,7 @@ export const withAppGroupHelper: ConfigPlugin = (config) => {
     const appGroups = cfg.ios?.entitlements?.['com.apple.security.application-groups'];
     const appGroupIdentifier = Array.isArray(appGroups) && appGroups.length > 0
       ? appGroups[0]
-      : 'group.com.noxtton.pearpass';
+      : 'group.com.pears.pass';
 
     // Copy AppGroupHelper.h to project directory
     const headerSrc = path.join(templateDir, 'AppGroupHelper.h');

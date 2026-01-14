@@ -27,7 +27,7 @@ export async function copyAndProcessSourceFiles(
   srcDir: string,
   destDir: string,
   packageName: string,
-  templatePackages: string[] = ['com.noxtton.pearpass', 'com.pears.pass']
+  templatePackages: string[] = ['com.pears.pass']
 ): Promise<void> {
   await fs.promises.mkdir(destDir, { recursive: true });
   const files = await fs.promises.readdir(srcDir, { withFileTypes: true });

@@ -26,19 +26,11 @@ export const withAndroidAutofillModule: ConfigPlugin<AutofillPluginOptions> = (c
 
         // Replace package declarations
         content = content.replace(
-          /^package com\.noxtton\.pearpass$/gm,
-          `package ${packageName}`
-        );
-        content = content.replace(
           /^package com\.pears\.pass$/gm,
           `package ${packageName}`
         );
 
         // Replace imports
-        content = content.replace(
-          /import com\.noxtton\.pearpass\./g,
-          `import ${packageName}.`
-        );
         content = content.replace(
           /import com\.pears\.pass\./g,
           `import ${packageName}.`

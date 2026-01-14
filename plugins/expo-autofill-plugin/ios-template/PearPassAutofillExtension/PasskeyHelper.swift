@@ -9,7 +9,7 @@ import Security
 class PasskeyHelper: NSObject {
     static let shared = PasskeyHelper()
     
-    private let domain = "dev-passkey-demo.noxtton.com"
+    private let domain = "dev-passkey-demo.pears.pass"
     private let userIdentifier = "PearPass User"
     
     private override init() {
