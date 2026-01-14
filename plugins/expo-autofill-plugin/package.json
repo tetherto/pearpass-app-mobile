@@ -4,17 +4,10 @@
   "main": "app.plugin.js",
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf build",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "clean": "rm -rf build"
   },
   "devDependencies": {
     "@expo/config-plugins": "~9.0.0",
     "typescript": "^5.3.0"
-  },
-  "dependencies": {
-    "expo": "~53.0.24",
-    "react": "19.0.0",
-    "react-native": "0.79.6"
   }
 }
