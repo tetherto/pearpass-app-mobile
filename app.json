@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "PearPass",
-    "slug": "pearpass-app-mobile",
+    "slug": "pearpass",
     "icon": "./assets/images/appIcons/app-icon.png",
     "version": "1.2.1",
     "android": {
-      "package": "com.noxtton.pearpass",
+      "package": "com.pears.pass",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -18,7 +18,7 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.noxtton.pearpass",
+      "bundleIdentifier": "com.pears.pass",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to allow you to select and upload photos.",
         "ITSAppUsesNonExemptEncryption": false
@@ -29,10 +29,10 @@
       },
       "usesNonExemptEncryption": false,
       "scheme": "pearpassappmobile",
-      "appleTeamId": "77ZH693K52",
+      "appleTeamId": "43QFHSJ5QR",
       "entitlements": {
         "com.apple.developer.authentication-services.autofill-credential-provider": true,
-        "com.apple.security.application-groups": ["group.com.noxtton.pearpass"]
+        "com.apple.security.application-groups": ["group.com.pears.pass"]
       },
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
@@ -81,7 +81,7 @@
             "minSdkVersion": 29,
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
-            "extraProguardRules": "-keep class com.swmansion.reanimated.** { *; }\n-keep class com.facebook.react.turbomodule.** { *; }\n-keep class to.pear.bare.** { *; }\n-keep class com.noxtton.pearpass.autofill.** { *; }",
+            "extraProguardRules": "-keep class com.swmansion.reanimated.** { *; }\n-keep class com.facebook.react.turbomodule.** { *; }\n-keep class to.pear.bare.** { *; }\n-keep class com.pears.pass.autofill.** { *; }",
             "usesCleartextTraffic": true
           },
           "ios": {
@@ -109,7 +109,7 @@
       "./plugins/withCustomSplashScreen",
       ["./plugins/expo-autofill-plugin", {
         "ios": {
-          "appGroupIdentifier": "group.com.noxtton.pearpass"
+          "appGroupIdentifier": "group.com.pears.pass"
         },
         "extensionBundlePath": "bundles/autofill.bundle"
       }]
@@ -117,18 +117,22 @@
     "extra": {
       "appVersion": "1.2.1",
       "eas": {
-        "projectId": "f6132c16-1ff8-446a-8012-5271ec0e16e5",
+        "projectId": "28facb62-e2a2-4b6c-bc3f-0f5469e79415",
         "build": {
           "experimental": {
             "ios": {
               "appExtensions": [
                 {
                   "targetName": "PearPassAutoFillExtension",
-                  "bundleIdentifier": "com.noxtton.pearpass.PearPassAutoFillExtension",
+                  "bundleIdentifier": "com.pears.pass.PearPassAutoFillExtension",
                   "entitlements": {
                     "com.apple.developer.authentication-services.autofill-credential-provider": true,
-                    "com.apple.security.application-groups": ["group.com.noxtton.pearpass"],
-                    "keychain-access-groups": ["$(AppIdentifierPrefix)com.noxtton.pearpass"]
+                    "com.apple.security.application-groups": [
+                      "group.com.pears.pass"
+                    ],
+                    "keychain-access-groups": [
+                      "$(AppIdentifierPrefix)com.pears.pass"
+                    ]
                   }
                 }
               ]
