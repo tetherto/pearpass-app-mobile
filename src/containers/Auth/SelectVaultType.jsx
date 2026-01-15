@@ -60,12 +60,12 @@ export const SelectVaultType = () => {
             <Text
               style={styles.headerText}
               testID="select-vault-type-empty-title"
-            >{t`Enter Master Password`}</Text>
+            >{t`Set Up Your Vault`}</Text>
             <Text
               style={styles.subHeaderText}
               testID="select-vault-type-empty-subtitle"
             >
-              {t`Now create a secure vault or load an existing one to get started.`}
+              {t`Start fresh with a new vault or open an existing one to continue.`}
             </Text>
           </View>
         ) : (
@@ -108,7 +108,7 @@ export const SelectVaultType = () => {
           stretch
           onPress={() => navigation.navigate('Welcome', { state: 'load' })}
         >
-          {t`Load a vault`}
+          {t`Import existing vault`}
         </ButtonSecondary>
       </View>
     </View>
