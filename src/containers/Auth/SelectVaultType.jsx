@@ -65,7 +65,7 @@ export const SelectVaultType = () => {
               style={styles.subHeaderText}
               testID="select-vault-type-empty-subtitle"
             >
-              {t`Start fresh with a new vault or open an existing one to continue.`}
+              {t`Start fresh with a new vault or import an existing one to continue.`}
             </Text>
           </View>
         ) : (

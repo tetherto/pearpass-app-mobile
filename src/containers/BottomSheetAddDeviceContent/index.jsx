@@ -71,7 +71,7 @@ export const BottomSheetAddDeviceContent = () => {
                 activeOpacity={0.7}
                 onPress={() => setActiveTab(TAB.PAIR_ANOTHER)}
               >
-                <Text style={styles.tabText}>{t`Load a Vault`}</Text>
+                <Text style={styles.tabText}>{t`Import vault`}</Text>
               </TouchableOpacity>
             </View>
           }
@@ -95,7 +95,7 @@ export const BottomSheetAddDeviceContent = () => {
                 onPress={() => setActiveTab(TAB.PAIR_ANOTHER)}
               >
                 <Text style={[styles.tabText, styles.tabTextActive]}>
-                  {t`Load a Vault`}
+                  {t`Import vault`}
                 </Text>
               </TouchableOpacity>
             </View>
