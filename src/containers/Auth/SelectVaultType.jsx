@@ -73,7 +73,9 @@ export const SelectVaultType = () => {
             <Text
               style={styles.headerText}
               testID="select-vault-type-list-title"
-            >{t`Select a vault, create a new one or load another one`}</Text>
+            >
+              {t`Open an existing vault or create a new one.`}
+            </Text>
 
             <ScrollView
               style={styles.vaultsList}
