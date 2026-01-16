@@ -183,15 +183,19 @@ struct MasterPasswordView: View {
             errorMessage = NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized")
             return
         }
-        
+
         errorMessage = nil
-        
+
+        // Capture password and clear from viewModel immediately
+        let password = viewModel.masterPassword
+        viewModel.masterPassword = ""
+
         Task {
             await MainActor.run { isLoading = true }
-            
+
             do {
-                try await authenticateWithPassword(viewModel.masterPassword, client: client)
-                
+                try await authenticateWithPassword(password, client: client)
+
                 await MainActor.run {
                     isLoading = false
                     viewModel.currentFlow = .vaultSelection
@@ -199,8 +203,8 @@ struct MasterPasswordView: View {
             } catch {
                 await MainActor.run {
                     isLoading = false
-                    errorMessage = error.localizedDescription.isEmpty ? 
-                        NSLocalizedString("Invalid password", comment: "Invalid password error") : 
+                    errorMessage = error.localizedDescription.isEmpty ?
+                        NSLocalizedString("Invalid password", comment: "Invalid password error") :
                         error.localizedDescription
                 }
             }
@@ -208,33 +212,40 @@ struct MasterPasswordView: View {
     }
     
     // MARK: - Authentication Functions
-    
+
     private func authenticateWithPassword(_ password: String, client: PearPassVaultClient) async throws {
+        // Convert password string to Data buffer for secure handling
+        var passwordBuffer = Utils.stringToBuffer(password)
+        defer {
+            // Securely clear the password buffer after use
+            Utils.clearBuffer(&passwordBuffer)
+        }
+
         guard let masterPasswordEncryption = try await client.getMasterPasswordEncryption() else {
             throw NSError(domain: "MasterPasswordView", code: 1001, userInfo: [
                 NSLocalizedDescriptionKey: NSLocalizedString("Failed to get master password encryption data", comment: "Error description")
             ])
         }
-        
+
         try await initialize(
             ciphertext: masterPasswordEncryption.ciphertext,
             nonce: masterPasswordEncryption.nonce,
             salt: masterPasswordEncryption.salt,
             hashedPassword: masterPasswordEncryption.hashedPassword,
-            password: password,
+            password: passwordBuffer,
             client: client
         )
-        
+
         let vaults = try await client.listVaults()
         await MainActor.run { viewModel.vaults = vaults }
     }
-    
+
     private func initialize(
         ciphertext: String,
         nonce: String,
         salt: String,
         hashedPassword: String?,
-        password: String,
+        password: Data,
         client: PearPassVaultClient
     ) async throws {
         // Check if vaults are already initialized
@@ -242,7 +253,7 @@ struct MasterPasswordView: View {
         if vaultStatus.isInitialized && !vaultStatus.isLocked {
             return
         }
-        
+
         // Case 1: We have ciphertext, nonce, and hashedPassword
         if !ciphertext.isEmpty && !nonce.isEmpty, let hashedPwd = hashedPassword, !hashedPwd.isEmpty {
             let decryptedVaultKeyResult = try await client.decryptVaultKey(
@@ -250,30 +261,30 @@ struct MasterPasswordView: View {
                 nonce: nonce,
                 hashedPassword: hashedPwd
             )
-            
+
             guard let decryptedVaultKey = extractVaultKey(from: decryptedVaultKeyResult) else {
                 throw NSError(domain: "MasterPasswordView", code: 1002, userInfo: [
                     NSLocalizedDescriptionKey: NSLocalizedString("Error decrypting vault key", comment: "Error description")
                 ])
             }
-            
+
             try await client.vaultsInit(encryptionKey: decryptedVaultKey)
             return
         }
-        
+
         // Case 2: We need to use the password to decrypt
         if password.isEmpty {
             throw NSError(domain: "MasterPasswordView", code: 1003, userInfo: [
                 NSLocalizedDescriptionKey: NSLocalizedString("Password is required", comment: "Error description")
             ])
         }
-        
-        
+
+
         let encryptionStatus = try await client.encryptionGetStatus()
         if !encryptionStatus.status {
             _ = try await client.encryptionInit()
         }
-        
+
         // Get master password encryption data
         guard let encryptionData = try await client.encryptionGet(key: "masterPassword"),
               let encCiphertext = encryptionData["ciphertext"] as? String,
@@ -283,26 +294,26 @@ struct MasterPasswordView: View {
                 NSLocalizedDescriptionKey: NSLocalizedString("Failed to get master password encryption data", comment: "Error description")
             ])
         }
-        
-        // Get decryption key using salt and password
+
+        // Get decryption key using salt and password (using Data-based method)
         let decryptionKeyResult = try await client.getDecryptionKey(
             salt: encSalt,
             password: password
         )
-        
+
         // Decrypt the vault key
         let decryptedVaultKeyResult = try await client.decryptVaultKey(
             ciphertext: encCiphertext,
             nonce: encNonce,
             hashedPassword: decryptionKeyResult.key
         )
-        
+
         guard let decryptedVaultKey = extractVaultKey(from: decryptedVaultKeyResult) else {
             throw NSError(domain: "MasterPasswordView", code: 1005, userInfo: [
                 NSLocalizedDescriptionKey: NSLocalizedString("Error decrypting vault key", comment: "Error description")
             ])
         }
-        
+
         // Initialize vaults with the decrypted key
         try await client.vaultsInit(encryptionKey: decryptedVaultKey)
     }
@@ -364,7 +375,7 @@ struct MasterPasswordView: View {
                     nonce: encryptionData.nonce,
                     salt: "",
                     hashedPassword: encryptionData.hashedPassword,
-                    password: "",
+                    password: Data(), // No password needed for biometric auth
                     client: client
                 )
                 
@@ -421,7 +432,7 @@ struct MasterPasswordView: View {
                         nonce: encryptionData.nonce,
                         salt: encryptionData.salt,
                         hashedPassword: encryptionData.hashedPassword,
-                        password: "", // No password needed for passkey auth
+                        password: Data(), // No password needed for passkey auth
                         client: client
                     )
                 

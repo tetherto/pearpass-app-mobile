@@ -608,12 +608,111 @@ import Foundation
         // Initialize active vault with the decrypted key
         log("Initializing active vault \(vaultId) with decrypted key")
         _ = try await activeVaultInit(id: vaultId, encryptionKey: encryptionKey)
-        
+
         // Just return a success indicator since activeVaultGet has command mapping issues
         log("Successfully initialized active vault \(vaultId)")
         return ["success": true, "id": vaultId]
     }
-    
+
+    /// Gets a vault by ID with optional password as Data buffer for protected vaults
+    /// This follows the JavaScript getVaultById implementation with secure buffer handling
+    func getVaultById(vaultId: String, password: Data, ciphertext: String? = nil, nonce: String? = nil, hashedPassword: String? = nil) async throws -> [String: Any] {
+        log("Getting vault by ID: \(vaultId) (buffer)")
+
+        // Check if vault exists in the list
+        let vaults = try await listVaults()
+        guard vaults.first(where: { $0.id == vaultId }) != nil else {
+            throw PearPassVaultError.unknown("Vault not found")
+        }
+
+        // Check if active vault is already open and matches the requested vault
+        let activeStatus = try await activeVaultGetStatus()
+        if activeStatus.isInitialized && !activeStatus.isLocked {
+            let currentVault = try await activeVaultGet(key: "vault")
+            if let currentVaultId = currentVault["id"] as? String, currentVaultId == vaultId {
+                log("Vault \(vaultId) is already active, returning current vault")
+                return currentVault
+            } else {
+                // Close active vault if it's a different one
+                log("Closing active vault to switch to \(vaultId)")
+                _ = try await activeVaultClose()
+            }
+        }
+
+        var encryptionKey: String
+
+        // Get vault encryption info
+        let vaultEncryption = try await getVaultEncryption(vaultId: vaultId)
+
+        if let ciphertext = ciphertext, let nonce = nonce, let hashedPassword = hashedPassword {
+            // Use provided encryption parameters
+            log("Using provided encryption parameters to decrypt vault key")
+            let decryptionResult = try await decryptVaultKey(
+                ciphertext: ciphertext,
+                nonce: nonce,
+                hashedPassword: hashedPassword
+            )
+
+            guard let key = decryptionResult?["value"] as? String ??
+                           decryptionResult?["key"] as? String ??
+                           decryptionResult?["data"] as? String else {
+                throw PearPassVaultError.decryptionFailed
+            }
+            encryptionKey = key
+
+        } else if !password.isEmpty {
+            // Use provided password Data buffer to decrypt
+            log("Using provided password (buffer) to decrypt vault key")
+            guard let salt = vaultEncryption["salt"] as? String else {
+                throw PearPassVaultError.unknown("Vault encryption missing salt for password decryption")
+            }
+
+            // Use Data-based getDecryptionKey
+            let decryptionKeyResult = try await getDecryptionKey(salt: salt, password: password)
+            let decryptionResult = try await decryptVaultKey(
+                ciphertext: vaultEncryption["ciphertext"] as? String ?? "",
+                nonce: vaultEncryption["nonce"] as? String ?? "",
+                hashedPassword: decryptionKeyResult.key
+            )
+
+            guard let key = decryptionResult?["value"] as? String ??
+                           decryptionResult?["key"] as? String ??
+                           decryptionResult?["data"] as? String else {
+                throw PearPassVaultError.decryptionFailed
+            }
+            encryptionKey = key
+
+        } else {
+            // Use master encryption to decrypt
+            log("Using master encryption to decrypt vault key")
+            let masterEncryptionData = try await vaultsGet(key: "masterEncryption")
+            guard let masterHashedPassword = masterEncryptionData["hashedPassword"] as? String else {
+                throw PearPassVaultError.unknown("No hashed password available in master encryption")
+            }
+
+            let decryptionResult = try await decryptVaultKey(
+                ciphertext: vaultEncryption["ciphertext"] as? String ?? "",
+                nonce: vaultEncryption["nonce"] as? String ?? "",
+                hashedPassword: masterHashedPassword
+            )
+
+            guard let key = decryptionResult?["value"] as? String ??
+                           decryptionResult?["key"] as? String ??
+                           decryptionResult?["data"] as? String else {
+                throw PearPassVaultError.decryptionFailed
+            }
+            encryptionKey = key
+        }
+
+        // Initialize active vault with the decrypted key
+        log("Initializing active vault \(vaultId) with decrypted key (buffer)")
+        _ = try await activeVaultInit(id: vaultId, encryptionKey: encryptionKey)
+
+        // Just return a success indicator since activeVaultGet has command mapping issues
+        log("Successfully initialized active vault \(vaultId)")
+        return ["success": true, "id": vaultId]
+    }
+
     /// Helper method to get vault encryption data by vault ID
     private func getVaultEncryption(vaultId: String) async throws -> [String: Any] {
         log("Getting vault encryption for vault ID: \(vaultId)")
@@ -759,7 +858,7 @@ import Foundation
     }
     
     
-    /// Hashes a password
+    /// Hashes a password (String version - deprecated, use Data version)
     /// - Parameter password: The password to hash
     /// - Returns: The hashed password
     func hashPassword(_ password: String) async throws -> String {
@@ -767,18 +866,39 @@ import Foundation
             command: API.ENCRYPTION_HASH_PASSWORD.rawValue,
             data: ["password": password]
         )
-        
+
         // Extract the hashed password from the result
         guard let hashedPassword = result?["hashedPassword"] as? String else {
             throw PearPassVaultError.encryptionFailed
         }
-        
+
         log("Successfully hashed password")
+        return hashedPassword
+    }
+
+    /// Hashes a password using secure Data buffer
+    /// - Parameter password: The password as Data buffer (will be converted to Base64 for transmission)
+    /// - Returns: The hashed password
+    func hashPassword(_ password: Data) async throws -> String {
+        // Convert password Data to Base64 for transmission (matching JS pattern)
+        let passwordBase64 = password.base64EncodedString()
+
+        let result = try await sendRequest(
+            command: API.ENCRYPTION_HASH_PASSWORD.rawValue,
+            data: ["password": passwordBase64]
+        )
+
+        // Extract the hashed password from the result
+        guard let hashedPassword = result?["hashedPassword"] as? String else {
+            throw PearPassVaultError.encryptionFailed
+        }
+
+        log("Successfully hashed password (buffer)")
         return hashedPassword
     }
     
     
-    /// Gets the decryption key
+    /// Gets the decryption key (String version - deprecated, use Data version)
     /// - Parameters:
     ///   - salt: The salt to use for key derivation
     ///   - password: The password to use for key derivation
@@ -791,11 +911,11 @@ import Foundation
                 "password": password
             ]
         )
-        
+
         // The API returns the key directly as a string in the data field
         // Since sendRequest wraps strings in a "value" key, check for that first
         var key: String?
-        
+
         if let resultDict = result {
             // Check for wrapped string value
             if let wrappedValue = resultDict["value"] as? String {
@@ -806,13 +926,54 @@ import Foundation
                 key = hashedPassword
             }
         }
-        
+
         guard let derivedKey = key else {
             logError("Failed to extract key from getDecryptionKey response: \(String(describing: result))")
             throw PearPassVaultError.decryptionFailed
         }
-        
+
         log("Successfully generated decryption key")
+        return DecryptionKeyResult(key: derivedKey, salt: salt)
+    }
+
+    /// Gets the decryption key using secure Data buffer for password
+    /// - Parameters:
+    ///   - salt: The salt to use for key derivation
+    ///   - password: The password as Data buffer (will be converted to Base64 for transmission)
+    /// - Returns: The decryption key result containing the derived key and salt
+    func getDecryptionKey(salt: String, password: Data) async throws -> DecryptionKeyResult {
+        // Convert password Data to Base64 for transmission (matching JS pattern)
+        let passwordBase64 = password.base64EncodedString()
+
+        let result = try await sendRequest(
+            command: API.ENCRYPTION_GET_DECRYPTION_KEY.rawValue,
+            data: [
+                "salt": salt,
+                "password": passwordBase64
+            ]
+        )
+
+        // The API returns the key directly as a string in the data field
+        // Since sendRequest wraps strings in a "value" key, check for that first
+        var key: String?
+
+        if let resultDict = result {
+            // Check for wrapped string value
+            if let wrappedValue = resultDict["value"] as? String {
+                key = wrappedValue
+            } else if let directKey = resultDict["key"] as? String {
+                key = directKey
+            } else if let hashedPassword = resultDict["hashedPassword"] as? String {
+                key = hashedPassword
+            }
+        }
+
+        guard let derivedKey = key else {
+            logError("Failed to extract key from getDecryptionKey response: \(String(describing: result))")
+            throw PearPassVaultError.decryptionFailed
+        }
+
+        log("Successfully generated decryption key (buffer)")
         return DecryptionKeyResult(key: derivedKey, salt: salt)
     }
     

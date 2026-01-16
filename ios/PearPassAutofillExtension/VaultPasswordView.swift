@@ -126,46 +126,57 @@ struct VaultPasswordView: View {
     }
 
     // MARK: - Private Methods
-    
+
     private func unlockVault() {
         print("VaultPasswordView: Unlocking vault \(vault.name) with password")
-        
+
         guard let client = vaultClient else {
             print("VaultPasswordView: Vault client not available, using fallback method")
             viewModel.authenticateWithVaultPassword()
             return
         }
-        
+
         guard !viewModel.vaultPassword.isEmpty else {
             print("VaultPasswordView: Password is empty")
             errorMessage = NSLocalizedString("Password is required", comment: "Empty password error")
             return
         }
-        
+
+        // Capture password and clear from viewModel immediately
+        let password = viewModel.vaultPassword
+        viewModel.vaultPassword = ""
+
         isLoading = true
         errorMessage = nil
-        
+
         Task {
+            // Convert password string to Data buffer
+            var passwordBuffer = Utils.stringToBuffer(password)
+            defer {
+                // Securely clear the password buffer after use
+                Utils.clearBuffer(&passwordBuffer)
+            }
+
             do {
-                print("VaultPasswordView: Attempting to unlock vault \(vault.name) (ID: \(vault.id)) with password")
-                
+                print("VaultPasswordView: Attempting to unlock vault \(vault.name) (ID: \(vault.id)) with password (buffer)")
+
                 // This matches the RN app's refetchVault -> fetchVault -> getVaultById pattern
+                // Using the Data-based version of getVaultById
                 let vaultData = try await client.getVaultById(
                     vaultId: vault.id,
-                    password: viewModel.vaultPassword
+                    password: passwordBuffer
                 )
-                
+
                 print("VaultPasswordView: Successfully unlocked vault \(vault.name)")
                 print("VaultPasswordView: Vault data received: \(vaultData)")
-                
+
                 await MainActor.run {
                     self.isLoading = false
                     // Navigate to credentials list - vault is now active and ready
                     viewModel.currentFlow = .credentialsList(vault: vault)
-                    viewModel.vaultPassword = ""
                     print("VaultPasswordView: Navigated to credentials list")
                 }
-                
+
             } catch PearPassVaultError.decryptionFailed {
                 print("VaultPasswordView: Decryption failed - invalid password")
                 await MainActor.run {

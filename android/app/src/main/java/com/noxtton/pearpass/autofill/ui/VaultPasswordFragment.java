@@ -107,6 +107,9 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
             return;
         }
 
+        // Clear password from EditText immediately for security
+        passwordInput.setText("");
+
         isUnlocking = true;
         unlockButton.setEnabled(false);
 
@@ -115,9 +118,13 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
             errorText.setVisibility(View.GONE);
         }
 
+        // Convert password to byte array for secure handling
+        byte[] passwordBuffer = com.pears.pass.autofill.utils.SecureBufferUtils.stringToBuffer(password);
+
         CompletableFuture.runAsync(() -> {
             try {
-                boolean success = vaultClient.validateVaultPassword(vaultId, password).get();
+                // Use byte[] version of validateVaultPassword
+                boolean success = vaultClient.validateVaultPassword(vaultId, passwordBuffer).get();
 
                 if (getActivity() == null) {
                     return;
@@ -137,7 +144,6 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
                         Toast.makeText(getContext(), "Incorrect password", Toast.LENGTH_SHORT).show();
                         showError("Incorrect password");
                         unlockButton.setEnabled(true);
-                        passwordInput.setText("");
                         passwordInput.requestFocus();
                     }
                 });
@@ -155,6 +161,9 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
                     showError("Failed to unlock vault");
                     unlockButton.setEnabled(true);
                 });
+            } finally {
+                // Securely clear the password buffer
+                com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(passwordBuffer);
             }
         });
     }
