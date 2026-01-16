@@ -103,6 +103,9 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
         unlockButton.setEnabled(false);
         unlockButton.setText("Unlocking...");
 
+        // Convert password to byte array for secure handling
+        byte[] passwordBuffer = com.pears.pass.autofill.utils.SecureBufferUtils.stringToBuffer(password);
+
         CompletableFuture.runAsync(() -> {
             try {
                 // Get the master password encryption to get salt
@@ -113,9 +116,9 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     throw new Exception("No master password configuration found");
                 }
 
-                // Get decryption key from password and salt
+                // Get decryption key from password buffer and salt (using byte[] version)
                 PearPassVaultClient.DecryptionKeyResult decryptionKey =
-                    vaultClient.getDecryptionKey(masterPasswordEncryption.salt, password).get();
+                    vaultClient.getDecryptionKey(masterPasswordEncryption.salt, passwordBuffer).get();
 
                 // Decrypt the vault key using the hashed password
                 Map<String, Object> decryptResult = vaultClient.decryptVaultKey(
@@ -162,6 +165,9 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     unlockButton.setText("Unlock");
                     passwordInput.setText("");
                 });
+            } finally {
+                // Securely clear the password buffer
+                com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(passwordBuffer);
             }
         });
     }
