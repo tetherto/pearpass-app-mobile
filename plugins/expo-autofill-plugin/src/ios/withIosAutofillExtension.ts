@@ -204,7 +204,7 @@ export const withIosAutofillExtension: ConfigPlugin<AutofillPluginOptions> = (co
       IPHONEOS_DEPLOYMENT_TARGET: deploymentTarget,
       SWIFT_OBJC_BRIDGING_HEADER: `${extensionFolder}/PearPassAutoFillExtension-Bridging-Header.h`,
       SWIFT_VERSION: '5.0',
-      TARGETED_DEVICE_FAMILY: '"1,2"',
+      TARGETED_DEVICE_FAMILY: '"1"',
       SKIP_INSTALL: 'YES',
       PRODUCT_BUNDLE_IDENTIFIER: bundleId,
       PRODUCT_NAME: '"$(TARGET_NAME)"',
