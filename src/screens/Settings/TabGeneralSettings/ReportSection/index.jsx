@@ -30,6 +30,8 @@ export const ReportSection = ({
           placeholder={t`Write your issue...`}
           value={message}
           onChange={(text) => setMessage(text)}
+          testID="report-problem-issue-input"
+          accessibilityLabel={t`Write your issue`}
         />
 
         {isLoading ? (
