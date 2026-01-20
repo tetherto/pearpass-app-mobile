@@ -30,12 +30,20 @@ export const PrivacySection = () => {
       {
         name: 'passwordChangeReminder',
         label: t`Reminders`,
-        description: t`Enable the reminders to change your passwords`
+        description: t`Enable the reminders to change your passwords`,
+        testIDOn: 'reminders-toggle-on',
+        testIDOff: 'reminders-toggle-off',
+        accessibilityLabelOn: t`Reminders enabled`,
+        accessibilityLabelOff: t`Reminders disabled`
       },
       {
         name: 'copyToClipboard',
         label: t`Copy to clipboard`,
-        description: t`When clicking a password you copy that into your clipboard`
+        description: t`When clicking a password you copy that into your clipboard`,
+        testIDOn: 'copy-to-clipboard-toggle-on',
+        testIDOff: 'copy-to-clipboard-toggle-off',
+        accessibilityLabelOn: t`Copy to clipboard enabled`,
+        accessibilityLabelOff: t`Copy to clipboard disabled`
       }
     ]
 
@@ -43,7 +51,11 @@ export const PrivacySection = () => {
       options.push({
         name: 'biometrics',
         label: t`Unlock with biometrics`,
-        description: t`Unlock PearPass using the biometrics on your device`
+        description: t`Unlock PearPass using the biometrics on your device`,
+        testIDOn: 'biometrics-toggle-on',
+        testIDOff: 'biometrics-toggle-off',
+        accessibilityLabelOn: t`Unlock with biometrics enabled`,
+        accessibilityLabelOff: t`Unlock with biometrics disabled`
       })
     }
 

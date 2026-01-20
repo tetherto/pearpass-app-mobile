@@ -91,6 +91,7 @@ export const BottomSheetMasterPassword = ({ onClose, onConfirm }) => {
             placeholder={t`Insert Master password`}
             isPassword
             as={BottomSheetTextInput}
+            testID="export-vault-modal-password-input"
             {...register('password')}
           />
         </View>
