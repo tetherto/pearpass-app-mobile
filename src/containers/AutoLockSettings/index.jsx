@@ -55,7 +55,14 @@ export const AutoLockSettings = () => {
     <View style={styles.container}>
       <View style={styles.settingRow}>
         <Text style={styles.settingLabel}>{t`Auto Log-out`}</Text>
-        <AppSwitch value={isAutoLockEnabled} onChange={handleToggleAutoLock} />
+        <AppSwitch
+          value={isAutoLockEnabled}
+          onChange={handleToggleAutoLock}
+          testIDOn="auto-logout-toggle-on"
+          testIDOff="auto-logout-toggle-off"
+          accessibilityLabelOn={t`Auto Log-out enabled`}
+          accessibilityLabelOff={t`Auto Log-out disabled`}
+        />
       </View>
       <Text style={styles.description}>
         {t`Automatically logs you out after you stop interacting with the app, based on the timeout you select.`}

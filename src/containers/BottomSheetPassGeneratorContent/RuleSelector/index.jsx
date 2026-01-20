@@ -16,7 +16,11 @@ import { AppSwitch } from '../../../components/AppSwitch/AppSwitch'
  *    name: string,
  *    label: string,
  *    description: string,
- *    disabled: boolean
+ *    disabled: boolean,
+ *    testIDOn: string,
+ *    testIDOff: string,
+ *    accessibilityLabelOn: string,
+ *    accessibilityLabelOff: string
  *  }
  *  selectedRules: {[key: string]: any}
  *  setRules: ({[key: string]: any}) => void
@@ -71,6 +75,10 @@ export const RuleSelector = ({
               disabled={rule.disabled}
               value={selectedRules[rule.name] || isAllRuleSelected}
               onChange={() => handleSwitchToggle(rule.name)}
+              testIDOn={rule.testIDOn}
+              testIDOff={rule.testIDOff}
+              accessibilityLabelOn={rule.accessibilityLabelOn}
+              accessibilityLabelOff={rule.accessibilityLabelOff}
             />
           </View>
         </Wrapper>
