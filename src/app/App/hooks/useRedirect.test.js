@@ -17,8 +17,9 @@ jest.mock('pearpass-lib-vault', () => ({
 jest.mock('../../../utils/logger', () => ({
   logger: { error: jest.fn() }
 }))
-jest.mock('expo-splash-screen', () => ({
-  hideAsync: jest.fn()
+jest.mock('../../../utils/SplashScreen', () => ({
+  hideAsync: jest.fn(),
+  preventAutoHideAsync: jest.fn()
 }))
 
 const mockRefetchUserData = jest.fn()
