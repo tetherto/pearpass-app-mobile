@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 
-import * as SplashScreen from 'expo-splash-screen'
 import { useUserData } from 'pearpass-lib-vault'
-import { NativeModules, Platform } from 'react-native'
 
 import { logger } from '../../../utils/logger'
+import * as SplashScreen from '../../../utils/SplashScreen'
 
 /**
  * Custom hook to determine the initial route for navigation.
@@ -37,11 +36,9 @@ export const useRedirect = () => {
         logger.error('Auto-redirect error: ', error)
         setInitialRouteName('Error')
       } finally {
-        SplashScreen.hideAsync()
+        // Hide splash screen after a short delay to ensure smooth transition
         timeout = setTimeout(() => {
-          if (Platform.OS === 'android') {
-            NativeModules.CustomSplashScreen?.hide()
-          }
+          SplashScreen.hideAsync()
         }, 1000)
 
         setIsLoading(false)

@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.anonymous.withriveassets"
+  },
+  "ios": {
+    "bundleIdentifier": "com.anonymous.withriveassets"
+  }
+}
