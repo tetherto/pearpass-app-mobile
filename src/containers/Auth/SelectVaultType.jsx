@@ -60,12 +60,12 @@ export const SelectVaultType = () => {
             <Text
               style={styles.headerText}
               testID="select-vault-type-empty-title"
-            >{t`Enter Master Password`}</Text>
+            >{t`Set Up Your Vault`}</Text>
             <Text
               style={styles.subHeaderText}
               testID="select-vault-type-empty-subtitle"
             >
-              {t`Now create a secure vault or load an existing one to get started.`}
+              {t`Start fresh with a new vault or import an existing one to continue.`}
             </Text>
           </View>
         ) : (
@@ -73,7 +73,9 @@ export const SelectVaultType = () => {
             <Text
               style={styles.headerText}
               testID="select-vault-type-list-title"
-            >{t`Select a vault, create a new one or load another one`}</Text>
+            >
+              {t`Open an existing vault or create a new one.`}
+            </Text>
 
             <ScrollView
               style={styles.vaultsList}
@@ -108,7 +110,7 @@ export const SelectVaultType = () => {
           stretch
           onPress={() => navigation.navigate('Welcome', { state: 'load' })}
         >
-          {t`Load a vault`}
+          {t`Import existing vault`}
         </ButtonSecondary>
       </View>
     </View>

@@ -3,7 +3,7 @@
     "name": "PearPass",
     "slug": "pearpass",
     "icon": "./assets/images/appIcons/app-icon.png",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "android": {
       "package": "com.pears.pass",
       "permissions": [
@@ -29,18 +29,35 @@
       },
       "usesNonExemptEncryption": false,
       "scheme": "pearpassappmobile",
-      "appleTeamId": "43QFHSJ5QR"
+      "appleTeamId": "43QFHSJ5QR",
+      "entitlements": {
+        "com.apple.developer.authentication-services.autofill-credential-provider": true,
+        "com.apple.security.application-groups": ["group.com.pears.pass"]
+      },
+      "privacyManifests": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": ["0A2A.1", "3B52.1", "C617.1"]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": ["E174.1", "85F4.1"]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": ["35F9.1"]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
     },
     "plugins": [
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#232323",
-          "image": "./assets/images/splash/splash-icon.png",
-          "imageWidth": 150,
-          "resizeMode": "contain"
-        }
-      ],
       [
         "expo-camera",
         {
@@ -63,7 +80,12 @@
           "android": {
             "minSdkVersion": 29,
             "compileSdkVersion": 35,
-            "targetSdkVersion": 35
+            "targetSdkVersion": 35,
+            "extraProguardRules": "-keep class com.swmansion.reanimated.** { *; }\n-keep class com.facebook.react.turbomodule.** { *; }\n-keep class to.pear.bare.** { *; }\n-keep class com.pears.pass.autofill.** { *; }",
+            "usesCleartextTraffic": true
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
           }
         }
       ],
@@ -80,12 +102,43 @@
           "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID or Touch ID to quickly and securely unlock your vault without entering your master password."
         }
       ],
-      "expo-video"
+      "expo-video",
+      "./plugins/withAppConfig",
+      "./plugins/withRiveAssets",
+      "./plugins/withNativeClipboard",
+      "./plugins/withCustomSplashScreen",
+      ["./plugins/expo-autofill-plugin", {
+        "ios": {
+          "appGroupIdentifier": "group.com.pears.pass"
+        },
+        "extensionBundlePath": "bundles/autofill.bundle"
+      }]
     ],
     "extra": {
-      "appVersion": "1.2.1",
+      "appVersion": "1.2.2",
       "eas": {
-        "projectId": "28facb62-e2a2-4b6c-bc3f-0f5469e79415"
+        "projectId": "28facb62-e2a2-4b6c-bc3f-0f5469e79415",
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "PearPassAutoFillExtension",
+                  "bundleIdentifier": "com.pears.pass.PearPassAutoFillExtension",
+                  "entitlements": {
+                    "com.apple.developer.authentication-services.autofill-credential-provider": true,
+                    "com.apple.security.application-groups": [
+                      "group.com.pears.pass"
+                    ],
+                    "keychain-access-groups": [
+                      "$(AppIdentifierPrefix)com.pears.pass"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
       }
     }
   }

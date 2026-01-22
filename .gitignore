@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+/android/
+/ios/
+
 # Expo
 .expo/
 dist/
@@ -52,3 +55,6 @@ yalc.lock
 bundles/
 
 src/locales/
+
+# Plugin build outputs
+plugins/*/build/

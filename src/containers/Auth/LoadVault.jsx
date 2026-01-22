@@ -78,7 +78,7 @@ export const LoadVault = () => {
               <Text
                 style={styles.subtitle}
                 testID="load-vault-subtitle"
-              >{t`Using PearPass on your other device, use "Add Device" to generate a QR or connection code to pair your vault. This method keeps your vault secure.`}</Text>
+              >{t`Using PearPass on your other device, use "Add Device" to generate a QR or connection code to pair your vault. This method keeps your account secure.`}</Text>
             </View>
 
             <View style={{ width: '100%', gap: 15 }}>

@@ -23,7 +23,12 @@ export const AppSwitch = ({
   onChange,
   style,
   value,
-  testID
+  testID,
+  testIDOn,
+  testIDOff,
+  accessibilityLabel,
+  accessibilityLabelOn,
+  accessibilityLabelOff
 }) => {
   const progress = useSharedValue(value ? 1 : 0)
 
@@ -54,13 +59,18 @@ export const AppSwitch = ({
     return { transform: [{ translateX }] }
   })
 
+  const resolvedTestID = testID || (value ? testIDOn : testIDOff)
+  const resolvedAccessibilityLabel =
+    accessibilityLabel || (value ? accessibilityLabelOn : accessibilityLabelOff)
+
   return (
     <Pressable
       onPress={handlePress}
       disabled={disabled}
-      testID={testID}
+      testID={resolvedTestID}
       accessibilityRole="switch"
       accessibilityState={{ checked: value, disabled }}
+      accessibilityLabel={resolvedAccessibilityLabel}
     >
       <Animated.View
         style={[

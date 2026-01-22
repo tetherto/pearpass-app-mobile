@@ -134,7 +134,11 @@ export const BlindPeeringSection = () => {
             {
               name: 'blindPeers',
               label: t`Private Connections`,
-              description: t`Sync your encrypted vault securely with blind peers to improve availability and consistency. Blind peers cannot read your data.`
+              description: t`Sync your encrypted vault securely with blind peers to improve availability and consistency. Blind peers cannot read your data.`,
+              testIDOn: 'blind-peering-toggle-on',
+              testIDOff: 'blind-peering-toggle-off',
+              accessibilityLabelOn: t`Blind Peering enabled`,
+              accessibilityLabelOff: t`Blind Peering disabled`
             }
           ]}
           selectedRules={blindPeersRules}

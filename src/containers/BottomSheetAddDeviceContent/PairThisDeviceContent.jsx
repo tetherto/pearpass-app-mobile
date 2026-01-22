@@ -9,7 +9,6 @@ import { useInvite } from 'pearpass-lib-vault'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 
-import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
 
@@ -18,7 +17,6 @@ export const PairThisDeviceContent = ({ tabs }) => {
   const { collapse } = useBottomSheet()
   const { copyToClipboard, isCopied } = useCopyToClipboard()
   const { createInvite, deleteInvite, data } = useInvite()
-  const { setShouldBypassAutoLock } = useAutoLockContext()
 
   const [svg, setSvg] = useState('')
 
@@ -31,7 +29,6 @@ export const PairThisDeviceContent = ({ tabs }) => {
 
   useEffect(() => {
     const setup = async () => {
-      setShouldBypassAutoLock(true)
       await createInvite()
     }
 
@@ -39,7 +36,6 @@ export const PairThisDeviceContent = ({ tabs }) => {
 
     return () => {
       const cleanup = async () => {
-        setShouldBypassAutoLock(false)
         await deleteInvite()
       }
 
