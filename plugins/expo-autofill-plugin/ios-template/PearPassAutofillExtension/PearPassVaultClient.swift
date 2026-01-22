@@ -41,6 +41,10 @@ import Foundation
         case ENCRYPTION_GET_DECRYPTION_KEY = 32
         case CLOSE = 33
         case CANCEL_PAIR_ACTIVE_VAULT = 34
+        case MASTER_PASSWORD_CREATE = 43
+        case MASTER_PASSWORD_INIT_WITH_PASSWORD = 44
+        case MASTER_PASSWORD_UPDATE = 45
+        case MASTER_PASSWORD_INIT_WITH_CREDENTIALS = 46
     }
     
     // MARK: - Properties
@@ -210,13 +214,50 @@ import Foundation
     }
     
     // MARK: - Master Vault Methods
-    
-    /// Initializes the vault with an encryption key
-    func vaultsInit(encryptionKey: String) async throws {
-        _ = try await sendRequest(command: API.MASTER_VAULT_INIT.rawValue, data: ["encryptionKey": encryptionKey])
-        log("Initialized vaults with encryption key")
+
+    /// Initializes the vault with an encryption key and hashed password
+    func vaultsInit(encryptionKey: String, hashedPassword: String) async throws {
+        _ = try await sendRequest(command: API.MASTER_VAULT_INIT.rawValue, data: [
+            "encryptionKey": encryptionKey,
+            "hashedPassword": hashedPassword
+        ])
+        log("Initialized vaults with encryption key and hashed password")
     }
-    
+
+    /// Initializes vaults using the provided master password
+    /// - Parameter password: The master password as Data
+    func initWithPassword(password: Data) async throws {
+        let passwordBase64 = password.base64EncodedString()
+        let result = try await sendRequest(
+            command: API.MASTER_PASSWORD_INIT_WITH_PASSWORD.rawValue,
+            data: ["password": passwordBase64]
+        )
+
+        if let error = result?["error"] as? String {
+            throw PearPassVaultError.unknown(error)
+        }
+
+        log("Initialized vaults with password")
+    }
+
+    /// Initializes vaults using provided encryption credentials (biometric auth)
+    func initWithCredentials(ciphertext: String, nonce: String, hashedPassword: String) async throws {
+        let result = try await sendRequest(
+            command: API.MASTER_PASSWORD_INIT_WITH_CREDENTIALS.rawValue,
+            data: [
+                "ciphertext": ciphertext,
+                "nonce": nonce,
+                "hashedPassword": hashedPassword
+            ]
+        )
+
+        if let error = result?["error"] as? String {
+            throw PearPassVaultError.unknown(error)
+        }
+
+        log("Initialized vaults with credentials")
+    }
+
     /// Gets the status of the vault
     func vaultsGetStatus() async throws -> VaultStatus {
         let result = try await sendRequest(command: API.MASTER_VAULT_GET_STATUS.rawValue)
