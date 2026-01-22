@@ -6,6 +6,7 @@ on:
       - main
       - dev
       - staging
+      - rc-1.3.0
 
 
 jobs:
@@ -71,7 +72,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Generate worklet bundle for Android
-        run: npm run bundle:android
+        run: npm run build
 
       - name: Install EAS CLI
         run: npm install --global eas-cli
@@ -218,25 +219,6 @@ jobs:
           EXPO_GOOGLE_SERVICE_ACCOUNT_KEY_PATH: "${{ env.GITHUB_WORKSPACE }}/google-service-account.json"
           CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
           GOOGLE_PLAY_KEYSTORE: ${{ secrets.GOOGLE_PLAY_KEYSTORE }}
-          SLACK_WEBHOOK_URL_PATH: ${{ secrets.SLACK_WEBHOOK_URL_PATH }}
-          GOOGLE_FORM_KEY: ${{ secrets.GOOGLE_FORM_KEY }}
-          GOOGLE_FORM_MAPPING_TIMESTAMP: ${{ secrets.GOOGLE_FORM_MAPPING_TIMESTAMP }}
-          GOOGLE_FORM_MAPPING_TOPIC: ${{ secrets.GOOGLE_FORM_MAPPING_TOPIC }}
-          GOOGLE_FORM_MAPPING_APP: ${{ secrets.GOOGLE_FORM_MAPPING_APP }}
-          GOOGLE_FORM_MAPPING_OPERATING_SYSTEM: ${{ secrets.GOOGLE_FORM_MAPPING_OPERATING_SYSTEM }}
-          GOOGLE_FORM_MAPPING_DEVICE_MODEL: ${{ secrets.GOOGLE_FORM_MAPPING_DEVICE_MODEL }}
-          GOOGLE_FORM_MAPPING_MESSAGE: ${{ secrets.GOOGLE_FORM_MAPPING_MESSAGE }}
-          GOOGLE_FORM_MAPPING_APP_VERSION: ${{ secrets.GOOGLE_FORM_MAPPING_APP_VERSION }}
-          TEST_SLACK_WEBHOOK_URL_PATH: ${{ secrets.TEST_SLACK_WEBHOOK_URL_PATH }}
-          TEST_GOOGLE_FORM_KEY: ${{ secrets.TEST_GOOGLE_FORM_KEY }}
-          TEST_GOOGLE_FORM_MAPPING_TIMESTAMP: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_TIMESTAMP }}
-          TEST_GOOGLE_FORM_MAPPING_TOPIC: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_TOPIC }}
-          TEST_GOOGLE_FORM_MAPPING_APP: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_APP }}
-          TEST_GOOGLE_FORM_MAPPING_OPERATING_SYSTEM: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_OPERATING_SYSTEM }}
-          TEST_GOOGLE_FORM_MAPPING_DEVICE_MODEL: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_DEVICE_MODEL }}
-          TEST_GOOGLE_FORM_MAPPING_MESSAGE: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_MESSAGE }}
-          TEST_GOOGLE_FORM_MAPPING_APP_VERSION: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_APP_VERSION }}
-          IOS_APP_GROUP_ID: ${{ secrets.IOS_APP_GROUP_ID }}
         run: |
           if [ -n "${{ steps.find_android.outputs.AAB_PATH }}" ]; then
             eas submit -p android --path ${{ steps.find_android.outputs.AAB_PATH }} --non-interactive
@@ -272,16 +254,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Generate worklet bundle for iOS
-        run: npm run bundle:ios
-  
-      - name: Generate worklet bundle for iOS extension
-        run: npm run bundle:ios-extension
-
-      - name: Extract translations
-        run: |
-          npm run lingui:extract
-          npm run lingui:compile
+      - name: Generate worklet bundle and translations
+        run: npm run build
 
       - name: Install EAS CLI
         run: npm install --global eas-cli
@@ -306,25 +280,6 @@ jobs:
           APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
           APPLE_PROVISIONING_PROFILE_AUTOFILL: ${{ secrets.APPLE_PROVISIONING_PROFILE_AUTOFILL }}
           APPLE_DISTRIBUTION_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
-          SLACK_WEBHOOK_URL_PATH: ${{ secrets.SLACK_WEBHOOK_URL_PATH }}
-          GOOGLE_FORM_KEY: ${{ secrets.GOOGLE_FORM_KEY }}
-          GOOGLE_FORM_MAPPING_TIMESTAMP: ${{ secrets.GOOGLE_FORM_MAPPING_TIMESTAMP }}
-          GOOGLE_FORM_MAPPING_TOPIC: ${{ secrets.GOOGLE_FORM_MAPPING_TOPIC }}
-          GOOGLE_FORM_MAPPING_APP: ${{ secrets.GOOGLE_FORM_MAPPING_APP }}
-          GOOGLE_FORM_MAPPING_OPERATING_SYSTEM: ${{ secrets.GOOGLE_FORM_MAPPING_OPERATING_SYSTEM }}
-          GOOGLE_FORM_MAPPING_DEVICE_MODEL: ${{ secrets.GOOGLE_FORM_MAPPING_DEVICE_MODEL }}
-          GOOGLE_FORM_MAPPING_MESSAGE: ${{ secrets.GOOGLE_FORM_MAPPING_MESSAGE }}
-          GOOGLE_FORM_MAPPING_APP_VERSION: ${{ secrets.GOOGLE_FORM_MAPPING_APP_VERSION }}
-          TEST_SLACK_WEBHOOK_URL_PATH: ${{ secrets.TEST_SLACK_WEBHOOK_URL_PATH }}
-          TEST_GOOGLE_FORM_KEY: ${{ secrets.TEST_GOOGLE_FORM_KEY }}
-          TEST_GOOGLE_FORM_MAPPING_TIMESTAMP: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_TIMESTAMP }}
-          TEST_GOOGLE_FORM_MAPPING_TOPIC: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_TOPIC }}
-          TEST_GOOGLE_FORM_MAPPING_APP: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_APP }}
-          TEST_GOOGLE_FORM_MAPPING_OPERATING_SYSTEM: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_OPERATING_SYSTEM }}
-          TEST_GOOGLE_FORM_MAPPING_DEVICE_MODEL: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_DEVICE_MODEL }}
-          TEST_GOOGLE_FORM_MAPPING_MESSAGE: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_MESSAGE }}
-          TEST_GOOGLE_FORM_MAPPING_APP_VERSION: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_APP_VERSION }}
-          IOS_APP_GROUP_ID: ${{ secrets.IOS_APP_GROUP_ID }}
           
         run: |
           mkdir -p ios/certs
@@ -382,25 +337,7 @@ jobs:
           CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
           APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
           APPLE_DISTRIBUTION_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
-          SLACK_WEBHOOK_URL_PATH: ${{ secrets.SLACK_WEBHOOK_URL_PATH }}
-          GOOGLE_FORM_KEY: ${{ secrets.GOOGLE_FORM_KEY }}
-          GOOGLE_FORM_MAPPING_TIMESTAMP: ${{ secrets.GOOGLE_FORM_MAPPING_TIMESTAMP }}
-          GOOGLE_FORM_MAPPING_TOPIC: ${{ secrets.GOOGLE_FORM_MAPPING_TOPIC }}
-          GOOGLE_FORM_MAPPING_APP: ${{ secrets.GOOGLE_FORM_MAPPING_APP }}
-          GOOGLE_FORM_MAPPING_OPERATING_SYSTEM: ${{ secrets.GOOGLE_FORM_MAPPING_OPERATING_SYSTEM }}
-          GOOGLE_FORM_MAPPING_DEVICE_MODEL: ${{ secrets.GOOGLE_FORM_MAPPING_DEVICE_MODEL }}
-          GOOGLE_FORM_MAPPING_MESSAGE: ${{ secrets.GOOGLE_FORM_MAPPING_MESSAGE }}
-          GOOGLE_FORM_MAPPING_APP_VERSION: ${{ secrets.GOOGLE_FORM_MAPPING_APP_VERSION }}
-          TEST_SLACK_WEBHOOK_URL_PATH: ${{ secrets.TEST_SLACK_WEBHOOK_URL_PATH }}
-          TEST_GOOGLE_FORM_KEY: ${{ secrets.TEST_GOOGLE_FORM_KEY }}
-          TEST_GOOGLE_FORM_MAPPING_TIMESTAMP: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_TIMESTAMP }}
-          TEST_GOOGLE_FORM_MAPPING_TOPIC: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_TOPIC }}
-          TEST_GOOGLE_FORM_MAPPING_APP: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_APP }}
-          TEST_GOOGLE_FORM_MAPPING_OPERATING_SYSTEM: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_OPERATING_SYSTEM }}
-          TEST_GOOGLE_FORM_MAPPING_DEVICE_MODEL: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_DEVICE_MODEL }}
-          TEST_GOOGLE_FORM_MAPPING_MESSAGE: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_MESSAGE }}
-          TEST_GOOGLE_FORM_MAPPING_APP_VERSION: ${{ secrets.TEST_GOOGLE_FORM_MAPPING_APP_VERSION }}
-          IOS_APP_GROUP_ID: ${{ secrets.IOS_APP_GROUP_ID }}
+
         run: |
           echo $APPLE_APIKEY | base64 -d > apple-asc-api-key.p8
           eas submit -p ios --path ${{ steps.find_ipa.outputs.IPA_PATH }} --non-interactive
