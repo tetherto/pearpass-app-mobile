@@ -81,12 +81,14 @@ export const SelectVaultType = () => {
               style={styles.vaultsList}
               showsVerticalScrollIndicator={false}
             >
-              {sortedVaults?.map((vault) => (
+              {sortedVaults?.map((vault, index) => (
                 <View key={vault.id} style={styles.vaultItemWrapper}>
                   <ListItem
                     onPress={() => handleVaultSelect(vault.id)}
                     name={vault.name ?? vault.id}
                     date={vault.createdAt}
+                    testID={`auth-vault-item-${index}`}
+                    accessibilityLabel={`auth-vault-item-${index}`}
                     isLoading={loadingVaultId === vault.id}
                   />
                 </View>
