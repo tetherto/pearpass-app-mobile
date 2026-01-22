@@ -254,74 +254,26 @@ struct MasterPasswordView: View {
             return
         }
 
-        // Case 1: We have ciphertext, nonce, and hashedPassword
+        // Case 1: We have ciphertext, nonce, and hashedPassword (from biometric auth)
+        // Use the simplified initWithCredentials API
         if !ciphertext.isEmpty && !nonce.isEmpty, let hashedPwd = hashedPassword, !hashedPwd.isEmpty {
-            let decryptedVaultKeyResult = try await client.decryptVaultKey(
+            try await client.initWithCredentials(
                 ciphertext: ciphertext,
                 nonce: nonce,
                 hashedPassword: hashedPwd
             )
-
-            guard let decryptedVaultKey = extractVaultKey(from: decryptedVaultKeyResult) else {
-                throw NSError(domain: "MasterPasswordView", code: 1002, userInfo: [
-                    NSLocalizedDescriptionKey: NSLocalizedString("Error decrypting vault key", comment: "Error description")
-                ])
-            }
-
-            try await client.vaultsInit(encryptionKey: decryptedVaultKey)
             return
         }
 
         // Case 2: We need to use the password to decrypt
+        // Use the simplified initWithPassword API
         if password.isEmpty {
             throw NSError(domain: "MasterPasswordView", code: 1003, userInfo: [
                 NSLocalizedDescriptionKey: NSLocalizedString("Password is required", comment: "Error description")
             ])
         }
 
-
-        let encryptionStatus = try await client.encryptionGetStatus()
-        if !encryptionStatus.status {
-            _ = try await client.encryptionInit()
-        }
-
-        // Get master password encryption data
-        guard let encryptionData = try await client.encryptionGet(key: "masterPassword"),
-              let encCiphertext = encryptionData["ciphertext"] as? String,
-              let encNonce = encryptionData["nonce"] as? String,
-              let encSalt = encryptionData["salt"] as? String else {
-            throw NSError(domain: "MasterPasswordView", code: 1004, userInfo: [
-                NSLocalizedDescriptionKey: NSLocalizedString("Failed to get master password encryption data", comment: "Error description")
-            ])
-        }
-
-        // Get decryption key using salt and password (using Data-based method)
-        let decryptionKeyResult = try await client.getDecryptionKey(
-            salt: encSalt,
-            password: password
-        )
-
-        // Decrypt the vault key
-        let decryptedVaultKeyResult = try await client.decryptVaultKey(
-            ciphertext: encCiphertext,
-            nonce: encNonce,
-            hashedPassword: decryptionKeyResult.key
-        )
-
-        guard let decryptedVaultKey = extractVaultKey(from: decryptedVaultKeyResult) else {
-            throw NSError(domain: "MasterPasswordView", code: 1005, userInfo: [
-                NSLocalizedDescriptionKey: NSLocalizedString("Error decrypting vault key", comment: "Error description")
-            ])
-        }
-
-        // Initialize vaults with the decrypted key
-        try await client.vaultsInit(encryptionKey: decryptedVaultKey)
-    }
-    
-    private func extractVaultKey(from result: [String: Any]?) -> String? {
-        return result?["value"] as? String ??
-               result?["key"] as? String ??
-               result?["decryptedKey"] as? String
+        try await client.initWithPassword(password: password)
     }
     
     // MARK: - Biometric Authentication

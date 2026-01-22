@@ -108,39 +108,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
 
         CompletableFuture.runAsync(() -> {
             try {
-                // Get the master password encryption to get salt
-                PearPassVaultClient.MasterPasswordEncryption masterPasswordEncryption =
-                    vaultClient.getMasterPasswordEncryption(null).get();
-
-                if (masterPasswordEncryption == null || masterPasswordEncryption.salt == null) {
-                    throw new Exception("No master password configuration found");
-                }
-
-                // Get decryption key from password buffer and salt (using byte[] version)
-                PearPassVaultClient.DecryptionKeyResult decryptionKey =
-                    vaultClient.getDecryptionKey(masterPasswordEncryption.salt, passwordBuffer).get();
-
-                // Decrypt the vault key using the hashed password
-                Map<String, Object> decryptResult = vaultClient.decryptVaultKey(
-                    masterPasswordEncryption.ciphertext,
-                    masterPasswordEncryption.nonce,
-                    decryptionKey.key
-                ).get();
-
-                // Verify that decryption returned a valid key
-                if (decryptResult == null || decryptResult.isEmpty()) {
-                    throw new Exception("Invalid master password - decryption failed");
-                }
-
-                // Extract the decrypted vault key
-                String decryptedVaultKey = (String) decryptResult.get("value");
-
-                if (decryptedVaultKey == null || decryptedVaultKey.isEmpty()) {
-                    throw new Exception("Invalid master password - no decrypted key returned");
-                }
-
-                // Initialize the vault with the decrypted key
-                vaultClient.vaultsInit(decryptedVaultKey).get();
+                // Use the simplified initWithPassword API which handles everything internally
+                vaultClient.initWithPassword(passwordBuffer).get();
 
                 // Verify that the vault was actually unlocked by checking status
                 PearPassVaultClient.VaultStatus vaultStatus = vaultClient.vaultsGetStatus().get();
@@ -298,27 +267,12 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     throw new Exception("Invalid credentials - no hashed password available");
                 }
 
-                // Decrypt the vault key using the stored hashed password to verify it's valid
-                Map<String, Object> decryptResult = vaultClient.decryptVaultKey(
+                // Use the simplified initWithCredentials API which handles everything internally
+                vaultClient.initWithCredentials(
                     encryptionData.ciphertext,
                     encryptionData.nonce,
                     encryptionData.hashedPassword
                 ).get();
-
-                // Verify that decryption returned a valid key
-                if (decryptResult == null || decryptResult.isEmpty()) {
-                    throw new Exception("Invalid credentials - decryption failed");
-                }
-
-                // Extract the decrypted vault key - we need to verify it exists
-                String decryptedVaultKey = (String) decryptResult.get("value");
-
-                if (decryptedVaultKey == null || decryptedVaultKey.isEmpty()) {
-                    throw new Exception("Invalid credentials - no decrypted key returned");
-                }
-
-                // Initialize the vault with the hashed password (this is the encryption key)
-                vaultClient.vaultsInit(encryptionData.hashedPassword).get();
 
                 // Verify that the vault was actually unlocked by checking status
                 PearPassVaultClient.VaultStatus vaultStatus = vaultClient.vaultsGetStatus().get();
