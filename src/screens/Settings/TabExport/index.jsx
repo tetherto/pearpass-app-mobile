@@ -229,11 +229,13 @@ export const TabExport = () => {
     <CardSingleSetting title={t`Export`}>
       <Container>
         <VaultsList>
-          {sortedVaults?.map((vault) => (
+          {sortedVaults?.map((vault, index) => (
             <ListItem
               key={vault.id}
               name={vault.name}
               date={vault.createdAt}
+              testID={`export-vault-item-${index}`}
+              accessibilityLabel={`export-vault-item-${index}`}
               isSelected={
                 selectedVaults.includes(vault.id) ||
                 vault.id === selectedProtectedVault?.id
