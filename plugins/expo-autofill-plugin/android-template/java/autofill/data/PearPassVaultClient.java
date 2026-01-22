@@ -54,7 +54,6 @@ public class PearPassVaultClient {
         ENCRYPTION_GET_DECRYPTION_KEY(32),
         CLOSE_ALL_INSTANCES(33),
         CANCEL_PAIR_ACTIVE_VAULT(34),
-        // New master password manager APIs
         MASTER_PASSWORD_CREATE(43),
         MASTER_PASSWORD_INIT_WITH_PASSWORD(44),
         MASTER_PASSWORD_UPDATE(45),
@@ -401,7 +400,6 @@ public class PearPassVaultClient {
 
     /**
      * Initializes vaults using the provided master password.
-     * This is a convenience method that handles encryption init, key derivation, and vault init internally.
      * @param passwordBuffer The master password as byte array
      */
     public CompletableFuture<Void> initWithPassword(byte[] passwordBuffer) {
@@ -416,8 +414,7 @@ public class PearPassVaultClient {
     }
 
     /**
-     * Initializes vaults using provided encryption credentials.
-     * Use this when you already have the ciphertext, nonce, and hashedPassword (e.g., from biometric auth).
+     * Initializes vaults using provided encryption credentials.(biometric auth).
      */
     public CompletableFuture<Void> initWithCredentials(String ciphertext, String nonce, String hashedPassword) {
         Map<String, Object> params = new HashMap<>();
