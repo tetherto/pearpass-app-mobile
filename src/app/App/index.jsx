@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react'
 import Toast from 'react-native-toast-message'
 
 import { Navigation } from '../Navigation'
-import { useAutoLock } from './hooks/useAutoLock'
 import { useRedirect } from './hooks/useRedirect'
 import { ToastCard } from '../../components/ToastCard'
 import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
@@ -16,7 +15,6 @@ export const App = () => {
   const { needsUpdate } = useVersionCheck()
   const hasOpenedUpdateModal = useRef(false)
 
-  useAutoLock()
   useFirstLaunchCleanUp()
 
   useEffect(() => {

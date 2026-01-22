@@ -48,7 +48,7 @@
       <true/>
     </dict>
     <key>NSCameraUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your camera to scan QR codes for securely pairing your account with another device.</string>
+    <string>Allow $(PRODUCT_NAME) to access your camera to scan QR codes for securely pairing your vault with another device.</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to use Face ID or Touch ID to quickly and securely unlock your vault without entering your master password.</string>
     <key>NSMicrophoneUsageDescription</key>
