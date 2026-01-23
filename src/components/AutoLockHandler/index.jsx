@@ -74,7 +74,7 @@ export const AutoLockHandler = ({ children }) => {
     let userData
     try {
       userData = await refetchUser()
-    } catch (error) {
+    } catch {
       lockInProgressRef.current = false
       return
     }
