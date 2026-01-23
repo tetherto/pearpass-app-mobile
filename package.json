@@ -1,6 +1,6 @@
 {
   "name": "pearpass-app-mobile",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "main": "index.js",
   "type": "module",
   "license": "Apache-2.0",
