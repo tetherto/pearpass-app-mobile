@@ -94,7 +94,8 @@
     "react-native-vector-icons": "10.2.0",
     "rive-react-native": "9.3.4",
     "sodium-native": "5.0.9",
-    "styled-components": "6.1.19"
+    "styled-components": "6.1.19",
+    "suspendify": "^1.7.1"
   },
   "devDependencies": {
     "@babel/core": "7.28.0",
