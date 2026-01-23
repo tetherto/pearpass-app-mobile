@@ -30,6 +30,7 @@ import {
   PasswordField
 } from '../../../libComponents'
 import { addHttps } from '../../../utils/addHttps'
+import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
 import {
@@ -93,7 +94,9 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
         : [{ name: 'website' }],
       customFields: initialRecord?.data.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.attachments ?? []
+      attachments: initialRecord?.attachments ?? [],
+      credential: initialRecord?.data?.credential?.id ?? '',
+      passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
     },
     validate: (values) => schema.validate(values)
   })
@@ -256,6 +259,22 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                 }
               />
             </FormGroup>
+
+            {!!values?.credential && (
+              <FormGroup>
+                <InputField
+                  icon={KeyIcon}
+                  label={t`Passkey`}
+                  placeholder={t`Passkey`}
+                  variant="outline"
+                  value={formatPasskeyDate(values.passkeyCreatedAt) || t`Passkey Stored`}
+                  isFirst
+                  isLast
+                  isDisabled
+                  editable={false}
+                />
+              </FormGroup>
+            )}
 
             <CompoundField>
               <FormGroup>

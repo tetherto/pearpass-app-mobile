@@ -24,6 +24,7 @@ import {
   InputField,
   PasswordField
 } from '../../../libComponents'
+import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 
 export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
   const { t } = useLingui()
@@ -39,7 +40,9 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
         : [{ name: 'website', id: generateUniqueId() }],
       customFields: initialRecord?.data.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.data?.attachments ?? []
+      attachments: initialRecord?.data?.attachments ?? [],
+      credential: initialRecord?.data?.credential?.id ?? '',
+      passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
     }),
     [initialRecord, selectedFolder]
   )
@@ -77,6 +80,7 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
 
   const hasUsername = !!values?.username?.length
   const hasPassword = !!values?.password?.length
+  const hasPasskey = !!values?.credential
   const hasWebsites = !!websitesList?.length
   const hasNote = !!values?.note?.length
   const hasCustomFields = !!customFieldsList?.length
@@ -124,6 +128,20 @@ Consider changing it to keep your account secure.`}
               {...register('password')}
             />
           )}
+        </FormGroup>
+      )}
+
+      {hasPasskey && (
+        <FormGroup>
+          <InputField
+            icon={KeyIcon}
+            label={t`Passkey`}
+            placeholder={t`Passkey`}
+            variant="outline"
+            value={formatPasskeyDate(values.passkeyCreatedAt) || t`Passkey Stored`}
+            isDisabled
+            editable={false}
+          />
         </FormGroup>
       )}
 
