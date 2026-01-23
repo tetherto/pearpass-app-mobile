@@ -53,7 +53,11 @@ public class PearPassVaultClient {
         ENCRYPTION_DECRYPT_VAULT_KEY(31),
         ENCRYPTION_GET_DECRYPTION_KEY(32),
         CLOSE_ALL_INSTANCES(33),
-        CANCEL_PAIR_ACTIVE_VAULT(34);
+        CANCEL_PAIR_ACTIVE_VAULT(34),
+        MASTER_PASSWORD_CREATE(43),
+        MASTER_PASSWORD_INIT_WITH_PASSWORD(44),
+        MASTER_PASSWORD_UPDATE(45),
+        MASTER_PASSWORD_INIT_WITH_CREDENTIALS(46);
 
         private final int value;
 
@@ -386,9 +390,44 @@ public class PearPassVaultClient {
     }
 
     // Master Vault Methods
-    public CompletableFuture<Void> vaultsInit(String encryptionKey) {
-        return sendRequest(API.MASTER_VAULT_INIT.getValue(), createMap("encryptionKey", encryptionKey))
-                .thenAccept(result -> log("Initialized vaults with encryption key"));
+    public CompletableFuture<Void> vaultsInit(String encryptionKey, String hashedPassword) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("encryptionKey", encryptionKey);
+        params.put("hashedPassword", hashedPassword);
+        return sendRequest(API.MASTER_VAULT_INIT.getValue(), params)
+                .thenAccept(result -> log("Initialized vaults with encryption key and hashed password"));
+    }
+
+    /**
+     * Initializes vaults using the provided master password.
+     * @param passwordBuffer The master password as byte array
+     */
+    public CompletableFuture<Void> initWithPassword(byte[] passwordBuffer) {
+        String passwordBase64 = android.util.Base64.encodeToString(passwordBuffer, android.util.Base64.NO_WRAP);
+        return sendRequest(API.MASTER_PASSWORD_INIT_WITH_PASSWORD.getValue(), createMap("password", passwordBase64))
+                .thenAccept(result -> {
+                    if (result != null && result.containsKey("error")) {
+                        throw new RuntimeException((String) result.get("error"));
+                    }
+                    log("Initialized vaults with password");
+                });
+    }
+
+    /**
+     * Initializes vaults using provided encryption credentials.(biometric auth).
+     */
+    public CompletableFuture<Void> initWithCredentials(String ciphertext, String nonce, String hashedPassword) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("ciphertext", ciphertext);
+        params.put("nonce", nonce);
+        params.put("hashedPassword", hashedPassword);
+        return sendRequest(API.MASTER_PASSWORD_INIT_WITH_CREDENTIALS.getValue(), params)
+                .thenAccept(result -> {
+                    if (result != null && result.containsKey("error")) {
+                        throw new RuntimeException((String) result.get("error"));
+                    }
+                    log("Initialized vaults with credentials");
+                });
     }
 
     public CompletableFuture<VaultStatus> vaultsGetStatus() {
