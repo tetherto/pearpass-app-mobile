@@ -14,6 +14,10 @@ import {
 } from '../../utils/autoLockStorage'
 import { clearAllFileCache } from '../../utils/filesCache'
 
+/**
+ * Component responsible for monitoring user inactivity and handling auto-lock logic.
+ * @returns {null} This component renders nothing.
+ */
 export const AutoLockWatcher = () => {
   const timerRef = useRef(null)
   const lastActivityRef = useRef(Date.now())
