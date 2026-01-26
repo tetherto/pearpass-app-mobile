@@ -69,7 +69,8 @@ describe('AutoLockHandler', () => {
     contextValue = {
       shouldBypassAutoLock: false,
       autoLockTimeout: 5000,
-      isAutoLockEnabled: true
+      isAutoLockEnabled: true,
+      notifyInteraction: jest.fn()
     }
 
     useVaults.mockReturnValue({ resetState: resetStateMock })
