@@ -12,6 +12,13 @@ import {
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { ButtonPrimary, ButtonSecondary } from '../../libComponents'
 
+/**
+ * @param {Object} props
+ * @param {Function} props.onConfirm
+ * @param {Function} props.onDismiss
+ * @param {string} [props.title]
+ * @param {string} [props.description]
+ */
 export const BottomSheetBiometricsLoginPrompt = ({
   onConfirm,
   onDismiss,
