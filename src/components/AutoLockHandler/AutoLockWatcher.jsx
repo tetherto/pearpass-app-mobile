@@ -28,12 +28,10 @@ export const AutoLockWatcher = () => {
 
   const {
     shouldBypassAutoLock,
-    // autoLockTimeout,
+    autoLockTimeout,
     isAutoLockEnabled,
     registerInteractionListener
   } = useAutoLockContext()
-
-  const autoLockTimeout = 3000
 
   const performLock = useCallback(async () => {
     const state = navigation.getState()
