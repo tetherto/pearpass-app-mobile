@@ -16,7 +16,7 @@ import { InputLabel, InputWrapper } from './styles'
 import { InputPasswordPearPass } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 
-export const ModifyMasterVaultModalContent = () => {
+export const ModifyMasterVaultModalContent = ({ onPasswordChange }) => {
   const { closeModal } = useModal()
   const { t } = useLingui()
 
@@ -78,6 +78,7 @@ export const ModifyMasterVaultModalContent = () => {
       })
 
       setIsLoading(false)
+      onPasswordChange?.()
       closeModal()
     } catch (error) {
       setIsLoading(false)
