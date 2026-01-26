@@ -8,7 +8,10 @@ import {
 } from 'react'
 
 import * as SecureStore from 'expo-secure-store'
-import { DEFAULT_AUTO_LOCK_TIMEOUT } from 'pearpass-lib-constants'
+import {
+  DEFAULT_AUTO_LOCK_TIMEOUT,
+  AUTO_LOCK_ENABLED
+} from 'pearpass-lib-constants'
 
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
 import { logger } from '../utils/logger'
@@ -31,6 +34,12 @@ export const AutoLockProvider = ({ children }) => {
   useEffect(() => {
     const loadSavedTimeout = async () => {
       try {
+        if (!AUTO_LOCK_ENABLED) {
+          setAutoLockTimeoutState(DEFAULT_AUTO_LOCK_TIMEOUT)
+          setIsLoaded(true)
+          return
+        }
+
         const savedTimeout = await SecureStore.getItemAsync(
           SECURE_STORAGE_KEYS.AUTO_LOCK_TIMEOUT
         )
