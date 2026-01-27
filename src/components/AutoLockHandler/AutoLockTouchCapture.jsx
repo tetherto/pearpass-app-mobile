@@ -1,6 +1,6 @@
-import { useNavigation } from '@react-navigation/native'
 import { View } from 'react-native'
 
+import { useRouteHelper } from '../../app/App/hooks/useRouteHelper'
 import { useAutoLockContext } from '../../context/AutoLockContext'
 import { setLastActivityAt } from '../../utils/autoLockStorage'
 
@@ -12,23 +12,21 @@ import { setLastActivityAt } from '../../utils/autoLockStorage'
  */
 export const AutoLockTouchCapture = ({ children }) => {
   const { notifyInteraction } = useAutoLockContext()
-  const navigation = useNavigation()
-
+  const { getCurrentRoute, isMasterPasswordScreen } = useRouteHelper()
   const updateActivityTimestamp = async () => {
     const now = Date.now()
     await setLastActivityAt(now)
   }
 
   const handleInteraction = () => {
-    const state = navigation.getState()
-    const currentRoute = state?.routes?.[state.index]?.name
-    if (currentRoute === 'Welcome') {
+    const currentRoute = getCurrentRoute()
+    if (isMasterPasswordScreen(currentRoute)) {
       return false
     }
 
     updateActivityTimestamp()
 
-    notifyInteraction()
+    notifyInteraction(Date.now())
 
     return false
   }
