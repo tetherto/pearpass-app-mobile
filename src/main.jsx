@@ -11,10 +11,7 @@ import { setPearpassVaultClient, VaultProvider } from 'pearpass-lib-vault'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { App } from './app/App'
-import {
-  AutoLockTouchCapture,
-  AutoLockWatcher
-} from './components/AutoLockHandler'
+import { AutoLockTouchCapture } from './components/AutoLockHandler'
 import { AutoLockProvider } from './context/AutoLockContext'
 import { BottomSheetProvider } from './context/BottomSheetContext'
 import { LoadingProvider } from './context/LoadingContext'
@@ -67,7 +64,6 @@ export const Main = () => {
                       <AutoLockTouchCapture>
                         <ModalProvider>
                           <BottomSheetProvider>
-                            <AutoLockWatcher />
                             <App />
                           </BottomSheetProvider>
                         </ModalProvider>

@@ -80,10 +80,8 @@ export const AutoLockProvider = ({ children }) => {
   }, [])
 
   const notifyInteraction = useCallback(() => {
-    if (interactionListenerRef.current) {
-      interactionListenerRef.current()
-    }
-  }, [])
+    interactionListenerRef?.current?.(Date.now())
+  }, [interactionListenerRef])
 
   const autoLockContextValue = useMemo(
     () => ({
