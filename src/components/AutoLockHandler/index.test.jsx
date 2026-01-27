@@ -3,7 +3,7 @@ import { render, act, cleanup } from '@testing-library/react-native'
 import { closeAllInstances, useUserData, useVaults } from 'pearpass-lib-vault'
 import { AppState, View } from 'react-native'
 
-import { AutoLockHandler } from './index'
+import { AutoLockTouchCapture, AutoLockWatcher } from './index'
 import { NAVIGATION_ROUTES } from '../../constants/navigation'
 import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -13,6 +13,13 @@ import {
   setLastActivityAt
 } from '../../utils/autoLockStorage'
 import { clearAllFileCache } from '../../utils/filesCache'
+
+const AutoLockHandler = ({ children }) => (
+  <AutoLockTouchCapture>
+    <AutoLockWatcher />
+    {children}
+  </AutoLockTouchCapture>
+)
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn()
@@ -49,9 +56,9 @@ describe('AutoLockHandler', () => {
   const removeListenerMock = jest.fn()
   let currentRouteName = 'Home'
   let contextValue = {
-    shouldBypassAutoLock: false,
     autoLockTimeout: 5000,
-    isAutoLockEnabled: true
+    isAutoLockEnabled: true,
+    notifyInteraction: jest.fn()
   }
 
   beforeEach(() => {
@@ -62,7 +69,8 @@ describe('AutoLockHandler', () => {
     contextValue = {
       shouldBypassAutoLock: false,
       autoLockTimeout: 5000,
-      isAutoLockEnabled: true
+      isAutoLockEnabled: true,
+      notifyInteraction: jest.fn()
     }
 
     useVaults.mockReturnValue({ resetState: resetStateMock })
