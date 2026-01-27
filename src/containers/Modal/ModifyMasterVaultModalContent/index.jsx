@@ -10,11 +10,11 @@ import {
 } from 'pearpass-lib-vault/src/utils/buffer'
 import { validatePasswordChange } from 'pearpass-utils-password-check'
 
-import { useModal } from '../../../context/ModalContext'
-import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
 import { InputLabel, InputWrapper } from './styles'
+import { useModal } from '../../../context/ModalContext'
 import { InputPasswordPearPass } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
+import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
 
 export const ModifyMasterVaultModalContent = () => {
   const { closeModal } = useModal()
@@ -93,7 +93,7 @@ export const ModifyMasterVaultModalContent = () => {
 
   return (
     <ModifyVaultsModaContentWrapper
-      title={t`Modify master password`}
+      title={t`Update master password`}
       secondaryAction={closeModal}
       primaryAction={handleSubmit(onSubmit)}
       isLoading={isLoading}

@@ -9,8 +9,8 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { BottomSheetRecordCreateContent } from '../../containers/BottomSheetRecordCreateContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
-import { Settings } from '../../screens/Settings'
 import { DrawerNavigator } from '../DrawerNavigator'
+import { SettingsNavigator } from '../SettingsNavigator'
 
 const Tab = createBottomTabNavigator()
 
@@ -103,7 +103,7 @@ export const TabNavigator = () => {
           tabBarLabel: 'Settings'
         }}
         name="Settings"
-        component={Settings}
+        component={SettingsNavigator}
       />
     </Tab.Navigator>
   )

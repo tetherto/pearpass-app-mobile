@@ -2,11 +2,14 @@ import { useState } from 'react'
 
 import { i18n } from '@lingui/core'
 import { useLingui } from '@lingui/react/macro'
+import { useNavigation } from '@react-navigation/native'
 import {
   sendGoogleFormFeedback,
   sendSlackFeedback
 } from 'pear-apps-lib-feedback'
-import { Platform } from 'react-native'
+import { BackIcon } from 'pearpass-lib-ui-react-native-components'
+import { Platform, ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 
 import { DeviceSection } from './DeviceSection'
@@ -24,10 +27,13 @@ import {
 import { ModifyMasterVaultModalContent } from '../../../containers/Modal/ModifyMasterVaultModalContent'
 import { useModal } from '../../../context/ModalContext'
 import { useLanguageOptions } from '../../../hooks/useLanguageOptions'
+import { ButtonLittle } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
+import { settingsStyles } from '../styles'
 
 export const TabGeneralSettings = () => {
   const { t } = useLingui()
+  const navigation = useNavigation()
   const [language, setLanguage] = useState(i18n.locale)
   const { openModal } = useModal()
   const handleChangeLanguage = (newLang) => {
@@ -96,35 +102,49 @@ export const TabGeneralSettings = () => {
   }
 
   return (
-    <>
-      <LanguageSection
-        language={language}
-        setLanguage={handleChangeLanguage}
-        title={t`Language`}
-        languageOptions={languageOptions}
-      />
+    <SafeAreaView
+      style={settingsStyles.container}
+      edges={['top', 'left', 'right']}
+    >
+      <View style={settingsStyles.header}>
+        <ButtonLittle
+          startIcon={BackIcon}
+          variant="secondary"
+          borderRadius="md"
+          onPress={() => navigation.goBack()}
+        />
+        <Text style={settingsStyles.screenTitle}>{t`General`}</Text>
+      </View>
+      <ScrollView contentContainerStyle={settingsStyles.contentContainer}>
+        <LanguageSection
+          language={language}
+          setLanguage={handleChangeLanguage}
+          title={t`Language`}
+          languageOptions={languageOptions}
+        />
 
-      <CardSingleSetting title={t`Passwords`}>
-        <ManageVaultsContainer>
-          <ListItem
-            name={t`Master Vault`}
-            onEditClick={handleMasterEditClick}
-          />
-        </ManageVaultsContainer>
-      </CardSingleSetting>
+        <CardSingleSetting title={t`Passwords`}>
+          <ManageVaultsContainer>
+            <ListItem
+              name={t`Master Vault`}
+              onEditClick={handleMasterEditClick}
+            />
+          </ManageVaultsContainer>
+        </CardSingleSetting>
 
-      <ReportSection
-        message={message}
-        setMessage={setMessage}
-        isLoading={isLoading}
-        handleReportProblem={handleReportProblem}
-      />
+        <ReportSection
+          message={message}
+          setMessage={setMessage}
+          isLoading={isLoading}
+          handleReportProblem={handleReportProblem}
+        />
 
-      <DeviceSection />
+        <DeviceSection />
 
-      <CardSingleSetting title={t`Version`}>
-        <Version>{version}</Version>
-      </CardSingleSetting>
-    </>
+        <CardSingleSetting title={t`Version`}>
+          <Version>{version}</Version>
+        </CardSingleSetting>
+      </ScrollView>
+    </SafeAreaView>
   )
 }

@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
+import { useNavigation } from '@react-navigation/native'
 import { MAX_IMPORT_RECORDS } from 'pearpass-lib-constants'
 import {
   parse1PasswordData,
@@ -8,13 +9,15 @@ import {
   parsePearPassData,
   parseProtonPassData
 } from 'pearpass-lib-data-import'
-import { LockIcon } from 'pearpass-lib-ui-react-native-components'
+import { BackIcon, LockIcon } from 'pearpass-lib-ui-react-native-components'
 import { useCreateRecord } from 'pearpass-lib-vault'
+import { ScrollView, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 
 import {
   AcceptedFormats,
-  Container,
+  Container as ImportContainer,
   Description,
   ImportOptionImage,
   ImportOptionItem,
@@ -24,7 +27,10 @@ import {
 import { readFileContent } from './utils/readFileContent'
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { ButtonLittle } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
+import { settingsStyles } from '../styles'
+
 const importOptions = [
   {
     title: '1Password',
@@ -78,18 +84,18 @@ const isAllowedType = (fileType, accepts) =>
     return fileType === accept
   })
 
-export const TabImport = () => {
+const images = {
+  '1password': require('../../../../assets/images/1password.png'),
+  bitwarden: require('../../../../assets/images/BitWarden.png'),
+  lastpass: require('../../../../assets/images/LastPass.png'),
+  protonpass: require('../../../../assets/images/ProtonPass.png'),
+  nordpass: require('../../../../assets/images/NordPass.png')
+}
+
+export const ImportSection = () => {
   const { t } = useLingui()
   const { setShouldBypassAutoLock } = useAutoLockContext()
   const { createRecord } = useCreateRecord()
-
-  const images = {
-    '1password': require('../../../../assets/images/1password.png'),
-    bitwarden: require('../../../../assets/images/BitWarden.png'),
-    lastpass: require('../../../../assets/images/LastPass.png'),
-    protonpass: require('../../../../assets/images/ProtonPass.png'),
-    nordpass: require('../../../../assets/images/NordPass.png')
-  }
 
   const handleFileChange = async ({ type, accepts }) => {
     let result = []
@@ -188,10 +194,10 @@ export const TabImport = () => {
   }
 
   return (
-    <CardSingleSetting title={t`Import`}>
-      <Container>
+    <CardSingleSetting title={t`Import Vault`}>
+      <ImportContainer>
         <Description>
-          {t`Import your Vaults from a file or another app. Currently, only CSV files are supported.`}
+          {t`Move your saved items here from another password manager. They'll be added to this vault.`}
         </Description>
         <ImportOptionsList>
           {importOptions.map((option) => (
@@ -214,7 +220,32 @@ export const TabImport = () => {
             </ImportOptionItem>
           ))}
         </ImportOptionsList>
-      </Container>
+      </ImportContainer>
     </CardSingleSetting>
+  )
+}
+
+export const TabImport = () => {
+  const { t } = useLingui()
+  const navigation = useNavigation()
+
+  return (
+    <SafeAreaView
+      style={settingsStyles.container}
+      edges={['top', 'left', 'right']}
+    >
+      <View style={settingsStyles.header}>
+        <ButtonLittle
+          startIcon={BackIcon}
+          variant="secondary"
+          borderRadius="md"
+          onPress={() => navigation.goBack()}
+        />
+        <Text style={settingsStyles.screenTitle}>{t`Import`}</Text>
+      </View>
+      <ScrollView contentContainerStyle={settingsStyles.contentContainer}>
+        <ImportSection />
+      </ScrollView>
+    </SafeAreaView>
   )
 }
