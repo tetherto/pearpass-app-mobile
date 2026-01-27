@@ -16,7 +16,11 @@ import { InputPasswordPearPass } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
 
-export const ModifyMasterVaultModalContent = () => {
+/**
+ * @param {Object} props
+ * @param {Function} [props.onPasswordChange]
+ */
+export const ModifyMasterVaultModalContent = ({ onPasswordChange }) => {
   const { closeModal } = useModal()
   const { t } = useLingui()
 
@@ -78,6 +82,7 @@ export const ModifyMasterVaultModalContent = () => {
       })
 
       setIsLoading(false)
+      onPasswordChange?.()
       closeModal()
     } catch (error) {
       setIsLoading(false)

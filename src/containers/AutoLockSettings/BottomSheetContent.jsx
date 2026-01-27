@@ -24,13 +24,13 @@ export const BottomSheetAutoLockContent = ({ selectedValue, onSelect }) => {
     () =>
       Object.values(AUTO_LOCK_TIMEOUT_OPTIONS).map((option) => ({
         label: t(option.label),
-        value: String(option.value)
+        value: option.value
       })),
     [t]
   )
 
   const handleChange = (value) => {
-    onSelect(Number(value))
+    onSelect(value)
   }
 
   return (
@@ -38,7 +38,7 @@ export const BottomSheetAutoLockContent = ({ selectedValue, onSelect }) => {
       <Container>
         <RadioSelect
           options={timeoutOptions}
-          selectedOption={String(selectedValue)}
+          selectedOption={selectedValue}
           onChange={handleChange}
         />
       </Container>
