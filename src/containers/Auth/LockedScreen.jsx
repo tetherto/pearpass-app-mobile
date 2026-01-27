@@ -1,10 +1,12 @@
+import { useEffect } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useCountDown } from 'pear-apps-lib-ui-react-hooks'
 import { LockIcon, TimeIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { useUserData } from 'pearpass-lib-vault'
-import { ScrollView, View, Text, StyleSheet } from 'react-native'
+import { AppState, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { NAVIGATION_ROUTES } from '../../constants/navigation'
@@ -17,10 +19,17 @@ export const LockedScreen = () => {
   const { t } = useLingui()
   const { masterPasswordStatus, refreshMasterPasswordStatus } = useUserData()
 
-  const timeRemaining = useCountDown({
-    initialSeconds: Math.ceil(masterPasswordStatus.lockoutRemainingMs / 1000),
-    onFinish: () => onFinish()
-  })
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        refreshMasterPasswordStatus()
+      }
+    })
+
+    return () => {
+      subscription.remove()
+    }
+  }, [refreshMasterPasswordStatus])
 
   const onFinish = async () => {
     const status = await refreshMasterPasswordStatus()
@@ -38,6 +47,11 @@ export const LockedScreen = () => {
       })
     }
   }
+
+  const timeRemaining = useCountDown({
+    initialSeconds: Math.ceil(masterPasswordStatus.lockoutRemainingMs / 1000),
+    onFinish
+  })
 
   return (
     <View style={styles.container}>
