@@ -47,8 +47,8 @@ describe('InputFieldNote component', () => {
 
     const inputField = getByTestId('input-field')
     expect(inputField).toBeTruthy()
-    expect(inputField.props['data-label']).toBe('Note')
-    expect(inputField.props['data-placeholder']).toBe('Add note')
+    expect(inputField.props['data-label']).toBe('Comment')
+    expect(inputField.props['data-placeholder']).toBe('Add comment')
     expect(inputField.props['data-variant']).toBe('outline')
     expect(toJSON()).toMatchSnapshot()
   })
@@ -57,18 +57,18 @@ describe('InputFieldNote component', () => {
     const onChangeText = jest.fn()
     const { getByTestId } = renderWithProviders(
       <InputFieldNote
-        value="Test note"
+        value="Test comment"
         onChangeText={onChangeText}
         testID="custom-test-id"
       />
     )
 
     const inputField = getByTestId('custom-test-id')
-    expect(inputField.props.value).toBe('Test note')
+    expect(inputField.props.value).toBe('Test comment')
     expect(inputField.props.testID).toBe('custom-test-id')
 
-    fireEvent(inputField, 'changeText', 'New note')
-    expect(onChangeText).toHaveBeenCalledWith('New note')
+    fireEvent(inputField, 'changeText', 'New comment')
+    expect(onChangeText).toHaveBeenCalledWith('New comment')
   })
 
   test('renders with custom style prop', () => {
