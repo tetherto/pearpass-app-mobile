@@ -45,6 +45,7 @@ import Foundation
         case MASTER_PASSWORD_INIT_WITH_PASSWORD = 44
         case MASTER_PASSWORD_UPDATE = 45
         case MASTER_PASSWORD_INIT_WITH_CREDENTIALS = 46
+        case SET_CORE_STORE_OPTIONS = 49
     }
     
     // MARK: - Properties
@@ -100,11 +101,15 @@ import Foundation
             do {
                 // First initialize the worklet
                 try await initializeWorklet()
-                
+
                 // Then set the storage path
                 try await setStoragePath(pathToUse)
-                
-                log("Vault client fully initialized")
+
+                // Set readOnly mode for autofill extension to avoid file lock conflicts
+                log("Setting core store options: readOnly=true")
+                try await setCoreStoreOptions(readOnly: true)
+
+                log("Vault client fully initialized with readOnly mode")
             } catch {
                 logError("Failed to initialize: \(error.localizedDescription)")
                 throw error
@@ -211,6 +216,13 @@ import Foundation
         self.storagePath = path
         _ = try await sendRequest(command: API.STORAGE_PATH_SET.rawValue, data: ["path": path])
         log("Storage path set to: \(path)")
+    }
+
+    /// Sets core store options (e.g., readOnly mode for autofill extension)
+    func setCoreStoreOptions(readOnly: Bool) async throws {
+        let coreStoreOptions: [String: Any] = ["readOnly": readOnly]
+        _ = try await sendRequest(command: API.SET_CORE_STORE_OPTIONS.rawValue, data: ["coreStoreOptions": coreStoreOptions])
+        log("Core store options set: readOnly=\(readOnly)")
     }
     
     // MARK: - Master Vault Methods
