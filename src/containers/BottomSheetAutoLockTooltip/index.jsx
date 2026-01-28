@@ -3,6 +3,11 @@ import { useLingui } from '@lingui/react/macro'
 import { colors } from 'pearpass-lib-ui-theme-provider'
 import { Text, StyleSheet } from 'react-native'
 
+/**
+ * Bottom sheet tooltip that explains how the auto-lock feature works.
+ * @component
+ * @returns {JSX.Element}
+ */
 export const BottomSheetAutoLockTooltip = () => {
   const { t } = useLingui()
 
