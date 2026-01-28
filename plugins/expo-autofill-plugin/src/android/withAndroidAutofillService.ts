@@ -10,12 +10,13 @@ export const withAndroidAutofillService: ConfigPlugin<AutofillPluginOptions> = (
     config = withAppBuildGradle(config, (cfg) => {
       const copyTaskCode = `
 // Copy autofill extension bundle before build
+// Path is relative to android/app/, so ../../ goes to project root
 tasks.register("copyAutofillBundle", Copy) {
-    from "../${options.extensionBundlePath}"
+    from "../../${options.extensionBundlePath}"
     into "src/main/assets"
     rename { "extension.bundle" }
     doFirst {
-        if (!file("../${options.extensionBundlePath}").exists()) {
+        if (!file("../../${options.extensionBundlePath}").exists()) {
             logger.warn("Extension bundle not found at ${options.extensionBundlePath}")
             logger.warn("Run 'npm run bundle:autofill' to generate it")
         }
