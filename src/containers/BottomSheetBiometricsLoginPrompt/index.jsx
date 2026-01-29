@@ -12,18 +12,31 @@ import {
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { ButtonPrimary, ButtonSecondary } from '../../libComponents'
 
-export const BottomSheetBiometricsLoginPrompt = ({ onConfirm, onDismiss }) => {
+/**
+ * @param {Object} props
+ * @param {Function} props.onConfirm
+ * @param {Function} props.onDismiss
+ * @param {string} [props.title]
+ * @param {string} [props.description]
+ */
+export const BottomSheetBiometricsLoginPrompt = ({
+  onConfirm,
+  onDismiss,
+  title,
+  description
+}) => {
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
 
   return (
     <BottomSheetView style={{ padding: 20 }}>
       <Header>
-        <Title>{t`Enable biometric authentication`}</Title>
+        <Title>{title || t`Enable biometric authentication`}</Title>
       </Header>
       <ContentWrapper>
         <BottomSheetBody>
-          {t`Your device supports biometric authentication. Do you want to enable biometric authentication for easier and more secure sign-in?`}
+          {description ||
+            t`Your device supports biometric authentication. Do you want to enable biometric authentication for easier and more secure sign-in?`}
         </BottomSheetBody>
         <ActionsWrapper>
           <ButtonSecondary

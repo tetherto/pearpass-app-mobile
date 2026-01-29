@@ -64,7 +64,7 @@ public class BareHelper {
             // The bundle file is located in the assets directory
             String bundleFileName = bundleName + "." + bundleType;
             InputStream bundleStream = context.getAssets().open(bundleFileName);
-            worklet.start("/" + bundleFileName, bundleStream, null);
+            worklet.start("/" + bundleFileName, bundleStream, new String[]{});
 
             Log.d(TAG, "Worklet started successfully with bundle");
 
@@ -78,10 +78,10 @@ public class BareHelper {
             return true;
         } catch (Exception e) {
             Log.e(TAG, "Failed to start worklet", e);
-            if (worklet != null) {
-                worklet.terminate();
-                worklet = null;
-            }
+            // Don't call worklet.terminate() here - if start() failed,
+            // the native instance may not be properly initialized and
+            // terminate() will crash with SIGSEGV (null pointer dereference)
+            worklet = null;
             return false;
         }
     }

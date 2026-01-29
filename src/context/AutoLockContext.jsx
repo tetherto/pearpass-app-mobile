@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from 'react'
 
@@ -30,6 +31,8 @@ export const AutoLockProvider = ({ children }) => {
     DEFAULT_AUTO_LOCK_TIMEOUT
   )
   const [isLoaded, setIsLoaded] = useState(false)
+
+  const interactionListenerRef = useRef(null)
 
   useEffect(() => {
     const loadSavedTimeout = async () => {
@@ -72,19 +75,31 @@ export const AutoLockProvider = ({ children }) => {
 
   const isAutoLockEnabled = autoLockTimeout !== null
 
+  const registerInteractionListener = useCallback((listener) => {
+    interactionListenerRef.current = listener
+  }, [])
+
+  const notifyInteraction = useCallback(() => {
+    interactionListenerRef?.current?.(Date.now())
+  }, [interactionListenerRef])
+
   const autoLockContextValue = useMemo(
     () => ({
       shouldBypassAutoLock,
       setShouldBypassAutoLock,
       autoLockTimeout,
       setAutoLockTimeout,
-      isAutoLockEnabled
+      isAutoLockEnabled,
+      registerInteractionListener,
+      notifyInteraction
     }),
     [
       shouldBypassAutoLock,
       autoLockTimeout,
       setAutoLockTimeout,
-      isAutoLockEnabled
+      isAutoLockEnabled,
+      registerInteractionListener,
+      notifyInteraction
     ]
   )
 

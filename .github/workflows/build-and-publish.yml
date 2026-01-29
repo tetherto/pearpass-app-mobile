@@ -73,6 +73,9 @@ jobs:
       - name: Generate worklet bundle for Android
         run: npm run bundle:android
 
+      - name: Generate worklet bundle for Autofill
+        run: npm run bundle:autofill
+
       - name: Install EAS CLI
         run: npm install --global eas-cli
 
@@ -112,7 +115,7 @@ jobs:
           mv "$tmp" app.json
           echo "expo.version updated to: $DEV_VERSION (Android dev build)"
       - name: Run expo prebuild
-        run: npx expo prebuild --platform android
+        run: npx expo prebuild --platform android --clean
 
       - name: EAS build (Android local) with auto submit
         env:
@@ -275,8 +278,8 @@ jobs:
       - name: Generate worklet bundle for iOS
         run: npm run bundle:ios
   
-      - name: Generate worklet bundle for iOS extension
-        run: npm run bundle:ios-extension
+      - name: Generate worklet bundle for Autofill
+        run: npm run bundle:autofill
 
       - name: Extract translations
         run: |
@@ -297,7 +300,7 @@ jobs:
           echo "PROFILE=$PROFILE" >> "$GITHUB_OUTPUT"
 
       - name: Run expo prebuild
-        run: npx expo prebuild --platform ios
+        run: npx expo prebuild --platform ios --clean
 
       - name: EAS build (iOS local) with auto submit
         env:
