@@ -20,8 +20,8 @@ export const Appearance = () => {
 
   const [language, setLanguage] = useState(i18n.locale)
 
-  const handleChangeLanguage = (newLang) => {
-    setLanguage(newLang)
+  const handleChangeLanguage = async (newLang) => {
+    await setLanguage(() => newLang)
     i18n.activate(newLang)
   }
 

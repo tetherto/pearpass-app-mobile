@@ -26,6 +26,13 @@ import {
 
 const IOS_VERSION_WITH_AUTOFILL_ENABLE = 18
 
+const getIosMajorVersion = () => {
+  if (Platform.OS !== 'ios') return 0
+  return typeof Platform.Version === 'string'
+    ? Number(String(Platform.Version).split('.')[0])
+    : Number(Platform.Version)
+}
+
 export const Autofill = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
@@ -146,8 +153,7 @@ export const Autofill = () => {
             </Text>
             {Platform.OS === 'android' && renderAndroidAutofill()}
             {Platform.OS === 'ios' &&
-              (parseInt(Platform.Version, 10) >=
-              IOS_VERSION_WITH_AUTOFILL_ENABLE
+              (getIosMajorVersion() >= IOS_VERSION_WITH_AUTOFILL_ENABLE
                 ? renderIOS18Autofill()
                 : renderIOSLegacyAutofill())}
           </View>
