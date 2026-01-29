@@ -8,6 +8,7 @@ import { CopyIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import Toast from 'react-native-toast-message'
 
+import { useHapticFeedback } from './useHapticFeedback'
 import { IOS_APP_GROUP_ID } from '../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
 import NativeClipboard from '../native-modules/NativeClipboard'
@@ -22,6 +23,7 @@ export const useCopyToClipboard = () => {
   const clearClipboardTimeoutRef = useRef(null)
   const lastCopiedTextRef = useRef(null)
   const { t } = useLingui()
+  const { hapticSuccess } = useHapticFeedback()
 
   useEffect(() => {
     const checkCopyToClipboardOptIn = async () => {
@@ -105,6 +107,7 @@ export const useCopyToClipboard = () => {
         }
 
         setIsCopied(true)
+        hapticSuccess()
 
         Toast.show({
           type: 'baseToast',
@@ -124,7 +127,7 @@ export const useCopyToClipboard = () => {
         return false
       }
     },
-    [isCopyToClipboardEnabled, t]
+    [isCopyToClipboardEnabled, t, hapticSuccess]
   )
 
   return { copyToClipboard, isCopied }

@@ -8,6 +8,7 @@ import {
 } from './styles'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'
 import { RECORD_ICON_BY_TYPE } from '../../constants/recordIconByType'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
 /**
  *
@@ -22,11 +23,17 @@ import { RECORD_ICON_BY_TYPE } from '../../constants/recordIconByType'
  */
 export const ListItemRecordCategory = ({ item, onPress }) => {
   const Icon = RECORD_ICON_BY_TYPE[item.type]
+  const { hapticButtonSecondary } = useHapticFeedback()
+
+  const handlePress = () => {
+    hapticButtonSecondary()
+    onPress?.()
+  }
 
   return (
     <ItemCategoryWrapper>
       <CategoryContainer
-        onPress={onPress}
+        onPress={handlePress}
         testID={`record-item-${item.type}`}
         accessible
       >
