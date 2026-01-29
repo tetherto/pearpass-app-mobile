@@ -41,6 +41,8 @@ export const MasterPasswordSection = () => {
       return
     }
 
+    clearTimeout(timeoutRef.current)
+
     timeoutRef.current = setTimeout(() => {
       expand({
         children: (
