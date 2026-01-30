@@ -1,0 +1,3 @@
+folder,favorite,type,name,notes,fields,reprompt,login_uri,login_username,login_password,login_totp
+,,login,Bit login,Notes hello,Notes: Hello notes,0,https://fill.dev/form/login-simple,Bit_login,Bit_password,qwe12312w1wq
+,,note,Bit note,bit notes,Notes add: Hello,0,,,,

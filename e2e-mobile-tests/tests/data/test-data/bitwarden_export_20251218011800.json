@@ -1,0 +1,163 @@
+{
+  "encrypted": false,
+  "folders": [],
+  "items": [
+    {
+      "passwordHistory": [],
+      "revisionDate": "2025-12-17T18:13:21.020Z",
+      "creationDate": "2025-10-24T19:24:59.696Z",
+      "id": "68a09c4d-8da7-4647-b7e0-b380013ff9b8",
+      "type": 3,
+      "reprompt": 0,
+      "name": "Bit credit",
+      "notes": "Notes hello",
+      "favorite": false,
+      "fields": [
+        {
+          "name": "Notes add",
+          "value": "Hello",
+          "type": 0
+        }
+      ],
+      "card": {
+        "cardholderName": "Bit name",
+        "brand": "Visa",
+        "number": "1234 5678 9012",
+        "expMonth": "1",
+        "expYear": "2025",
+        "code": "123"
+      },
+      "collectionIds": null
+    },
+    {
+      "passwordHistory": [],
+      "revisionDate": "2025-12-17T18:14:21.496Z",
+      "creationDate": "2025-10-24T19:27:56.053Z",
+      "id": "763dc6c7-11de-4dba-bfac-b3800140c863",
+      "type": 4,
+      "reprompt": 0,
+      "name": "Bit identity",
+      "notes": "bit notes",
+      "favorite": false,
+      "fields": [
+        {
+          "name": "bit text",
+          "value": "custom text",
+          "type": 0
+        },
+        {
+          "name": "bit hidden",
+          "value": "custom hidden",
+          "type": 1
+        },
+        {
+          "name": "bit boolean",
+          "value": "false",
+          "type": 2
+        },
+        {
+          "name": "bit linked",
+          "value": null,
+          "type": 3,
+          "linkedId": 416
+        },
+        {
+          "name": "Notes add",
+          "value": "Hello",
+          "type": 0
+        }
+      ],
+      "identity": {
+        "title": "Mr",
+        "firstName": "bit name",
+        "middleName": "bit middle",
+        "lastName": "bit last",
+        "address1": "bit address 1",
+        "address2": "bit address 2",
+        "address3": "bit address 3",
+        "city": "bit city",
+        "state": "bit country",
+        "postalCode": "bit postcode",
+        "country": "bit country",
+        "company": "bit company",
+        "email": "bit@email.com",
+        "phone": "bit phone",
+        "ssn": "bit insurance",
+        "username": "bit username",
+        "passportNumber": "bit passport",
+        "licenseNumber": "bit licence"
+      },
+      "collectionIds": null
+    },
+    {
+      "passwordHistory": [],
+      "revisionDate": "2025-12-17T18:12:51.203Z",
+      "creationDate": "2025-10-24T19:24:03.906Z",
+      "id": "415c205e-ad3e-4e98-826d-b380013fb858",
+      "type": 1,
+      "reprompt": 0,
+      "name": "Bit login",
+      "notes": "Notes hello",
+      "favorite": false,
+      "fields": [
+        {
+          "name": "Notes",
+          "value": "Hello notes",
+          "type": 0
+        }
+      ],
+      "login": {
+        "uris": [
+          {
+            "uri": "https://fill.dev/form/login-simple"
+          }
+        ],
+        "fido2Credentials": [],
+        "username": "Bit_login",
+        "password": "Bit_password",
+        "totp": "qwe12312w1wq"
+      },
+      "collectionIds": null
+    },
+    {
+      "passwordHistory": [],
+      "revisionDate": "2025-12-17T18:14:42.020Z",
+      "creationDate": "2025-10-24T19:28:19.173Z",
+      "id": "f6da1fc7-8acb-41f1-8f51-b3800140e37c",
+      "type": 2,
+      "reprompt": 0,
+      "name": "Bit note",
+      "notes": "bit notes",
+      "favorite": false,
+      "fields": [
+        {
+          "name": "Notes add",
+          "value": "Hello",
+          "type": 0
+        }
+      ],
+      "secureNote": {
+        "type": 0
+      },
+      "collectionIds": null
+    },
+    {
+      "passwordHistory": [],
+      "revisionDate": "2025-12-17T18:14:59.360Z",
+      "creationDate": "2025-12-17T18:14:59.360Z",
+      "id": "132e0490-08fc-4bf1-8ff4-b3b6012cbf72",
+      "type": 5,
+      "reprompt": 0,
+      "name": "SSH",
+      "notes": "Hello",
+      "favorite": false,
+      "fields": [],
+      "sshKey": {
+        "privateKey": "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\nQyNTUxOQAAACDLbWYqSvts7ywgJkNcUwlNeqhRkin7TYcy1g7Glkn0BwAAAIgqjZnGKo2Z\nxgAAAAtzc2gtZWQyNTUxOQAAACDLbWYqSvts7ywgJkNcUwlNeqhRkin7TYcy1g7Glkn0Bw\nAAAEDhBMvFkMeusFvAojC5EB61ro14xuyTh6EZS+TFEpatq8ttZipK+2zvLCAmQ1xTCU16\nqFGSKftNhzLWDsaWSfQHAAAAAAECAwQF\n-----END OPENSSH PRIVATE KEY-----\n",
+        "publicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMttZipK+2zvLCAmQ1xTCU16qFGSKftNhzLWDsaWSfQH",
+        "keyFingerprint": "SHA256:bRD/3mHpwBQxzUmiCghD81VHomXpMVHtkZXRRIHatsw"
+      },
+      "collectionIds": null
+    }
+  ]
+}
