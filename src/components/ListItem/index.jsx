@@ -30,6 +30,7 @@ import {
  *  isSelected?: boolean
  *  isLoading?: boolean
  *  testID?: string
+ *  accessibilityLabel?: string
  * }} props
  */
 export const ListItem = ({
@@ -42,12 +43,14 @@ export const ListItem = ({
   isSelected = false,
   isLoading = false,
   testID,
+  accessibilityLabel,
   ...restProps
 }) => (
   <ListItemContainer
     isSelected={isSelected}
     onPress={onPress}
     testID={testID}
+    accessibilityLabel={accessibilityLabel}
     {...restProps}
   >
     <ListItemInfo>

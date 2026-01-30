@@ -19,12 +19,21 @@ jest.mock('react-native-bare-kit', () => ({
 }))
 
 jest.mock('pearpass-lib-vault-core', () => ({
-  PearpassVaultClient: jest.fn()
+  PearpassVaultClient: jest
+    .fn()
+    .mockImplementation(function PearpassVaultClient() {
+      return {}
+    })
 }))
 
 jest.mock('react-native', () => ({
   Platform: {
     select: jest.fn()
+  },
+  AppState: {
+    addEventListener: jest.fn(() => ({
+      remove: jest.fn()
+    }))
   }
 }))
 
@@ -81,7 +90,7 @@ describe('createPearpassVaultClient', () => {
         debugMode: undefined
       }
     )
-    expect(client).toBeInstanceOf(PearpassVaultClient)
+    expect(client).toBe(PearpassVaultClient.mock.results[0].value)
   })
 
   it('should create a client for Android', async () => {

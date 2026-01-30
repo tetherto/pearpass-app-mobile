@@ -5,20 +5,20 @@ import { useEffect, useState } from 'react'
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { NavigationContainer } from '@react-navigation/native'
-import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { colors, ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
 import { setPearpassVaultClient, VaultProvider } from 'pearpass-lib-vault'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { App } from './app/App'
-import { AutoLockHandler } from './components/AutoLockHandler'
+import { AutoLockTouchCapture } from './components/AutoLockHandler'
 import { AutoLockProvider } from './context/AutoLockContext'
 import { BottomSheetProvider } from './context/BottomSheetContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
 import { SharedFilterProvider } from './context/SharedFilterContext'
 import { messages } from './locales/en/messages'
+import * as SplashScreen from './utils/SplashScreen'
 import { createPearpassVaultClient } from './worklet'
 
 global.Buffer = global.Buffer || Buffer
@@ -61,13 +61,13 @@ export const Main = () => {
                 <SharedFilterProvider>
                   <NavigationContainer>
                     <AutoLockProvider>
-                      <ModalProvider>
-                        <BottomSheetProvider>
-                          <AutoLockHandler>
+                      <AutoLockTouchCapture>
+                        <ModalProvider>
+                          <BottomSheetProvider>
                             <App />
-                          </AutoLockHandler>
-                        </BottomSheetProvider>
-                      </ModalProvider>
+                          </BottomSheetProvider>
+                        </ModalProvider>
+                      </AutoLockTouchCapture>
                     </AutoLockProvider>
                   </NavigationContainer>
                 </SharedFilterProvider>

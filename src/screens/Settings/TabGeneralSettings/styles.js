@@ -12,6 +12,3 @@ export const Version = styled.Text`
   line-height: 16px;
   margin-top: 10px;
 `
-export const ManageVaultsContainer = styled.View`
-  gap: 15px;
-`

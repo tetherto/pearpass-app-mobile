@@ -16,7 +16,11 @@ import { InputLabel, InputWrapper } from './styles'
 import { InputPasswordPearPass } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 
-export const ModifyMasterVaultModalContent = () => {
+/**
+ * @param {Object} props
+ * @param {Function} [props.onPasswordChange]
+ */
+export const ModifyMasterVaultModalContent = ({ onPasswordChange }) => {
   const { closeModal } = useModal()
   const { t } = useLingui()
 
@@ -78,6 +82,7 @@ export const ModifyMasterVaultModalContent = () => {
       })
 
       setIsLoading(false)
+      onPasswordChange?.()
       closeModal()
     } catch (error) {
       setIsLoading(false)
@@ -100,17 +105,32 @@ export const ModifyMasterVaultModalContent = () => {
     >
       <InputWrapper>
         <InputLabel>{t`Insert old password`}</InputLabel>
-        <InputPasswordPearPass isPassword {...register('currentPassword')} />
+        <InputPasswordPearPass
+          isPassword
+          {...register('currentPassword')}
+          testID="insert-old-password-input"
+          accessibilityLabel={t`Insert old password`}
+        />
       </InputWrapper>
 
       <InputWrapper>
         <InputLabel>{t`Create new password`}</InputLabel>
-        <InputPasswordPearPass isPassword {...register('newPassword')} />
+        <InputPasswordPearPass
+          isPassword
+          {...register('newPassword')}
+          testID="create-new-password-input"
+          accessibilityLabel={t`Create new password`}
+        />
       </InputWrapper>
 
       <InputWrapper>
         <InputLabel>{t`Repeat new password`}</InputLabel>
-        <InputPasswordPearPass isPassword {...register('repeatPassword')} />
+        <InputPasswordPearPass
+          isPassword
+          {...register('repeatPassword')}
+          testID="repeat-new-password-input"
+          accessibilityLabel={t`Repeat new password`}
+        />
       </InputWrapper>
     </ModifyVaultsModaContentWrapper>
   )

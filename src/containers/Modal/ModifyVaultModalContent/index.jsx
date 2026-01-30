@@ -138,7 +138,11 @@ export const ModifyVaultModalContent = ({
         <>
           <InputWrapper>
             <InputLabel>{t`Vault name`}</InputLabel>
-            <InputPasswordPearPass {...register('name')} />
+            <InputPasswordPearPass
+              {...register('name')}
+              testID="change-vault-name-input"
+              accessibilityLabel={t`Vault name`}
+            />
           </InputWrapper>
 
           {isProtected && (

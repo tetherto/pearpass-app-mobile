@@ -32,11 +32,13 @@ export const TabVaultsSettings = () => {
   return (
     <CardSingleSetting title={t`Manage Vaults`}>
       <ManageVaultsContainer>
-        {sortedVaults?.map((vault) => (
+        {sortedVaults?.map((vault, index) => (
           <ListItem
             key={vault.id}
             name={vault?.name ?? vault?.id}
             date={vault.createdAt}
+            testID={`vault-item-${index}`}
+            accessibilityLabel={`vault-item-${index}`}
             onEditClick={() => handleVaultEditClick(vault.id, vault.name)}
           />
         ))}

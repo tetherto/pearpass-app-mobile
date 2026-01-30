@@ -22,6 +22,7 @@ export const ContentWrapper = styled.View`
 `
 
 export const BottomSheetBody = styled.Text`
+  text-align: center;
   color: ${({ theme }) => theme.colors.white.mode1};
   font-size: 14px;
   line-height: 22px;

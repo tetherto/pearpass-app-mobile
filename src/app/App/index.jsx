@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import Toast from 'react-native-toast-message'
 
 import { Navigation } from '../Navigation'
-import { useAutoLock } from './hooks/useAutoLock'
+import { useAutoLockWatcher } from './hooks/useAutoLockWatcher'
 import { useRedirect } from './hooks/useRedirect'
 import { ToastCard } from '../../components/ToastCard'
 import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
@@ -12,11 +12,11 @@ import { useFirstLaunchCleanUp } from '../../hooks/useFirstLaunchCleanUp'
 import { useVersionCheck } from '../../hooks/useVersionCheck'
 
 export const App = () => {
+  useAutoLockWatcher()
   const { openModal } = useModal()
   const { needsUpdate } = useVersionCheck()
   const hasOpenedUpdateModal = useRef(false)
 
-  useAutoLock()
   useFirstLaunchCleanUp()
 
   useEffect(() => {
