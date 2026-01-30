@@ -179,7 +179,7 @@ struct CredentialsListView: View {
                                 .frame(width: 31, height: 42)
                         }
 
-                        SearchBar(text: $viewModel.searchText, credentialCount: filteredCredentials.count + filteredPasskeys.count)
+                        SearchBar(text: $viewModel.searchText, credentialCount: hasPasskeySupport ? filteredPasskeys.count : filteredCredentials.count + filteredPasskeys.count)
                             .onChange(of: viewModel.searchText) { _ in
                                 // Once user starts typing, disable domain filtering permanently
                                 if !viewModel.searchText.isEmpty && !hasUserSearched {
@@ -214,8 +214,8 @@ struct CredentialsListView: View {
                                 }
                             }
 
-                            // Passwords section
-                            if !filteredCredentials.isEmpty {
+                            // Passwords section (hidden in passkey mode)
+                            if !hasPasskeySupport && !filteredCredentials.isEmpty {
                                 Section {
                                     ForEach(filteredCredentials, id: \.id) { credential in
                                         CredentialRow(credential: credential) {
@@ -428,11 +428,11 @@ struct PasskeyRecordRow: View {
             HStack(spacing: 12) {
                 ZStack {
                     RoundedRectangle(cornerRadius: Constants.Layout.mediumCornerRadius)
-                        .fill(Constants.Colors.vaultIconBackground)
+                        .fill(Constants.Colors.credentialBackground)
                         .frame(width: 45, height: 45)
 
-                    Image(systemName: "person.badge.key.fill")
-                        .font(.system(size: 20))
+                    Text(getInitials())
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(Constants.Colors.primaryGreen)
                 }
 
@@ -451,6 +451,19 @@ struct PasskeyRecordRow: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(Color.clear)
+        }
+    }
+
+    private func getInitials() -> String {
+        let title = displayData.title
+        guard !title.isEmpty else { return "PK" }
+        let words = title.components(separatedBy: " ")
+        if words.count >= 2 {
+            let firstInitial = String(words[0].prefix(1)).uppercased()
+            let secondInitial = String(words[1].prefix(1)).uppercased()
+            return firstInitial + secondInitial
+        } else {
+            return String(title.prefix(2)).uppercased()
         }
     }
 }
