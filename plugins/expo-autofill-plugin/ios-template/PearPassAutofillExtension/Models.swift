@@ -44,6 +44,141 @@ struct Credential {
     let websites: [String]
 }
 
+// MARK: - Vault Record Models
+
+struct AttachmentMetadata: Equatable {
+    let id: String
+    let name: String
+}
+
+struct RecordData {
+    let title: String
+    let username: String
+    let password: String
+    let passwordUpdatedAt: Int64
+    let passkeyCreatedAt: Int64?
+    let credential: PasskeyCredential?
+    let note: String
+    let websites: [String]
+    let customFields: [[String: Any]]
+    let attachments: [AttachmentMetadata]
+}
+
+extension RecordData {
+    private static func parseTimestamp(_ value: Any?) -> Int64 {
+        if let val = value as? Int64 { return val }
+        if let val = value as? Int { return Int64(val) }
+        if let val = value as? Double { return Int64(val) }
+        return 0
+    }
+
+    private static func parseOptionalTimestamp(_ value: Any?) -> Int64? {
+        guard let value = value, !(value is NSNull) else { return nil }
+        return parseTimestamp(value)
+    }
+
+    init(from dict: [String: Any]) {
+        self.title = dict["title"] as? String ?? ""
+        self.username = dict["username"] as? String ?? ""
+        self.password = dict["password"] as? String ?? ""
+        self.passwordUpdatedAt = Self.parseTimestamp(dict["passwordUpdatedAt"])
+        self.passkeyCreatedAt = Self.parseOptionalTimestamp(dict["passkeyCreatedAt"])
+        if let credDict = dict["credential"] as? [String: Any] {
+            self.credential = PasskeyCredential.fromDictionary(credDict)
+        } else {
+            self.credential = nil
+        }
+        self.note = dict["note"] as? String ?? ""
+        self.websites = dict["websites"] as? [String] ?? []
+        self.customFields = dict["customFields"] as? [[String: Any]] ?? []
+        let rawAttachments = dict["attachments"] as? [[String: Any]] ?? []
+        self.attachments = rawAttachments.compactMap { item in
+            guard let id = item["id"] as? String,
+                  let name = item["name"] as? String else { return nil }
+            return AttachmentMetadata(id: id, name: name)
+        }
+    }
+
+    func toDictionary() -> [String: Any] {
+        var dict: [String: Any] = [
+            "title": title,
+            "username": username,
+            "password": password,
+            "passwordUpdatedAt": passwordUpdatedAt,
+            "note": note,
+            "websites": websites,
+            "customFields": customFields,
+            "attachments": attachments.map { ["id": $0.id, "name": $0.name] }
+        ]
+        if let passkeyCreatedAt = passkeyCreatedAt {
+            dict["passkeyCreatedAt"] = passkeyCreatedAt
+        }
+        if let credential = credential {
+            dict["credential"] = credential.toDictionary()
+        }
+        return dict
+    }
+}
+
+struct VaultRecord: Identifiable {
+    let id: String
+    let version: Int
+    let type: String
+    let vaultId: String
+    let data: RecordData?
+    let isFavorite: Bool
+    let createdAt: Int64
+    let updatedAt: Int64
+    let folder: String?
+}
+
+extension VaultRecord {
+    private static func parseTimestamp(_ value: Any?) -> Int64 {
+        if let val = value as? Int64 { return val }
+        if let val = value as? Int { return Int64(val) }
+        if let val = value as? Double { return Int64(val) }
+        return 0
+    }
+
+    init?(from dict: [String: Any]) {
+        guard let id = dict["id"] as? String else { return nil }
+        self.id = id
+        self.version = dict["version"] as? Int ?? 1
+        self.type = dict["type"] as? String ?? ""
+        self.vaultId = dict["vaultId"] as? String ?? ""
+        if let dataDict = dict["data"] as? [String: Any] {
+            self.data = RecordData(from: dataDict)
+        } else {
+            self.data = nil
+        }
+        self.isFavorite = dict["isFavorite"] as? Bool ?? false
+        self.createdAt = Self.parseTimestamp(dict["createdAt"])
+        self.updatedAt = Self.parseTimestamp(dict["updatedAt"])
+        self.folder = dict["folder"] as? String
+    }
+
+    func toDictionary() -> [String: Any] {
+        var dict: [String: Any] = [
+            "id": id,
+            "version": version,
+            "type": type,
+            "vaultId": vaultId,
+            "isFavorite": isFavorite,
+            "createdAt": createdAt,
+            "updatedAt": updatedAt
+        ]
+        if let data = data {
+            dict["data"] = data.toDictionary()
+        }
+        if let folder = folder {
+            dict["folder"] = folder
+        } else {
+            dict["folder"] = NSNull()
+        }
+        return dict
+    }
+}
+
 enum AuthFlow: Equatable {
     case missingConfiguration
     case masterPassword

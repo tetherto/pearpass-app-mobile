@@ -21,7 +21,7 @@ struct PasskeyFormView: View {
     let request: PasskeyRegistrationRequest
     let vaultClient: PearPassVaultClient?
     let selectedVault: Vault?
-    let existingRecord: [String: Any]?
+    let existingRecord: VaultRecord?
     let preloadedFolders: [String]
     let onSave: (PasskeyFormData) -> Void
     let onCancel: () -> Void
@@ -393,14 +393,14 @@ struct PasskeyFormView: View {
     private func initializeForm() {
         if let record = existingRecord {
             // Pre-populate from existing record
-            let data = record["data"] as? [String: Any] ?? [:]
-            title = data["title"] as? String ?? ""
-            username = data["username"] as? String ?? ""
-            let websites = data["websites"] as? [String] ?? []
+            let data = record.data
+            title = data?.title ?? ""
+            username = data?.username ?? ""
+            let websites = data?.websites ?? []
             website = websites.first ?? ""
-            comment = data["note"] as? String ?? ""
-            selectedFolder = record["folder"] as? String
-            if let existingPasskeyCreatedAt = data["passkeyCreatedAt"] as? Int64 {
+            comment = data?.note ?? ""
+            selectedFolder = record.folder
+            if let existingPasskeyCreatedAt = data?.passkeyCreatedAt {
                 passkeyCreatedAt = existingPasskeyCreatedAt
             } else {
                 passkeyCreatedAt = Int64(Date().timeIntervalSince1970 * 1000)
@@ -539,7 +539,7 @@ struct PasskeyFormData {
     let folder: String?
     let attachments: [AttachmentFile]
     let passkeyCreatedAt: Int64
-    let existingRecord: [String: Any]?
+    let existingRecord: VaultRecord?
 }
 
 // MARK: - Document Picker

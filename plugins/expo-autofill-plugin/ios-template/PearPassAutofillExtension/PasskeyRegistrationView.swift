@@ -29,8 +29,8 @@ struct PasskeyRegistrationView: View {
     @State private var isLoggedIn: Bool = false
 
     // Search results for existing credential matching
-    @State private var matchingRecords: [[String: Any]] = []
-    @State private var selectedExistingRecord: [String: Any]? = nil
+    @State private var matchingRecords: [VaultRecord] = []
+    @State private var selectedExistingRecord: VaultRecord? = nil
     @State private var loadedFolders: [String] = []
 
     enum RegistrationStep {
@@ -299,12 +299,11 @@ struct PasskeyRegistrationView: View {
                 let (credential, attestationObject, credentialIdData) = try generatePasskey()
 
                 // 2. Save file attachments first (matching main app order)
-                var attachmentMetadata: [[String: String]] = []
+                var attachmentMetadata: [AttachmentMetadata] = []
                 let recordId: String
 
-                if let existingRecord = formData.existingRecord,
-                   let existingId = existingRecord["id"] as? String {
-                    recordId = existingId
+                if let existingRecord = formData.existingRecord {
+                    recordId = existingRecord.id
                 } else {
                     recordId = UUID().uuidString
                 }
@@ -317,7 +316,7 @@ struct PasskeyRegistrationView: View {
                         buffer: attachment.data,
                         name: attachment.name
                     )
-                    attachmentMetadata.append(["id": fileId, "name": attachment.name])
+                    attachmentMetadata.append(AttachmentMetadata(id: fileId, name: attachment.name))
                 }
 
                 // 3. Save or update record

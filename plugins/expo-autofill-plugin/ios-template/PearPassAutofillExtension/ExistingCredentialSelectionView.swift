@@ -10,27 +10,26 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 struct ExistingCredentialSelectionView: View {
-    let matchingRecords: [[String: Any]]
+    let matchingRecords: [VaultRecord]
     let rpId: String
     let userName: String
-    let onSelectRecord: ([String: Any]) -> Void
+    let onSelectRecord: (VaultRecord) -> Void
     let onCreateNew: () -> Void
     let onCancel: () -> Void
 
     @State private var showReplaceAlert = false
-    @State private var recordToReplace: [String: Any]?
+    @State private var recordToReplace: VaultRecord?
     @State private var searchText = ""
 
-    private var filteredRecords: [[String: Any]] {
+    private var filteredRecords: [VaultRecord] {
         if searchText.trimmingCharacters(in: .whitespaces).isEmpty {
             return matchingRecords
         }
         let query = searchText.trimmingCharacters(in: .whitespaces)
         return matchingRecords.filter { record in
-            let data = record["data"] as? [String: Any] ?? [:]
-            let title = data["title"] as? String ?? ""
-            let username = data["username"] as? String ?? ""
-            let websites = data["websites"] as? [String] ?? []
+            let title = record.data?.title ?? ""
+            let username = record.data?.username ?? ""
+            let websites = record.data?.websites ?? []
             return title.localizedCaseInsensitiveContains(query)
                 || username.localizedCaseInsensitiveContains(query)
                 || websites.contains { $0.localizedCaseInsensitiveContains(query) }
@@ -149,11 +148,10 @@ struct ExistingCredentialSelectionView: View {
         }
     }
 
-    private func credentialRow(record: [String: Any]) -> some View {
-        let data = record["data"] as? [String: Any] ?? [:]
-        let title = data["title"] as? String ?? NSLocalizedString("Untitled", comment: "Untitled record")
-        let username = data["username"] as? String ?? ""
-        let hasPasskey = data["credential"] is [String: Any]
+    private func credentialRow(record: VaultRecord) -> some View {
+        let title = record.data?.title ?? NSLocalizedString("Untitled", comment: "Untitled record")
+        let username = record.data?.username ?? ""
+        let hasPasskey = record.data?.credential != nil
 
         return Button(action: {
             if hasPasskey {

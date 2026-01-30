@@ -14,7 +14,7 @@ struct CredentialsListView: View {
     var onPasskeySelected: ((PasskeyCredential) -> Void)? = nil
 
     @State private var credentials: [Credential] = []
-    @State private var passkeyRecords: [[String: Any]] = []
+    @State private var passkeyRecords: [VaultRecord] = []
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     @State private var hasUserSearched: Bool = false
@@ -44,16 +44,15 @@ struct CredentialsListView: View {
         return filtered
     }
 
-    var filteredPasskeys: [[String: Any]] {
+    var filteredPasskeys: [VaultRecord] {
         var filtered = passkeyRecords
 
         // If user is searching, filter passkeys by search text
         if !viewModel.searchText.isEmpty {
             filtered = passkeyRecords.filter { record in
-                let data = record["data"] as? [String: Any] ?? record
-                let userName = data["username"] as? String ?? ""
-                let title = data["title"] as? String ?? ""
-                let websites = data["websites"] as? [String] ?? []
+                let userName = record.data?.username ?? ""
+                let title = record.data?.title ?? ""
+                let websites = record.data?.websites ?? []
                 let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
 
                 return userName.localizedCaseInsensitiveContains(viewModel.searchText) ||
@@ -63,8 +62,7 @@ struct CredentialsListView: View {
         } else if let filterRpId = passkeyRpId, !filterRpId.isEmpty, !hasUserSearched {
             // Filter by RP ID if provided and user hasn't searched
             let matchingPasskeys = passkeyRecords.filter { record in
-                let data = record["data"] as? [String: Any] ?? record
-                let websites = data["websites"] as? [String] ?? []
+                let websites = record.data?.websites ?? []
                 let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
 
                 return rpId == filterRpId ||
@@ -270,7 +268,7 @@ struct CredentialsListView: View {
 
         Task {
             do {
-                var records: [[String: Any]] = []
+                var records: [VaultRecord] = []
 
                 // First, try to fetch records directly (works if vault is already active)
                 do {
@@ -327,58 +325,36 @@ struct CredentialsListView: View {
 
     /// Parse records into passwords and passkeys based on their structure
     /// Passkeys have a `credential` field with `_privateKeyBuffer`, passwords have `username`/`password`
-    private func parseAllRecords(_ records: [[String: Any]]) -> (passwords: [Credential], passkeys: [[String: Any]]) {
+    private func parseAllRecords(_ records: [VaultRecord]) -> (passwords: [Credential], passkeys: [VaultRecord]) {
         var passwords: [Credential] = []
-        var passkeys: [[String: Any]] = []
+        var passkeys: [VaultRecord] = []
 
         for record in records {
+            guard let recordData = record.data else { continue }
 
-            guard let id = record["id"] as? String else {
-                continue
+            // Check if this is a passkey (has a valid credential with private key)
+            if recordData.credential != nil {
+                let websites = recordData.websites
+                let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
+                let userName = recordData.username
+                print("CredentialsListView: Detected passkey for rpId: \(rpId), userName: \(userName)")
+                passkeys.append(record)
+                // Don't continue - also parse as password credential if it has username/password
             }
 
-            // Check if there's a data field wrapper
-            let recordData: [String: Any]
-            if let data = record["data"] as? [String: Any] {
-                recordData = data
-            } else {
-                recordData = record
-            }
-
-            // Check if this is a passkey (has credential field with _privateKeyBuffer)
-            let credentialValue = recordData["credential"]
-            print("CredentialsListView: Checking for passkey - credential field exists: \(credentialValue != nil), type: \(type(of: credentialValue))")
-
-            if let credentialDict = recordData["credential"] as? [String: Any] {
-                let hasPrivateKeyBuffer = credentialDict["_privateKeyBuffer"] != nil
-                print("CredentialsListView: credential cast succeeded, _privateKeyBuffer exists: \(hasPrivateKeyBuffer), keys: \(credentialDict.keys)")
-
-                if hasPrivateKeyBuffer {
-                    let websites = recordData["websites"] as? [String] ?? []
-                    let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
-                    let userName = recordData["username"] as? String ?? ""
-                    print("CredentialsListView: Detected passkey for rpId: \(rpId), userName: \(userName)")
-                    passkeys.append(record)
-                    // Don't continue - also parse as password credential if it has username/password
-                }
-            } else {
-                print("CredentialsListView: credential field cast to [String: Any] failed")
-            }
-
-            // Otherwise, parse as a password credential
-            let name = recordData["title"] as? String ?? recordData["name"] as? String ?? "Unknown"
-            let username = recordData["username"] as? String ?? recordData["email"] as? String ?? ""
-            let password = recordData["password"] as? String ?? ""
-            let websites = recordData["websites"] as? [String] ?? []
+            // Also parse as a password credential
+            let name = recordData.title.isEmpty ? "Unknown" : recordData.title
+            let username = recordData.username
+            let password = recordData.password
+            let websites = recordData.websites
 
             // Skip records that don't have password data (could be other types)
             guard !username.isEmpty || !password.isEmpty else {
                 continue
             }
 
-
             passwords.append(Credential(
-                id: id,
+                id: record.id,
                 name: name,
                 username: username,
                 password: password,
@@ -395,15 +371,9 @@ struct CredentialsListView: View {
         onComplete(credential.username, credential.password)
     }
 
-    private func handlePasskeySelection(_ record: [String: Any]) {
-        let data = record["data"] as? [String: Any] ?? record
-        let userName = data["username"] as? String ?? ""
-        let websites = data["websites"] as? [String] ?? []
-        let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
-
-        // Extract the credential from the record and pass to callback
-        guard let credentialDict = data["credential"] as? [String: Any],
-              let credential = PasskeyCredential.fromDictionary(credentialDict) else {
+    private func handlePasskeySelection(_ record: VaultRecord) {
+        guard let recordData = record.data,
+              let credential = recordData.credential else {
             return
         }
         onPasskeySelected?(credential)
@@ -413,13 +383,12 @@ struct CredentialsListView: View {
 // MARK: - Passkey Record Row
 
 struct PasskeyRecordRow: View {
-    let record: [String: Any]
+    let record: VaultRecord
     let action: () -> Void
 
     private var displayData: (title: String, userName: String) {
-        let data = record["data"] as? [String: Any] ?? record
-        let userName = data["username"] as? String ?? ""
-        let title = data["title"] as? String ?? ""
+        let userName = record.data?.username ?? ""
+        let title = record.data?.title ?? ""
         return (title, userName)
     }
 

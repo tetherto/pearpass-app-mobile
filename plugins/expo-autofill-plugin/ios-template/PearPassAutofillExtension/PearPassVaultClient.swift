@@ -559,34 +559,33 @@ import Foundation
     
     
     /// Lists all records in the active vault
-    func activeVaultList(filterKey: String? = nil) async throws -> [[String: Any]] {
+    func activeVaultList(filterKey: String? = nil) async throws -> [VaultRecord] {
         let filter = filterKey ?? "record/"
         log("Listing active vault records with filter: \(filter)")
-        
+
         let result = try await sendRequest(
             command: API.ACTIVE_VAULT_LIST.rawValue,
             data: ["filterKey": filter]
         )
-        
-        // Parse the response similar to vaultsList
+
+        var rawRecords: [[String: Any]] = []
+
         if let resultDict = result, let arrayWrapper = resultDict["array"] as? [[String: Any]] {
-            log("Found \(arrayWrapper.count) records in active vault")
-            return arrayWrapper
+            rawRecords = arrayWrapper
         } else if let resultDict = result, let data = resultDict["data"] as? [[String: Any]] {
-            log("Found \(data.count) records in active vault")
-            return data
+            rawRecords = data
         } else if let directArray = result as? [[String: Any]] {
-            log("Found \(directArray.count) records in active vault")
-            return directArray
+            rawRecords = directArray
         }
-        
-        log("No records found in active vault")
-        return []
+
+        let records = rawRecords.compactMap { VaultRecord(from: $0) }
+        log("Found \(records.count) records in active vault")
+        return records
     }
     
     /// Initialize active vault and fetch records for a specific vault
     /// This follows the RN app pattern for getting vault records
-    func initializeVaultAndFetchRecords(vault: Vault) async throws -> [[String: Any]] {
+    func initializeVaultAndFetchRecords(vault: Vault) async throws -> [VaultRecord] {
         log("Initializing vault \(vault.name) and fetching records")
         
         // Step 1: Get the vault's encryption key
@@ -1202,23 +1201,17 @@ import Foundation
 
     /// Search for login records matching an rpId and username
     /// Mirrors web extension logic: returns records where username matches OR record has no username
-    func searchLoginRecords(rpId: String, username: String) async throws -> [[String: Any]] {
+    func searchLoginRecords(rpId: String, username: String) async throws -> [VaultRecord] {
         log("Searching login records for rpId: \(rpId), username: \(username)")
 
         let allRecords = try await activeVaultList(filterKey: "record/")
-        var matches: [[String: Any]] = []
+        var matches: [VaultRecord] = []
 
         for record in allRecords {
-            // Only consider login-type records
-            guard let recordType = record["type"] as? String, recordType == "login" else {
-                continue
-            }
-            // Must have a data field (folder records don't)
-            guard let data = record["data"] as? [String: Any] else {
-                continue
-            }
+            guard record.type == "login" else { continue }
+            guard let data = record.data else { continue }
 
-            let recordUsername = (data["username"] as? String ?? "").trimmingCharacters(in: .whitespaces)
+            let recordUsername = data.username.trimmingCharacters(in: .whitespaces)
             let passkeyUsername = username.trimmingCharacters(in: .whitespaces)
 
             let usernameMatches = !passkeyUsername.isEmpty && !recordUsername.isEmpty && passkeyUsername == recordUsername
@@ -1234,16 +1227,12 @@ import Foundation
     }
 
     /// List all login records in the active vault
-    func listAllLoginRecords() async throws -> [[String: Any]] {
+    func listAllLoginRecords() async throws -> [VaultRecord] {
         log("Listing all login records")
 
         let allRecords = try await activeVaultList(filterKey: "record/")
         let loginRecords = allRecords.filter { record in
-            guard let recordType = record["type"] as? String, recordType == "login" else {
-                return false
-            }
-            // Must have data field (not a folder record)
-            return record["data"] is [String: Any]
+            record.type == "login" && record.data != nil
         }
 
         log("Found \(loginRecords.count) login records")
@@ -1269,14 +1258,10 @@ import Foundation
         var folderNames: [String] = []
 
         for (index, record) in allRecords.enumerated() {
-            let keys = Array(record.keys).sorted()
-            let hasData = record["data"] is [String: Any]
-            let folderValue = record["folder"]
-            let recordType = record["type"] as? String ?? "no-type"
-            NSLog("[PearPassVaultClient] listFolders: record[\(index)] type=\(recordType) keys=\(keys) folder=\(String(describing: folderValue)) hasData=\(hasData)")
+            NSLog("[PearPassVaultClient] listFolders: record[\(index)] type=\(record.type) folder=\(String(describing: record.folder)) hasData=\(record.data != nil)")
 
-            if let folderName = record["folder"] as? String,
-               !hasData,
+            if let folderName = record.folder,
+               record.data == nil,
                !folderName.isEmpty {
                 folderNames.append(folderName)
                 NSLog("[PearPassVaultClient] listFolders: matched folder '\(folderName)'")
@@ -1299,7 +1284,7 @@ import Foundation
     ///   - websites: User-edited websites (already normalized with https://)
     ///   - note: User-edited comment/note
     ///   - folder: Selected folder name (nil for no folder)
-    ///   - attachmentMetadata: Array of {id, name} for files already saved via activeVaultAddFile
+    ///   - attachmentMetadata: Array of AttachmentMetadata for files already saved via activeVaultAddFile
     ///   - passkeyCreatedAt: Timestamp in milliseconds when passkey was created
     /// - Returns: The record ID of the saved passkey
     func savePasskey(
@@ -1310,7 +1295,7 @@ import Foundation
         websites: [String],
         note: String = "",
         folder: String? = nil,
-        attachmentMetadata: [[String: String]] = [],
+        attachmentMetadata: [AttachmentMetadata] = [],
         passkeyCreatedAt: Int64? = nil,
         recordId: String? = nil
     ) async throws -> String {
@@ -1328,40 +1313,36 @@ import Foundation
             return "https://\(lower)"
         }
 
-        // Build record matching main app's validateAndPrepareRecord structure
-        var recordData: [String: Any] = [
-            "id": recordId,
-            "version": 1,
-            "type": "login",
-            "vaultId": vaultId,
-            "data": [
-                "title": title,
-                "username": userName,
-                "password": "",
-                "passwordUpdatedAt": now,
-                "passkeyCreatedAt": passkeyCreatedAt ?? now,
-                "credential": credential.toDictionary(),
-                "note": note,
-                "websites": formattedWebsites,
-                "customFields": [] as [Any],
-                "attachments": attachmentMetadata.isEmpty ? [] as [Any] : attachmentMetadata
-            ] as [String: Any],
-            "isFavorite": false,
-            "createdAt": now,
-            "updatedAt": now
-        ]
+        // Build record using typed models
+        let data = RecordData(
+            title: title,
+            username: userName,
+            password: "",
+            passwordUpdatedAt: now,
+            passkeyCreatedAt: passkeyCreatedAt ?? now,
+            credential: credential,
+            note: note,
+            websites: formattedWebsites,
+            customFields: [],
+            attachments: attachmentMetadata
+        )
 
-        // Handle folder: null for no folder, string for folder name
-        if let folderName = folder {
-            recordData["folder"] = folderName
-        } else {
-            recordData["folder"] = NSNull()
-        }
+        let record = VaultRecord(
+            id: recordId,
+            version: 1,
+            type: "login",
+            vaultId: vaultId,
+            data: data,
+            isFavorite: false,
+            createdAt: now,
+            updatedAt: now,
+            folder: folder
+        )
 
         let key = "record/\(recordId)"
         _ = try await sendRequest(
             command: API.ACTIVE_VAULT_ADD.rawValue,
-            data: ["key": key, "data": recordData]
+            data: ["key": key, "data": record.toDictionary()]
         )
 
         log("Passkey saved with ID: \(recordId)")
@@ -1371,24 +1352,21 @@ import Foundation
     /// Update an existing record to add a passkey credential
     /// Preserves existing record data while merging in passkey and form edits
     func updateRecordWithPasskey(
-        existingRecord: [String: Any],
+        existingRecord: VaultRecord,
         credential: PasskeyCredential,
         title: String,
         userName: String,
         websites: [String],
         note: String,
         folder: String?,
-        attachmentMetadata: [[String: String]],
+        attachmentMetadata: [AttachmentMetadata],
         passkeyCreatedAt: Int64
     ) async throws -> String {
-        guard let recordId = existingRecord["id"] as? String else {
-            throw PearPassVaultError.unknown("Existing record has no ID")
-        }
+        let recordId = existingRecord.id
 
         log("Updating existing record \(recordId) with passkey")
 
         let now = Int64(Date().timeIntervalSince1970 * 1000)
-        let existingData = existingRecord["data"] as? [String: Any] ?? [:]
 
         // Format websites
         let formattedWebsites = websites.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.map { website -> String in
@@ -1400,49 +1378,45 @@ import Foundation
         }
 
         // Merge existing attachments with new ones
-        let existingAttachments = existingData["attachments"] as? [[String: Any]] ?? []
-        var mergedAttachments: [Any] = existingAttachments
+        let existingAttachments = existingRecord.data?.attachments ?? []
+        var mergedAttachments = existingAttachments
         for meta in attachmentMetadata {
-            // Only add if not already present
-            let alreadyExists = existingAttachments.contains { ($0["id"] as? String) == meta["id"] }
+            let alreadyExists = existingAttachments.contains { $0.id == meta.id }
             if !alreadyExists {
                 mergedAttachments.append(meta)
             }
         }
 
-        // Build updated record, preserving existing fields
-        var updatedRecord: [String: Any] = [
-            "id": recordId,
-            "version": existingRecord["version"] as? Int ?? 1,
-            "type": "login",
-            "vaultId": existingRecord["vaultId"] as? String ?? "",
-            "data": [
-                "title": title,
-                "username": userName,
-                "password": existingData["password"] as? String ?? "",
-                "passwordUpdatedAt": existingData["passwordUpdatedAt"] as? Int64 ?? now,
-                "passkeyCreatedAt": passkeyCreatedAt,
-                "credential": credential.toDictionary(),
-                "note": note,
-                "websites": formattedWebsites,
-                "customFields": existingData["customFields"] as? [Any] ?? [],
-                "attachments": mergedAttachments
-            ] as [String: Any],
-            "isFavorite": existingRecord["isFavorite"] as? Bool ?? false,
-            "createdAt": existingRecord["createdAt"] as? Int64 ?? now,
-            "updatedAt": now
-        ]
+        // Build updated record using typed models
+        let updatedData = RecordData(
+            title: title,
+            username: userName,
+            password: existingRecord.data?.password ?? "",
+            passwordUpdatedAt: existingRecord.data?.passwordUpdatedAt ?? now,
+            passkeyCreatedAt: passkeyCreatedAt,
+            credential: credential,
+            note: note,
+            websites: formattedWebsites,
+            customFields: existingRecord.data?.customFields ?? [],
+            attachments: mergedAttachments
+        )
 
-        if let folderName = folder {
-            updatedRecord["folder"] = folderName
-        } else {
-            updatedRecord["folder"] = NSNull()
-        }
+        let updatedRecord = VaultRecord(
+            id: recordId,
+            version: existingRecord.version,
+            type: "login",
+            vaultId: existingRecord.vaultId,
+            data: updatedData,
+            isFavorite: existingRecord.isFavorite,
+            createdAt: existingRecord.createdAt,
+            updatedAt: now,
+            folder: folder
+        )
 
         let key = "record/\(recordId)"
         _ = try await sendRequest(
             command: API.ACTIVE_VAULT_ADD.rawValue,
-            data: ["key": key, "data": updatedRecord]
+            data: ["key": key, "data": updatedRecord.toDictionary()]
         )
 
         log("Record \(recordId) updated with passkey")
@@ -1486,30 +1460,17 @@ import Foundation
     func listPasskeys(rpId: String? = nil) async throws -> [PasskeyCredential] {
         log("Listing passkeys" + (rpId != nil ? " for RP: \(rpId!)" : ""))
 
-        // Get all records from active vault
         let records = try await activeVaultList(filterKey: "record/")
-
-        // Filter for passkey records and extract credentials
         var passkeys: [PasskeyCredential] = []
 
         for record in records {
-            // Get the data wrapper
-            let recordData = record["data"] as? [String: Any] ?? record
-
-            // Check for credential field with _privateKeyBuffer (browser extension format)
-            guard let credentialDict = recordData["credential"] as? [String: Any],
-                  credentialDict["_privateKeyBuffer"] != nil,
-                  let credential = PasskeyCredential.fromDictionary(credentialDict) else {
+            guard let recordData = record.data,
+                  let credential = recordData.credential else {
                 continue
             }
 
-            // Filter by RP ID if specified (using websites from parent record)
             if let filterRpId = rpId {
-                let websites = recordData["websites"] as? [String] ?? []
-
-                // Check if RP ID matches
-                let matches = websites.contains(where: { normalizedDomainMatch($0, filterRpId) })
-
+                let matches = recordData.websites.contains(where: { normalizedDomainMatch($0, filterRpId) })
                 if matches {
                     passkeys.append(credential)
                 }
