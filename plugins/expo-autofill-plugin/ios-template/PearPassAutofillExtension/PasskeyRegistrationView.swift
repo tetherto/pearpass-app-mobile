@@ -28,55 +28,89 @@ struct PasskeyRegistrationView: View {
     @State private var hasPasswordSet: Bool = false
     @State private var isLoggedIn: Bool = false
 
+    // Search results for existing credential matching
+    @State private var matchingRecords: [[String: Any]] = []
+    @State private var selectedExistingRecord: [String: Any]? = nil
+    @State private var loadedFolders: [String] = []
+
     enum RegistrationStep {
         case initializing
         case masterPassword
         case vaultSelection
         case vaultPassword
-        case confirming
+        case searchingCredentials
+        case selectingExisting
+        case editingForm
         case saving
     }
 
     var body: some View {
         ZStack {
-            SharedBackgroundView()
+            SimpleBackgroundView()
 
-            VStack(spacing: 0) {
-                switch currentStep {
-                case .initializing:
-                    loadingView
+            switch currentStep {
+            case .initializing:
+                loadingView
 
-                case .masterPassword:
-                    MasterPasswordView(
+            case .masterPassword:
+                MasterPasswordView(
+                    viewModel: viewModel,
+                    onCancel: onCancel,
+                    vaultClient: vaultClient,
+                    presentationWindow: presentationWindow
+                )
+
+            case .vaultSelection:
+                VaultSelectionView(
+                    viewModel: viewModel,
+                    onCancel: onCancel,
+                    vaultClient: vaultClient
+                )
+
+            case .vaultPassword:
+                if let vault = selectedVault {
+                    VaultPasswordView(
                         viewModel: viewModel,
-                        onCancel: onCancel,
-                        vaultClient: vaultClient,
-                        presentationWindow: presentationWindow
-                    )
-
-                case .vaultSelection:
-                    VaultSelectionView(
-                        viewModel: viewModel,
+                        vault: vault,
                         onCancel: onCancel,
                         vaultClient: vaultClient
                     )
-
-                case .vaultPassword:
-                    if let vault = selectedVault {
-                        VaultPasswordView(
-                            viewModel: viewModel,
-                            vault: vault,
-                            onCancel: onCancel,
-                            vaultClient: vaultClient
-                        )
-                    }
-
-                case .confirming:
-                    confirmationView
-
-                case .saving:
-                    savingView
                 }
+
+            case .searchingCredentials:
+                loadingView
+
+            case .selectingExisting:
+                ExistingCredentialSelectionView(
+                    matchingRecords: matchingRecords,
+                    rpId: request.rpId,
+                    userName: request.userName,
+                    onSelectRecord: { record in
+                        selectedExistingRecord = record
+                        currentStep = .editingForm
+                    },
+                    onCreateNew: {
+                        selectedExistingRecord = nil
+                        currentStep = .editingForm
+                    },
+                    onCancel: onCancel
+                )
+
+            case .editingForm:
+                PasskeyFormView(
+                    request: request,
+                    vaultClient: vaultClient,
+                    selectedVault: selectedVault,
+                    existingRecord: selectedExistingRecord,
+                    preloadedFolders: loadedFolders,
+                    onSave: { formData in
+                        handleFormSave(formData: formData)
+                    },
+                    onCancel: onCancel
+                )
+
+            case .saving:
+                savingView
             }
         }
         .animation(.easeInOut(duration: 0.3), value: currentStep)
@@ -99,140 +133,6 @@ struct PasskeyRegistrationView: View {
             Text(NSLocalizedString("Loading...", comment: "Loading indicator"))
                 .font(.system(size: 16))
                 .foregroundColor(.white.opacity(0.8))
-        }
-    }
-
-    private var confirmationView: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
-                CancelHeader {
-                    onCancel()
-                }
-
-                ScrollView {
-                    VStack(spacing: 32) {
-                        Spacer()
-                            .frame(height: 40)
-
-                        // Passkey icon
-                        ZStack {
-                            RoundedRectangle(cornerRadius: Constants.Layout.mediumCornerRadius)
-                                .fill(Constants.Colors.vaultIconBackground)
-                                .frame(width: 80, height: 80)
-
-                            Image(systemName: "person.badge.key.fill")
-                                .font(.system(size: 36))
-                                .foregroundColor(Constants.Colors.primaryGreen)
-                        }
-
-                        VStack(spacing: 8) {
-                            Text(NSLocalizedString("Create Passkey", comment: "Create passkey title"))
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.white)
-
-                            Text(String(format: NSLocalizedString("Save a passkey for %@", comment: "Save passkey description"), request.rpId))
-                                .font(.system(size: 14))
-                                .foregroundColor(.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                        }
-
-                        // User info card
-                        VStack(alignment: .leading, spacing: 16) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "person.fill")
-                                    .foregroundColor(Constants.Colors.primaryGreen)
-                                    .frame(width: 24)
-                                Text(request.userName)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-                            }
-
-                            HStack(spacing: 12) {
-                                Image(systemName: "globe")
-                                    .foregroundColor(Constants.Colors.primaryGreen)
-                                    .frame(width: 24)
-                                Text(request.rpId)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white.opacity(0.7))
-                            }
-
-                            if let vault = selectedVault {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "lock.shield.fill")
-                                        .foregroundColor(Constants.Colors.primaryGreen)
-                                        .frame(width: 24)
-                                    Text(String(format: NSLocalizedString("Saving to: %@", comment: "Saving to vault"), vault.name))
-                                        .font(.system(size: 16))
-                                        .foregroundColor(.white.opacity(0.7))
-                                }
-                            }
-                        }
-                        .padding(20)
-                        .background(
-                            RoundedRectangle(cornerRadius: Constants.Layout.mediumCornerRadius)
-                                .fill(Constants.Colors.credentialBackground)
-                        )
-
-                        // Error message
-                        if let error = error {
-                            Text(error)
-                                .font(.system(size: 14))
-                                .foregroundColor(.red)
-                                .multilineTextAlignment(.center)
-                        }
-
-                        Spacer()
-                            .frame(height: 20)
-
-                        // Actions
-                        VStack(spacing: 12) {
-                            Button(action: createPasskey) {
-                                if isLoading {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 12)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                                .fill(Constants.Colors.primaryGreen)
-                                        )
-                                } else {
-                                    HStack(spacing: 8) {
-                                        Image(systemName: "key.fill")
-                                        Text(NSLocalizedString("Save Passkey", comment: "Save passkey button"))
-                                    }
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(.black)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                            .fill(Constants.Colors.primaryGreen)
-                                    )
-                                }
-                            }
-                            .disabled(isLoading || selectedVault == nil)
-                            .opacity(isLoading || selectedVault == nil ? 0.6 : 1.0)
-
-                            Button(action: onCancel) {
-                                Text(NSLocalizedString("Cancel", comment: "Cancel button"))
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(Constants.Colors.primaryGreen)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                            .stroke(Constants.Colors.primaryGreen, lineWidth: 2)
-                                    )
-                            }
-                        }
-
-                        Spacer()
-                            .frame(height: 30)
-                    }
-                    .padding(.horizontal, Constants.Layout.horizontalPadding)
-                }
-            }
         }
     }
 
@@ -297,7 +197,7 @@ struct PasskeyRegistrationView: View {
                 if !passwordSet {
                     // Cannot create passkey without master password
                     self.error = NSLocalizedString("Please set up PearPass first", comment: "Setup required error")
-                    self.currentStep = .confirming
+                    self.currentStep = .editingForm
                 } else if !loggedIn {
                     self.viewModel.currentFlow = .masterPassword
                     self.currentStep = .masterPassword
@@ -309,7 +209,7 @@ struct PasskeyRegistrationView: View {
         } catch {
             await MainActor.run {
                 self.error = NSLocalizedString("Failed to check authentication status", comment: "Auth check error")
-                self.currentStep = .confirming
+                self.currentStep = .editingForm
             }
         }
     }
@@ -326,44 +226,140 @@ struct PasskeyRegistrationView: View {
             selectedVault = vault
             currentStep = .vaultPassword
         case .credentialsList(let vault):
-            // User has unlocked a vault, proceed to confirmation
+            // User has unlocked a vault — search for matching credentials
             selectedVault = vault
-            currentStep = .confirming
+            currentStep = .searchingCredentials
+            searchForExistingCredentials(vault: vault)
         default:
             break
         }
     }
 
-    // MARK: - Passkey Creation
+    // MARK: - Credential Search
 
-    private func createPasskey() {
-        guard let vault = selectedVault else {
-            error = NSLocalizedString("Please select a vault", comment: "Vault selection required error")
+    private func searchForExistingCredentials(vault: Vault) {
+        guard let client = vaultClient else {
+            currentStep = .editingForm
             return
         }
 
-        isLoading = true
-        error = nil
-        currentStep = .saving
-
         Task {
             do {
-                let credential = try await generateAndSavePasskey(vault: vault)
+                // Ensure vault is active
+                try await activateVaultIfNeeded(client: client, vault: vault)
+
+                let matches = try await client.searchLoginRecords(
+                    rpId: request.rpId,
+                    username: request.userName
+                )
+
+                // Preload folders while vault is active
+                let folders = try await client.listFolders()
+
                 await MainActor.run {
-                    isLoading = false
+                    self.loadedFolders = folders
+                    self.matchingRecords = matches
+                    if matches.isEmpty {
+                        // No matches — go directly to form
+                        self.selectedExistingRecord = nil
+                        self.currentStep = .editingForm
+                    } else {
+                        // Show selection screen
+                        self.currentStep = .selectingExisting
+                    }
                 }
             } catch {
                 await MainActor.run {
-                    self.error = error.localizedDescription
-                    self.isLoading = false
-                    self.currentStep = .confirming
+                    print("[PasskeyRegistrationView] Error searching credentials: \(error)")
+                    // On error, go directly to form
+                    self.selectedExistingRecord = nil
+                    self.currentStep = .editingForm
                 }
             }
         }
     }
 
-    private func generateAndSavePasskey(vault: Vault) async throws -> PasskeyCredential {
+    // MARK: - Form Save Handler
 
+    private func handleFormSave(formData: PasskeyFormData) {
+        guard let vault = selectedVault, let client = vaultClient else {
+            return
+        }
+
+        currentStep = .saving
+
+        Task {
+            do {
+                // 1. Generate passkey
+                let (credential, attestationObject, credentialIdData) = try generatePasskey()
+
+                // 2. Save file attachments first (matching main app order)
+                var attachmentMetadata: [[String: String]] = []
+                let recordId: String
+
+                if let existingRecord = formData.existingRecord,
+                   let existingId = existingRecord["id"] as? String {
+                    recordId = existingId
+                } else {
+                    recordId = UUID().uuidString
+                }
+
+                for attachment in formData.attachments {
+                    let fileId = attachment.id
+                    try await client.activeVaultAddFile(
+                        recordId: recordId,
+                        fileId: fileId,
+                        buffer: attachment.data,
+                        name: attachment.name
+                    )
+                    attachmentMetadata.append(["id": fileId, "name": attachment.name])
+                }
+
+                // 3. Save or update record
+                if let existingRecord = formData.existingRecord {
+                    // Update existing record with passkey
+                    _ = try await client.updateRecordWithPasskey(
+                        existingRecord: existingRecord,
+                        credential: credential,
+                        title: formData.title,
+                        userName: formData.username,
+                        websites: formData.websites,
+                        note: formData.note,
+                        folder: formData.folder,
+                        attachmentMetadata: attachmentMetadata,
+                        passkeyCreatedAt: formData.passkeyCreatedAt
+                    )
+                } else {
+                    // Create new record
+                    _ = try await client.savePasskey(
+                        vaultId: vault.id,
+                        credential: credential,
+                        title: formData.title,
+                        userName: formData.username,
+                        websites: formData.websites,
+                        note: formData.note,
+                        folder: formData.folder,
+                        attachmentMetadata: attachmentMetadata,
+                        passkeyCreatedAt: formData.passkeyCreatedAt
+                    )
+                }
+
+                // 4. Complete registration
+                await MainActor.run {
+                    onComplete(credential, attestationObject, credentialIdData)
+                }
+            } catch {
+                await MainActor.run {
+                    print("[PasskeyRegistrationView] Save error: \(error)")
+                    self.currentStep = .editingForm
+                }
+            }
+        }
+    }
+
+    // MARK: - Passkey Generation
+
+    private func generatePasskey() throws -> (PasskeyCredential, Data, Data) {
         // 1. Generate key pair
         let privateKey = PasskeyCrypto.generatePrivateKey()
         let privateKeyB64 = PasskeyCrypto.exportPrivateKey(privateKey)
@@ -372,10 +368,8 @@ struct PasskeyRegistrationView: View {
         }
         let publicKeyB64 = PasskeyCrypto.exportPublicKey(privateKey.publicKey)
 
-
         // 2. Generate credential ID
         let (credentialIdData, credentialIdB64) = PasskeyCrypto.generateCredentialId()
-
 
         // 3. Build authenticator data
         let authData = AuthenticatorDataBuilder.buildForRegistration(
@@ -384,12 +378,10 @@ struct PasskeyRegistrationView: View {
             publicKey: privateKey.publicKey
         )
 
-
         // 4. Build attestation object
         let attestationObject = AuthenticatorDataBuilder.encodeAttestationObject(authData: authData)
 
-
-        // 5. Build client data JSON (for storage reference)
+        // 5. Build client data JSON
         let clientDataJSON = AuthenticatorDataBuilder.buildClientDataJSONForRegistration(
             challenge: request.challenge,
             origin: "https://\(request.rpId)"
@@ -401,11 +393,11 @@ struct PasskeyRegistrationView: View {
             attestationObject: attestationObject.base64URLEncodedString(),
             authenticatorData: authData.base64URLEncodedString(),
             publicKey: publicKeyB64,
-            publicKeyAlgorithm: -7,  // ES256
+            publicKeyAlgorithm: -7,
             transports: ["internal"]
         )
 
-        // 7. Create the full credential (matches browser extension format - no rpId/userName in credential)
+        // 7. Create the full credential
         let credential = PasskeyCredential.create(
             credentialId: credentialIdB64,
             response: response,
@@ -413,53 +405,21 @@ struct PasskeyRegistrationView: View {
             userId: request.userId.base64URLEncodedString()
         )
 
-
-        // 8. Save to vault
-        if let client = vaultClient {
-            do {
-                // Ensure the vault is active before saving
-                // This follows the same pattern as CredentialsListView
-                try await activateVaultIfNeeded(client: client, vault: vault)
-
-                let recordId = try await client.savePasskey(
-                    vaultId: vault.id,
-                    credential: credential,
-                    name: request.rpName,
-                    userName: request.userName,
-                    websites: [request.rpId]
-                )
-                print("[PasskeyRegistrationView] Passkey saved successfully with recordId: \(recordId)")
-            } catch {
-                // Log the error for debugging but continue - the credential is generated
-                print("[PasskeyRegistrationView] ERROR saving passkey to vault: \(error.localizedDescription)")
-            }
-        }
-
-        // 9. Complete registration
-        await MainActor.run {
-            onComplete(credential, attestationObject, credentialIdData)
-        }
-
-        return credential
+        return (credential, attestationObject, credentialIdData)
     }
 
     /// Activates the vault if it's not already active
-    /// This follows the same pattern as CredentialsListView.loadAllCredentials()
     private func activateVaultIfNeeded(client: PearPassVaultClient, vault: Vault) async throws {
-        // Check if the active vault is already the one we need
         let activeStatus = try await client.activeVaultGetStatus()
         if activeStatus.isInitialized && !activeStatus.isLocked {
-            // We could check if it's the same vault, but for simplicity we'll re-initialize
+            return
         }
 
-        // Check if vault is protected (has its own password)
         let isProtected = try await client.checkVaultIsProtected(vaultId: vault.id)
 
         if isProtected {
-            // For protected vaults, use getVaultById which handles password-protected vaults
-            let vaultData = try await client.getVaultById(vaultId: vault.id)
+            let _ = try await client.getVaultById(vaultId: vault.id)
         } else {
-            // For unprotected vaults, use master encryption key
             let masterEncryptionData = try await client.vaultsGet(key: "masterEncryption")
             guard let hashedPassword = masterEncryptionData["hashedPassword"] as? String else {
                 throw PearPassVaultError.unknown("No hashed password available in master encryption")
