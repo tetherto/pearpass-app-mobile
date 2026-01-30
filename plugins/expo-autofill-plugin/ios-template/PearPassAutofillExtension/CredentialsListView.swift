@@ -8,15 +8,20 @@ struct CredentialsListView: View {
     let onCancel: () -> Void
     let onComplete: (String, String) -> Void
     let vaultClient: PearPassVaultClient?
-    
+
+    // Passkey support (iOS 17+)
+    var passkeyRpId: String? = nil
+    var onPasskeySelected: ((PasskeyCredential) -> Void)? = nil
+
     @State private var credentials: [Credential] = []
+    @State private var passkeyRecords: [VaultRecord] = []
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     @State private var hasUserSearched: Bool = false
-    
+
     var filteredCredentials: [Credential] {
         var filtered = credentials
-        
+
         // If user is searching, show all credentials that match the search
         if !viewModel.searchText.isEmpty {
             filtered = credentials.filter { credential in
@@ -28,314 +33,423 @@ struct CredentialsListView: View {
             let matchingCredentials = credentials.filter { credential in
                 matchesServiceIdentifiers(credential: credential)
             }
-            
+
             // If we have matching credentials, show only those; otherwise show all
             if !matchingCredentials.isEmpty {
                 filtered = matchingCredentials
             }
         }
         // If hasUserSearched is true and searchText is empty, show all credentials (no filtering)
-        
+
         return filtered
     }
-    
+
+    var filteredPasskeys: [VaultRecord] {
+        var filtered = passkeyRecords
+
+        // If user is searching, filter passkeys by search text
+        if !viewModel.searchText.isEmpty {
+            filtered = passkeyRecords.filter { record in
+                let userName = record.data?.username ?? ""
+                let title = record.data?.title ?? ""
+                let websites = record.data?.websites ?? []
+                let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
+
+                return userName.localizedCaseInsensitiveContains(viewModel.searchText) ||
+                       title.localizedCaseInsensitiveContains(viewModel.searchText) ||
+                       rpId.localizedCaseInsensitiveContains(viewModel.searchText)
+            }
+        } else if let filterRpId = passkeyRpId, !filterRpId.isEmpty, !hasUserSearched {
+            // Filter by RP ID if provided and user hasn't searched
+            let matchingPasskeys = passkeyRecords.filter { record in
+                let websites = record.data?.websites ?? []
+                let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
+
+                return rpId == filterRpId ||
+                       rpId.hasSuffix(".\(filterRpId)") ||
+                       filterRpId.hasSuffix(".\(rpId)")
+            }
+
+            if !matchingPasskeys.isEmpty {
+                filtered = matchingPasskeys
+            }
+        }
+
+        return filtered
+    }
+
+    var hasPasskeySupport: Bool {
+        onPasskeySelected != nil
+    }
+
     private func matchesServiceIdentifiers(credential: Credential) -> Bool {
         guard !credential.websites.isEmpty else { return false }
-        
+
         for identifier in serviceIdentifiers {
             let identifierDomain = extractDomain(from: identifier.identifier)
-            
+
             for website in credential.websites {
                 let websiteDomain = extractDomain(from: website)
-                
+
                 // Check if domains match (considering subdomains)
                 if domainsMatch(identifierDomain, websiteDomain) {
-                    print("CredentialsListView: Domain match found! Credential '\(credential.name)' website '\(websiteDomain)' matches identifier '\(identifierDomain)'")
                     return true
                 }
             }
         }
-        
+
         return false
     }
-    
+
     private func extractDomain(from urlString: String) -> String {
         var domain = urlString.lowercased()
-        
+
         // Remove protocol if present
         if domain.hasPrefix("https://") {
             domain = String(domain.dropFirst(8))
         } else if domain.hasPrefix("http://") {
             domain = String(domain.dropFirst(7))
         }
-        
+
         // Remove path and query parameters
         if let firstSlash = domain.firstIndex(of: "/") {
             domain = String(domain[..<firstSlash])
         }
-        
+
         // Remove port if present
         if let colon = domain.firstIndex(of: ":") {
             domain = String(domain[..<colon])
         }
-        
+
         // Remove www. prefix
         if domain.hasPrefix("www.") {
             domain = String(domain.dropFirst(4))
         }
-        
+
         return domain
     }
-    
+
     private func domainsMatch(_ domain1: String, _ domain2: String) -> Bool {
         // Exact match
         if domain1 == domain2 {
             return true
         }
-        
+
         // Check if one is a subdomain of the other
         if domain1.hasSuffix("." + domain2) || domain2.hasSuffix("." + domain1) {
             return true
         }
-        
+
         // Special case for common domains (e.g., google.com matches accounts.google.com)
         let domain1Parts = domain1.split(separator: ".")
         let domain2Parts = domain2.split(separator: ".")
-        
+
         if domain1Parts.count >= 2 && domain2Parts.count >= 2 {
             // Get the main domain (last two parts, e.g., "google.com")
             let mainDomain1 = domain1Parts.suffix(2).joined(separator: ".")
             let mainDomain2 = domain2Parts.suffix(2).joined(separator: ".")
-            
+
             if mainDomain1 == mainDomain2 {
                 return true
             }
         }
-        
+
         return false
     }
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 SimpleBackgroundView()
-                
+
                 VStack(spacing: 0) {
                     CancelHeader(onCancel: onCancel)
-                    
+
                     HStack(spacing: 12) {
                         ZStack {
                             RoundedRectangle(cornerRadius: Constants.Layout.mediumCornerRadius)
                                 .fill(Constants.Colors.vaultIconBackground)
                                 .frame(width: 56, height: 56)
-                            
+
                             Image("Logo")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 31, height: 42)
                         }
-                        
-                        SearchBar(text: $viewModel.searchText, credentialCount: filteredCredentials.count)
+
+                        SearchBar(text: $viewModel.searchText, credentialCount: hasPasskeySupport ? filteredPasskeys.count : filteredCredentials.count + filteredPasskeys.count)
                             .onChange(of: viewModel.searchText) { _ in
                                 // Once user starts typing, disable domain filtering permanently
                                 if !viewModel.searchText.isEmpty && !hasUserSearched {
                                     hasUserSearched = true
-                                    print("CredentialsListView: User started searching, domain filtering disabled permanently for this session")
                                 }
                             }
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
-                    
+
                     ScrollView {
                         LazyVStack(spacing: 1) {
-                            ForEach(filteredCredentials, id: \.id) { credential in
-                                CredentialRow(credential: credential) {
-                                    handleCredentialSelection(credential)
+                            // Passkeys section (if available)
+                            if hasPasskeySupport && !filteredPasskeys.isEmpty {
+                                Section {
+                                    ForEach(Array(filteredPasskeys.enumerated()), id: \.offset) { _, record in
+                                        PasskeyRecordRow(record: record) {
+                                            handlePasskeySelection(record)
+                                        }
+                                    }
+                                } header: {
+                                    HStack {
+                                        Text("Passkeys")
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundColor(.gray)
+                                            .textCase(.uppercase)
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 16)
+                                    .padding(.bottom, 8)
+                                }
+                            }
+
+                            // Passwords section (hidden in passkey mode)
+                            if !hasPasskeySupport && !filteredCredentials.isEmpty {
+                                Section {
+                                    ForEach(filteredCredentials, id: \.id) { credential in
+                                        CredentialRow(credential: credential) {
+                                            handleCredentialSelection(credential)
+                                        }
+                                    }
+                                } header: {
+                                    if hasPasskeySupport && !filteredPasskeys.isEmpty {
+                                        HStack {
+                                            Text("Passwords")
+                                                .font(.system(size: 12, weight: .semibold))
+                                                .foregroundColor(.gray)
+                                                .textCase(.uppercase)
+                                            Spacer()
+                                        }
+                                        .padding(.horizontal, 16)
+                                        .padding(.top, 16)
+                                        .padding(.bottom, 8)
+                                    }
                                 }
                             }
                         }
-                        .padding(.top, 16)
+                        .padding(.top, hasPasskeySupport && !filteredPasskeys.isEmpty ? 0 : 16)
                     }
-                    
+
                     Spacer(minLength: 0)
                 }
             }
         }
         .onAppear {
-            loadCredentials()
+            loadAllCredentials()
         }
     }
-    
+
     // MARK: - Private Methods
-    
-    private func loadCredentials() {
-        print("CredentialsListView: Loading credentials for vault \(vault.name)")
-        
+
+    /// Load all credentials (passwords and passkeys) from a single API call
+    private func loadAllCredentials() {
+
         // Print the domain we're looking for credentials for
         if !serviceIdentifiers.isEmpty {
-            print("CredentialsListView: Looking for credentials for domains:")
             for identifier in serviceIdentifiers {
-                print("  - \(identifier.identifier) (Type: \(identifier.type == .domain ? "Domain" : identifier.type == .URL ? "URL" : "Unknown"))")
             }
         }
-        
+
         guard let client = vaultClient else {
-            print("CredentialsListView: No vault client available, cannot load credentials")
             return
         }
-        
-        loadCredentialsFromActiveVault()
-    }
-    
-    
-    private func loadCredentialsFromActiveVault() {
-        guard let client = vaultClient else {
-            print("CredentialsListView: No vault client available")
-            return
-        }
-        
-        print("CredentialsListView: Loading records from vault \(vault.name) (ID: \(vault.id))")
+
         isLoading = true
         errorMessage = nil
-        
+
         Task {
             do {
-                // First, try to fetch records directly (works if vault is already active from VaultPasswordView)
+                var records: [VaultRecord] = []
+
+                // First, try to fetch records directly (works if vault is already active)
                 do {
-                    print("CredentialsListView: Attempting to fetch records from active vault")
-                    let records = try await client.activeVaultList(filterKey: "record/")
-                    print("CredentialsListView: Received \(records.count) records from active vault")
-                    
-                    // If we got records, parse them
-                    let parsedCredentials = try await parseCredentials(records)
-                    
-                    await MainActor.run {
-                        self.credentials = parsedCredentials
-                        self.isLoading = false
-                        print("CredentialsListView: Loaded \(parsedCredentials.count) credentials from active vault")
-                    }
-                    return
-                    
+                    records = try await client.activeVaultList(filterKey: "record/")
                 } catch {
-                    print("CredentialsListView: Failed to fetch from active vault directly: \(error.localizedDescription)")
-                    print("CredentialsListView: Vault might not be active yet, attempting to activate...")
-                }
-                
-                // If direct fetch failed, the vault is not active yet
-                // Check if this is an unprotected vault (no encryption) or protected vault
-                let isProtected = try await client.checkVaultIsProtected(vaultId: vault.id)
-                print("CredentialsListView: Vault \(vault.name) is protected: \(isProtected)")
 
-                if isProtected {
-                    // Protected vault - use getVaultById with master encryption
-                    let vaultData = try await client.getVaultById(vaultId: vault.id)
-                    print("CredentialsListView: Successfully activated protected vault \(vault.name): \(vaultData)")
-                } else {
-                    // Unprotected vault - activate directly with master vault key
-                    print("CredentialsListView: Activating unprotected vault \(vault.name)")
+                    // Activate the vault first
+                    let isProtected = try await client.checkVaultIsProtected(vaultId: vault.id)
 
-                    // Get the master encryption key that was used to decrypt the vault storage
-                    let masterEncryptionData = try await client.vaultsGet(key: "masterEncryption")
-                    guard let hashedPassword = masterEncryptionData["hashedPassword"] as? String else {
-                        throw PearPassVaultError.unknown("No hashed password available in master encryption")
+                    if isProtected {
+                        let vaultData = try await client.getVaultById(vaultId: vault.id)
+                    } else {
+                        let masterEncryptionData = try await client.vaultsGet(key: "masterEncryption")
+                        guard let hashedPassword = masterEncryptionData["hashedPassword"] as? String else {
+                            throw PearPassVaultError.unknown("No hashed password available in master encryption")
+                        }
+
+                        let decryptedKeyResult = try await client.decryptVaultKey(
+                            ciphertext: masterEncryptionData["ciphertext"] as? String ?? "",
+                            nonce: masterEncryptionData["nonce"] as? String ?? "",
+                            hashedPassword: hashedPassword
+                        )
+
+                        guard let encryptionKey = decryptedKeyResult?["value"] as? String ??
+                                                 decryptedKeyResult?["key"] as? String ??
+                                                 decryptedKeyResult?["data"] as? String else {
+                            throw PearPassVaultError.decryptionFailed
+                        }
+
+                        _ = try await client.activeVaultInit(id: vault.id, encryptionKey: encryptionKey)
                     }
 
-                    // For unprotected vaults, we can use the master vault's decrypted key directly
-                    let decryptedKeyResult = try await client.decryptVaultKey(
-                        ciphertext: masterEncryptionData["ciphertext"] as? String ?? "",
-                        nonce: masterEncryptionData["nonce"] as? String ?? "",
-                        hashedPassword: hashedPassword
-                    )
-
-                    guard let encryptionKey = decryptedKeyResult?["value"] as? String ??
-                                             decryptedKeyResult?["key"] as? String ??
-                                             decryptedKeyResult?["data"] as? String else {
-                        throw PearPassVaultError.decryptionFailed
-                    }
-
-                    // Initialize the active vault with the decrypted key
-                    _ = try await client.activeVaultInit(id: vault.id, encryptionKey: encryptionKey)
-                    print("CredentialsListView: Successfully activated unprotected vault \(vault.name)")
+                    // Now fetch records from the newly active vault
+                    records = try await client.activeVaultList(filterKey: "record/")
                 }
 
-                // Now fetch records from the newly active vault
-                let records = try await client.activeVaultList(filterKey: "record/")
-                print("CredentialsListView: Received \(records.count) records from newly activated vault")
-                
-                let parsedCredentials = try await parseCredentials(records)
-                
+                // Parse all records into passwords and passkeys
+                let (parsedCredentials, parsedPasskeys) = parseAllRecords(records)
+
                 await MainActor.run {
                     self.credentials = parsedCredentials
+                    self.passkeyRecords = parsedPasskeys
                     self.isLoading = false
-                    print("CredentialsListView: Loaded \(parsedCredentials.count) credentials from activated vault")
                 }
-                
+
             } catch {
                 await MainActor.run {
                     self.isLoading = false
                     self.errorMessage = error.localizedDescription
-                    print("CredentialsListView: Error loading from vault: \(error.localizedDescription)")
                 }
             }
         }
     }
-    
-    private func parseCredentials(_ records: [[String: Any]]) async throws -> [Credential] {
-        return records.compactMap { record -> Credential? in
-            print("CredentialsListView: Processing record: \(record)")
-            
-            guard let id = record["id"] as? String else {
-                print("CredentialsListView: Skipping record with missing id: \(record)")
-                return nil
+
+    /// Parse records into passwords and passkeys based on their structure
+    /// Passkeys have a `credential` field with `_privateKeyBuffer`, passwords have `username`/`password`
+    private func parseAllRecords(_ records: [VaultRecord]) -> (passwords: [Credential], passkeys: [VaultRecord]) {
+        var passwords: [Credential] = []
+        var passkeys: [VaultRecord] = []
+
+        for record in records {
+            guard let recordData = record.data else { continue }
+
+            // Check if this is a passkey (has a valid credential with private key)
+            if recordData.credential != nil {
+                let websites = recordData.websites
+                let rpId = websites.first.flatMap { extractDomain(from: $0) } ?? ""
+                let userName = recordData.username
+                print("CredentialsListView: Detected passkey for rpId: \(rpId), userName: \(userName)")
+                passkeys.append(record)
+                // Don't continue - also parse as password credential if it has username/password
             }
-            
-            // Check if there's a data field (like in RN logs)
-            var recordData: [String: Any] = [:]
-            if let data = record["data"] as? [String: Any] {
-                recordData = data
-            } else {
-                recordData = record
+
+            // Also parse as a password credential
+            let name = recordData.title.isEmpty ? "Unknown" : recordData.title
+            let username = recordData.username
+            let password = recordData.password
+            let websites = recordData.websites
+
+            // Skip records that don't have password data (could be other types)
+            guard !username.isEmpty || !password.isEmpty else {
+                continue
             }
-            
-            let name = recordData["title"] as? String ?? recordData["name"] as? String ?? "Unknown"
-            let username = recordData["username"] as? String ?? recordData["email"] as? String ?? ""
-            let password = recordData["password"] as? String ?? ""
-            let websites = recordData["websites"] as? [String] ?? []
-            
-            print("CredentialsListView: Successfully parsed credential: \(name) (\(username)), password length: \(password.count), websites: \(websites)")
-            
-            return Credential(
-                id: id,
+
+            passwords.append(Credential(
+                id: record.id,
                 name: name,
                 username: username,
                 password: password,
                 websites: websites
-            )
+            ))
+        }
+
+        return (passwords, passkeys)
+    }
+
+    // MARK: - Credential Selection
+
+    private func handleCredentialSelection(_ credential: Credential) {
+        onComplete(credential.username, credential.password)
+    }
+
+    private func handlePasskeySelection(_ record: VaultRecord) {
+        guard let recordData = record.data,
+              let credential = recordData.credential else {
+            return
+        }
+        onPasskeySelected?(credential)
+    }
+}
+
+// MARK: - Passkey Record Row
+
+struct PasskeyRecordRow: View {
+    let record: VaultRecord
+    let action: () -> Void
+
+    private var displayData: (title: String, userName: String) {
+        let userName = record.data?.username ?? ""
+        let title = record.data?.title ?? ""
+        return (title, userName)
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: Constants.Layout.mediumCornerRadius)
+                        .fill(Constants.Colors.credentialBackground)
+                        .frame(width: 45, height: 45)
+
+                    Text(getInitials())
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(Constants.Colors.primaryGreen)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(displayData.title.isEmpty ? "Passkey" : displayData.title)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white)
+
+                    Text(displayData.userName)
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.clear)
         }
     }
-    
-    // MARK: - Credential Selection
-    
-    private func handleCredentialSelection(_ credential: Credential) {
-        print("CredentialsListView: Selected credential: \(credential.name) (\(credential.username)), password length: \(credential.password.count)")
-        onComplete(credential.username, credential.password)
+
+    private func getInitials() -> String {
+        let title = displayData.title
+        guard !title.isEmpty else { return "PK" }
+        let words = title.components(separatedBy: " ")
+        if words.count >= 2 {
+            let firstInitial = String(words[0].prefix(1)).uppercased()
+            let secondInitial = String(words[1].prefix(1)).uppercased()
+            return firstInitial + secondInitial
+        } else {
+            return String(title.prefix(2)).uppercased()
+        }
     }
 }
 
 struct SearchBar: View {
     @Binding var text: String
     let credentialCount: Int
-    
+
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-            
+
             TextField(NSLocalizedString("Search in all folders...", comment: "Search placeholder"), text: $text)
                 .textFieldStyle(PlainTextFieldStyle())
                 .foregroundColor(.white)
-            
+
             Text("\(credentialCount)")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.gray)
@@ -352,7 +466,7 @@ struct SearchBar: View {
 struct CredentialRow: View {
     let credential: Credential
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
@@ -360,22 +474,22 @@ struct CredentialRow: View {
                     RoundedRectangle(cornerRadius: Constants.Layout.mediumCornerRadius)
                         .fill(Constants.Colors.credentialBackground)
                         .frame(width: 45, height: 45)
-                    
+
                     Text(getInitials())
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(Constants.Colors.primaryGreen)
                 }
-                
+
                 VStack(alignment: .leading, spacing: 2) {
                     Text(credential.name)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.white)
-                    
+
                     Text(credential.username)
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
                 }
-                
+
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -383,7 +497,7 @@ struct CredentialRow: View {
             .background(Color.clear)
         }
     }
-    
+
     private func getInitials() -> String {
         let words = credential.name.components(separatedBy: " ")
         if words.count >= 2 {

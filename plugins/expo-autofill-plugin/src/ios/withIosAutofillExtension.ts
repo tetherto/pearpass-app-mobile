@@ -53,6 +53,22 @@ export const withIosAutofillExtension: ConfigPlugin<AutofillPluginOptions> = (co
     const extensionName = 'PearPassAutoFillExtension';
     const extensionFolder = 'PearPassAutofillExtension';
 
+    // Check if extension target already exists (idempotent for --no-install reruns)
+    const nativeTargets = project.pbxNativeTargetSection();
+    const existingTarget = Object.keys(nativeTargets).find((key) => {
+      if (key.endsWith('_comment')) return false;
+      const t = nativeTargets[key];
+      if (typeof t !== 'object' || t === null) return false;
+      // Name may be stored with or without quotes by the pbxproj parser
+      const name = (t.name || '').replace(/^"|"$/g, '');
+      return name === extensionName;
+    });
+
+    if (existingTarget) {
+      // Target already exists, skip adding it again
+      return cfg;
+    }
+
     // Get main app target's deployment target
     const mainTarget = project.getFirstTarget();
     let deploymentTarget = '15.1';
@@ -274,7 +290,7 @@ fi
     }
 
     // Add target dependency - main app depends on extension
-    const nativeTargets = project.pbxNativeTargetSection();
+    const allNativeTargets = project.pbxNativeTargetSection();
 
     // Ensure PBXTargetDependency section exists
     if (!hash['PBXTargetDependency']) {
@@ -313,11 +329,11 @@ fi
     hash['PBXTargetDependency'][`${dependencyUuid}_comment`] = 'PBXTargetDependency';
 
     // Add dependency to main target's dependencies array
-    if (nativeTargets[mainTarget.uuid]) {
-      if (!nativeTargets[mainTarget.uuid].dependencies) {
-        nativeTargets[mainTarget.uuid].dependencies = [];
+    if (allNativeTargets[mainTarget.uuid]) {
+      if (!allNativeTargets[mainTarget.uuid].dependencies) {
+        allNativeTargets[mainTarget.uuid].dependencies = [];
       }
-      nativeTargets[mainTarget.uuid].dependencies.push({
+      allNativeTargets[mainTarget.uuid].dependencies.push({
         value: dependencyUuid,
         comment: 'PBXTargetDependency'
       });
