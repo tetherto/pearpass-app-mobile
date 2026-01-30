@@ -1,15 +1,21 @@
 {
   "name": "e2e-mobile-tests",
-  "version": "1.2.1",
+  "version": "1.1.1",
   "description": "End-to-end mobile automation tests for PearPass (Android & iOS, BrowserStack & local)",
   "main": "index.js",
   "scripts": {
     "wdio": "wdio run ./wdio.conf.ts",
-    "e2e:android:bs": "cross-env PLATFORM=Android RUN_TARGET=bs ENABLE_QASE=true npm run wdio",
-    "e2e:ios:bs": "cross-env PLATFORM=iOS RUN_TARGET=bs ENABLE_QASE=true npm run wdio",
-    "e2e:android:local": "cross-env PLATFORM=Android RUN_TARGET=local_real_android ENABLE_QASE=false npm run wdio",
-    "e2e:ios:local": "cross-env PLATFORM=iOS RUN_TARGET=local_real_ios ENABLE_QASE=false npm run wdio",
-    "e2e:android:emulator": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false npm run wdio"
+    "e2e:android:bs": "cross-env PLATFORM=Android RUN_TARGET=bs ENABLE_QASE=true ENABLE_SLACK=true npm run wdio",
+    "e2e:ios:bs": "cross-env PLATFORM=iOS RUN_TARGET=bs ENABLE_QASE=true ENABLE_SLACK=true npm run wdio",
+    "e2e:android:local": "cross-env PLATFORM=Android RUN_TARGET=local_real_android ENABLE_QASE=false ENABLE_SLACK=true npm run wdio",
+    "e2e:ios:local": "cross-env PLATFORM=iOS RUN_TARGET=local_real_ios ENABLE_QASE=false ENABLE_SLACK=true npm run wdio",
+    "e2e:android:emulator": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio",
+    "test:signup": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio -- --suite signup && node slack-stats.js",
+    "test:onboarding": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio -- --suite onboarding && node slack-stats.js",
+    "test:sidebar": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio -- --suite sidebar && node slack-stats.js",
+    "test:sidebar-only": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio -- --suite sidebarOnly && node slack-stats.js",
+    "test:settings": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=false npm run wdio -- --suite settingsOnly && node slack-stats.js",
+    "test:all": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true PUSH_TEST_DATA=true npm run wdio -- --suite all && node slack-stats.js"
   },
   "keywords": [],
   "author": "",
@@ -25,12 +31,16 @@
     "@wdio/mocha-framework": "^9.21.0",
     "@wdio/spec-reporter": "^9.20.0",
     "appium-uiautomator2-driver": "^6.7.0",
+    "axios": "^1.6.0",
     "chai": "^6.2.1",
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",
     "expect-webdriverio": "^5.5.0",
+    "slack-ctrf": "^0.0.31",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "wdio-qase-reporter": "^1.1.4"
+    "wdio-ctrf-json-reporter": "^0.0.16",
+    "wdio-qase-reporter": "^1.1.4",
+    "wdio-slack-reporter": "^2.0.1"
   }
 }

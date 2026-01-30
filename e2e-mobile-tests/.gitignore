@@ -16,6 +16,9 @@ error-shots/
 allure-results/
 allure-report/
 
+# CTRF reports
+ctrf/
+
 # Environment files
 .env
 *.env.local
