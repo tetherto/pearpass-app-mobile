@@ -2,13 +2,17 @@ import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { AUTO_LOCK_TIMEOUT_OPTIONS } from 'pearpass-lib-constants'
-import { ArrowDownIcon } from 'pearpass-lib-ui-react-native-components'
+import {
+  ArrowDownIcon,
+  TooltipIcon
+} from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { BottomSheetAutoLockContent } from './BottomSheetContent'
 import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { BottomSheetAutoLockTooltip } from '../BottomSheetAutoLockTooltip'
 
 /**
  * @returns {JSX.Element}
@@ -30,6 +34,13 @@ export const AutoLockSettings = () => {
     collapse()
   }
 
+  const handleTooltipPress = () => {
+    expand({
+      children: <BottomSheetAutoLockTooltip />,
+      snapPoints: ['25%', '50%']
+    })
+  }
+
   const handleOpenSelector = () => {
     expand({
       children: (
@@ -44,7 +55,12 @@ export const AutoLockSettings = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.settingLabel}>{t`Auto Log-out`}</Text>
+      <View style={styles.labelRow}>
+        <Text style={styles.settingLabel}>{t`Auto Log-out`}</Text>
+        <Pressable onPress={handleTooltipPress}>
+          <TooltipIcon color={colors.white.mode1} />
+        </Pressable>
+      </View>
       <Text style={styles.description}>
         {t`Automatically logs you out after you stop interacting with the app, based on the timeout you select.`}
       </Text>
@@ -65,6 +81,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '300',
     marginTop: 5
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   settingLabel: {
     color: colors.white.mode1,

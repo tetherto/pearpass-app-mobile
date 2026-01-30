@@ -2,6 +2,7 @@ import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { View } from 'react-native'
 
 import { Button, ButtonText } from './styles'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
 /**
  * @param {{
@@ -20,10 +21,17 @@ export const ButtonCreate = ({
   textTestID
 }) => {
   const Icon = startIcon
+  const { hapticButtonPrimary } = useHapticFeedback()
+
+  const handlePress = () => {
+    hapticButtonPrimary()
+    onPress?.()
+  }
+
   return (
     <Button
       activeOpacity={0.8}
-      onPress={onPress}
+      onPress={handlePress}
       testID={testID}
       hasIcon={!!Icon}
     >

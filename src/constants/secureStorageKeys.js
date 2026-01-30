@@ -6,5 +6,6 @@ export const SECURE_STORAGE_KEYS = {
   ENCRYPTION_DATA: 'encryptionData',
   BIOMETRICS_ENABLED: 'biometricsEnabled',
   COPY_TO_CLIPBOARD: 'copyToClipboard',
-  ACCEPTED_TERMS: 'acceptedTerms'
+  ACCEPTED_TERMS: 'acceptedTerms',
+  HAPTICS_ENABLED: 'hapticsEnabled'
 }

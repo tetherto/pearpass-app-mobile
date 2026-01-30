@@ -57,7 +57,8 @@ public class PearPassVaultClient {
         MASTER_PASSWORD_CREATE(43),
         MASTER_PASSWORD_INIT_WITH_PASSWORD(44),
         MASTER_PASSWORD_UPDATE(45),
-        MASTER_PASSWORD_INIT_WITH_CREDENTIALS(46);
+        MASTER_PASSWORD_INIT_WITH_CREDENTIALS(46),
+        SET_CORE_STORE_OPTIONS(49);
 
         private final int value;
 
@@ -187,18 +188,24 @@ public class PearPassVaultClient {
             initializeWorklet();
             log("Worklet initialized successfully");
 
-            // Set the storage path asynchronously to avoid blocking the UI thread
-            setStoragePath(pathToUse).whenComplete((result, error) -> {
-                if (error != null) {
-                    logError("Failed to set storage path: " + error.getMessage());
-                    initializationError = new RuntimeException("Failed to set storage path", error);
-                    initializationFuture.completeExceptionally(initializationError);
-                } else {
-                    log("Vault client fully initialized");
-                    isFullyInitialized = true;
-                    initializationFuture.complete(null);
-                }
-            });
+            // Set the storage path and core store options asynchronously
+            setStoragePath(pathToUse)
+                .thenCompose(v -> {
+                    // Set readOnly mode for autofill extension to avoid file lock conflicts
+                    log("Setting core store options: readOnly=true");
+                    return setCoreStoreOptions(true);
+                })
+                .whenComplete((result, error) -> {
+                    if (error != null) {
+                        logError("Failed to initialize: " + error.getMessage());
+                        initializationError = new RuntimeException("Failed to initialize", error);
+                        initializationFuture.completeExceptionally(initializationError);
+                    } else {
+                        log("Vault client fully initialized with readOnly mode");
+                        isFullyInitialized = true;
+                        initializationFuture.complete(null);
+                    }
+                });
         } catch (Exception e) {
             logError("Failed to initialize: " + e.getMessage());
             initializationError = new RuntimeException("Failed to initialize", e);
@@ -244,8 +251,10 @@ public class PearPassVaultClient {
     private CompletableFuture<Map<String, Object>> sendRequest(int command, Map<String, Object> data) {
         CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
 
-        // Allow STORAGE_PATH_SET command during initialization
-        if (command != API.STORAGE_PATH_SET.getValue() && !isFullyInitialized) {
+        // Allow STORAGE_PATH_SET and SET_CORE_STORE_OPTIONS commands during initialization
+        if (command != API.STORAGE_PATH_SET.getValue() &&
+            command != API.SET_CORE_STORE_OPTIONS.getValue() &&
+            !isFullyInitialized) {
             future.completeExceptionally(new PearPassVaultException("Vault is not initialized"));
             return future;
         }
@@ -387,6 +396,16 @@ public class PearPassVaultClient {
     public CompletableFuture<Void> setStoragePath(String path) {
         return sendRequest(API.STORAGE_PATH_SET.getValue(), createMap("path", path))
                 .thenAccept(result -> log("Storage path set to: " + path));
+    }
+
+    // Core Store Options
+    public CompletableFuture<Void> setCoreStoreOptions(boolean readOnly) {
+        Map<String, Object> coreStoreOptions = new HashMap<>();
+        coreStoreOptions.put("readOnly", readOnly);
+        Map<String, Object> params = new HashMap<>();
+        params.put("coreStoreOptions", coreStoreOptions);
+        return sendRequest(API.SET_CORE_STORE_OPTIONS.getValue(), params)
+                .thenAccept(result -> log("Core store options set: readOnly=" + readOnly));
     }
 
     // Master Vault Methods

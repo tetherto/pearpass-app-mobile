@@ -126,6 +126,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
       folder: values.folder,
       isFavorite: initialRecord?.isFavorite,
       data: {
+        ...(initialRecord?.data ? initialRecord.data : {}),
         title: values.title,
         username: values.username,
         password: values.password,
