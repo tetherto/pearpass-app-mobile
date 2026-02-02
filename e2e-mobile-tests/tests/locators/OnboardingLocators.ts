@@ -1,78 +1,54 @@
 const onboardingLocators = {
-  /* ============================
+/* ============================
         HEADER
-  ============================ */
-  onboardingLogoAndroid: '~onboarding_logo',
-  onboardingLogoiOS: '~onboarding_logo',
-
-  /* ============================
+============================ */
+  onboardingLogo: '//android.view.ViewGroup[@resource-id="onboarding-logo"]',
+/* ============================
         PROGRESS BAR
-  ============================ */
-  onboardingProgressBarAndroid: '~onboarding_progress_bar',
-  onboardingProgressBariOS: '~onboarding_progress_bar',
-
-  /* ============================
+============================ */
+  onboardingProgressBar: '//android.view.ViewGroup[@resource-id="onboarding-progress-bar"]',
+/* ============================
         PROGRESS STEPS (0–5)
-  ============================ */
-  onboardingProgressStep0Android: '~onboarding_progress_step_0',
-  onboardingProgressStep0iOS: '~onboarding_progress_step_0',
-
-  onboardingProgressStep1Android: '~onboarding_progress_step_1',
-  onboardingProgressStep1iOS: '~onboarding_progress_step_1',
-
-  onboardingProgressStep2Android: '~onboarding_progress_step_2',
-  onboardingProgressStep2iOS: '~onboarding_progress_step_2',
-
-  onboardingProgressStep3Android: '~onboarding_progress_step_3',
-  onboardingProgressStep3iOS: '~onboarding_progress_step_3',
-
-  onboardingProgressStep4Android: '~onboarding_progress_step_4',
-  onboardingProgressStep4iOS: '~onboarding_progress_step_4',
-
-  onboardingProgressStep5Android: '~onboarding_progress_step_5',
-  onboardingProgressStep5iOS: '~onboarding_progress_step_5',
-
-  /* ============================
-        MAIN DESCRIPTION
-  ============================ */
-  onboardingMainDescriptionAndroid: '~onboarding_main_description',
-  onboardingMainDescriptioniOS: '~onboarding_main_description',
-
-  /* ============================
-        SUB DESCRIPTION
-  ============================ */
-  onboardingSubDescriptionAndroid: '~onboarding_sub_description',
-  onboardingSubDescriptioniOS: '~onboarding_sub_description',
-
-  /* ============================
+============================ */
+  onboardingProgressStep0: '//android.view.ViewGroup[@resource-id="onboarding-progress-step-0"]',
+  onboardingProgressStep1: '//android.view.ViewGroup[@resource-id="onboarding-progress-step-1"]',
+  onboardingProgressStep2: '//android.view.ViewGroup[@resource-id="onboarding-progress-step-2"]',
+  onboardingProgressStep3: '//android.view.ViewGroup[@resource-id="onboarding-progress-step-3"]',
+  onboardingProgressStep4: '//android.view.ViewGroup[@resource-id="onboarding-progress-step-4"]',
+  onboardingProgressStep5: '//android.view.ViewGroup[@resource-id="onboarding-progress-step-5"]',
+/* ============================
+        MAIN DESCRIPTION (per step)
+============================ */
+  onboardingMainDescription0: '//android.widget.TextView[@resource-id="onboarding-main-description-0"]',
+  onboardingMainDescription1: '//android.widget.TextView[@resource-id="onboarding-main-description-1"]',
+  onboardingMainDescription2: '//android.widget.TextView[@resource-id="onboarding-main-description-2"]',
+  onboardingMainDescription3: '//android.widget.TextView[@resource-id="onboarding-main-description-3"]',
+  onboardingMainDescription4: '//android.widget.TextView[@resource-id="onboarding-main-description-4"]',
+  onboardingMainDescription5: '//android.widget.TextView[@resource-id="onboarding-main-description-5"]',
+/* ============================
+        SUB DESCRIPTION (per step)
+============================ */
+  onboardingSubDescription1: '//android.widget.TextView[@resource-id="onboarding-sub-description-1"]',
+  onboardingSubDescription2: '//android.widget.TextView[@resource-id="onboarding-sub-description-2"]',
+  onboardingSubDescription3: '//android.widget.TextView[@resource-id="onboarding-sub-description-3"]',
+  onboardingSubDescription4: '//android.widget.TextView[@resource-id="onboarding-sub-description-4"]',
+  onboardingSubDescription5: '//android.widget.TextView[@resource-id="onboarding-sub-description-5"]',
+/* ============================
         MEDIA CONTENT FOR EACH STEP
-  ============================ */
-  onboardingMediaStep0Android: '~onboarding_media_step_0',
-  onboardingMediaStep0iOS: '~onboarding_media_step_0',
-
-  onboardingMediaStep1Android: '~onboarding_media_step_1',
-  onboardingMediaStep1iOS: '~onboarding_media_step_1',
-
-  onboardingMediaStep2Android: '~onboarding_media_step_2',
-  onboardingMediaStep2iOS: '~onboarding_media_step_2',
-
-  onboardingMediaStep3Android: '~onboarding_media_step_3',
-  onboardingMediaStep3iOS: '~onboarding_media_step_3',
-
-  onboardingMediaStep4Android: '~onboarding_media_step_4',
-  onboardingMediaStep4iOS: '~onboarding_media_step_4',
-
-  onboardingMediaStep5Android: '~onboarding_media_step_5',
-  onboardingMediaStep5iOS: '~onboarding_media_step_5',
-
-  /* ============================
+============================ */
+  onboardingMediaStep0: '//android.widget.FrameLayout[@resource-id="com.pears.pass:id/exo_subtitles"]/android.view.View',
+  onboardingMediaStep1: '//android.view.ViewGroup[@resource-id="onboarding-media-step-1"]',
+  onboardingMediaStep2: '//android.view.ViewGroup[@resource-id="onboarding-media-step-2"]',
+  onboardingMediaStep3: '//android.view.ViewGroup[@resource-id="onboarding-media-step-3"]',
+  onboardingMediaStep4: '//android.view.ViewGroup[@resource-id="onboarding-media-step-4"]',
+  onboardingMediaStep5: '//android.widget.ImageView[@resource-id="onboarding-media-step-5"]',
+/* ============================
         BUTTONS
-  ============================ */
-  onboardingContinueButtonAndroid: '~onboarding_continue_button',
-  onboardingContinueButtoniOS: '~onboarding_continue_button',
-
-  onboardingSkipButtonAndroid: '~onboarding_skip_button',
-  onboardingSkipButtoniOS: '~onboarding_skip_button',
+============================ */
+  onboardingContinueButton: '~Continue',
+  onboardingSkipButton: '~Skip',
+  onboardingContinueText: '//android.widget.TextView[@resource-id="onboarding-continue-text"]',
+  onboardingSkipText: '//android.widget.TextView[@resource-id="onboarding-skip-text"]',
 }
 
 export default onboardingLocators

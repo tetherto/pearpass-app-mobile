@@ -1,0 +1,4 @@
+name,url,additional_urls,username,password,note,cardholdername,cardnumber,cvc,pin,expirydate,zipcode,folder,full_name,phone_number,email,address1,address2,city,country,state,type,custom_fields
+Gmail.com,https://gmail.com,,alyaksey.bachila@gmail.com,nord_password,,,,,,,,,,,,,,,,,password,
+test,,,,,,,,,,,,,,,,,,,,,folder,
+Nordpass credit,,,,,,nordpass name,123456789012,444,555,10/26,777,test,,,,,,,,,credit_card,"[{""type"":""text"",""label"":""qwerty"",""value"":""""}]"
