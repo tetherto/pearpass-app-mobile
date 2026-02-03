@@ -16,7 +16,11 @@ export const PasswordChecker = ({ pass }) => {
 
   return (
     <PasswordWrapper>
-      <HighlightString text={pass} />
+      <HighlightString
+        text={pass}
+        testID="generate-password-popup-generated-password"
+        accessibilityLabel={t`Generated Password`}
+      />
       <NoticeText text={t(strengthText)} type={strengthType} />
     </PasswordWrapper>
   )
