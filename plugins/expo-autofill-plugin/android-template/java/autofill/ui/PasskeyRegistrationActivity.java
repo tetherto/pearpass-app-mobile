@@ -58,10 +58,17 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
     private PearPassVaultClient vaultClient;
     private final AtomicBoolean isInitializing = new AtomicBoolean(false);
     private final AtomicBoolean hasNavigated = new AtomicBoolean(false);
+    private volatile CompletableFuture<Boolean> vaultReadyFuture;
+
+    // Authentication credentials for reinitialization on resume
+    private String storedCiphertext;
+    private String storedNonce;
+    private String storedHashedPassword;
 
     // Registration state
     private String selectedVaultId;
     private String selectedVaultName;
+    private String selectedVaultPassword;
     private Map<String, Object> selectedExistingRecord;
     private List<String> preloadedFolders = new ArrayList<>();
     private PasskeyCredential generatedCredential;
@@ -313,11 +320,25 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
     public Map<String, Object> getSelectedExistingRecord() { return selectedExistingRecord; }
     public List<String> getPreloadedFolders() { return preloadedFolders; }
 
+    /**
+     * Called by MasterPasswordFragment after successful authentication.
+     * Stores the credentials so they can be reused to reinitialize on resume.
+     */
+    public void onCredentialsObtained(String ciphertext, String nonce, String hashedPassword) {
+        this.storedCiphertext = ciphertext;
+        this.storedNonce = nonce;
+        this.storedHashedPassword = hashedPassword;
+        Log.d(TAG, "Credentials stored for resume reinitialization");
+    }
+
     // Private methods
 
     private void searchForExistingCredentials(String vaultId, String password) {
         // Show loading
         replaceFragment(new LoadingFragment(), true);
+
+        // Store the password for re-opening vault on resume
+        this.selectedVaultPassword = password;
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -333,6 +354,9 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 if (!success) {
                     throw new RuntimeException("Failed to activate vault");
                 }
+
+                // Mark vault as ready
+                vaultReadyFuture = CompletableFuture.completedFuture(true);
 
                 // Search for matching records
                 List<Map<String, Object>> matches = vaultClient.searchLoginRecords(rpId, userName).get();
@@ -378,6 +402,16 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
 
         CompletableFuture.runAsync(() -> {
             try {
+                // Wait for vault to be ready (important after onResume reinitializes the vault)
+                if (vaultReadyFuture != null) {
+                    Log.d(TAG, "Waiting for vault to be ready...");
+                    Boolean ready = vaultReadyFuture.get(30, java.util.concurrent.TimeUnit.SECONDS);
+                    if (ready == null || !ready) {
+                        throw new RuntimeException("Vault is not ready for saving");
+                    }
+                    Log.d(TAG, "Vault is ready for saving");
+                }
+
                 // 1. Generate passkey
                 KeyPair keyPair = PasskeyCrypto.generateKeyPair();
                 byte[] credentialIdBytes = PasskeyCrypto.generateCredentialId();
@@ -571,12 +605,44 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 // User was on a form - reinitialize vault silently, keep current fragment
                 Log.d(TAG, "Resuming with form visible, reinitializing vault client silently");
                 vaultClient = new PearPassVaultClient(this, null, true, false);
+
+                // Create a future that will be completed when the vault is ready
+                final CompletableFuture<Boolean> readyFuture = new CompletableFuture<>();
+                vaultReadyFuture = readyFuture;
+
                 CompletableFuture.runAsync(() -> {
                     try {
                         vaultClient.waitForInitialization().get(30, java.util.concurrent.TimeUnit.SECONDS);
                         Log.d(TAG, "Vault client reinitialized on resume");
+
+                        // Reinitialize vaults with stored credentials
+                        if (storedCiphertext != null && storedNonce != null && storedHashedPassword != null) {
+                            Log.d(TAG, "Reinitializing vaults with stored credentials");
+                            vaultClient.initWithCredentials(storedCiphertext, storedNonce, storedHashedPassword).get();
+                            Log.d(TAG, "Vaults reinitialized with credentials");
+                        } else {
+                            Log.e(TAG, "No stored credentials available for reinitialization");
+                            readyFuture.complete(false);
+                            return;
+                        }
+
+                        // Re-open the active vault if we have the vault ID
+                        if (selectedVaultId != null) {
+                            Log.d(TAG, "Re-opening active vault: " + selectedVaultId);
+                            boolean success = vaultClient.getVaultById(selectedVaultId, selectedVaultPassword).get();
+                            if (success) {
+                                Log.d(TAG, "Active vault re-opened successfully");
+                                readyFuture.complete(true);
+                            } else {
+                                Log.e(TAG, "Failed to re-open active vault");
+                                readyFuture.complete(false);
+                            }
+                        } else {
+                            readyFuture.complete(false);
+                        }
                     } catch (Exception e) {
                         Log.e(TAG, "Failed to reinitialize vault client on resume: " + e.getMessage());
+                        readyFuture.completeExceptionally(e);
                     }
                 });
             } else {
@@ -596,10 +662,12 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         super.onDestroy();
         if (isFinishing()) {
             cleanup();
+            clearSensitiveData();
         }
     }
 
     private void cleanup() {
+        vaultReadyFuture = null;
         if (vaultClient == null) return;
         final PearPassVaultClient client = vaultClient;
         vaultClient = null;
@@ -608,5 +676,15 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         } catch (Exception e) {
             Log.w(TAG, "Error during cleanup: " + e.getMessage());
         }
+    }
+
+    /**
+     * Clear sensitive data when activity is finishing.
+     */
+    private void clearSensitiveData() {
+        storedCiphertext = null;
+        storedNonce = null;
+        storedHashedPassword = null;
+        selectedVaultPassword = null;
     }
 }

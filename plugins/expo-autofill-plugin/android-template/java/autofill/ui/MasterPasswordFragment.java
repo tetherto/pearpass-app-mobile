@@ -119,6 +119,21 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     throw new Exception("Invalid master password - vault remains locked");
                 }
 
+                // Get and store the master password encryption for resume reinitialization
+                try {
+                    PearPassVaultClient.MasterPasswordEncryption masterEnc =
+                        vaultClient.getMasterPasswordEncryption(vaultStatus).get();
+                    if (masterEnc != null && getActivity() instanceof PasskeyRegistrationActivity) {
+                        ((PasskeyRegistrationActivity) getActivity()).onCredentialsObtained(
+                            masterEnc.ciphertext,
+                            masterEnc.nonce,
+                            masterEnc.hashedPassword
+                        );
+                    }
+                } catch (Exception e) {
+                    android.util.Log.w("MasterPasswordFragment", "Could not get master encryption for resume: " + e.getMessage());
+                }
+
                 // Authentication successful
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
@@ -282,7 +297,15 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     throw new Exception("Invalid credentials - vault remains locked");
                 }
 
-                // Authentication successful
+                // Authentication successful - store credentials for resume reinitialization
+                if (getActivity() instanceof PasskeyRegistrationActivity) {
+                    ((PasskeyRegistrationActivity) getActivity()).onCredentialsObtained(
+                        encryptionData.ciphertext,
+                        encryptionData.nonce,
+                        encryptionData.hashedPassword
+                    );
+                }
+
                 getActivity().runOnUiThread(() -> {
                     isAuthenticatingBiometric = false;
                     Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
