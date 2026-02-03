@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 
 import com.pears.pass.R;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.SecureLog;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -167,7 +168,7 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
                 });
 
             } catch (Exception e) {
-                android.util.Log.e("VaultPasswordFragment", "Failed to validate password: " + e.getMessage());
+                SecureLog.e("VaultPasswordFragment", "Failed to validate password: " + e.getMessage());
 
                 // Clear navigation buffer if created but not used
                 if (navigationBuffer != null) {
@@ -192,13 +193,13 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
     }
 
     private void showError(String message) {
-        android.util.Log.d("VaultPasswordFragment", "showError called with message: " + message);
+        SecureLog.d("VaultPasswordFragment", "showError called with message: " + message);
         if (errorText != null) {
             errorText.setText(message);
             errorText.setVisibility(View.VISIBLE);
-            android.util.Log.d("VaultPasswordFragment", "Error text set and made visible");
+            SecureLog.d("VaultPasswordFragment", "Error text set and made visible");
         } else {
-            android.util.Log.e("VaultPasswordFragment", "errorText is null!");
+            SecureLog.e("VaultPasswordFragment", "errorText is null!");
         }
     }
 }

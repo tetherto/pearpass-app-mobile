@@ -6,8 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.OutcomeReceiver;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.credentials.exceptions.ClearCredentialException;
@@ -29,6 +27,7 @@ import androidx.credentials.provider.PublicKeyCredentialEntry;
 
 import com.pears.pass.R;
 import com.pears.pass.autofill.ui.AuthenticationActivity;
+import com.pears.pass.autofill.utils.SecureLog;
 import com.pears.pass.autofill.ui.PasskeyRegistrationActivity;
 
 /**
@@ -46,10 +45,10 @@ public class PearPassCredentialProviderService extends CredentialProviderService
             @NonNull CancellationSignal cancellationSignal,
             @NonNull OutcomeReceiver<BeginCreateCredentialResponse, CreateCredentialException> callback) {
 
-        Log.d(TAG, "onBeginCreateCredentialRequest called");
+        SecureLog.d(TAG, "onBeginCreateCredentialRequest called");
 
         if (request instanceof BeginCreatePublicKeyCredentialRequest) {
-            Log.d(TAG, "Processing passkey registration request");
+            SecureLog.d(TAG, "Processing passkey registration request");
 
             try {
                 // Create PendingIntent to launch PasskeyRegistrationActivity
@@ -72,11 +71,11 @@ public class PearPassCredentialProviderService extends CredentialProviderService
 
                 callback.onResult(response);
             } catch (Exception e) {
-                Log.e(TAG, "Error creating registration response: " + e.getMessage());
+                SecureLog.e(TAG, "Error creating registration response: " + e.getMessage());
                 callback.onError(new CreateCredentialUnknownException(e.getMessage()));
             }
         } else {
-            Log.d(TAG, "Unsupported credential type, ignoring");
+            SecureLog.d(TAG, "Unsupported credential type, ignoring");
             callback.onError(new CreateCredentialUnknownException("Unsupported credential type"));
         }
     }
@@ -87,7 +86,7 @@ public class PearPassCredentialProviderService extends CredentialProviderService
             @NonNull CancellationSignal cancellationSignal,
             @NonNull OutcomeReceiver<BeginGetCredentialResponse, GetCredentialException> callback) {
 
-        Log.d(TAG, "onBeginGetCredentialRequest called");
+        SecureLog.d(TAG, "onBeginGetCredentialRequest called");
 
         BeginGetCredentialResponse.Builder responseBuilder =
                 new BeginGetCredentialResponse.Builder();
@@ -98,7 +97,7 @@ public class PearPassCredentialProviderService extends CredentialProviderService
                 BeginGetPublicKeyCredentialOption option =
                         (BeginGetPublicKeyCredentialOption) request.getBeginGetCredentialOptions().get(i);
 
-                Log.d(TAG, "Processing passkey assertion request");
+                SecureLog.d(TAG, "Processing passkey assertion request");
 
                 try {
                     // Create PendingIntent to launch AuthenticationActivity in passkey mode
@@ -118,7 +117,7 @@ public class PearPassCredentialProviderService extends CredentialProviderService
                     responseBuilder.addCredentialEntry(entry);
                     hasEntries = true;
                 } catch (Exception e) {
-                    Log.e(TAG, "Error creating assertion entry: " + e.getMessage());
+                    SecureLog.e(TAG, "Error creating assertion entry: " + e.getMessage());
                 }
             }
         }
@@ -126,7 +125,7 @@ public class PearPassCredentialProviderService extends CredentialProviderService
         if (hasEntries) {
             callback.onResult(responseBuilder.build());
         } else {
-            Log.d(TAG, "No passkey options found in request");
+            SecureLog.d(TAG, "No passkey options found in request");
             callback.onError(new NoCredentialException());
         }
     }
@@ -136,7 +135,7 @@ public class PearPassCredentialProviderService extends CredentialProviderService
             @NonNull ProviderClearCredentialStateRequest request,
             @NonNull CancellationSignal cancellationSignal,
             @NonNull OutcomeReceiver<Void, ClearCredentialException> callback) {
-        Log.d(TAG, "onClearCredentialStateRequest - no-op");
+        SecureLog.d(TAG, "onClearCredentialStateRequest - no-op");
         callback.onResult(null);
     }
 }

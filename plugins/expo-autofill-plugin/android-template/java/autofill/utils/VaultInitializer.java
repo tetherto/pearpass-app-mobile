@@ -1,7 +1,5 @@
 package com.pears.pass.autofill.utils;
 
-import android.util.Log;
-
 import com.pears.pass.autofill.data.PearPassVaultClient;
 
 import java.util.concurrent.CompletableFuture;
@@ -63,7 +61,7 @@ public class VaultInitializer {
         return CompletableFuture.runAsync(() -> {
             try {
                 client.waitForInitialization().get(timeoutMs, TimeUnit.MILLISECONDS);
-                Log.d(TAG, "Vault client is ready");
+                SecureLog.d(TAG, "Vault client is ready");
             } catch (TimeoutException e) {
                 throw new RuntimeException("Vault client initialization timed out", e);
             } catch (Exception e) {
@@ -110,7 +108,7 @@ public class VaultInitializer {
                         activeVaultStatus.isInitialized &&
                         !activeVaultStatus.isLocked;
 
-                Log.d(TAG, "User initialization complete - hasPasswordSet: " + hasPasswordSet +
+                SecureLog.d(TAG, "User initialization complete - hasPasswordSet: " + hasPasswordSet +
                         ", isLoggedIn: " + isLoggedIn + ", isVaultOpen: " + isVaultOpen);
 
                 return new VaultInitState(hasPasswordSet, isLoggedIn, isVaultOpen, encryption);
@@ -172,7 +170,7 @@ public class VaultInitializer {
                     encryption.nonce != null &&
                     encryption.salt != null;
         } catch (Exception e) {
-            Log.e(TAG, "Could not check password status: " + e.getMessage());
+            SecureLog.e(TAG, "Could not check password status: " + e.getMessage());
             return false;
         }
     }

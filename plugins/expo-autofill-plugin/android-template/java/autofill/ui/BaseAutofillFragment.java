@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.SecureLog;
 
 /**
  * Base fragment for all autofill UI fragments.
@@ -51,7 +52,7 @@ public abstract class BaseAutofillFragment extends Fragment {
      * @param fallbackAction Action to run on UI thread if needed
      */
     protected void handleAsyncError(String tag, String message, Runnable fallbackAction) {
-        android.util.Log.e(tag, message);
+        SecureLog.e(tag, message);
         if (getActivity() != null && fallbackAction != null) {
             getActivity().runOnUiThread(fallbackAction);
         }

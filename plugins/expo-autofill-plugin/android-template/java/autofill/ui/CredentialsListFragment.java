@@ -2,7 +2,6 @@ package com.pears.pass.autofill.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pears.pass.R;
 import com.pears.pass.autofill.data.CredentialItem;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.SecureLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +61,10 @@ public class CredentialsListFragment extends BaseAutofillFragment {
             packageName = getArguments().getString(ARG_PACKAGE_NAME);
 
             if (webDomain != null) {
-                Log.d(TAG, "Received web domain for filtering: " + webDomain);
+                SecureLog.d(TAG, "Received web domain for filtering: " + webDomain);
             }
             if (packageName != null) {
-                Log.d(TAG, "Received package name for filtering: " + packageName);
+                SecureLog.d(TAG, "Received package name for filtering: " + packageName);
             }
         }
     }
@@ -117,7 +117,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 // Mark that user has searched, disable domain filtering permanently
                 if (!query.isEmpty() && !hasUserSearched) {
                     hasUserSearched = true;
-                    Log.d(TAG, "User started searching, domain filtering disabled permanently for this session");
+                    SecureLog.d(TAG, "User started searching, domain filtering disabled permanently for this session");
                 }
 
                 filterCredentials(query);
@@ -165,9 +165,9 @@ public class CredentialsListFragment extends BaseAutofillFragment {
             // If we have matching credentials, show only those; otherwise show all
             if (!matchingCredentials.isEmpty()) {
                 filtered = matchingCredentials;
-                Log.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
+                SecureLog.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
             } else {
-                Log.d(TAG, "No matching credentials found, showing all " + allCredentials.size() + " credentials");
+                SecureLog.d(TAG, "No matching credentials found, showing all " + allCredentials.size() + " credentials");
             }
         }
         // If hasUserSearched is true and query is empty, show all credentials (no filtering)
@@ -185,17 +185,17 @@ public class CredentialsListFragment extends BaseAutofillFragment {
      * Load credentials from the active vault
      */
     private void loadCredentialsFromActiveVault() {
-        Log.d(TAG, "Loading credentials for vault " + vaultId);
+        SecureLog.d(TAG, "Loading credentials for vault " + vaultId);
 
         if (getActivity() == null) {
-            Log.e(TAG, "Activity is null, cannot load credentials");
+            SecureLog.e(TAG, "Activity is null, cannot load credentials");
             return;
         }
 
         // Use vaultClient from BaseAutofillFragment (resolved in onAttach for both
         // AuthenticationActivity and PasskeyRegistrationActivity)
         if (vaultClient == null) {
-            Log.e(TAG, "No vault client available, cannot load credentials");
+            SecureLog.e(TAG, "No vault client available, cannot load credentials");
             return;
         }
 
@@ -218,18 +218,18 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
         CompletableFuture.runAsync(() -> {
             try {
-                Log.d(TAG, "Closing any active vault before activating vault " + vaultId);
+                SecureLog.d(TAG, "Closing any active vault before activating vault " + vaultId);
 
                 // IMPORTANT: Close any currently active vault first to release the database lock
                 // This prevents "lock hold by current process" errors
                 try {
                     vaultClient.activeVaultClose().get();
-                    Log.d(TAG, "Closed previous active vault");
+                    SecureLog.d(TAG, "Closed previous active vault");
                 } catch (Exception e) {
-                    Log.d(TAG, "No active vault to close or already closed: " + e.getMessage());
+                    SecureLog.d(TAG, "No active vault to close or already closed: " + e.getMessage());
                 }
 
-                Log.d(TAG, "Activating vault " + vaultId);
+                SecureLog.d(TAG, "Activating vault " + vaultId);
 
                 // Now activate the vault by ID with password buffer if available
                 boolean success;
@@ -243,11 +243,11 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                     throw new RuntimeException("Failed to activate vault " + vaultId);
                 }
 
-                Log.d(TAG, "Successfully activated vault " + vaultId);
+                SecureLog.d(TAG, "Successfully activated vault " + vaultId);
 
                 // Now fetch records from the newly active vault
                 List<Map<String, Object>> records = vaultClient.activeVaultList("record/").get();
-                Log.d(TAG, "Received " + records.size() + " records from vault " + vaultId);
+                SecureLog.d(TAG, "Received " + records.size() + " records from vault " + vaultId);
 
                 List<CredentialItem> parsedCredentials = parseCredentials(records);
 
@@ -256,7 +256,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                     getActivity().runOnUiThread(() -> {
                         this.allCredentials = parsedCredentials;
                         this.isLoading = false;
-                        Log.d(TAG, "Loaded " + parsedCredentials.size() + " credentials from activated vault");
+                        SecureLog.d(TAG, "Loaded " + parsedCredentials.size() + " credentials from activated vault");
 
                         // Hide loading indicator
                         if (loadingIndicator != null) {
@@ -274,7 +274,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 }
 
             } catch (Exception e) {
-                Log.e(TAG, "Error loading from vault: " + e.getMessage());
+                SecureLog.e(TAG, "Error loading from vault: " + e.getMessage());
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         this.isLoading = false;
@@ -296,7 +296,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 // Securely clear the password buffer after vault activation
                 if (finalPasswordBuffer != null) {
                     com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(finalPasswordBuffer);
-                    Log.d(TAG, "Password buffer cleared from memory");
+                    SecureLog.d(TAG, "Password buffer cleared from memory");
                 }
             }
         });
@@ -400,7 +400,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
         String packageAsDomain = null;
         if (packageName != null) {
             packageAsDomain = convertPackageToDomain(packageName);
-            Log.d(TAG, "Converted package '" + packageName + "' to domain format '" + packageAsDomain + "'");
+            SecureLog.d(TAG, "Converted package '" + packageName + "' to domain format '" + packageAsDomain + "'");
         }
 
         for (String website : credential.getWebsites()) {
@@ -408,14 +408,14 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
             // Check web domain match
             if (targetDomain != null && domainsMatch(targetDomain, websiteDomain)) {
-                Log.d(TAG, "Domain match found! Credential '" + credential.getTitle() +
+                SecureLog.d(TAG, "Domain match found! Credential '" + credential.getTitle() +
                         "' website '" + websiteDomain + "' matches target '" + targetDomain + "'");
                 return true;
             }
 
             // Check package name match (converted to domain format)
             if (packageAsDomain != null && domainsMatch(packageAsDomain, websiteDomain)) {
-                Log.d(TAG, "Package match found! Credential '" + credential.getTitle() +
+                SecureLog.d(TAG, "Package match found! Credential '" + credential.getTitle() +
                         "' website '" + websiteDomain + "' matches package as domain '" + packageAsDomain + "'");
                 return true;
             }

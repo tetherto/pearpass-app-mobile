@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +20,7 @@ import com.pears.pass.autofill.data.PasskeyCredential;
 import com.pears.pass.autofill.data.PasskeyFormData;
 import com.pears.pass.autofill.data.PasskeyResponse;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.SecureLog;
 import com.pears.pass.autofill.utils.VaultInitializer;
 
 import org.json.JSONObject;
@@ -112,7 +111,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                         (androidx.credentials.CreatePublicKeyCredentialRequest) providerRequest.getCallingRequest();
 
                 String requestJson = pkRequest.getRequestJson();
-                Log.d(TAG, "Passkey creation request JSON: " + requestJson);
+                SecureLog.d(TAG, "Passkey creation request JSON: " + requestJson);
 
                 JSONObject json = new JSONObject(requestJson);
 
@@ -144,12 +143,12 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 byte[] hash = pkRequest.getClientDataHash();
                 clientDataHash = hash != null ? hash : new byte[0];
 
-                Log.d(TAG, "Parsed passkey request - rpId: " + rpId + ", userName: " + userName);
+                SecureLog.d(TAG, "Parsed passkey request - rpId: " + rpId + ", userName: " + userName);
             } else {
-                Log.e(TAG, "No valid passkey creation request found");
+                SecureLog.e(TAG, "No valid passkey creation request found");
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error parsing passkey request: " + e.getMessage());
+            SecureLog.e(TAG, "Error parsing passkey request: " + e.getMessage());
         }
     }
 
@@ -166,7 +165,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error setting fullscreen", e);
+            SecureLog.e(TAG, "Error setting fullscreen", e);
         }
     }
 
@@ -194,7 +193,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
 
             @Override
             public void onError(VaultInitializer.VaultInitError error, Exception exception) {
-                Log.e(TAG, "Initialization error: " + error + " - " + exception.getMessage());
+                SecureLog.e(TAG, "Initialization error: " + error + " - " + exception.getMessage());
                 runOnUiThread(() -> {
                     if (!hasNavigated.compareAndSet(false, true)) return;
 
@@ -330,7 +329,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         this.storedCiphertext = ciphertext;
         this.storedNonce = nonce;
         this.storedHashedPassword = hashedPassword;
-        Log.d(TAG, "Credentials stored for resume reinitialization");
+        SecureLog.d(TAG, "Credentials stored for resume reinitialization");
     }
 
     // Private methods
@@ -352,7 +351,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 try {
                     vaultClient.activeVaultClose().get();
                 } catch (Exception e) {
-                    Log.d(TAG, "No active vault to close: " + e.getMessage());
+                    SecureLog.d(TAG, "No active vault to close: " + e.getMessage());
                 }
 
                 // Activate the vault using byte[] password
@@ -388,7 +387,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                     }
                 });
             } catch (Exception e) {
-                Log.e(TAG, "Error searching credentials: " + e.getMessage());
+                SecureLog.e(TAG, "Error searching credentials: " + e.getMessage());
                 runOnUiThread(() -> {
                     selectedExistingRecord = null;
                     navigateToPasskeyForm();
@@ -425,12 +424,12 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
             try {
                 // Wait for vault to be ready (important after onResume reinitializes the vault)
                 if (vaultReadyFuture != null) {
-                    Log.d(TAG, "Waiting for vault to be ready...");
+                    SecureLog.d(TAG, "Waiting for vault to be ready...");
                     Boolean ready = vaultReadyFuture.get(30, java.util.concurrent.TimeUnit.SECONDS);
                     if (ready == null || !ready) {
                         throw new RuntimeException("Vault is not ready for saving");
                     }
-                    Log.d(TAG, "Vault is ready for saving");
+                    SecureLog.d(TAG, "Vault is ready for saving");
                 }
 
                 // 1. Generate passkey
@@ -517,7 +516,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 runOnUiThread(this::completeRegistration);
 
             } catch (Exception e) {
-                Log.e(TAG, "Error saving passkey: " + e.getMessage());
+                SecureLog.e(TAG, "Error saving passkey: " + e.getMessage());
                 e.printStackTrace();
                 runOnUiThread(() -> {
                     // Pop back to the form fragment (preserved on back stack)
@@ -565,7 +564,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
             responseJson.put("clientExtensionResults", clientExtResults);
 
             String jsonResponse = responseJson.toString();
-            Log.d(TAG, "Registration response built successfully");
+            SecureLog.d(TAG, "Registration response built successfully");
 
             Intent resultData = new Intent();
             androidx.credentials.CreateCredentialResponse createCredentialResponse =
@@ -576,7 +575,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
             setResult(Activity.RESULT_OK, resultData);
             finish();
         } catch (Exception e) {
-            Log.e(TAG, "Error completing registration: " + e.getMessage());
+            SecureLog.e(TAG, "Error completing registration: " + e.getMessage());
             onCancel();
         }
     }
@@ -624,7 +623,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
             Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (current instanceof PasskeyFormFragment || current instanceof ExistingCredentialSelectionFragment) {
                 // User was on a form - reinitialize vault silently, keep current fragment
-                Log.d(TAG, "Resuming with form visible, reinitializing vault client silently");
+                SecureLog.d(TAG, "Resuming with form visible, reinitializing vault client silently");
                 vaultClient = new PearPassVaultClient(this, null, true, false);
 
                 // Create a future that will be completed when the vault is ready
@@ -634,22 +633,22 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 CompletableFuture.runAsync(() -> {
                     try {
                         vaultClient.waitForInitialization().get(30, java.util.concurrent.TimeUnit.SECONDS);
-                        Log.d(TAG, "Vault client reinitialized on resume");
+                        SecureLog.d(TAG, "Vault client reinitialized on resume");
 
                         // Reinitialize vaults with stored credentials
                         if (storedCiphertext != null && storedNonce != null && storedHashedPassword != null) {
-                            Log.d(TAG, "Reinitializing vaults with stored credentials");
+                            SecureLog.d(TAG, "Reinitializing vaults with stored credentials");
                             vaultClient.initWithCredentials(storedCiphertext, storedNonce, storedHashedPassword).get();
-                            Log.d(TAG, "Vaults reinitialized with credentials");
+                            SecureLog.d(TAG, "Vaults reinitialized with credentials");
                         } else {
-                            Log.e(TAG, "No stored credentials available for reinitialization");
+                            SecureLog.e(TAG, "No stored credentials available for reinitialization");
                             readyFuture.complete(false);
                             return;
                         }
 
                         // Re-open the active vault if we have the vault ID
                         if (selectedVaultId != null) {
-                            Log.d(TAG, "Re-opening active vault: " + selectedVaultId);
+                            SecureLog.d(TAG, "Re-opening active vault: " + selectedVaultId);
                             boolean success;
                             if (selectedVaultPasswordBuffer != null) {
                                 success = vaultClient.getVaultById(selectedVaultId, selectedVaultPasswordBuffer).get();
@@ -657,17 +656,17 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                                 success = vaultClient.getVaultById(selectedVaultId, (String) null).get();
                             }
                             if (success) {
-                                Log.d(TAG, "Active vault re-opened successfully");
+                                SecureLog.d(TAG, "Active vault re-opened successfully");
                                 readyFuture.complete(true);
                             } else {
-                                Log.e(TAG, "Failed to re-open active vault");
+                                SecureLog.e(TAG, "Failed to re-open active vault");
                                 readyFuture.complete(false);
                             }
                         } else {
                             readyFuture.complete(false);
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, "Failed to reinitialize vault client on resume: " + e.getMessage());
+                        SecureLog.e(TAG, "Failed to reinitialize vault client on resume: " + e.getMessage());
                         readyFuture.completeExceptionally(e);
                     }
                 });
@@ -702,7 +701,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         try {
             client.closeAllInstances().get(500, java.util.concurrent.TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            Log.w(TAG, "Error during cleanup: " + e.getMessage());
+            SecureLog.w(TAG, "Error during cleanup: " + e.getMessage());
         }
     }
 

@@ -8,7 +8,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import com.pears.pass.R;
 import com.pears.pass.autofill.data.PasskeyFormData;
+import com.pears.pass.autofill.utils.SecureLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -197,7 +197,7 @@ public class PasskeyFormFragment extends Fragment {
         folderSelector.setClickable(true);
         folderSelector.setFocusable(true);
         folderSelector.setOnClickListener(v -> {
-            Log.d(TAG, "Folder selector clicked!");
+            SecureLog.d(TAG, "Folder selector clicked!");
             showFolderPicker();
         });
 
@@ -216,15 +216,15 @@ public class PasskeyFormFragment extends Fragment {
     }
 
     private void showFolderPicker() {
-        Log.d(TAG, "showFolderPicker called");
+        SecureLog.d(TAG, "showFolderPicker called");
         if (!(getActivity() instanceof PasskeyRegistrationActivity)) {
-            Log.e(TAG, "Activity is not PasskeyRegistrationActivity: " + getActivity());
+            SecureLog.e(TAG, "Activity is not PasskeyRegistrationActivity: " + getActivity());
             return;
         }
 
         PasskeyRegistrationActivity activity = (PasskeyRegistrationActivity) getActivity();
         List<String> folders = activity.getPreloadedFolders();
-        Log.d(TAG, "Got folders: " + folders.size() + " folders");
+        SecureLog.d(TAG, "Got folders: " + folders.size() + " folders");
 
         // Build list with "No folder" option at the top
         List<String> options = new ArrayList<>();
@@ -242,11 +242,11 @@ public class PasskeyFormFragment extends Fragment {
             }
         }
 
-        Log.d(TAG, "Showing folder picker dialog with " + items.length + " options");
+        SecureLog.d(TAG, "Showing folder picker dialog with " + items.length + " options");
         new AlertDialog.Builder(requireContext())
                 .setTitle("Select Folder")
                 .setSingleChoiceItems(items, checkedItem, (dialog, which) -> {
-                    Log.d(TAG, "Folder selected: " + which);
+                    SecureLog.d(TAG, "Folder selected: " + which);
                     if (which == 0) {
                         selectedFolder = null;
                         folderSelector.setText("No folder");
@@ -308,7 +308,7 @@ public class PasskeyFormFragment extends Fragment {
             refreshAttachmentsDisplay();
 
         } catch (Exception e) {
-            Log.e(TAG, "Error reading file: " + e.getMessage());
+            SecureLog.e(TAG, "Error reading file: " + e.getMessage());
         }
     }
 

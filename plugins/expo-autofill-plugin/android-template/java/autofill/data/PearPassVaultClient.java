@@ -1,7 +1,8 @@
 package com.pears.pass.autofill.data;
 
 import android.content.Context;
-import android.util.Log;
+
+import com.pears.pass.autofill.utils.SecureLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -2029,12 +2030,12 @@ public class PearPassVaultClient {
     // Helper Methods
     private void log(String message) {
         if (debugMode) {
-            Log.d(TAG, message);
+            SecureLog.d(TAG, message);
         }
     }
 
     private void logError(String message) {
-        Log.e(TAG, message);
+        SecureLog.e(TAG, message);
     }
 
     private static Map<String, Object> createMap(String key, Object value) {
