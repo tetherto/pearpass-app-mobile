@@ -1,6 +1,7 @@
 import { NoteIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native'
+import { CopyButton } from 'src/libComponents'
 
 /**
  * @param {Object} props - Component props
@@ -11,23 +12,35 @@ import { TouchableOpacity, Text, View, StyleSheet } from 'react-native'
  */
 export const PressableNote = ({ label, text, onPress }) => (
   <TouchableOpacity onPress={onPress} style={styles.container}>
-    <View style={styles.headerContainer}>
-      <NoteIcon color={colors.white.mode1} />
-      <Text style={styles.labelText}>{label}</Text>
+    <View style={styles.contentWrapper}>
+      <View style={styles.headerContainer}>
+        <NoteIcon color={colors.white.mode1} />
+        <Text style={styles.labelText}>{label}</Text>
+      </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.noteText}>{text}</Text>
+      </View>
     </View>
-    <View style={styles.textContainer}>
-      <Text style={styles.noteText}>{text}</Text>
+    <View style={styles.additionalItems}>
+      <CopyButton value={text} />
     </View>
   </TouchableOpacity>
 )
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
     padding: 10,
     backgroundColor: colors.grey400.mode1,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.white.mode1
+  },
+  contentWrapper: {
+    flex: 1,
+    flexDirection: 'column'
   },
   headerContainer: {
     flexDirection: 'row',
@@ -43,12 +56,20 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    marginLeft: 34
+    marginLeft: 34,
+    marginTop: 5
   },
   noteText: {
     fontFamily: 'Inter',
     color: colors.white.mode1,
     fontSize: 14,
     fontWeight: '500'
+  },
+  additionalItems: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 10,
+    alignSelf: 'center'
   }
 })

@@ -6,6 +6,7 @@ export { ButtonPrimary } from './ButtonPrimary'
 export { ButtonSecondary } from './ButtonSecondary'
 
 export { CompoundField } from './CompoundField'
+export { CopyButton } from './CopyButton'
 export { InputField } from './InputField'
 export { InputPasswordPearPass } from './InputPasswordPearPass'
 export { HighlightString } from './HighlightString'

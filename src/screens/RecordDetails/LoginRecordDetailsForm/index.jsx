@@ -16,7 +16,6 @@ import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { InputFieldNote } from '../../../components/InputFieldNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
 import {
@@ -72,12 +71,6 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const { copyToClipboard } = useCopyToClipboard()
-
-  const handleTapToCopy = (name) => {
-    copyToClipboard(values[name])
-  }
-
   const hasUsername = !!values?.username?.length
   const hasPassword = !!values?.password?.length
   const hasPasskey = !!values?.credential
@@ -107,7 +100,6 @@ Consider changing it to keep your account secure.`}
           )}
           {hasUsername && (
             <InputField
-              onClick={() => handleTapToCopy('username')}
               icon={UserIcon}
               label={t`Email or username`}
               placeholder={t`Email or username`}
@@ -119,7 +111,6 @@ Consider changing it to keep your account secure.`}
 
           {hasPassword && (
             <PasswordField
-              onClick={() => handleTapToCopy('password')}
               icon={KeyIcon}
               label={t`Password`}
               placeholder={t`Insert password`}
@@ -151,7 +142,6 @@ Consider changing it to keep your account secure.`}
         <CompoundField>
           {websitesList.map((website, index) => (
             <InputField
-              onClick={() => copyToClipboard(website.website)}
               key={index}
               icon={WebsiteIcon}
               label={t`Website`}
@@ -176,17 +166,12 @@ Consider changing it to keep your account secure.`}
 
       {hasNote && (
         <FormGroup>
-          <InputFieldNote
-            onClick={() => handleTapToCopy('note')}
-            isDisabled
-            {...register('note')}
-          />
+          <InputFieldNote isDisabled {...register('note')} />
         </FormGroup>
       )}
 
       {hasCustomFields && (
         <CustomFields
-          onClick={copyToClipboard}
           areInputsDisabled
           customFields={customFieldsList}
           register={registerCustomFieldItem}

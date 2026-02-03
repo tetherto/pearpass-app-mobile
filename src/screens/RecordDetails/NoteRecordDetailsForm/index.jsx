@@ -7,7 +7,6 @@ import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { PressableNote } from '../../../components/PressableNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 
 export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
@@ -39,18 +38,12 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const { copyToClipboard } = useCopyToClipboard()
-
   const hasAttachments = !!values?.attachments?.length
 
   return (
     <>
       {!!values?.note.length && (
-        <PressableNote
-          label={t`Note`}
-          text={values.note}
-          onPress={() => copyToClipboard(values.note)}
-        />
+        <PressableNote label={t`Note`} text={values.note} />
       )}
 
       {hasAttachments && (
@@ -67,7 +60,6 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
 
       {!!list?.length && (
         <CustomFields
-          onClick={copyToClipboard}
           areInputsDisabled
           customFields={list}
           register={registerItem}
