@@ -7,17 +7,15 @@ private class InitializationState: ObservableObject {
     @Published var isInitializing = true  // Start as true to show loading initially
     private var isInitializingFlag = false
     private var hasInitializedOnce = false
-    
+
     private init() {}
-    
+
     @MainActor
     func startInitialization() -> Bool {
-        print("InitializationState: startInitialization called, current flag=\(isInitializingFlag)")
         if isInitializingFlag {
             print("InitializationState: Already initializing, returning false")
             return false
         }
-        print("InitializationState: Setting flag to true, proceeding")
         isInitializingFlag = true
         // Only show loading state on first initialization
         if !hasInitializedOnce {
@@ -25,7 +23,7 @@ private class InitializationState: ObservableObject {
         }
         return true
     }
-    
+
     @MainActor
     func finishInitialization() {
         isInitializingFlag = false
@@ -44,137 +42,137 @@ struct ExtensionMainView: View {
     let onCancel: () -> Void
     let onComplete: (String, String) -> Void
     let onVaultClientCreated: ((PearPassVaultClient) -> Void)?
-    
+
+    // Passkey-specific properties (iOS 17+)
+    let passkeyRpId: String?
+    let passkeyClientDataHash: Data?
+    let onPasskeySelected: ((PasskeyCredential) -> Void)?
+
     // User initialization state
     @State private var hasPasswordSet: Bool = false
     @State private var isLoggedIn: Bool = false
     @State private var isVaultOpen: Bool = false
-    
+
+    // Standard initializer for password-only flows
     init(serviceIdentifiers: [ASCredentialServiceIdentifier] = [], presentationWindow: UIWindow? = nil, onCancel: @escaping () -> Void, onComplete: @escaping (String, String) -> Void, onVaultClientCreated: ((PearPassVaultClient) -> Void)? = nil) {
         self.serviceIdentifiers = serviceIdentifiers
         self.presentationWindow = presentationWindow
         self.onCancel = onCancel
         self.onComplete = onComplete
         self.onVaultClientCreated = onVaultClientCreated
-        print("ExtensionMainView: Basic initialization completed")
-        
-        // Print the domain information
-        if !serviceIdentifiers.isEmpty {
-            print("ExtensionMainView: Service identifiers received:")
-            for identifier in serviceIdentifiers {
-                print("  - Domain/URL: \(identifier.identifier)")
-                print("  - Type: \(identifier.type == .domain ? "Domain" : identifier.type == .URL ? "URL" : "Unknown")")
-            }
-        } else {
-            print("ExtensionMainView: No service identifiers provided")
-        }
+        self.passkeyRpId = nil
+        self.passkeyClientDataHash = nil
+        self.onPasskeySelected = nil
     }
-    
+
+    // Extended initializer for passkey flows (iOS 17+)
+    @available(iOS 17.0, *)
+    init(
+        serviceIdentifiers: [ASCredentialServiceIdentifier] = [],
+        presentationWindow: UIWindow? = nil,
+        passkeyRpId: String?,
+        passkeyClientDataHash: Data?,
+        onCancel: @escaping () -> Void,
+        onComplete: @escaping (String, String) -> Void,
+        onPasskeySelected: ((PasskeyCredential) -> Void)?,
+        onVaultClientCreated: ((PearPassVaultClient) -> Void)? = nil
+    ) {
+        self.serviceIdentifiers = serviceIdentifiers
+        self.presentationWindow = presentationWindow
+        self.onCancel = onCancel
+        self.onComplete = onComplete
+        self.onVaultClientCreated = onVaultClientCreated
+        self.passkeyRpId = passkeyRpId
+        self.passkeyClientDataHash = passkeyClientDataHash
+        self.onPasskeySelected = onPasskeySelected
+    }
+
     private func initialize() {
         guard vaultClient == nil else { return }
 
-        print("ExtensionMainView: Initializing PearPassVaultClient")
 
-        // Initialize the vault client with debug mode enabled
-        let client = PearPassVaultClient(debugMode: false)
+        // Initialize the vault client in read-only mode for credential lookup
+        let client = PearPassVaultClient(debugMode: true, readOnly: true)
         vaultClient = client
 
         // Notify parent view controller so it can store reference for cleanup
         onVaultClientCreated?(client)
 
-        print("ExtensionMainView: PearPassVaultClient created")
-        
         // Initialize user after vault client is ready
         Task {
             do {
                 // Wait for vault client to be fully initialized
-                print("ExtensionMainView: Waiting for vault client initialization...")
                 try await vaultClient?.waitForInitialization()
-                print("ExtensionMainView: Vault client is ready")
-                
+
                 // Now initialize the user
                 await initializeUser()
             } catch {
-                print("ExtensionMainView: Failed to initialize vault client: \(error.localizedDescription)")
             }
         }
     }
-    
+
     /// Initializes the user by checking password, login and vault status
     /// Implements the initializeUser logic from JavaScript
     private func initializeUser() async {
         guard let client = vaultClient else {
-            print("ExtensionMainView: Cannot initialize user - vault client is nil")
             return
         }
-        
+
         // Prevent concurrent initialization using shared state with synchronous flag
         let shouldContinue = await initializationState.startInitialization()
-        
-        guard shouldContinue else { 
-            print("ExtensionMainView: Initialization skipped due to concurrent call")
-            return 
+
+        guard shouldContinue else {
+            return
         }
-        
-        
-        print("ExtensionMainView: Calling initializeUser")
-        
+
+
         do {
             // Get vault status and active vault status sequentially to avoid race conditions
             let vaultsStatusRes = try await client.vaultsGetStatus()
             let activeVaultStatusRes = try await client.activeVaultGetStatus()
-            
+
             // Now get master password encryption, passing the vault status to avoid duplicate call
             let masterPasswordEncryption = try await client.getMasterPasswordEncryption(vaultStatus: vaultsStatusRes)
-            
+
             // Check if password is set by verifying all required fields exist
             let passwordSet = masterPasswordEncryption != nil &&
                              masterPasswordEncryption?.ciphertext != nil &&
                              masterPasswordEncryption?.nonce != nil &&
                              masterPasswordEncryption?.salt != nil
-            
+
             // Check if user is logged in (vault is initialized and unlocked)
             let loggedIn = vaultsStatusRes.isInitialized && !vaultsStatusRes.isLocked
-            
+
             // Check if active vault is open
-            let vaultOpen = loggedIn && 
-                           activeVaultStatusRes.isInitialized && 
+            let vaultOpen = loggedIn &&
+                           activeVaultStatusRes.isInitialized &&
                            !activeVaultStatusRes.isLocked
-            
+
             // Check if biometrics are available for quick login
             // This only checks biometricsEnabled flag, not encryptionData, so won't trigger Face ID
             let biometricsAvailable = KeychainHelper.shared.canUseBiometrics()
-            
+
             // Update state on main thread
             await MainActor.run {
                 self.hasPasswordSet = passwordSet
                 self.isLoggedIn = loggedIn
                 self.isVaultOpen = vaultOpen
-                
-                print("ExtensionMainView: User initialization complete")
-                print("  - hasPasswordSet: \(passwordSet)")
-                print("  - isLoggedIn: \(loggedIn)")
-                print("  - isVaultOpen: \(vaultOpen)")
-                print("  - biometricsAvailable: \(biometricsAvailable)")
-                
+
                 // Set the appropriate flow based on password configuration
                 if !passwordSet {
-                    print("ExtensionMainView: Setting flow to missingConfiguration (passwordSet=false)")
                     self.viewModel.currentFlow = .missingConfiguration
                 } else if !loggedIn {
-                    print("ExtensionMainView: Setting flow to masterPassword (passwordSet=true, loggedIn=false)")
                     self.viewModel.currentFlow = .masterPassword
                 } else {
                     print("ExtensionMainView: User is logged in, keeping current flow")
                 }
-                
+
                 // Reset initialization state after flow is set
                 initializationState.finishInitialization()
             }
-            
+
         } catch {
-            print("ExtensionMainView: Error initializing user: \(error.localizedDescription)")
-            
+
             // Try to at least check if password is set
             var passwordSet = false
             do {
@@ -184,43 +182,40 @@ struct ExtensionMainView: View {
                                  masterPasswordEncryption.salt != nil
                 }
             } catch {
-                print("ExtensionMainView: Could not check password status: \(error.localizedDescription)")
             }
-            
+
             // Set default values on error
             await MainActor.run {
                 self.hasPasswordSet = passwordSet
                 self.isLoggedIn = false
                 self.isVaultOpen = false
-                
+
                 // Only show missing configuration if password is not set
                 if !passwordSet {
-                    print("ExtensionMainView: Error handler - Setting flow to missingConfiguration (passwordSet=false)")
                     self.viewModel.currentFlow = .missingConfiguration
                 } else {
                     // Password is set but something else went wrong, show master password screen
-                    print("ExtensionMainView: Error handler - Setting flow to masterPassword (passwordSet=true)")
                     self.viewModel.currentFlow = .masterPassword
                 }
-                
+
                 // Reset initialization state after flow is set
                 initializationState.finishInitialization()
             }
         }
     }
-    
+
 
     var body: some View {
         ZStack {
             SimpleBackgroundView()
-            
+
             if initializationState.isInitializing {
                 // Show loading state while initializing
                 VStack(spacing: 20) {
                     ProgressView()
                         .scaleEffect(1.2)
                         .foregroundColor(.white)
-                    
+
                     Text(NSLocalizedString("Loading...", comment: "Loading indicator text"))
                         .font(.system(size: 16))
                         .foregroundColor(.white.opacity(0.8))
@@ -229,24 +224,32 @@ struct ExtensionMainView: View {
                 switch viewModel.currentFlow {
                 case .missingConfiguration:
                     MissingConfigurationView(onCancel: onCancel)
-                    
+
                 case .masterPassword:
                     MasterPasswordView(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient, presentationWindow: presentationWindow)
-                    
+
                 case .vaultSelection:
                     VaultSelectionView(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient)
-                    
+
                 case .vaultPassword(let vault):
                     VaultPasswordView(viewModel: viewModel, vault: vault, onCancel: onCancel, vaultClient: vaultClient)
-                    
+
                 case .credentialsList(let vault):
-                    CredentialsListView(viewModel: viewModel, vault: vault, serviceIdentifiers: serviceIdentifiers, onCancel: onCancel, onComplete: onComplete, vaultClient: vaultClient)
+                    CredentialsListView(
+                        viewModel: viewModel,
+                        vault: vault,
+                        serviceIdentifiers: serviceIdentifiers,
+                        onCancel: onCancel,
+                        onComplete: onComplete,
+                        vaultClient: vaultClient,
+                        passkeyRpId: passkeyRpId,
+                        onPasskeySelected: onPasskeySelected
+                    )
                 }
             }
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.currentFlow)
         .onAppear {
-            print("ExtensionMainView: View appeared, initializing...")
             initialize()
         }
     }
