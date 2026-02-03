@@ -10,5 +10,6 @@ public interface NavigationListener {
     void navigateToCredentialsList(String vaultId);
     void navigateToCredentialsList(String vaultId, String password);
     void onCredentialSelected(CredentialItem credential);
+    void onPasskeySelected(CredentialItem credential);
     void onCancel();
 }

@@ -96,9 +96,21 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
         // Setup RecyclerView
         credentialsList.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Determine if we're in passkey assertion mode
+        boolean passkeyMode = false;
+        if (getActivity() instanceof AuthenticationActivity) {
+            passkeyMode = ((AuthenticationActivity) getActivity()).isPasskeyAssertionMode();
+        }
+        final boolean isPasskeyMode = passkeyMode;
+
         adapter = new CredentialAdapter(new ArrayList<>(), credential -> {
             if (navigationListener != null) {
-                navigationListener.onCredentialSelected(credential);
+                if (isPasskeyMode && credential.hasPasskey()) {
+                    navigationListener.onPasskeySelected(credential);
+                } else {
+                    navigationListener.onCredentialSelected(credential);
+                }
             }
         });
         credentialsList.setAdapter(adapter);
@@ -189,13 +201,13 @@ public class CredentialsListFragment extends BaseAutofillFragment {
     private void loadCredentialsFromActiveVault() {
         Log.d(TAG, "Loading credentials for vault " + vaultId);
 
-        AuthenticationActivity activity = (AuthenticationActivity) getActivity();
-        if (activity == null) {
+        if (getActivity() == null) {
             Log.e(TAG, "Activity is null, cannot load credentials");
             return;
         }
 
-        PearPassVaultClient vaultClient = activity.getVaultClient();
+        // Use vaultClient from BaseAutofillFragment (resolved in onAttach for both
+        // AuthenticationActivity and PasskeyRegistrationActivity)
         if (vaultClient == null) {
             Log.e(TAG, "No vault client available, cannot load credentials");
             return;
@@ -338,7 +350,30 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 }
             }
 
-            credentials.add(new CredentialItem(id, name, username, password, websites));
+            // Parse passkey data
+            boolean hasPasskey = false;
+            long passkeyCreatedAt = 0;
+            Map<String, Object> credentialMap = null;
+            String privateKeyBuffer = null;
+            String userId = null;
+            String credentialId = null;
+
+            Object credentialObj = recordData.get("credential");
+            if (credentialObj instanceof Map) {
+                hasPasskey = true;
+                credentialMap = (Map<String, Object>) credentialObj;
+                credentialId = (String) credentialMap.get("id");
+                privateKeyBuffer = (String) credentialMap.get("_privateKeyBuffer");
+                userId = (String) credentialMap.get("_userId");
+
+                Object passkeyTs = recordData.get("passkeyCreatedAt");
+                if (passkeyTs instanceof Number) {
+                    passkeyCreatedAt = ((Number) passkeyTs).longValue();
+                }
+            }
+
+            credentials.add(new CredentialItem(id, name, username, password, websites,
+                    hasPasskey, passkeyCreatedAt, credentialMap, privateKeyBuffer, userId, credentialId));
         }
 
         return credentials;

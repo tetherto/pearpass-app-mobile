@@ -21,9 +21,16 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.pears.pass.R;
+import com.pears.pass.autofill.crypto.AuthenticatorDataBuilder;
+import com.pears.pass.autofill.crypto.Base64URLUtils;
+import com.pears.pass.autofill.crypto.PasskeyCrypto;
 import com.pears.pass.autofill.data.CredentialItem;
+import com.pears.pass.autofill.data.PasskeyCredential;
 import com.pears.pass.autofill.data.PearPassVaultClient;
 
+import org.json.JSONObject;
+
+import java.security.PrivateKey;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +41,12 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     private AutofillId passwordId;
     private String webDomain;
     private String packageName;
+
+    // Passkey assertion mode
+    private boolean isPasskeyAssertion = false;
+    private String passkeyRpId;
+    private byte[] passkeyChallenge;
+    private byte[] passkeyClientDataHash;
 
     // Vault client and initialization state
     private PearPassVaultClient vaultClient;
@@ -74,6 +87,42 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         passwordId = intent.getParcelableExtra("password_id");
         webDomain = intent.getStringExtra("web_domain");
         packageName = intent.getStringExtra("package_name");
+
+        // Check for passkey assertion mode
+        isPasskeyAssertion = intent.getBooleanExtra("is_passkey_assertion", false);
+
+        if (isPasskeyAssertion && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            android.util.Log.d(TAG, "Passkey assertion mode enabled");
+            try {
+                androidx.credentials.provider.ProviderGetCredentialRequest providerRequest =
+                        androidx.credentials.provider.PendingIntentHandler.retrieveProviderGetCredentialRequest(intent);
+                if (providerRequest != null) {
+                    for (androidx.credentials.CredentialOption option : providerRequest.getCredentialOptions()) {
+                        if (option instanceof androidx.credentials.GetPublicKeyCredentialOption) {
+                            androidx.credentials.GetPublicKeyCredentialOption pkOption =
+                                    (androidx.credentials.GetPublicKeyCredentialOption) option;
+                            String requestJson = pkOption.getRequestJson();
+                            android.util.Log.d(TAG, "Passkey request JSON: " + requestJson);
+                            JSONObject json = new JSONObject(requestJson);
+                            passkeyRpId = json.optString("rpId", "");
+                            webDomain = passkeyRpId; // Use rpId as domain for credential filtering
+
+                            // Extract challenge for fallback clientDataJSON construction
+                            String challengeB64 = json.optString("challenge", "");
+                            if (!challengeB64.isEmpty()) {
+                                passkeyChallenge = Base64URLUtils.decode(challengeB64);
+                            }
+
+                            passkeyClientDataHash = pkOption.getClientDataHash();
+                            android.util.Log.d(TAG, "Passkey rpId: " + passkeyRpId);
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                android.util.Log.e(TAG, "Error parsing passkey request: " + e.getMessage());
+            }
+        }
 
         if (webDomain != null) {
             android.util.Log.d(TAG, "Received web domain: " + webDomain);
@@ -203,6 +252,123 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
         setResult(Activity.RESULT_OK, replyIntent);
         finish();
+    }
+
+    @Override
+    public void onPasskeySelected(CredentialItem credential) {
+        if (!isPasskeyAssertion) {
+            android.util.Log.w(TAG, "onPasskeySelected called but not in passkey assertion mode");
+            return;
+        }
+        completePasskeyAssertion(credential);
+    }
+
+    /**
+     * Complete passkey assertion by signing with the private key and returning the response.
+     */
+    private void completePasskeyAssertion(CredentialItem credential) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            android.util.Log.e(TAG, "Passkey assertion requires API 34+");
+            onCancel();
+            return;
+        }
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                android.util.Log.d(TAG, "Starting passkey assertion for credential: " + credential.getCredentialId());
+
+                // Import the private key from the credential
+                String privateKeyB64 = credential.getPrivateKeyBuffer();
+                if (privateKeyB64 == null || privateKeyB64.isEmpty()) {
+                    throw new Exception("No private key found in credential");
+                }
+
+                PrivateKey privateKey = PasskeyCrypto.importPrivateKey(privateKeyB64);
+
+                // Build authenticator data for assertion
+                String rpId = passkeyRpId != null ? passkeyRpId : webDomain;
+                byte[] authData = AuthenticatorDataBuilder.buildForAssertion(rpId);
+
+                // Get or compute client data hash and build clientDataJSON for response
+                byte[] clientDataHash;
+                byte[] clientDataJSON;
+                if (passkeyClientDataHash != null) {
+                    // System provided clientDataHash — it handles clientDataJSON construction
+                    clientDataHash = passkeyClientDataHash;
+                    clientDataJSON = null; // System fills this in the final response
+                } else if (passkeyChallenge != null && passkeyChallenge.length > 0) {
+                    // Build our own clientDataJSON from the parsed challenge
+                    String origin = "android:apk-key-hash:" + getPackageName();
+                    clientDataJSON = AuthenticatorDataBuilder.buildClientDataJSONForAssertion(
+                            passkeyChallenge, origin);
+                    clientDataHash = PasskeyCrypto.sha256(clientDataJSON);
+                } else {
+                    throw new Exception("No clientDataHash from system and no challenge in request");
+                }
+
+                // Sign the assertion
+                String signature = PasskeyCrypto.signAssertion(privateKey, authData, clientDataHash);
+
+                // Build response JSON
+                JSONObject responseJson = new JSONObject();
+                responseJson.put("id", credential.getCredentialId());
+                responseJson.put("rawId", credential.getCredentialId());
+                responseJson.put("type", "public-key");
+
+                JSONObject responseBody = new JSONObject();
+                responseBody.put("authenticatorData", Base64URLUtils.encode(authData));
+                // Include clientDataJSON if we built it ourselves; otherwise empty (system fills it)
+                responseBody.put("clientDataJSON",
+                        clientDataJSON != null ? Base64URLUtils.encode(clientDataJSON) : "");
+                responseBody.put("signature", signature);
+                responseBody.put("userHandle", credential.getUserId() != null ? credential.getUserId() : "");
+                responseJson.put("response", responseBody);
+
+                JSONObject clientExtResults = new JSONObject();
+                responseJson.put("clientExtensionResults", clientExtResults);
+                responseJson.put("authenticatorAttachment", "platform");
+
+                String jsonResponse = responseJson.toString();
+                android.util.Log.d(TAG, "Passkey assertion response built successfully");
+
+                runOnUiThread(() -> {
+                    try {
+                        Intent resultData = new Intent();
+                        androidx.credentials.PublicKeyCredential publicKeyCredential =
+                                new androidx.credentials.PublicKeyCredential(jsonResponse);
+                        androidx.credentials.GetCredentialResponse getCredentialResponse =
+                                new androidx.credentials.GetCredentialResponse(publicKeyCredential);
+                        androidx.credentials.provider.PendingIntentHandler.setGetCredentialResponse(
+                                resultData, getCredentialResponse);
+
+                        setResult(Activity.RESULT_OK, resultData);
+                        finish();
+                    } catch (Exception e) {
+                        android.util.Log.e(TAG, "Error setting passkey response: " + e.getMessage());
+                        onCancel();
+                    }
+                });
+
+            } catch (Exception e) {
+                android.util.Log.e(TAG, "Error completing passkey assertion: " + e.getMessage());
+                e.printStackTrace();
+                runOnUiThread(this::onCancel);
+            }
+        });
+    }
+
+    /**
+     * Check if this activity is in passkey assertion mode.
+     */
+    public boolean isPasskeyAssertionMode() {
+        return isPasskeyAssertion;
+    }
+
+    /**
+     * Get the passkey RP ID for filtering credentials.
+     */
+    public String getPasskeyRpId() {
+        return passkeyRpId;
     }
 
     @Override

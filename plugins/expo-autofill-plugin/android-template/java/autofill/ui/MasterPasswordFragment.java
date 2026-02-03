@@ -44,9 +44,11 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Close any open vaults when returning to this screen
-        // This ensures we can authenticate again without lock conflicts
-        if (vaultClient != null) {
+        // Close any open vaults when returning to this screen in assertion mode.
+        // This ensures we can authenticate again without lock conflicts.
+        // Skip in registration mode (PasskeyRegistrationActivity) since vault lifecycle
+        // is managed by the registration activity itself.
+        if (vaultClient != null && getActivity() instanceof AuthenticationActivity) {
             CompletableFuture.runAsync(() -> {
                 try {
                     vaultClient.vaultsClose().get();

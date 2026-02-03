@@ -25,6 +25,8 @@ public abstract class BaseAutofillFragment extends Fragment {
         }
         if (context instanceof AuthenticationActivity) {
             vaultClient = ((AuthenticationActivity) context).getVaultClient();
+        } else if (context instanceof PasskeyRegistrationActivity) {
+            vaultClient = ((PasskeyRegistrationActivity) context).getVaultClient();
         }
     }
 

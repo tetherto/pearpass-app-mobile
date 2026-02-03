@@ -42,12 +42,14 @@ public class CredentialAdapter extends BaseItemAdapter<CredentialItem, Credentia
         private TextView titleText;
         private TextView usernameText;
         private TextView initialsText;
+        private TextView passkeyLabel;
 
         CredentialViewHolder(@NonNull View itemView) {
             super(itemView);
             titleText = itemView.findViewById(R.id.credential_title);
             usernameText = itemView.findViewById(R.id.credential_username);
             initialsText = itemView.findViewById(R.id.initials_text);
+            passkeyLabel = itemView.findViewById(R.id.passkey_label);
 
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -60,6 +62,11 @@ public class CredentialAdapter extends BaseItemAdapter<CredentialItem, Credentia
         void bind(CredentialItem credential) {
             titleText.setText(credential.getTitle());
             usernameText.setText(credential.getUsername());
+
+            // Show/hide passkey label
+            if (passkeyLabel != null) {
+                passkeyLabel.setVisibility(credential.hasPasskey() ? View.VISIBLE : View.GONE);
+            }
 
             // Generate initials from title
             String initials = getInitials(credential.getTitle());
