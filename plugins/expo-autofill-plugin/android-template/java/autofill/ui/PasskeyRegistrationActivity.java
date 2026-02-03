@@ -69,12 +69,15 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
     // Registration state
     private String selectedVaultId;
     private String selectedVaultName;
-    private String selectedVaultPassword;
+    private byte[] selectedVaultPasswordBuffer;  // Stored as byte[] for secure handling
     private Map<String, Object> selectedExistingRecord;
     private List<String> preloadedFolders = new ArrayList<>();
     private PasskeyCredential generatedCredential;
     private byte[] generatedAttestationObject;
     private byte[] generatedCredentialId;
+
+    // Secure password buffer for passing between fragments
+    private byte[] pendingPasswordBuffer = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -248,9 +251,22 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
     }
 
     @Override
-    public void navigateToCredentialsList(String vaultId, String password) {
+    public void navigateToCredentialsList(String vaultId, byte[] passwordBuffer) {
         this.selectedVaultId = vaultId;
-        searchForExistingCredentials(vaultId, password);
+        // Store password buffer securely for vault re-opening on resume
+        clearPendingPasswordBuffer();
+        this.pendingPasswordBuffer = passwordBuffer;
+        searchForExistingCredentials(vaultId, passwordBuffer);
+    }
+
+    /**
+     * Clear any pending password buffer from memory.
+     */
+    private void clearPendingPasswordBuffer() {
+        if (pendingPasswordBuffer != null) {
+            com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(pendingPasswordBuffer);
+            pendingPasswordBuffer = null;
+        }
     }
 
     @Override
@@ -319,12 +335,16 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
 
     // Private methods
 
-    private void searchForExistingCredentials(String vaultId, String password) {
+    private void searchForExistingCredentials(String vaultId, byte[] passwordBuffer) {
         // Show loading
         replaceFragment(new LoadingFragment(), true);
 
-        // Store the password for re-opening vault on resume
-        this.selectedVaultPassword = password;
+        // Store a copy of the password buffer for re-opening vault on resume
+        clearSelectedVaultPasswordBuffer();
+        if (passwordBuffer != null) {
+            this.selectedVaultPasswordBuffer = new byte[passwordBuffer.length];
+            System.arraycopy(passwordBuffer, 0, this.selectedVaultPasswordBuffer, 0, passwordBuffer.length);
+        }
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -335,8 +355,13 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                     Log.d(TAG, "No active vault to close: " + e.getMessage());
                 }
 
-                // Activate the vault
-                boolean success = vaultClient.getVaultById(vaultId, password).get();
+                // Activate the vault using byte[] password
+                boolean success;
+                if (passwordBuffer != null) {
+                    success = vaultClient.getVaultById(vaultId, passwordBuffer).get();
+                } else {
+                    success = vaultClient.getVaultById(vaultId, (String) null).get();
+                }
                 if (!success) {
                     throw new RuntimeException("Failed to activate vault");
                 }
@@ -370,6 +395,16 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 });
             }
         });
+    }
+
+    /**
+     * Clear the selected vault password buffer from memory.
+     */
+    private void clearSelectedVaultPasswordBuffer() {
+        if (selectedVaultPasswordBuffer != null) {
+            com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(selectedVaultPasswordBuffer);
+            selectedVaultPasswordBuffer = null;
+        }
     }
 
     private void navigateToExistingCredentialSelection(List<Map<String, Object>> matchingRecords) {
@@ -615,7 +650,12 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                         // Re-open the active vault if we have the vault ID
                         if (selectedVaultId != null) {
                             Log.d(TAG, "Re-opening active vault: " + selectedVaultId);
-                            boolean success = vaultClient.getVaultById(selectedVaultId, selectedVaultPassword).get();
+                            boolean success;
+                            if (selectedVaultPasswordBuffer != null) {
+                                success = vaultClient.getVaultById(selectedVaultId, selectedVaultPasswordBuffer).get();
+                            } else {
+                                success = vaultClient.getVaultById(selectedVaultId, (String) null).get();
+                            }
                             if (success) {
                                 Log.d(TAG, "Active vault re-opened successfully");
                                 readyFuture.complete(true);
@@ -654,6 +694,8 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
 
     private void cleanup() {
         vaultReadyFuture = null;
+        // Note: Don't clear password buffers here - they may be needed for vault re-opening on resume
+        // They are cleared in clearSensitiveData() when activity is finishing
         if (vaultClient == null) return;
         final PearPassVaultClient client = vaultClient;
         vaultClient = null;
@@ -671,6 +713,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         storedCiphertext = null;
         storedNonce = null;
         storedHashedPassword = null;
-        selectedVaultPassword = null;
+        clearSelectedVaultPasswordBuffer();
+        clearPendingPasswordBuffer();
     }
 }

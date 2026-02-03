@@ -63,6 +63,10 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     private boolean isVaultOpen = false;
     private boolean isLoading = true;
 
+    // Secure password buffer for passing between fragments
+    // This avoids passing password as String through Bundle arguments
+    private byte[] pendingPasswordBuffer = null;
+
     // State keys for savedInstanceState
     private static final String STATE_HAS_PASSWORD_SET = "hasPasswordSet";
     private static final String STATE_HAS_INITIALIZED_ONCE = "hasInitializedOnce";
@@ -219,9 +223,35 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     }
 
     @Override
-    public void navigateToCredentialsList(String vaultId, String password) {
-        Fragment fragment = CredentialsListFragment.newInstance(vaultId, password, webDomain, packageName);
+    public void navigateToCredentialsList(String vaultId, byte[] passwordBuffer) {
+        // Store password buffer securely - it will be retrieved by CredentialsListFragment
+        // and cleared after vault activation
+        clearPendingPasswordBuffer(); // Clear any existing buffer first
+        this.pendingPasswordBuffer = passwordBuffer;
+        Fragment fragment = CredentialsListFragment.newInstance(vaultId, webDomain, packageName);
         replaceFragment(fragment, true);
+    }
+
+    /**
+     * Get the pending password buffer for vault activation.
+     * This retrieves and clears the buffer in one operation to prevent multiple uses.
+     *
+     * @return The password buffer, or null if not set. Caller is responsible for clearing after use.
+     */
+    public byte[] consumePendingPasswordBuffer() {
+        byte[] buffer = this.pendingPasswordBuffer;
+        this.pendingPasswordBuffer = null; // Clear reference but don't zero - caller will use it
+        return buffer;
+    }
+
+    /**
+     * Clear any pending password buffer from memory.
+     */
+    private void clearPendingPasswordBuffer() {
+        if (pendingPasswordBuffer != null) {
+            com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(pendingPasswordBuffer);
+            pendingPasswordBuffer = null;
+        }
     }
 
     @Override
@@ -684,6 +714,9 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
      * Cleanup the vault client resources
      */
     private void cleanup() {
+        // Clear any pending password buffer
+        clearPendingPasswordBuffer();
+
         if (vaultClient == null) {
             return;
         }

@@ -102,10 +102,15 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
     }
 
     private void unlockVault() {
-        String password = passwordInput.getText().toString();
-        if (password.isEmpty() || vaultClient == null || vaultId == null) {
+        // Extract password directly to char[] to avoid creating an immutable String
+        Editable editable = passwordInput.getText();
+        if (editable.length() == 0 || vaultClient == null || vaultId == null) {
             return;
         }
+
+        // Extract to char array - avoids creating String which cannot be cleared
+        char[] passwordChars = new char[editable.length()];
+        editable.getChars(0, editable.length(), passwordChars, 0);
 
         // Clear password from EditText immediately for security
         passwordInput.setText("");
@@ -118,10 +123,16 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
             errorText.setVisibility(View.GONE);
         }
 
-        // Convert password to byte array for secure handling
-        byte[] passwordBuffer = com.pears.pass.autofill.utils.SecureBufferUtils.stringToBuffer(password);
+        // Convert char[] to byte[] for secure handling (avoids intermediate String)
+        byte[] passwordBuffer = com.pears.pass.autofill.utils.SecureBufferUtils.charsToBuffer(passwordChars);
+
+        // Clear char array immediately after conversion
+        com.pears.pass.autofill.utils.SecureBufferUtils.clearChars(passwordChars);
 
         CompletableFuture.runAsync(() -> {
+            // Create a copy for navigation since we'll clear the original in finally
+            // This copy will be cleared by CredentialsListFragment after vault activation
+            byte[] navigationBuffer = null;
             try {
                 // Use byte[] version of validateVaultPassword
                 boolean success = vaultClient.validateVaultPassword(vaultId, passwordBuffer).get();
@@ -130,14 +141,21 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
                     return;
                 }
 
+                if (success) {
+                    // Create a copy for navigation - the original will be cleared in finally
+                    navigationBuffer = new byte[passwordBuffer.length];
+                    System.arraycopy(passwordBuffer, 0, navigationBuffer, 0, passwordBuffer.length);
+                }
+
+                final byte[] finalNavigationBuffer = navigationBuffer;
                 getActivity().runOnUiThread(() -> {
                     isUnlocking = false;
 
-                    if (success) {
-                        // Password validated, navigate to credentials list with password
-                        // CredentialsListFragment will use password to activate vault
+                    if (finalNavigationBuffer != null) {
+                        // Password validated, navigate to credentials list with password buffer
+                        // CredentialsListFragment will use password to activate vault and then clear it
                         if (navigationListener != null) {
-                            navigationListener.navigateToCredentialsList(vaultId, password);
+                            navigationListener.navigateToCredentialsList(vaultId, finalNavigationBuffer);
                         }
                     } else {
                         // Failed to validate - wrong password
@@ -151,6 +169,11 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
             } catch (Exception e) {
                 android.util.Log.e("VaultPasswordFragment", "Failed to validate password: " + e.getMessage());
 
+                // Clear navigation buffer if created but not used
+                if (navigationBuffer != null) {
+                    com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(navigationBuffer);
+                }
+
                 if (getActivity() == null) {
                     return;
                 }
@@ -162,7 +185,7 @@ public class VaultPasswordFragment extends BaseAutofillFragment {
                     unlockButton.setEnabled(true);
                 });
             } finally {
-                // Securely clear the password buffer
+                // Securely clear the password buffer used for validation
                 com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(passwordBuffer);
             }
         });

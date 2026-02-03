@@ -26,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
 public class CredentialsListFragment extends BaseAutofillFragment {
     private static final String TAG = "CredentialsListFragment";
     private static final String ARG_VAULT_ID = "vault_id";
-    private static final String ARG_PASSWORD = "password";
     private static final String ARG_WEB_DOMAIN = "web_domain";
     private static final String ARG_PACKAGE_NAME = "package_name";
 
@@ -37,7 +36,6 @@ public class CredentialsListFragment extends BaseAutofillFragment {
     private TextView resultsCount;
     private View loadingIndicator;
     private String vaultId;
-    private String password;
     private String webDomain;
     private String packageName;
     private List<CredentialItem> allCredentials = new ArrayList<>();
@@ -54,23 +52,11 @@ public class CredentialsListFragment extends BaseAutofillFragment {
         return fragment;
     }
 
-    public static CredentialsListFragment newInstance(String vaultId, String password, String webDomain, String packageName) {
-        CredentialsListFragment fragment = new CredentialsListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_VAULT_ID, vaultId);
-        args.putString(ARG_PASSWORD, password);
-        args.putString(ARG_WEB_DOMAIN, webDomain);
-        args.putString(ARG_PACKAGE_NAME, packageName);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             vaultId = getArguments().getString(ARG_VAULT_ID);
-            password = getArguments().getString(ARG_PASSWORD);
             webDomain = getArguments().getString(ARG_WEB_DOMAIN);
             packageName = getArguments().getString(ARG_PACKAGE_NAME);
 
@@ -213,6 +199,13 @@ public class CredentialsListFragment extends BaseAutofillFragment {
             return;
         }
 
+        // Retrieve password buffer from activity (will be cleared after use)
+        byte[] passwordBuffer = null;
+        if (getActivity() instanceof AuthenticationActivity) {
+            passwordBuffer = ((AuthenticationActivity) getActivity()).consumePendingPasswordBuffer();
+        }
+        final byte[] finalPasswordBuffer = passwordBuffer;
+
         isLoading = true;
 
         // Show loading indicator
@@ -238,8 +231,14 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
                 Log.d(TAG, "Activating vault " + vaultId);
 
-                // Now activate the vault by ID with password if available
-                boolean success = vaultClient.getVaultById(vaultId, password).get();
+                // Now activate the vault by ID with password buffer if available
+                boolean success;
+                if (finalPasswordBuffer != null) {
+                    success = vaultClient.getVaultById(vaultId, finalPasswordBuffer).get();
+                } else {
+                    // No password - use null (vault may already be unlocked)
+                    success = vaultClient.getVaultById(vaultId, (String) null).get();
+                }
                 if (!success) {
                     throw new RuntimeException("Failed to activate vault " + vaultId);
                 }
@@ -292,6 +291,12 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                         adapter.updateList(new ArrayList<>());
                         updateResultsCount(0);
                     });
+                }
+            } finally {
+                // Securely clear the password buffer after vault activation
+                if (finalPasswordBuffer != null) {
+                    com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(finalPasswordBuffer);
+                    Log.d(TAG, "Password buffer cleared from memory");
                 }
             }
         });
