@@ -122,6 +122,7 @@ public class VaultInitializer {
 
     /**
      * Classify an exception into a VaultInitError type.
+     * Delegates to VaultErrorUtils for consistent error detection.
      *
      * @param exception The exception to classify
      * @return The appropriate VaultInitError type
@@ -131,28 +132,15 @@ public class VaultInitializer {
             return VaultInitError.TIMEOUT;
         }
 
-        String errorMsg = exception.getMessage();
-        String errorLower = errorMsg != null ? errorMsg.toLowerCase() : "";
-
-        Throwable cause = exception.getCause();
-        String causeMsg = cause != null && cause.getMessage() != null ?
-                cause.getMessage().toLowerCase() : "";
-
-        // Check for database lock errors
-        boolean isLockError = errorLower.contains("lock hold by current process") ||
-                errorLower.contains("file descriptor could not be locked") ||
-                (errorMsg != null && errorMsg.contains("LOCK")) ||
-                errorLower.contains("no record locks available") ||
-                causeMsg.contains("lock") ||
-                causeMsg.contains("file descriptor could not be locked");
-
-        if (isLockError) {
-            return VaultInitError.VAULT_LOCKED;
-        }
-
         // Check if it's a timeout wrapped in another exception
+        Throwable cause = exception.getCause();
         if (cause instanceof TimeoutException) {
             return VaultInitError.TIMEOUT;
+        }
+
+        // Delegate lock error detection to VaultErrorUtils
+        if (VaultErrorUtils.isDatabaseLockError(exception)) {
+            return VaultInitError.VAULT_LOCKED;
         }
 
         return VaultInitError.VAULT_CLIENT_ERROR;

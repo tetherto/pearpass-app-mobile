@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.pears.pass.autofill.utils.VaultErrorUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -780,14 +782,7 @@ public class PearPassVaultClient {
                     logError("Encryption init failed: " + errorMessage);
 
                     // Check if this is a database lock error (another instance has the db open)
-                    String errorLower = errorMessage != null ? errorMessage.toLowerCase() : "";
-                    boolean isLockError = errorMessage != null &&
-                        (errorLower.contains("lock hold by current process") ||
-                         errorLower.contains("file descriptor could not be locked") ||
-                         errorMessage.contains("LOCK") ||
-                         errorLower.contains("no record locks available"));
-
-                    if (isLockError) {
+                    if (VaultErrorUtils.isDatabaseLockError(throwable)) {
                         log("Detected database lock - encryption already initialized by another instance (likely main app)");
                         // Treat this as if encryption is already initialized
                         Map<String, Object> alreadyInitializedResult = new HashMap<String, Object>();
@@ -887,9 +882,7 @@ public class PearPassVaultClient {
                         encryptionInitException.printStackTrace();
 
                         // Check if this is a lock error and re-throw it
-                        String errorMsg = encryptionInitException.getMessage();
-                        if (errorMsg != null && (errorMsg.contains("lock hold by current process") ||
-                            errorMsg.contains("LOCK") || errorMsg.contains("No record locks available"))) {
+                        if (VaultErrorUtils.isDatabaseLockError(encryptionInitException)) {
                             log("Detected lock error in exception handler - re-throwing");
                             throw new RuntimeException(encryptionInitException);
                         }
@@ -925,9 +918,7 @@ public class PearPassVaultClient {
                 throwable.printStackTrace();
 
                 // Check if this is a lock error and re-throw it
-                String errorMsg = throwable.getMessage();
-                if (errorMsg != null && (errorMsg.contains("lock hold by current process") ||
-                    errorMsg.contains("LOCK") || errorMsg.contains("No record locks available"))) {
+                if (VaultErrorUtils.isDatabaseLockError(throwable)) {
                     log("Detected lock error in outer exception handler - re-throwing");
                     throw new RuntimeException(throwable);
                 }
