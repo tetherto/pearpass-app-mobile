@@ -77,6 +77,12 @@ const truncateFileName = (fileName, maxLength = 20) => {
  * @param {function} [props.onUpload] - Callback function triggered when a file is uploaded.
  * @param {number} [props.attachmentIndex] - Index of the attachment in a list.
  * @param {function} [props.onDelete] - Callback function triggered when an attachment is deleted.
+ * @param {string} [props.testID] - Test ID for the field wrapper.
+ * @param {string} [props.accessibilityLabel] - Accessibility label for the field wrapper.
+ * @param {string} [props.inputTestID] - Test ID for the input area.
+ * @param {string} [props.inputAccessibilityLabel] - Accessibility label for the input area.
+ * @param {string} [props.addButtonTestID] - Test ID for the add button.
+ * @param {string} [props.addButtonAccessibilityLabel] - Accessibility label for the add button.
  * @returns {JSX.Element} The rendered AttachmentField component.
  */
 export const AttachmentField = ({
@@ -87,7 +93,13 @@ export const AttachmentField = ({
   isLast,
   onUpload,
   attachmentIndex,
-  onDelete
+  onDelete,
+  testID,
+  accessibilityLabel,
+  inputTestID,
+  inputAccessibilityLabel,
+  addButtonTestID,
+  addButtonAccessibilityLabel
 }) => {
   const { expand, collapse } = useBottomSheet()
   const navigation = useNavigation()
@@ -133,7 +145,12 @@ export const AttachmentField = ({
   }
 
   return (
-    <Wrapper isFirst={isFirst} isLast={isLast}>
+    <Wrapper
+      isFirst={isFirst}
+      isLast={isLast}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+    >
       <IconWrapper>
         <CommonFileIcon size={21} />
       </IconWrapper>
@@ -141,7 +158,10 @@ export const AttachmentField = ({
       <MainWrapper>
         <Label>{label}</Label>
 
-        <InputAreaWrapper>
+        <InputAreaWrapper
+          testID={inputTestID}
+          accessibilityLabel={inputAccessibilityLabel}
+        >
           <TouchableOpacity onPress={handleAttachmentPress}>
             <AttachmentName isPlaceHolder={!attachment}>
               {!attachment ? 'Add file' : truncateFileName(attachment?.name)}
@@ -156,6 +176,8 @@ export const AttachmentField = ({
           variant="secondary"
           borderRadius="md"
           onPress={handleUpload}
+          testID={addButtonTestID}
+          accessibilityLabel={addButtonAccessibilityLabel}
         />
       )}
 
