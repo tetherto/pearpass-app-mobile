@@ -1,5 +1,22 @@
 require('react-native-reanimated').setUpTests()
 
+// Since many components use clipboard and secure store, we mock them here
+// Developer can overwrite them in their test files if needed.
+jest.mock('expo-clipboard', () => ({
+  setStringAsync: jest.fn(() => Promise.resolve()),
+  getStringAsync: jest.fn(() => Promise.resolve('')),
+  hasStringAsync: jest.fn(() => Promise.resolve(false)),
+  setString: jest.fn(),
+  getString: jest.fn(() => '')
+}))
+
+jest.mock('expo-secure-store', () => ({
+  getItemAsync: jest.fn(() => Promise.resolve(null)),
+  setItemAsync: jest.fn(() => Promise.resolve()),
+  deleteItemAsync: jest.fn(() => Promise.resolve())
+}))
+
+
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
   selectionAsync: jest.fn(),
