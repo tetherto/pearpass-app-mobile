@@ -579,12 +579,18 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
                 android.util.Log.e(TAG, "Error initializing user: " + e.getMessage());
                 e.printStackTrace();
 
-                // Check if this is a database lock error
+                // Check if this is a database lock error (another instance has the db open)
                 String errorMsg = e.getMessage();
-                boolean isDatabaseLockError = errorMsg != null &&
-                    (errorMsg.contains("lock hold by current process") ||
-                     errorMsg.contains("LOCK") ||
-                     errorMsg.contains("No record locks available"));
+                String errorLower = errorMsg != null ? errorMsg.toLowerCase() : "";
+                Throwable cause = e.getCause();
+                String causeMsg = cause != null && cause.getMessage() != null ? cause.getMessage().toLowerCase() : "";
+                boolean isDatabaseLockError =
+                    (errorLower.contains("lock hold by current process") ||
+                     errorLower.contains("file descriptor could not be locked") ||
+                     errorMsg != null && errorMsg.contains("LOCK") ||
+                     errorLower.contains("no record locks available") ||
+                     causeMsg.contains("lock") ||
+                     causeMsg.contains("file descriptor could not be locked"));
 
                 if (isDatabaseLockError && initRetryCount < MAX_INIT_RETRIES) {
                     // Database lock error - retry after a delay
@@ -630,6 +636,7 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
                 // Set default values on error
                 final boolean finalPasswordSet = passwordSet;
                 final boolean finalCouldCheck = couldCheckPassword;
+                final boolean finalIsLockError = isDatabaseLockError;
 
                 runOnUiThread(() -> {
                     // Only navigate if we haven't already navigated
@@ -660,6 +667,10 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
                         // Password is set and we confirmed it - show master password screen
                         android.util.Log.d(TAG, "Error handler - Setting flow to masterPassword (passwordSet=true, confirmed)");
                         navigateToMasterPassword();
+                    } else if (finalIsLockError) {
+                        // Lock error and couldn't determine state - show vault locked error
+                        android.util.Log.d(TAG, "Error handler - Vault locked by another instance, showing lock error");
+                        navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_LOCKED_ERROR);
                     } else {
                         // Could not determine state reliably - show error boundary
                         android.util.Log.d(TAG, "Error handler - Could not reliably determine user state, showing error boundary");

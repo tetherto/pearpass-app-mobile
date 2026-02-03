@@ -218,9 +218,21 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 });
             } catch (Exception e) {
                 Log.e(TAG, "Error initializing user: " + e.getMessage());
+                // Check if this is a lock error (vault locked by another instance)
+                String errorMsg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+                Throwable cause = e.getCause();
+                String causeMsg = cause != null && cause.getMessage() != null ? cause.getMessage().toLowerCase() : "";
+                boolean isLockError = errorMsg.contains("lock") || causeMsg.contains("lock") ||
+                        errorMsg.contains("file descriptor could not be locked") ||
+                        causeMsg.contains("file descriptor could not be locked");
+
                 runOnUiThread(() -> {
                     if (hasNavigated.compareAndSet(false, true)) {
-                        navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_CLIENT_ERROR);
+                        if (isLockError) {
+                            navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_LOCKED_ERROR);
+                        } else {
+                            navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_CLIENT_ERROR);
+                        }
                     }
                     isInitializing.set(false);
                 });

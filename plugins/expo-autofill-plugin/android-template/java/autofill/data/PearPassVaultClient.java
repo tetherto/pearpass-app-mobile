@@ -780,10 +780,12 @@ public class PearPassVaultClient {
                     logError("Encryption init failed: " + errorMessage);
 
                     // Check if this is a database lock error (another instance has the db open)
+                    String errorLower = errorMessage != null ? errorMessage.toLowerCase() : "";
                     boolean isLockError = errorMessage != null &&
-                        (errorMessage.contains("lock hold by current process") ||
+                        (errorLower.contains("lock hold by current process") ||
+                         errorLower.contains("file descriptor could not be locked") ||
                          errorMessage.contains("LOCK") ||
-                         errorMessage.contains("No record locks available"));
+                         errorLower.contains("no record locks available"));
 
                     if (isLockError) {
                         log("Detected database lock - encryption already initialized by another instance (likely main app)");
