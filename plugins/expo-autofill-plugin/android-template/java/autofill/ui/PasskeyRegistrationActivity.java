@@ -22,6 +22,7 @@ import com.pears.pass.autofill.data.PasskeyCredential;
 import com.pears.pass.autofill.data.PasskeyFormData;
 import com.pears.pass.autofill.data.PasskeyResponse;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.VaultInitializer;
 
 import org.json.JSONObject;
 
@@ -172,69 +173,42 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         // readOnly=false for registration (need to write passkey to vault)
         vaultClient = new PearPassVaultClient(this, null, true, false);
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                vaultClient.waitForInitialization().get(30, java.util.concurrent.TimeUnit.SECONDS);
-                Log.d(TAG, "Vault client initialized (readOnly=false)");
-                initializeUser();
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to initialize vault client: " + e.getMessage());
-                runOnUiThread(() -> {
-                    if (hasNavigated.compareAndSet(false, true)) {
-                        navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.INITIALIZATION_FAILED);
-                    }
-                });
-            }
-        });
-    }
-
-    private void initializeUser() {
-        if (!isInitializing.compareAndSet(false, true)) return;
-
-        CompletableFuture.runAsync(() -> {
-            try {
-                PearPassVaultClient.VaultStatus vaultsStatus = vaultClient.vaultsGetStatus().get();
-                PearPassVaultClient.MasterPasswordEncryption masterPasswordEncryption =
-                        vaultClient.getMasterPasswordEncryption(vaultsStatus).get();
-
-                boolean passwordSet = masterPasswordEncryption != null &&
-                        masterPasswordEncryption.ciphertext != null &&
-                        masterPasswordEncryption.nonce != null &&
-                        masterPasswordEncryption.salt != null;
-
-                boolean loggedIn = vaultsStatus.isInitialized && !vaultsStatus.isLocked;
-
+        VaultInitializer.initialize(vaultClient, new VaultInitializer.Callback() {
+            @Override
+            public void onSuccess(VaultInitializer.VaultInitState state) {
                 runOnUiThread(() -> {
                     if (!hasNavigated.compareAndSet(false, true)) return;
 
-                    if (!passwordSet) {
+                    if (!state.hasPasswordSet) {
                         navigateToMissingConfiguration();
-                    } else if (!loggedIn) {
+                    } else if (!state.isLoggedIn) {
                         navigateToMasterPassword();
                     } else {
                         navigateToVaultSelection();
                     }
-                    isInitializing.set(false);
                 });
-            } catch (Exception e) {
-                Log.e(TAG, "Error initializing user: " + e.getMessage());
-                // Check if this is a lock error (vault locked by another instance)
-                String errorMsg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
-                Throwable cause = e.getCause();
-                String causeMsg = cause != null && cause.getMessage() != null ? cause.getMessage().toLowerCase() : "";
-                boolean isLockError = errorMsg.contains("lock") || causeMsg.contains("lock") ||
-                        errorMsg.contains("file descriptor could not be locked") ||
-                        causeMsg.contains("file descriptor could not be locked");
+            }
 
+            @Override
+            public void onError(VaultInitializer.VaultInitError error, Exception exception) {
+                Log.e(TAG, "Initialization error: " + error + " - " + exception.getMessage());
                 runOnUiThread(() -> {
-                    if (hasNavigated.compareAndSet(false, true)) {
-                        if (isLockError) {
+                    if (!hasNavigated.compareAndSet(false, true)) return;
+
+                    switch (error) {
+                        case TIMEOUT:
+                            navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.TIMEOUT_ERROR);
+                            break;
+                        case VAULT_LOCKED:
                             navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_LOCKED_ERROR);
-                        } else {
+                            break;
+                        case INITIALIZATION_FAILED:
+                            navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.INITIALIZATION_FAILED);
+                            break;
+                        default:
                             navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_CLIENT_ERROR);
-                        }
+                            break;
                     }
-                    isInitializing.set(false);
                 });
             }
         });

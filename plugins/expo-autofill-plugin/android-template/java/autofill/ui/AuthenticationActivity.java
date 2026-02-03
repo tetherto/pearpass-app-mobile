@@ -27,6 +27,7 @@ import com.pears.pass.autofill.crypto.PasskeyCrypto;
 import com.pears.pass.autofill.data.CredentialItem;
 import com.pears.pass.autofill.data.PasskeyCredential;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.VaultInitializer;
 
 import org.json.JSONObject;
 
@@ -462,228 +463,166 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
         vaultClient = new PearPassVaultClient(this, null, true);
 
-        // Initialize user after vault client is ready
-        CompletableFuture.runAsync(() -> {
-            try {
-                // Wait for vault client to be fully initialized with timeout
-                android.util.Log.d(TAG, "Waiting for vault client initialization...");
-                vaultClient.waitForInitialization().get(30, java.util.concurrent.TimeUnit.SECONDS);
-                android.util.Log.d(TAG, "Vault client is ready");
+        android.util.Log.d(TAG, "Starting vault initialization...");
+        VaultInitializer.initialize(vaultClient, new VaultInitializer.Callback() {
+            @Override
+            public void onSuccess(VaultInitializer.VaultInitState state) {
+                runOnUiThread(() -> handleInitSuccess(state));
+            }
 
-                // Now initialize the user
-                initializeUser();
-            } catch (java.util.concurrent.TimeoutException e) {
-                android.util.Log.e(TAG, "Vault client initialization timed out");
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping timeout error navigation");
-                        return;
-                    }
-                    isLoading = false;
-                    navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.TIMEOUT_ERROR);
-                });
-            } catch (Exception e) {
-                android.util.Log.e(TAG, "Failed to initialize vault client: " + e.getMessage());
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping init failed error navigation");
-                        return;
-                    }
-                    isLoading = false;
-                    navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.INITIALIZATION_FAILED);
-                });
+            @Override
+            public void onError(VaultInitializer.VaultInitError error, Exception exception) {
+                android.util.Log.e(TAG, "Initialization error: " + error + " - " + exception.getMessage());
+                exception.printStackTrace();
+                handleInitError(error, exception);
             }
         });
     }
 
     /**
-     * Initializes the user by checking password, login and vault status
+     * Handle successful initialization
      */
-    private void initializeUser() {
-        if (vaultClient == null) {
-            android.util.Log.e(TAG, "Cannot initialize user - vault client is null");
+    private void handleInitSuccess(VaultInitializer.VaultInitState state) {
+        // Only navigate if we haven't already navigated
+        if (!hasNavigated.compareAndSet(false, true)) {
+            android.util.Log.d(TAG, "Already navigated, skipping navigation");
             return;
         }
 
-        // Prevent concurrent initialization
-        if (!isInitializing.compareAndSet(false, true)) {
-            android.util.Log.d(TAG, "Initialization skipped due to concurrent call");
+        this.hasPasswordSet = state.hasPasswordSet;
+        this.isLoggedIn = state.isLoggedIn;
+        this.isVaultOpen = state.isVaultOpen;
+        this.isLoading = false;
+
+        android.util.Log.d(TAG, "User initialization complete");
+        android.util.Log.d(TAG, "  - hasPasswordSet: " + state.hasPasswordSet);
+        android.util.Log.d(TAG, "  - isLoggedIn: " + state.isLoggedIn);
+        android.util.Log.d(TAG, "  - isVaultOpen: " + state.isVaultOpen);
+
+        // Set the appropriate flow based on password configuration
+        if (!state.hasPasswordSet) {
+            android.util.Log.d(TAG, "Setting flow to missingConfiguration (passwordSet=false)");
+            navigateToMissingConfiguration();
+        } else if (!state.isLoggedIn) {
+            android.util.Log.d(TAG, "Setting flow to masterPassword (passwordSet=true, loggedIn=false)");
+            navigateToMasterPassword();
+        } else {
+            android.util.Log.d(TAG, "User is logged in, navigating to vault selection");
+            navigateToVaultSelection();
+        }
+
+        // Reset initialization state after flow is set
+        isInitializing.set(false);
+        initRetryCount = 0; // Reset retry counter on success
+        hasInitializedOnce = true;
+    }
+
+    /**
+     * Handle initialization error with retry logic for lock errors
+     */
+    private void handleInitError(VaultInitializer.VaultInitError error, Exception exception) {
+        boolean isLockError = error == VaultInitializer.VaultInitError.VAULT_LOCKED;
+
+        if (isLockError && initRetryCount < MAX_INIT_RETRIES) {
+            // Database lock error - retry after a delay
+            initRetryCount++;
+            int delayMs = initRetryCount * 300; // 300ms, 600ms, 900ms, etc.
+
+            android.util.Log.w(TAG, "Database lock detected, retrying in " + delayMs + "ms (attempt " + initRetryCount + "/" + MAX_INIT_RETRIES + ")");
+
+            runOnUiThread(() -> {
+                isInitializing.set(false);
+                // Keep loading state - don't set isLoading = false
+            });
+
+            // Retry after delay
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                android.util.Log.d(TAG, "Retrying initialization after database lock");
+                retryInitializeUser();
+            }, delayMs);
+
             return;
         }
 
-        android.util.Log.d(TAG, "Calling initializeUser");
+        // Not a lock error or max retries reached - handle normally
+        if (isLockError) {
+            android.util.Log.e(TAG, "Max retries reached for database lock, showing error");
+        }
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                // Get vault status and active vault status sequentially to avoid race conditions
-                PearPassVaultClient.VaultStatus vaultsStatusRes = vaultClient.vaultsGetStatus().get();
-                PearPassVaultClient.VaultStatus activeVaultStatusRes = vaultClient.activeVaultGetStatus().get();
+        // Try to at least check if password is set
+        boolean passwordSet = VaultInitializer.tryCheckPasswordSet(vaultClient);
+        boolean couldCheckPassword = passwordSet || vaultClient != null;
 
-                // Now get master password encryption, passing the vault status to avoid duplicate call
-                PearPassVaultClient.MasterPasswordEncryption masterPasswordEncryption =
-                    vaultClient.getMasterPasswordEncryption(vaultsStatusRes).get();
+        final boolean finalPasswordSet = passwordSet;
+        final boolean finalCouldCheck = couldCheckPassword;
+        final boolean finalIsLockError = isLockError;
 
-                // Check if password is set by verifying all required fields exist
-                boolean passwordSet = masterPasswordEncryption != null &&
-                                     masterPasswordEncryption.ciphertext != null &&
-                                     masterPasswordEncryption.nonce != null &&
-                                     masterPasswordEncryption.salt != null;
-
-                // Check if user is logged in (vault is initialized and unlocked)
-                boolean loggedIn = vaultsStatusRes.isInitialized && !vaultsStatusRes.isLocked;
-
-                // Check if active vault is open
-                boolean vaultOpen = loggedIn &&
-                                   activeVaultStatusRes.isInitialized &&
-                                   !activeVaultStatusRes.isLocked;
-
-                // Update state on UI thread
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping navigation");
-                        return;
-                    }
-
-                    this.hasPasswordSet = passwordSet;
-                    this.isLoggedIn = loggedIn;
-                    this.isVaultOpen = vaultOpen;
-                    this.isLoading = false;
-
-                    android.util.Log.d(TAG, "User initialization complete");
-                    android.util.Log.d(TAG, "  - hasPasswordSet: " + passwordSet);
-                    android.util.Log.d(TAG, "  - isLoggedIn: " + loggedIn);
-                    android.util.Log.d(TAG, "  - isVaultOpen: " + vaultOpen);
-
-                    // Set the appropriate flow based on password configuration
-                    if (!passwordSet) {
-                        android.util.Log.d(TAG, "Setting flow to missingConfiguration (passwordSet=false)");
-                        navigateToMissingConfiguration();
-                    } else if (!loggedIn) {
-                        android.util.Log.d(TAG, "Setting flow to masterPassword (passwordSet=true, loggedIn=false)");
-                        navigateToMasterPassword();
-                    } else {
-                        android.util.Log.d(TAG, "User is logged in, navigating to vault selection");
-                        navigateToVaultSelection();
-                    }
-
-                    // Reset initialization state after flow is set
-                    isInitializing.set(false);
-                    initRetryCount = 0; // Reset retry counter on success
-                    hasInitializedOnce = true;
-                });
-
-            } catch (Exception e) {
-                android.util.Log.e(TAG, "Error initializing user: " + e.getMessage());
-                e.printStackTrace();
-
-                // Check if this is a database lock error (another instance has the db open)
-                String errorMsg = e.getMessage();
-                String errorLower = errorMsg != null ? errorMsg.toLowerCase() : "";
-                Throwable cause = e.getCause();
-                String causeMsg = cause != null && cause.getMessage() != null ? cause.getMessage().toLowerCase() : "";
-                boolean isDatabaseLockError =
-                    (errorLower.contains("lock hold by current process") ||
-                     errorLower.contains("file descriptor could not be locked") ||
-                     errorMsg != null && errorMsg.contains("LOCK") ||
-                     errorLower.contains("no record locks available") ||
-                     causeMsg.contains("lock") ||
-                     causeMsg.contains("file descriptor could not be locked"));
-
-                if (isDatabaseLockError && initRetryCount < MAX_INIT_RETRIES) {
-                    // Database lock error - retry after a delay
-                    initRetryCount++;
-                    int delayMs = initRetryCount * 300; // 300ms, 600ms, 900ms, etc.
-
-                    android.util.Log.w(TAG, "Database lock detected, retrying in " + delayMs + "ms (attempt " + initRetryCount + "/" + MAX_INIT_RETRIES + ")");
-
-                    runOnUiThread(() -> {
-                        isInitializing.set(false);
-                        // Keep loading state - don't set isLoading = false
-                    });
-
-                    // Retry after delay
-                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                        android.util.Log.d(TAG, "Retrying initialization after database lock");
-                        initializeUser();
-                    }, delayMs);
-
-                    return;
-                }
-
-                // Not a lock error or max retries reached - handle normally
-                if (isDatabaseLockError) {
-                    android.util.Log.e(TAG, "Max retries reached for database lock, showing error");
-                }
-
-                // Try to at least check if password is set
-                boolean passwordSet = false;
-                boolean couldCheckPassword = false;
-                try {
-                    PearPassVaultClient.MasterPasswordEncryption masterPasswordEncryption =
-                        vaultClient.getMasterPasswordEncryption(null).get();
-                    passwordSet = masterPasswordEncryption != null &&
-                                 masterPasswordEncryption.ciphertext != null &&
-                                 masterPasswordEncryption.nonce != null &&
-                                 masterPasswordEncryption.salt != null;
-                    couldCheckPassword = true;
-                } catch (Exception ex) {
-                    android.util.Log.e(TAG, "Could not check password status: " + ex.getMessage());
-                }
-
-                // Set default values on error
-                final boolean finalPasswordSet = passwordSet;
-                final boolean finalCouldCheck = couldCheckPassword;
-                final boolean finalIsLockError = isDatabaseLockError;
-
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping error navigation");
-                        return;
-                    }
-
-                    // Only update hasPasswordSet if we could actually check it
-                    // Otherwise keep the saved state or assume password is set (safer default)
-                    if (finalCouldCheck) {
-                        this.hasPasswordSet = finalPasswordSet;
-                    } else if (!hasInitializedOnce) {
-                        // No saved state and couldn't check - assume password is set
-                        // This is safer than assuming it's not set and showing onboarding
-                        this.hasPasswordSet = true;
-                        android.util.Log.d(TAG, "Error handler - Could not verify password status, assuming set to avoid onboarding");
-                    }
-                    this.isLoggedIn = false;
-                    this.isVaultOpen = false;
-                    this.isLoading = false;
-
-                    // Only show missing configuration if we're CERTAIN password is not set
-                    if (!this.hasPasswordSet && finalCouldCheck) {
-                        android.util.Log.d(TAG, "Error handler - Setting flow to missingConfiguration (passwordSet=false, confirmed)");
-                        navigateToMissingConfiguration();
-                    } else if (this.hasPasswordSet && finalCouldCheck) {
-                        // Password is set and we confirmed it - show master password screen
-                        android.util.Log.d(TAG, "Error handler - Setting flow to masterPassword (passwordSet=true, confirmed)");
-                        navigateToMasterPassword();
-                    } else if (finalIsLockError) {
-                        // Lock error and couldn't determine state - show vault locked error
-                        android.util.Log.d(TAG, "Error handler - Vault locked by another instance, showing lock error");
-                        navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_LOCKED_ERROR);
-                    } else {
-                        // Could not determine state reliably - show error boundary
-                        android.util.Log.d(TAG, "Error handler - Could not reliably determine user state, showing error boundary");
-                        navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_CLIENT_ERROR);
-                    }
-
-                    // Reset initialization state after flow is set
-                    isInitializing.set(false);
-                    initRetryCount = 0; // Reset retry counter
-                    hasInitializedOnce = true;
-                });
+        runOnUiThread(() -> {
+            // Only navigate if we haven't already navigated
+            if (!hasNavigated.compareAndSet(false, true)) {
+                android.util.Log.d(TAG, "Already navigated, skipping error navigation");
+                return;
             }
+
+            // Only update hasPasswordSet if we could actually check it
+            // Otherwise keep the saved state or assume password is set (safer default)
+            if (finalCouldCheck) {
+                this.hasPasswordSet = finalPasswordSet;
+            } else if (!hasInitializedOnce) {
+                // No saved state and couldn't check - assume password is set
+                // This is safer than assuming it's not set and showing onboarding
+                this.hasPasswordSet = true;
+                android.util.Log.d(TAG, "Error handler - Could not verify password status, assuming set to avoid onboarding");
+            }
+            this.isLoggedIn = false;
+            this.isVaultOpen = false;
+            this.isLoading = false;
+
+            // Only show missing configuration if we're CERTAIN password is not set
+            if (!this.hasPasswordSet && finalCouldCheck) {
+                android.util.Log.d(TAG, "Error handler - Setting flow to missingConfiguration (passwordSet=false, confirmed)");
+                navigateToMissingConfiguration();
+            } else if (this.hasPasswordSet && finalCouldCheck) {
+                // Password is set and we confirmed it - show master password screen
+                android.util.Log.d(TAG, "Error handler - Setting flow to masterPassword (passwordSet=true, confirmed)");
+                navigateToMasterPassword();
+            } else if (finalIsLockError) {
+                // Lock error and couldn't determine state - show vault locked error
+                android.util.Log.d(TAG, "Error handler - Vault locked by another instance, showing lock error");
+                navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_LOCKED_ERROR);
+            } else {
+                // Could not determine state reliably - show error boundary
+                android.util.Log.d(TAG, "Error handler - Could not reliably determine user state, showing error boundary");
+                navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_CLIENT_ERROR);
+            }
+
+            // Reset initialization state after flow is set
+            isInitializing.set(false);
+            initRetryCount = 0; // Reset retry counter
+            hasInitializedOnce = true;
         });
+    }
+
+    /**
+     * Retry user initialization (used for lock error retries)
+     */
+    private void retryInitializeUser() {
+        if (vaultClient == null) {
+            android.util.Log.e(TAG, "Cannot retry initialization - vault client is null");
+            return;
+        }
+
+        VaultInitializer.initializeUser(vaultClient)
+            .whenComplete((state, error) -> {
+                if (error != null) {
+                    Exception ex = error instanceof Exception ?
+                            (Exception) error : new Exception(error);
+                    VaultInitializer.VaultInitError errorType = VaultInitializer.classifyError(ex);
+                    handleInitError(errorType, ex);
+                } else {
+                    runOnUiThread(() -> handleInitSuccess(state));
+                }
+            });
     }
 
     /**
