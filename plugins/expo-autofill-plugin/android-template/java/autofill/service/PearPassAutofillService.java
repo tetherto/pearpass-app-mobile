@@ -16,7 +16,6 @@ import android.service.autofill.FillResponse;
 import android.service.autofill.InlinePresentation;
 import android.service.autofill.SaveCallback;
 import android.service.autofill.SaveRequest;
-import android.util.Log;
 import android.view.autofill.AutofillId;
 import android.view.autofill.AutofillValue;
 import android.widget.RemoteViews;

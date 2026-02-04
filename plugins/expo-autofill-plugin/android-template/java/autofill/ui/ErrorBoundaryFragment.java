@@ -30,6 +30,7 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
         GENERIC_ERROR,
         INITIALIZATION_FAILED,
         VAULT_CLIENT_ERROR,
+        VAULT_LOCKED_ERROR,
         TIMEOUT_ERROR
     }
 
@@ -127,6 +128,14 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
                 title.setText("Vault Error");
                 subtitle.setText("Unable to access vault");
                 message.setText("There was an error accessing the vault. Please close and reopen the app.");
+                message.setVisibility(View.VISIBLE);
+                break;
+
+            case VAULT_LOCKED_ERROR:
+                icon.setText("🔒");
+                title.setText("Vault In Use");
+                subtitle.setText("PearPass is already running");
+                message.setText("The vault is locked by the PearPass app. Please close PearPass and try again.");
                 message.setVisibility(View.VISIBLE);
                 break;
 

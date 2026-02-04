@@ -2,7 +2,6 @@ package com.pears.pass.autofill.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pears.pass.R;
 import com.pears.pass.autofill.data.CredentialItem;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.SecureLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
 public class CredentialsListFragment extends BaseAutofillFragment {
     private static final String TAG = "CredentialsListFragment";
     private static final String ARG_VAULT_ID = "vault_id";
-    private static final String ARG_PASSWORD = "password";
     private static final String ARG_WEB_DOMAIN = "web_domain";
     private static final String ARG_PACKAGE_NAME = "package_name";
 
@@ -37,7 +36,6 @@ public class CredentialsListFragment extends BaseAutofillFragment {
     private TextView resultsCount;
     private View loadingIndicator;
     private String vaultId;
-    private String password;
     private String webDomain;
     private String packageName;
     private List<CredentialItem> allCredentials = new ArrayList<>();
@@ -54,31 +52,19 @@ public class CredentialsListFragment extends BaseAutofillFragment {
         return fragment;
     }
 
-    public static CredentialsListFragment newInstance(String vaultId, String password, String webDomain, String packageName) {
-        CredentialsListFragment fragment = new CredentialsListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_VAULT_ID, vaultId);
-        args.putString(ARG_PASSWORD, password);
-        args.putString(ARG_WEB_DOMAIN, webDomain);
-        args.putString(ARG_PACKAGE_NAME, packageName);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             vaultId = getArguments().getString(ARG_VAULT_ID);
-            password = getArguments().getString(ARG_PASSWORD);
             webDomain = getArguments().getString(ARG_WEB_DOMAIN);
             packageName = getArguments().getString(ARG_PACKAGE_NAME);
 
             if (webDomain != null) {
-                Log.d(TAG, "Received web domain for filtering: " + webDomain);
+                SecureLog.d(TAG, "Received web domain for filtering: " + webDomain);
             }
             if (packageName != null) {
-                Log.d(TAG, "Received package name for filtering: " + packageName);
+                SecureLog.d(TAG, "Received package name for filtering: " + packageName);
             }
         }
     }
@@ -96,9 +82,21 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
         // Setup RecyclerView
         credentialsList.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Determine if we're in passkey assertion mode
+        boolean passkeyMode = false;
+        if (getActivity() instanceof AuthenticationActivity) {
+            passkeyMode = ((AuthenticationActivity) getActivity()).isPasskeyAssertionMode();
+        }
+        final boolean isPasskeyMode = passkeyMode;
+
         adapter = new CredentialAdapter(new ArrayList<>(), credential -> {
             if (navigationListener != null) {
-                navigationListener.onCredentialSelected(credential);
+                if (isPasskeyMode && credential.hasPasskey()) {
+                    navigationListener.onPasskeySelected(credential);
+                } else {
+                    navigationListener.onCredentialSelected(credential);
+                }
             }
         });
         credentialsList.setAdapter(adapter);
@@ -119,7 +117,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 // Mark that user has searched, disable domain filtering permanently
                 if (!query.isEmpty() && !hasUserSearched) {
                     hasUserSearched = true;
-                    Log.d(TAG, "User started searching, domain filtering disabled permanently for this session");
+                    SecureLog.d(TAG, "User started searching, domain filtering disabled permanently for this session");
                 }
 
                 filterCredentials(query);
@@ -167,9 +165,9 @@ public class CredentialsListFragment extends BaseAutofillFragment {
             // If we have matching credentials, show only those; otherwise show all
             if (!matchingCredentials.isEmpty()) {
                 filtered = matchingCredentials;
-                Log.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
+                SecureLog.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
             } else {
-                Log.d(TAG, "No matching credentials found, showing all " + allCredentials.size() + " credentials");
+                SecureLog.d(TAG, "No matching credentials found, showing all " + allCredentials.size() + " credentials");
             }
         }
         // If hasUserSearched is true and query is empty, show all credentials (no filtering)
@@ -187,19 +185,26 @@ public class CredentialsListFragment extends BaseAutofillFragment {
      * Load credentials from the active vault
      */
     private void loadCredentialsFromActiveVault() {
-        Log.d(TAG, "Loading credentials for vault " + vaultId);
+        SecureLog.d(TAG, "Loading credentials for vault " + vaultId);
 
-        AuthenticationActivity activity = (AuthenticationActivity) getActivity();
-        if (activity == null) {
-            Log.e(TAG, "Activity is null, cannot load credentials");
+        if (getActivity() == null) {
+            SecureLog.e(TAG, "Activity is null, cannot load credentials");
             return;
         }
 
-        PearPassVaultClient vaultClient = activity.getVaultClient();
+        // Use vaultClient from BaseAutofillFragment (resolved in onAttach for both
+        // AuthenticationActivity and PasskeyRegistrationActivity)
         if (vaultClient == null) {
-            Log.e(TAG, "No vault client available, cannot load credentials");
+            SecureLog.e(TAG, "No vault client available, cannot load credentials");
             return;
         }
+
+        // Retrieve password buffer from activity (will be cleared after use)
+        byte[] passwordBuffer = null;
+        if (getActivity() instanceof AuthenticationActivity) {
+            passwordBuffer = ((AuthenticationActivity) getActivity()).consumePendingPasswordBuffer();
+        }
+        final byte[] finalPasswordBuffer = passwordBuffer;
 
         isLoading = true;
 
@@ -213,30 +218,36 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
         CompletableFuture.runAsync(() -> {
             try {
-                Log.d(TAG, "Closing any active vault before activating vault " + vaultId);
+                SecureLog.d(TAG, "Closing any active vault before activating vault " + vaultId);
 
                 // IMPORTANT: Close any currently active vault first to release the database lock
                 // This prevents "lock hold by current process" errors
                 try {
                     vaultClient.activeVaultClose().get();
-                    Log.d(TAG, "Closed previous active vault");
+                    SecureLog.d(TAG, "Closed previous active vault");
                 } catch (Exception e) {
-                    Log.d(TAG, "No active vault to close or already closed: " + e.getMessage());
+                    SecureLog.d(TAG, "No active vault to close or already closed: " + e.getMessage());
                 }
 
-                Log.d(TAG, "Activating vault " + vaultId);
+                SecureLog.d(TAG, "Activating vault " + vaultId);
 
-                // Now activate the vault by ID with password if available
-                boolean success = vaultClient.getVaultById(vaultId, password).get();
+                // Now activate the vault by ID with password buffer if available
+                boolean success;
+                if (finalPasswordBuffer != null) {
+                    success = vaultClient.getVaultById(vaultId, finalPasswordBuffer).get();
+                } else {
+                    // No password - use null (vault may already be unlocked)
+                    success = vaultClient.getVaultById(vaultId, (String) null).get();
+                }
                 if (!success) {
                     throw new RuntimeException("Failed to activate vault " + vaultId);
                 }
 
-                Log.d(TAG, "Successfully activated vault " + vaultId);
+                SecureLog.d(TAG, "Successfully activated vault " + vaultId);
 
                 // Now fetch records from the newly active vault
                 List<Map<String, Object>> records = vaultClient.activeVaultList("record/").get();
-                Log.d(TAG, "Received " + records.size() + " records from vault " + vaultId);
+                SecureLog.d(TAG, "Received " + records.size() + " records from vault " + vaultId);
 
                 List<CredentialItem> parsedCredentials = parseCredentials(records);
 
@@ -245,7 +256,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                     getActivity().runOnUiThread(() -> {
                         this.allCredentials = parsedCredentials;
                         this.isLoading = false;
-                        Log.d(TAG, "Loaded " + parsedCredentials.size() + " credentials from activated vault");
+                        SecureLog.d(TAG, "Loaded " + parsedCredentials.size() + " credentials from activated vault");
 
                         // Hide loading indicator
                         if (loadingIndicator != null) {
@@ -263,7 +274,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 }
 
             } catch (Exception e) {
-                Log.e(TAG, "Error loading from vault: " + e.getMessage());
+                SecureLog.e(TAG, "Error loading from vault: " + e.getMessage());
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         this.isLoading = false;
@@ -280,6 +291,12 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                         adapter.updateList(new ArrayList<>());
                         updateResultsCount(0);
                     });
+                }
+            } finally {
+                // Securely clear the password buffer after vault activation
+                if (finalPasswordBuffer != null) {
+                    com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(finalPasswordBuffer);
+                    SecureLog.d(TAG, "Password buffer cleared from memory");
                 }
             }
         });
@@ -338,7 +355,30 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 }
             }
 
-            credentials.add(new CredentialItem(id, name, username, password, websites));
+            // Parse passkey data
+            boolean hasPasskey = false;
+            long passkeyCreatedAt = 0;
+            Map<String, Object> credentialMap = null;
+            String privateKeyBuffer = null;
+            String userId = null;
+            String credentialId = null;
+
+            Object credentialObj = recordData.get("credential");
+            if (credentialObj instanceof Map) {
+                hasPasskey = true;
+                credentialMap = (Map<String, Object>) credentialObj;
+                credentialId = (String) credentialMap.get("id");
+                privateKeyBuffer = (String) credentialMap.get("_privateKeyBuffer");
+                userId = (String) credentialMap.get("_userId");
+
+                Object passkeyTs = recordData.get("passkeyCreatedAt");
+                if (passkeyTs instanceof Number) {
+                    passkeyCreatedAt = ((Number) passkeyTs).longValue();
+                }
+            }
+
+            credentials.add(new CredentialItem(id, name, username, password, websites,
+                    hasPasskey, passkeyCreatedAt, credentialMap, privateKeyBuffer, userId, credentialId));
         }
 
         return credentials;
@@ -360,7 +400,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
         String packageAsDomain = null;
         if (packageName != null) {
             packageAsDomain = convertPackageToDomain(packageName);
-            Log.d(TAG, "Converted package '" + packageName + "' to domain format '" + packageAsDomain + "'");
+            SecureLog.d(TAG, "Converted package '" + packageName + "' to domain format '" + packageAsDomain + "'");
         }
 
         for (String website : credential.getWebsites()) {
@@ -368,14 +408,14 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
             // Check web domain match
             if (targetDomain != null && domainsMatch(targetDomain, websiteDomain)) {
-                Log.d(TAG, "Domain match found! Credential '" + credential.getTitle() +
+                SecureLog.d(TAG, "Domain match found! Credential '" + credential.getTitle() +
                         "' website '" + websiteDomain + "' matches target '" + targetDomain + "'");
                 return true;
             }
 
             // Check package name match (converted to domain format)
             if (packageAsDomain != null && domainsMatch(packageAsDomain, websiteDomain)) {
-                Log.d(TAG, "Package match found! Credential '" + credential.getTitle() +
+                SecureLog.d(TAG, "Package match found! Credential '" + credential.getTitle() +
                         "' website '" + websiteDomain + "' matches package as domain '" + packageAsDomain + "'");
                 return true;
             }

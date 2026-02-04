@@ -54,6 +54,41 @@ public final class SecureBufferUtils {
     }
 
     /**
+     * Converts a char array to a UTF-8 encoded byte array.
+     * Use this instead of stringToBuffer when you have a char[] to avoid
+     * creating an intermediate String which cannot be cleared from memory.
+     *
+     * @param chars The char array to convert
+     * @return UTF-8 encoded byte array
+     */
+    public static byte[] charsToBuffer(char[] chars) {
+        if (chars == null || chars.length == 0) {
+            return new byte[0];
+        }
+        java.nio.CharBuffer charBuffer = java.nio.CharBuffer.wrap(chars);
+        java.nio.ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(charBuffer);
+        byte[] result = new byte[byteBuffer.remaining()];
+        byteBuffer.get(result);
+        // Clear the internal ByteBuffer array to avoid leaving data in memory
+        if (byteBuffer.hasArray()) {
+            Arrays.fill(byteBuffer.array(), (byte) 0);
+        }
+        return result;
+    }
+
+    /**
+     * Securely clears a char array by overwriting with null characters.
+     * Use this to clear password char arrays after converting to byte[].
+     *
+     * @param chars The char array to clear
+     */
+    public static void clearChars(char[] chars) {
+        if (chars != null && chars.length > 0) {
+            Arrays.fill(chars, '\0');
+        }
+    }
+
+    /**
      * Converts a byte array to Base64 encoded string.
      * Used for transmitting binary data over JSON/RPC.
      *

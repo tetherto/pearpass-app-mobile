@@ -20,7 +20,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.pears.pass.R;
 import com.pears.pass.autofill.data.PearPassVaultClient;
 import com.pears.pass.autofill.utils.BiometricAuthHelper;
-import android.util.Log;
+import com.pears.pass.autofill.utils.SecureLog;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -44,15 +44,17 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Close any open vaults when returning to this screen
-        // This ensures we can authenticate again without lock conflicts
-        if (vaultClient != null) {
+        // Close any open vaults when returning to this screen in assertion mode.
+        // This ensures we can authenticate again without lock conflicts.
+        // Skip in registration mode (PasskeyRegistrationActivity) since vault lifecycle
+        // is managed by the registration activity itself.
+        if (vaultClient != null && getActivity() instanceof AuthenticationActivity) {
             CompletableFuture.runAsync(() -> {
                 try {
                     vaultClient.vaultsClose().get();
-                    android.util.Log.d("MasterPasswordFragment", "Closed vaults on resume");
+                    SecureLog.d("MasterPasswordFragment", "Closed vaults on resume");
                 } catch (Exception e) {
-                    android.util.Log.d("MasterPasswordFragment", "No vaults to close or error closing: " + e.getMessage());
+                    SecureLog.d("MasterPasswordFragment", "No vaults to close or error closing: " + e.getMessage());
                 }
             });
         }
@@ -117,6 +119,21 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     throw new Exception("Invalid master password - vault remains locked");
                 }
 
+                // Get and store the master password encryption for resume reinitialization
+                try {
+                    PearPassVaultClient.MasterPasswordEncryption masterEnc =
+                        vaultClient.getMasterPasswordEncryption(vaultStatus).get();
+                    if (masterEnc != null && getActivity() instanceof PasskeyRegistrationActivity) {
+                        ((PasskeyRegistrationActivity) getActivity()).onCredentialsObtained(
+                            masterEnc.ciphertext,
+                            masterEnc.nonce,
+                            masterEnc.hashedPassword
+                        );
+                    }
+                } catch (Exception e) {
+                    SecureLog.w("MasterPasswordFragment", "Could not get master encryption for resume: " + e.getMessage());
+                }
+
                 // Authentication successful
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
@@ -126,7 +143,7 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 });
 
             } catch (Exception e) {
-                android.util.Log.e("MasterPasswordFragment", "Authentication failed: " + e.getMessage());
+                SecureLog.e("MasterPasswordFragment", "Authentication failed: " + e.getMessage());
 
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Invalid master password", Toast.LENGTH_SHORT).show();
@@ -174,7 +191,7 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             boolean isEnabled = biometricHelper.isBiometricsEnabled();
             boolean canUse = biometricHelper.canUseBiometrics();
 
-            android.util.Log.d("MasterPasswordFragment",
+            SecureLog.d("MasterPasswordFragment",
                 "Biometric status - supported: " + isSupported +
                 ", enabled: " + isEnabled +
                 ", canUse: " + canUse);
@@ -280,7 +297,15 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     throw new Exception("Invalid credentials - vault remains locked");
                 }
 
-                // Authentication successful
+                // Authentication successful - store credentials for resume reinitialization
+                if (getActivity() instanceof PasskeyRegistrationActivity) {
+                    ((PasskeyRegistrationActivity) getActivity()).onCredentialsObtained(
+                        encryptionData.ciphertext,
+                        encryptionData.nonce,
+                        encryptionData.hashedPassword
+                    );
+                }
+
                 getActivity().runOnUiThread(() -> {
                     isAuthenticatingBiometric = false;
                     Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
@@ -290,7 +315,7 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 });
 
             } catch (Exception e) {
-                android.util.Log.e("MasterPasswordFragment", "Biometric authentication failed: " + e.getMessage());
+                SecureLog.e("MasterPasswordFragment", "Biometric authentication failed: " + e.getMessage());
 
                 getActivity().runOnUiThread(() -> {
                     isAuthenticatingBiometric = false;

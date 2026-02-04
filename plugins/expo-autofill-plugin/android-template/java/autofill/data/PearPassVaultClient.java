@@ -1,11 +1,14 @@
 package com.pears.pass.autofill.data;
 
 import android.content.Context;
-import android.util.Log;
+
+import com.pears.pass.autofill.utils.SecureLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.pears.pass.autofill.utils.VaultErrorUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +78,7 @@ public class PearPassVaultClient {
     private final Context context;
     private final String storagePath;
     private final boolean debugMode;
+    private final boolean readOnly;
     private BareHelper bareHelper;
     private boolean isWorkletInitialized = false;
     private volatile boolean isFullyInitialized = false;
@@ -169,11 +173,17 @@ public class PearPassVaultClient {
         }
     }
 
-    // Constructor
+    // Constructors
+
     public PearPassVaultClient(Context context, String storagePath, boolean debugMode) {
+        this(context, storagePath, debugMode, true);
+    }
+
+    public PearPassVaultClient(Context context, String storagePath, boolean debugMode, boolean readOnly) {
         this.context = context;
         this.storagePath = storagePath;
         this.debugMode = debugMode;
+        this.readOnly = readOnly;
 
         // Initialize the worklet synchronously on the current thread
         try {
@@ -191,9 +201,8 @@ public class PearPassVaultClient {
             // Set the storage path and core store options asynchronously
             setStoragePath(pathToUse)
                 .thenCompose(v -> {
-                    // Set readOnly mode for autofill extension to avoid file lock conflicts
-                    log("Setting core store options: readOnly=true");
-                    return setCoreStoreOptions(true);
+                    log("Setting core store options: readOnly=" + readOnly);
+                    return setCoreStoreOptions(readOnly);
                 })
                 .whenComplete((result, error) -> {
                     if (error != null) {
@@ -201,7 +210,7 @@ public class PearPassVaultClient {
                         initializationError = new RuntimeException("Failed to initialize", error);
                         initializationFuture.completeExceptionally(initializationError);
                     } else {
-                        log("Vault client fully initialized with readOnly mode");
+                        log("Vault client fully initialized with readOnly=" + readOnly);
                         isFullyInitialized = true;
                         initializationFuture.complete(null);
                     }
@@ -774,12 +783,7 @@ public class PearPassVaultClient {
                     logError("Encryption init failed: " + errorMessage);
 
                     // Check if this is a database lock error (another instance has the db open)
-                    boolean isLockError = errorMessage != null &&
-                        (errorMessage.contains("lock hold by current process") ||
-                         errorMessage.contains("LOCK") ||
-                         errorMessage.contains("No record locks available"));
-
-                    if (isLockError) {
+                    if (VaultErrorUtils.isDatabaseLockError(throwable)) {
                         log("Detected database lock - encryption already initialized by another instance (likely main app)");
                         // Treat this as if encryption is already initialized
                         Map<String, Object> alreadyInitializedResult = new HashMap<String, Object>();
@@ -879,9 +883,7 @@ public class PearPassVaultClient {
                         encryptionInitException.printStackTrace();
 
                         // Check if this is a lock error and re-throw it
-                        String errorMsg = encryptionInitException.getMessage();
-                        if (errorMsg != null && (errorMsg.contains("lock hold by current process") ||
-                            errorMsg.contains("LOCK") || errorMsg.contains("No record locks available"))) {
+                        if (VaultErrorUtils.isDatabaseLockError(encryptionInitException)) {
                             log("Detected lock error in exception handler - re-throwing");
                             throw new RuntimeException(encryptionInitException);
                         }
@@ -917,9 +919,7 @@ public class PearPassVaultClient {
                 throwable.printStackTrace();
 
                 // Check if this is a lock error and re-throw it
-                String errorMsg = throwable.getMessage();
-                if (errorMsg != null && (errorMsg.contains("lock hold by current process") ||
-                    errorMsg.contains("LOCK") || errorMsg.contains("No record locks available"))) {
+                if (VaultErrorUtils.isDatabaseLockError(throwable)) {
                     log("Detected lock error in outer exception handler - re-throwing");
                     throw new RuntimeException(throwable);
                 }
@@ -1634,15 +1634,408 @@ public class PearPassVaultClient {
         }
     }
 
+    // ========================
+    // File Methods
+    // ========================
+
+    /**
+     * Add a file to the active vault (encrypted by vault core).
+     * Files are stored at: record/{recordId}/file/{fileId}
+     * Port of iOS PearPassVaultClient.activeVaultAddFile().
+     */
+    public CompletableFuture<Void> activeVaultAddFile(String recordId, String fileId, byte[] buffer, String name) {
+        log("Adding file '" + name + "' (" + buffer.length + " bytes) to record " + recordId);
+
+        String key = "record/" + recordId + "/file/" + fileId;
+
+        // Write file to a temp location so the Bare worklet can read it from disk
+        // (avoids IPC size limits, matching iOS approach)
+        java.io.File tempFile = new java.io.File(context.getCacheDir(), "temp_upload_" + fileId);
+        try {
+            java.io.FileOutputStream fos = new java.io.FileOutputStream(tempFile);
+            fos.write(buffer);
+            fos.close();
+        } catch (java.io.IOException e) {
+            CompletableFuture<Void> failed = new CompletableFuture<>();
+            failed.completeExceptionally(new RuntimeException("Failed to write temp file: " + e.getMessage()));
+            return failed;
+        }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("key", key);
+        params.put("filePath", tempFile.getAbsolutePath());
+        params.put("name", name);
+
+        return sendRequest(API.ACTIVE_VAULT_FILE_ADD.getValue(), params)
+                .thenAccept(result -> {
+                    log("File '" + name + "' added successfully");
+                    tempFile.delete();
+                })
+                .whenComplete((result, error) -> {
+                    if (error != null) {
+                        tempFile.delete();
+                    }
+                });
+    }
+
+    // ========================
+    // Passkey Methods
+    // ========================
+
+    /**
+     * Add a record to the active vault.
+     */
+    public CompletableFuture<Void> activeVaultAdd(String key, Map<String, Object> data) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("key", key);
+        params.put("data", data);
+        return sendRequest(API.ACTIVE_VAULT_ADD.getValue(), params)
+                .thenAccept(result -> log("Added to active vault with key: " + key));
+    }
+
+    /**
+     * Save a passkey credential as a new login record in the active vault.
+     * Port of iOS PearPassVaultClient.savePasskey().
+     */
+    public CompletableFuture<String> savePasskey(String vaultId, PasskeyCredential credential,
+                                                  String title, String userName,
+                                                  List<String> websites, String note,
+                                                  String folder, Long passkeyCreatedAt,
+                                                  String recordId) {
+        return savePasskey(vaultId, credential, title, userName, websites, note,
+                folder, passkeyCreatedAt, recordId, new ArrayList<>());
+    }
+
+    public CompletableFuture<String> savePasskey(String vaultId, PasskeyCredential credential,
+                                                  String title, String userName,
+                                                  List<String> websites, String note,
+                                                  String folder, Long passkeyCreatedAt,
+                                                  String recordId,
+                                                  List<Map<String, String>> attachmentMetadata) {
+        log("Saving passkey to vault " + vaultId);
+
+        long now = System.currentTimeMillis();
+
+        // Format websites
+        List<String> formattedWebsites = new ArrayList<>();
+        if (websites != null) {
+            for (String website : websites) {
+                String trimmed = website.trim();
+                if (!trimmed.isEmpty()) {
+                    String lower = trimmed.toLowerCase();
+                    if (!lower.startsWith("http://") && !lower.startsWith("https://")) {
+                        formattedWebsites.add("https://" + lower);
+                    } else {
+                        formattedWebsites.add(lower);
+                    }
+                }
+            }
+        }
+
+        // Build record data
+        Map<String, Object> recordData = new HashMap<>();
+        recordData.put("title", title);
+        recordData.put("username", userName);
+        recordData.put("password", "");
+        recordData.put("passwordUpdatedAt", now);
+        recordData.put("passkeyCreatedAt", passkeyCreatedAt != null ? passkeyCreatedAt : now);
+        recordData.put("credential", credential.toMap());
+        recordData.put("note", note != null ? note : "");
+        recordData.put("websites", formattedWebsites);
+        recordData.put("customFields", new ArrayList<>());
+        recordData.put("attachments", attachmentMetadata != null ? attachmentMetadata : new ArrayList<>());
+
+        // Build full record
+        Map<String, Object> record = new HashMap<>();
+        record.put("id", recordId);
+        record.put("version", 1);
+        record.put("type", "login");
+        record.put("vaultId", vaultId);
+        record.put("data", recordData);
+        record.put("isFavorite", false);
+        record.put("createdAt", now);
+        record.put("updatedAt", now);
+        record.put("folder", folder);
+
+        String key = "record/" + recordId;
+        return activeVaultAdd(key, record)
+                .thenApply(v -> {
+                    log("Passkey saved with ID: " + recordId);
+                    return recordId;
+                });
+    }
+
+    /**
+     * Update an existing record to add a passkey credential.
+     * Port of iOS PearPassVaultClient.updateRecordWithPasskey().
+     */
+    @SuppressWarnings("unchecked")
+    public CompletableFuture<String> updateRecordWithPasskey(Map<String, Object> existingRecord,
+                                                              PasskeyCredential credential,
+                                                              String title, String userName,
+                                                              List<String> websites, String note,
+                                                              String folder, long passkeyCreatedAt) {
+        return updateRecordWithPasskey(existingRecord, credential, title, userName,
+                websites, note, folder, passkeyCreatedAt, new ArrayList<>());
+    }
+
+    @SuppressWarnings("unchecked")
+    public CompletableFuture<String> updateRecordWithPasskey(Map<String, Object> existingRecord,
+                                                              PasskeyCredential credential,
+                                                              String title, String userName,
+                                                              List<String> websites, String note,
+                                                              String folder, long passkeyCreatedAt,
+                                                              List<Map<String, String>> attachmentMetadata) {
+        String recordId = (String) existingRecord.get("id");
+        log("Updating existing record " + recordId + " with passkey");
+
+        long now = System.currentTimeMillis();
+
+        // Format websites
+        List<String> formattedWebsites = new ArrayList<>();
+        if (websites != null) {
+            for (String website : websites) {
+                String trimmed = website.trim();
+                if (!trimmed.isEmpty()) {
+                    String lower = trimmed.toLowerCase();
+                    if (!lower.startsWith("http://") && !lower.startsWith("https://")) {
+                        formattedWebsites.add("https://" + lower);
+                    } else {
+                        formattedWebsites.add(lower);
+                    }
+                }
+            }
+        }
+
+        // Get existing record data
+        Map<String, Object> existingData = (Map<String, Object>) existingRecord.get("data");
+        if (existingData == null) existingData = new HashMap<>();
+
+        // Merge existing attachments with new ones
+        List<Object> existingAttachments = existingData.get("attachments") instanceof List ?
+                (List<Object>) existingData.get("attachments") : new ArrayList<>();
+        List<Object> mergedAttachments = new ArrayList<>(existingAttachments);
+        if (attachmentMetadata != null) {
+            for (Map<String, String> newMeta : attachmentMetadata) {
+                String newId = newMeta.get("id");
+                boolean alreadyExists = false;
+                for (Object existing : existingAttachments) {
+                    if (existing instanceof Map && newId != null && newId.equals(((Map<?, ?>) existing).get("id"))) {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+                if (!alreadyExists) {
+                    mergedAttachments.add(newMeta);
+                }
+            }
+        }
+
+        // Build updated record data (preserve existing fields)
+        Map<String, Object> updatedData = new HashMap<>();
+        updatedData.put("title", title);
+        updatedData.put("username", userName);
+        updatedData.put("password", existingData.get("password") != null ? existingData.get("password") : "");
+        updatedData.put("passwordUpdatedAt", existingData.get("passwordUpdatedAt") != null ? existingData.get("passwordUpdatedAt") : now);
+        updatedData.put("passkeyCreatedAt", passkeyCreatedAt);
+        updatedData.put("credential", credential.toMap());
+        updatedData.put("note", note != null ? note : "");
+        updatedData.put("websites", formattedWebsites);
+        updatedData.put("customFields", existingData.get("customFields") != null ? existingData.get("customFields") : new ArrayList<>());
+        updatedData.put("attachments", mergedAttachments);
+
+        // Build updated record
+        Map<String, Object> updatedRecord = new HashMap<>();
+        updatedRecord.put("id", recordId);
+        updatedRecord.put("version", existingRecord.get("version") != null ? existingRecord.get("version") : 1);
+        updatedRecord.put("type", "login");
+        updatedRecord.put("vaultId", existingRecord.get("vaultId"));
+        updatedRecord.put("data", updatedData);
+        updatedRecord.put("isFavorite", existingRecord.get("isFavorite") != null ? existingRecord.get("isFavorite") : false);
+        updatedRecord.put("createdAt", existingRecord.get("createdAt") != null ? existingRecord.get("createdAt") : now);
+        updatedRecord.put("updatedAt", now);
+        updatedRecord.put("folder", folder);
+
+        String key = "record/" + recordId;
+        return activeVaultAdd(key, updatedRecord)
+                .thenApply(v -> {
+                    log("Record " + recordId + " updated with passkey");
+                    return recordId;
+                });
+    }
+
+    /**
+     * Search login records matching username.
+     * Port of iOS PearPassVaultClient.searchLoginRecords().
+     * Returns records where username matches OR record has no username.
+     */
+    @SuppressWarnings("unchecked")
+    public CompletableFuture<List<Map<String, Object>>> searchLoginRecords(String rpId, String username) {
+        log("Searching login records for rpId=" + rpId + ", username=" + username);
+
+        return activeVaultList("record/").thenApply(records -> {
+            List<Map<String, Object>> matches = new ArrayList<>();
+
+            for (Map<String, Object> record : records) {
+                // Only process login-type records
+                String type = (String) record.get("type");
+                if (!"login".equals(type)) continue;
+
+                Map<String, Object> recordData;
+                if (record.containsKey("data") && record.get("data") instanceof Map) {
+                    recordData = (Map<String, Object>) record.get("data");
+                } else {
+                    continue;
+                }
+
+                String recordUsername = recordData.get("username") instanceof String
+                        ? ((String) recordData.get("username")).trim() : "";
+                String passkeyUsername = username != null ? username.trim() : "";
+
+                boolean usernameMatches = !passkeyUsername.isEmpty() && !recordUsername.isEmpty()
+                        && passkeyUsername.equals(recordUsername);
+                boolean hasNoUsername = recordUsername.isEmpty();
+
+                if (usernameMatches || hasNoUsername) {
+                    matches.add(record);
+                }
+            }
+
+            log("Found " + matches.size() + " matching login records");
+            return matches;
+        });
+    }
+
+    /**
+     * List passkeys in the active vault, optionally filtered by rpId.
+     * Port of iOS PearPassVaultClient.listPasskeys().
+     */
+    @SuppressWarnings("unchecked")
+    public CompletableFuture<List<CredentialItem>> listPasskeys(String rpId) {
+        log("Listing passkeys" + (rpId != null ? " for RP: " + rpId : ""));
+
+        return activeVaultList("record/").thenApply(records -> {
+            List<CredentialItem> passkeys = new ArrayList<>();
+
+            for (Map<String, Object> record : records) {
+                String id = (String) record.get("id");
+                if (id == null) continue;
+
+                Map<String, Object> recordData;
+                if (record.containsKey("data") && record.get("data") instanceof Map) {
+                    recordData = (Map<String, Object>) record.get("data");
+                } else {
+                    recordData = record;
+                }
+
+                // Only include records that have a credential field (passkeys)
+                Object credentialObj = recordData.get("credential");
+                if (!(credentialObj instanceof Map)) continue;
+
+                Map<String, Object> credentialMap = (Map<String, Object>) credentialObj;
+                String credentialId = (String) credentialMap.get("id");
+
+                // Check rpId filter
+                if (rpId != null) {
+                    boolean matches = false;
+                    Object websitesObj = recordData.get("websites");
+                    if (websitesObj instanceof List) {
+                        for (Object website : (List<?>) websitesObj) {
+                            if (website instanceof String && normalizedDomainMatch((String) website, rpId)) {
+                                matches = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!matches) continue;
+                }
+
+                String title = recordData.get("title") != null ? (String) recordData.get("title") : "Unknown";
+                String username = recordData.get("username") != null ? (String) recordData.get("username") : "";
+                String password = recordData.get("password") != null ? (String) recordData.get("password") : "";
+
+                List<String> websites = new ArrayList<>();
+                Object websitesListObj = recordData.get("websites");
+                if (websitesListObj instanceof List) {
+                    for (Object w : (List<?>) websitesListObj) {
+                        if (w instanceof String) websites.add((String) w);
+                    }
+                }
+
+                // Parse passkey timestamp
+                long passkeyCreatedAt = 0;
+                Object passkeyTs = recordData.get("passkeyCreatedAt");
+                if (passkeyTs instanceof Number) {
+                    passkeyCreatedAt = ((Number) passkeyTs).longValue();
+                }
+
+                // Private key and userId from credential
+                String privateKeyBuffer = (String) credentialMap.get("_privateKeyBuffer");
+                String userId = (String) credentialMap.get("_userId");
+
+                passkeys.add(new CredentialItem(id, title, username, password, websites,
+                        true, passkeyCreatedAt, credentialMap, privateKeyBuffer, userId, credentialId));
+            }
+
+            log("Found " + passkeys.size() + " passkeys");
+            return passkeys;
+        });
+    }
+
+    /**
+     * List unique folder names from vault records.
+     * Port of iOS PearPassVaultClient.listFolders().
+     */
+    @SuppressWarnings("unchecked")
+    public CompletableFuture<List<String>> listFolders() {
+        log("Listing folders");
+
+        return activeVaultList("record/").thenApply(records -> {
+            List<String> folders = new ArrayList<>();
+
+            for (Map<String, Object> record : records) {
+                String folder = (String) record.get("folder");
+                if (folder != null && !folder.isEmpty() && !folders.contains(folder)) {
+                    folders.add(folder);
+                }
+            }
+
+            log("Found " + folders.size() + " folders");
+            return folders;
+        });
+    }
+
+    /**
+     * Check if two domains match (handles subdomains, protocols, www).
+     * Port of iOS PearPassVaultClient.normalizedDomainMatch().
+     */
+    private boolean normalizedDomainMatch(String domain1, String domain2) {
+        String d1 = domain1.toLowerCase()
+                .replace("https://", "")
+                .replace("http://", "")
+                .replace("www.", "");
+        int slashIdx1 = d1.indexOf('/');
+        if (slashIdx1 != -1) d1 = d1.substring(0, slashIdx1);
+
+        String d2 = domain2.toLowerCase()
+                .replace("https://", "")
+                .replace("http://", "")
+                .replace("www.", "");
+        int slashIdx2 = d2.indexOf('/');
+        if (slashIdx2 != -1) d2 = d2.substring(0, slashIdx2);
+
+        return d1.equals(d2) || d1.endsWith("." + d2) || d2.endsWith("." + d1);
+    }
+
     // Helper Methods
     private void log(String message) {
         if (debugMode) {
-            Log.d(TAG, message);
+            SecureLog.d(TAG, message);
         }
     }
 
     private void logError(String message) {
-        Log.e(TAG, message);
+        SecureLog.e(TAG, message);
     }
 
     private static Map<String, Object> createMap(String key, Object value) {
@@ -1661,7 +2054,9 @@ public class PearPassVaultClient {
 
         for (String key : keys) {
             Object value = jsonObject.get(key);
-            if (value instanceof JSONObject) {
+            if (value == null || value == JSONObject.NULL) {
+                value = null;
+            } else if (value instanceof JSONObject) {
                 value = jsonObjectToMap((JSONObject) value);
             } else if (value instanceof JSONArray) {
                 value = jsonArrayToList((JSONArray) value);
@@ -1675,7 +2070,9 @@ public class PearPassVaultClient {
         List<Object> list = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             Object value = jsonArray.get(i);
-            if (value instanceof JSONObject) {
+            if (value == null || value == JSONObject.NULL) {
+                value = null;
+            } else if (value instanceof JSONObject) {
                 value = jsonObjectToMap((JSONObject) value);
             } else if (value instanceof JSONArray) {
                 value = jsonArrayToList((JSONArray) value);
