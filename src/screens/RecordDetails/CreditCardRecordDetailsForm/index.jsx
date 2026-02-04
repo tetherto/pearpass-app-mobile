@@ -13,7 +13,6 @@ import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { InputFieldNote } from '../../../components/InputFieldNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { InputField, PasswordField } from '../../../libComponents'
 
@@ -54,12 +53,6 @@ export const CreditCardRecordDetailsForm = ({
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const { copyToClipboard } = useCopyToClipboard()
-
-  const handleTapToCopy = (name) => {
-    copyToClipboard(values[name])
-  }
-
   const hasName = !!values?.name?.length
   const hasNumber = !!values?.number?.length
   const hasExpireDate = !!values?.expireDate?.length
@@ -79,7 +72,6 @@ export const CreditCardRecordDetailsForm = ({
         <FormGroup>
           {hasName && (
             <InputField
-              onClick={() => handleTapToCopy('name')}
               icon={UserIcon}
               label={t`Name on card`}
               placeholder={t`John Smith`}
@@ -92,7 +84,6 @@ export const CreditCardRecordDetailsForm = ({
 
           {hasNumber && (
             <InputField
-              onClick={() => handleTapToCopy('number')}
               icon={CreditCardIcon}
               label={t`Number on card`}
               placeholder={t`1234 1234 1234 1234 `}
@@ -105,7 +96,6 @@ export const CreditCardRecordDetailsForm = ({
 
           {hasExpireDate && (
             <InputField
-              onClick={() => handleTapToCopy('expireDate')}
               icon={CalendarIcon}
               label={t`Date of expire`}
               placeholder={t`MM YY`}
@@ -118,7 +108,6 @@ export const CreditCardRecordDetailsForm = ({
 
           {hasSecurityCode && (
             <PasswordField
-              onClick={() => handleTapToCopy('securityCode')}
               icon={CreditCardIcon}
               label={t`Security code`}
               placeholder={t`12C3`}
@@ -131,7 +120,6 @@ export const CreditCardRecordDetailsForm = ({
 
           {hasPinCode && (
             <PasswordField
-              onClick={() => handleTapToCopy('pinCode')}
               icon={NineDotsIcon}
               label={t`Pin code`}
               placeholder={t`1234`}
@@ -161,19 +149,12 @@ export const CreditCardRecordDetailsForm = ({
 
       {hasNote && (
         <FormGroup>
-          <InputFieldNote
-            onClick={() => handleTapToCopy('note')}
-            isDisabled
-            isFirst
-            isLast
-            {...register('note')}
-          />
+          <InputFieldNote isDisabled isFirst isLast {...register('note')} />
         </FormGroup>
       )}
 
       {hasCustomFields && (
         <CustomFields
-          onClick={copyToClipboard}
           areInputsDisabled
           customFields={list}
           register={registerItem}

@@ -250,6 +250,17 @@ exports[`InputField Component matches snapshot 1`] = `
         </Text>
       </View>
     </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "gap": 10,
+          "justifyContent": "flex-end",
+        }
+      }
+    />
   </View>
 </View>
 `;

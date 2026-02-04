@@ -8,7 +8,6 @@ import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { InputFieldNote } from '../../../components/InputFieldNote'
 import { WifiPasswordQRCode } from '../../../components/WifiPasswordQRCode'
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { PasswordField } from '../../../libComponents'
 
 /**
@@ -49,12 +48,6 @@ export const WifiPasswordDetailsForm = ({ initialRecord, selectedFolder }) => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const { copyToClipboard } = useCopyToClipboard()
-
-  const handleTapToCopy = (name) => {
-    copyToClipboard(values[name])
-  }
-
   const hasPassword = !!values?.password?.length
   const hasNote = !!values?.note?.length
   const hasCustomFields = !!customFieldsList?.length
@@ -64,7 +57,6 @@ export const WifiPasswordDetailsForm = ({ initialRecord, selectedFolder }) => {
       {hasPassword && (
         <FormGroup>
           <PasswordField
-            onClick={() => handleTapToCopy('password')}
             icon={PasswordIcon}
             label={t`Wi-Fi Password`}
             placeholder={t`Insert Wi-Fi Password`}
@@ -83,17 +75,12 @@ export const WifiPasswordDetailsForm = ({ initialRecord, selectedFolder }) => {
 
       {hasNote && (
         <FormGroup>
-          <InputFieldNote
-            onClick={() => handleTapToCopy('note')}
-            isDisabled
-            {...register('note')}
-          />
+          <InputFieldNote isDisabled {...register('note')} />
         </FormGroup>
       )}
 
       {hasCustomFields && (
         <CustomFields
-          onClick={copyToClipboard}
           areInputsDisabled
           customFields={customFieldsList}
           register={registerCustomFieldItem}

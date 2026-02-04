@@ -17,7 +17,8 @@ let globalClearTimer = null
 let globalLastCopiedText = null
 
 export const useCopyToClipboard = () => {
-  const [isCopyToClipboardEnabled, setIsCopyToClipboardEnabled] = useState(true)
+  const [isCopyToClipboardEnabled, setIsCopyToClipboardEnabled] =
+    useState(false)
   const [isCopied, setIsCopied] = useState(false)
   const timeoutRef = useRef(null)
   const clearClipboardTimeoutRef = useRef(null)
@@ -130,5 +131,5 @@ export const useCopyToClipboard = () => {
     [isCopyToClipboardEnabled, t, hapticSuccess]
   )
 
-  return { copyToClipboard, isCopied }
+  return { copyToClipboard, isCopied, isCopyToClipboardEnabled }
 }

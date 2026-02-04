@@ -6,7 +6,6 @@ import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { InputFieldNote } from '../../../components/InputFieldNote'
 import { PassPhrase } from '../../../containers/PassPhrase'
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 
 /**
  * @param {{
@@ -50,12 +49,6 @@ export const PassPhraseRecordDetailsForm = ({
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const { copyToClipboard } = useCopyToClipboard()
-
-  const handleTapToCopy = (name) => {
-    copyToClipboard(values[name])
-  }
-
   const hasPassPhrase = !!values?.passPhrase?.length
   const hasNote = !!values?.note?.length
   const hasCustomFields = !!customFieldsList?.length
@@ -70,17 +63,12 @@ export const PassPhraseRecordDetailsForm = ({
 
       {hasNote && (
         <FormGroup>
-          <InputFieldNote
-            onClick={() => handleTapToCopy('note')}
-            isDisabled
-            {...register('note')}
-          />
+          <InputFieldNote isDisabled {...register('note')} />
         </FormGroup>
       )}
 
       {hasCustomFields && (
         <CustomFields
-          onClick={copyToClipboard}
           areInputsDisabled
           customFields={customFieldsList}
           register={registerCustomFieldItem}
