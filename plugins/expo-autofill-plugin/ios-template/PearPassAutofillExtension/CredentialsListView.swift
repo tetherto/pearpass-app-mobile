@@ -30,13 +30,8 @@ struct CredentialsListView: View {
             }
         } else if !hasUserSearched && !serviceIdentifiers.isEmpty {
             // Only apply domain filtering if user hasn't searched yet
-            let matchingCredentials = credentials.filter { credential in
+            filtered = credentials.filter { credential in
                 matchesServiceIdentifiers(credential: credential)
-            }
-
-            // If we have matching credentials, show only those; otherwise show all
-            if !matchingCredentials.isEmpty {
-                filtered = matchingCredentials
             }
         }
         // If hasUserSearched is true and searchText is empty, show all credentials (no filtering)
@@ -342,8 +337,20 @@ struct CredentialsListView: View {
                 // Don't continue - also parse as password credential if it has username/password
             }
 
+            // Skip folder records - they have no title and no type
+            if recordData.title.isEmpty && recordData.websites.isEmpty && recordData.username.isEmpty && recordData.password.isEmpty {
+                print("CredentialsListView: Skipping folder/empty record: \(record.id)")
+                continue
+            }
+
+            // Skip records without title
+            guard !recordData.title.isEmpty else {
+                print("CredentialsListView: Skipping record without title: \(record.id)")
+                continue
+            }
+
             // Also parse as a password credential
-            let name = recordData.title.isEmpty ? "Unknown" : recordData.title
+            let name = recordData.title
             let username = recordData.username
             let password = recordData.password
             let websites = recordData.websites

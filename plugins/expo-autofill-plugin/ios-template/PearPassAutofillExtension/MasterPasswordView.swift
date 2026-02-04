@@ -203,9 +203,7 @@ struct MasterPasswordView: View {
             } catch {
                 await MainActor.run {
                     isLoading = false
-                    errorMessage = error.localizedDescription.isEmpty ?
-                        NSLocalizedString("Invalid password", comment: "Invalid password error") :
-                        error.localizedDescription
+                    errorMessage = NSLocalizedString("Invalid master password", comment: "Invalid master password error")
                 }
             }
         }
