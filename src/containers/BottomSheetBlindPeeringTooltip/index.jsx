@@ -47,7 +47,10 @@ export const BottomSheetBlindPeeringTooltip = () => {
         <Text style={styles.description}>
           {t`• `}
           <Text style={styles.boldText}>{t`Manual Blind Peers: `}</Text>
-          {t`Setup your own private Blind Peers.In both cases, all data stays fully encrypted, ensuring safe, non-intrusive replication and better data consistency`}
+          {t`Setup your own private Blind Peers.`}
+        </Text>
+        <Text style={styles.description}>
+          {t`In both cases, all data stays fully encrypted, ensuring safe, non-intrusive replication and better data consistency.`}
         </Text>
       </View>
       <View style={{ alignSelf: 'center' }}>
