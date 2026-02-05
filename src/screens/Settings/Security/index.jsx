@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -6,28 +6,41 @@ import * as SecureStore from 'expo-secure-store'
 import { AUTO_LOCK_ENABLED } from 'pearpass-lib-constants'
 import { BackIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Keyboard, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import Toast from 'react-native-toast-message'
 
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { ListItem } from '../../../components/ListItem'
 import { IOS_APP_GROUP_ID } from '../../../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../../../constants/secureStorageKeys'
+import { TOAST_CONFIG } from '../../../constants/toast'
 import { AutoLockSettings } from '../../../containers/AutoLockSettings'
+import { BottomSheetBiometricsLoginPrompt } from '../../../containers/BottomSheetBiometricsLoginPrompt'
 import { RuleSelector } from '../../../containers/BottomSheetPassGeneratorContent/RuleSelector'
 import { ModifyMasterVaultModalContent } from '../../../containers/Modal/ModifyMasterVaultModalContent'
+import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
 import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
 import { ButtonLittle } from '../../../libComponents'
+import { logger } from '../../../utils/logger'
 
 export const Security = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { openModal } = useModal()
+  const { expand, collapse } = useBottomSheet()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
-  const { isBiometricsSupported, isBiometricsEnabled, toggleBiometrics } =
-    useBiometricsAuthentication()
+  const {
+    isBiometricsSupported,
+    isBiometricsEnabled,
+    toggleBiometrics,
+    enableBiometrics,
+    disableBiometrics
+  } = useBiometricsAuthentication()
+
+  const timeoutRef = useRef(null)
 
   const [selectedRules, setSelectedRules] = useState({
     biometrics: false,
@@ -129,8 +142,64 @@ export const Security = () => {
     getInitialSettings()
   }, [isBiometricsEnabled, isPasswordChangeReminderEnabled])
 
+  useEffect(
+    () => () => {
+      clearTimeout(timeoutRef.current)
+    },
+    []
+  )
+
   const handleMasterEditClick = () => {
-    openModal(<ModifyMasterVaultModalContent />)
+    openModal(
+      <ModifyMasterVaultModalContent
+        onPasswordChange={handleShowBiometricsLoginPrompt}
+      />
+    )
+  }
+
+  const handleShowBiometricsLoginPrompt = async () => {
+    Keyboard.dismiss()
+
+    if (isBiometricsEnabled) {
+      await disableBiometrics()
+    } else {
+      return
+    }
+
+    clearTimeout(timeoutRef.current)
+
+    timeoutRef.current = setTimeout(() => {
+      expand({
+        children: (
+          <BottomSheetBiometricsLoginPrompt
+            title={t`Continue using Biometric Access`}
+            description={t`Your password was updated, so biometric login was turned off. Enable it again to continue signing in with your biometrics.`}
+            onConfirm={() => enableBiometricAuthentication()}
+            onDismiss={collapse}
+          />
+        ),
+        snapPoints: ['10%', '80%'],
+        enableContentPanningGesture: false
+      })
+    }, TOAST_CONFIG.TIMEOUT_DELAY)
+  }
+
+  const enableBiometricAuthentication = async () => {
+    try {
+      const { error } = await enableBiometrics()
+
+      if (error) {
+        logger.error('Failed to enable biometric authentication:', error)
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Failed to enable biometric authentication.`,
+          position: 'bottom',
+          bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+        })
+      }
+    } catch (error) {
+      logger.error('Error while enabling biometric authentication:', error)
+    }
   }
 
   return (
