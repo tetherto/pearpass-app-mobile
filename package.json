@@ -120,5 +120,9 @@
     "tether-dev-docs": "file:packages/tether-dev-docs",
     "typescript": "~5.8.3"
   },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
+  },
   "private": true
 }

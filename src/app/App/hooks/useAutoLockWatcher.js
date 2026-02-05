@@ -95,7 +95,8 @@ export const useAutoLockWatcher = () => {
     isMasterPasswordScreen,
     navigation,
     refetchUser,
-    resetState
+    resetState,
+    shouldBypassAutoLock
   ])
 
   const clearAutoLockTimer = useCallback(() => {
@@ -159,6 +160,7 @@ export const useAutoLockWatcher = () => {
    */
   useEffect(() => {
     if (!isAutoLockActive) {
+      clearAutoLockTimer()
       return
     }
 
@@ -170,7 +172,7 @@ export const useAutoLockWatcher = () => {
     }
 
     resetFromNow()
-  }, [resetAutoLockTimer, isAutoLockActive])
+  }, [resetAutoLockTimer, isAutoLockActive, clearAutoLockTimer])
 
   /**
    * Background → foreground handling
