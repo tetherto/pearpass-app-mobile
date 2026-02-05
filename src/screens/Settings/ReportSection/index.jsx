@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text } from 'react-native'
 
 import { ReportProblemContainer } from './styles'
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
@@ -26,6 +26,9 @@ export const ReportSection = ({
   return (
     <CardSingleSetting title={t`Report a problem`}>
       <ReportProblemContainer>
+        <Text style={styles.description}>
+          {t`Tell us what's going wrong and leave your email so we can follow up with you.`}
+        </Text>
         <TextAreaReport
           placeholder={t`Write your issue...`}
           value={message}
@@ -45,3 +48,12 @@ export const ReportSection = ({
     </CardSingleSetting>
   )
 }
+
+const styles = StyleSheet.create({
+  description: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    fontSize: 12,
+    fontWeight: '400'
+  }
+})
