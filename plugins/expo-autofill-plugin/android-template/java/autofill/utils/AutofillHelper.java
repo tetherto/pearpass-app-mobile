@@ -3,7 +3,6 @@ package com.pears.pass.autofill.utils;
 import android.app.assist.AssistStructure;
 import android.os.Build;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.view.autofill.AutofillId;
 
@@ -58,7 +57,7 @@ public class AutofillHelper {
         // Extract package name from the structure
         if (structure.getActivityComponent() != null) {
             fields.packageName = structure.getActivityComponent().getPackageName();
-            Log.d(TAG, "Extracted package name: " + fields.packageName);
+            SecureLog.d(TAG, "Extracted package name: " + fields.packageName);
         }
 
         int nodeCount = structure.getWindowNodeCount();
@@ -87,10 +86,10 @@ public class AutofillHelper {
 
         if (autofillId != null && isUsernameField(autofillHints, inputType, node) && fields.usernameId == null) {
             fields.usernameId = autofillId;
-            Log.d(TAG, "Found username field");
+            SecureLog.d(TAG, "Found username field");
         } else if (autofillId != null && isPasswordField(autofillHints, inputType, node) && fields.passwordId == null) {
             fields.passwordId = autofillId;
-            Log.d(TAG, "Found password field");
+            SecureLog.d(TAG, "Found password field");
         }
 
         for (int i = 0; i < node.getChildCount(); i++) {
@@ -255,7 +254,7 @@ public class AutofillHelper {
             
             return false;
         } catch (Exception e) {
-            Log.e(TAG, "Error accessing HTML info", e);
+            SecureLog.e(TAG, "Error accessing HTML info", e);
             return false;
         }
     }
@@ -303,7 +302,7 @@ public class AutofillHelper {
             
             return false;
         } catch (Exception e) {
-            Log.e(TAG, "Error accessing HTML info", e);
+            SecureLog.e(TAG, "Error accessing HTML info", e);
             return false;
         }
     }
