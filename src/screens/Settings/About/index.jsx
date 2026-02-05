@@ -33,7 +33,7 @@ import {
 } from '../../../constants/feedback'
 import { ButtonLittle } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
-import { ReportSection } from '../TabGeneralSettings/ReportSection'
+import { ReportSection } from '../ReportSection'
 
 export const About = () => {
   const { t } = useLingui()

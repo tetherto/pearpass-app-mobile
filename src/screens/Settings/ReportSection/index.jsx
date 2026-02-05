@@ -3,8 +3,8 @@ import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator } from 'react-native'
 
 import { ReportProblemContainer } from './styles'
-import { CardSingleSetting } from '../../../../components/CardSingleSetting'
-import { ButtonSecondary, TextAreaReport } from '../../../../libComponents'
+import { CardSingleSetting } from '../../../components/CardSingleSetting'
+import { ButtonSecondary, TextAreaReport } from '../../../libComponents'
 
 /**
  *
