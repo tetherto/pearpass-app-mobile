@@ -39,7 +39,6 @@
     "@react-navigation/native-stack": "7.2.0",
     "bare-pack": "1.4.1",
     "buffer": "6.0.3",
-    "crypto-js": "4.2.0",
     "expo": "~53.0.17",
     "expo-asset": "~11.1.7",
     "expo-av": "~15.1.7",
