@@ -1214,7 +1214,7 @@ import Foundation
             let recordUsername = data.username.trimmingCharacters(in: .whitespaces)
             let passkeyUsername = username.trimmingCharacters(in: .whitespaces)
 
-            let usernameMatches = !passkeyUsername.isEmpty && !recordUsername.isEmpty && passkeyUsername == recordUsername
+            let usernameMatches = !passkeyUsername.isEmpty && !recordUsername.isEmpty && passkeyUsername.caseInsensitiveCompare(recordUsername) == .orderedSame
             let hasNoUsername = recordUsername.isEmpty
 
             if usernameMatches || hasNoUsername {
