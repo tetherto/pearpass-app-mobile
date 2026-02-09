@@ -28,8 +28,6 @@
 		<dict>
 			<key>ASCredentialProviderExtensionCapabilities</key>
 			<dict>
-				<key>ProvidesPasskeys</key>
-				<true/>
 				<key>ProvidesPasswords</key>
 				<true/>
 			</dict>
