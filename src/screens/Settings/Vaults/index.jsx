@@ -64,9 +64,6 @@ export const Vaults = () => {
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <VaultsManageSection />
-        <ExportSection />
-        <ImportSection />
-
         {(data?.devices?.length ?? 0) > 0 && (
           <CardSingleSetting title={t`Linked devices`}>
             <View style={styles.sectionContent}>
@@ -88,6 +85,8 @@ export const Vaults = () => {
             </View>
           </CardSingleSetting>
         )}
+        <ExportSection />
+        <ImportSection />
       </ScrollView>
     </SafeAreaView>
   )
