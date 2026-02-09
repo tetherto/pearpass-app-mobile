@@ -1,11 +1,9 @@
-import { useMemo } from 'react'
-
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { PROTECTED_VAULT_ENABLED } from 'pearpass-lib-constants'
 import { BackIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useVaults } from 'pearpass-lib-vault'
+import { useVault } from 'pearpass-lib-vault'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -14,15 +12,12 @@ import { ListItem } from '../../../components/ListItem'
 import { BottomSheetVaultAction } from '../../../containers/BottomSheetVaultAction'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { ButtonLittle } from '../../../libComponents'
-import { sortAlphabetically } from '../../../utils/sortAlphabetically'
 import { settingsStyles } from '../styles'
 
 export const VaultsManageSection = () => {
   const { t } = useLingui()
   const { expand } = useBottomSheet()
-  const { data } = useVaults()
-
-  const sortedVaults = useMemo(() => sortAlphabetically(data), [data])
+  const { data: vault } = useVault()
 
   const handleVaultEditClick = (vaultId, vaultName) => {
     const snapPoints = PROTECTED_VAULT_ENABLED ? ['30%', '90%'] : ['20%', '90%']
@@ -41,16 +36,14 @@ export const VaultsManageSection = () => {
         <Text style={styles.description}>
           {t`Share, edit, or delete your vault from one place.`}
         </Text>
-        {sortedVaults?.map((vault, index) => (
-          <ListItem
-            key={vault.id}
-            name={vault?.name ?? vault?.id}
-            date={vault.createdAt}
-            testID={`vault-item-${index}`}
-            accessibilityLabel={`vault-item-${index}`}
-            onEditClick={() => handleVaultEditClick(vault.id, vault.name)}
-          />
-        ))}
+        <ListItem
+          key={vault.id}
+          name={vault?.name ?? vault?.id}
+          date={vault.createdAt}
+          testID={`vault-item-${vault.id}`}
+          accessibilityLabel={`vault-item-${vault.id}`}
+          onEditClick={() => handleVaultEditClick(vault.id, vault.name)}
+        />
       </View>
     </CardSingleSetting>
   )
