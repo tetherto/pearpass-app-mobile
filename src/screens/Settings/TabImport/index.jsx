@@ -9,7 +9,7 @@ import {
   parsePearPassData,
   parseProtonPassData
 } from 'pearpass-lib-data-import'
-import { BackIcon, LockIcon } from 'pearpass-lib-ui-react-native-components'
+import { BackIcon } from 'pearpass-lib-ui-react-native-components'
 import { useCreateRecord } from 'pearpass-lib-vault'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -72,7 +72,7 @@ const importOptions = [
     title: 'Unencrypted file',
     type: 'unencrypted',
     accepts: ['.json', '.csv'],
-    icon: LockIcon
+    imgKey: 'unencrypted'
   }
 ]
 
@@ -89,7 +89,8 @@ const images = {
   bitwarden: require('../../../../assets/images/BitWarden.png'),
   lastpass: require('../../../../assets/images/LastPass.png'),
   protonpass: require('../../../../assets/images/ProtonPass.png'),
-  nordpass: require('../../../../assets/images/NordPass.png')
+  nordpass: require('../../../../assets/images/NordPass.png'),
+  unencrypted: require('../../../../assets/images/VaultIcon.png')
 }
 
 export const ImportSection = () => {
