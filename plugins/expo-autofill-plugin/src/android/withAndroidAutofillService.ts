@@ -41,7 +41,7 @@ preBuild.dependsOn copyAutofillBundle
     });
   }
 
-  // Add androidx.credentials dependencies for passkey support
+  // Keep androidx.credentials dependencies for compilation (passkey code exists but is not registered)
   config = withAppBuildGradle(config, (cfg) => {
     const credentialsDep = 'implementation "androidx.credentials:credentials:1.6.0-beta03"';
     if (!cfg.modResults.contents.includes('androidx.credentials:credentials')) {
@@ -49,7 +49,7 @@ preBuild.dependsOn copyAutofillBundle
       if (dependenciesIndex !== -1) {
         const insertIndex = cfg.modResults.contents.indexOf('{', dependenciesIndex) + 1;
         const credentialsDeps = `
-    // Passkey / Credential Provider support
+    // Passkey / Credential Provider support (code compiled but services not registered)
     ${credentialsDep}
     implementation "androidx.credentials:credentials-play-services-auth:1.6.0-beta03"`;
         cfg.modResults.contents =
