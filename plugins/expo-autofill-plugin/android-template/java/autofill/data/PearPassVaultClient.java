@@ -1893,7 +1893,7 @@ public class PearPassVaultClient {
                 String passkeyUsername = username != null ? username.trim() : "";
 
                 boolean usernameMatches = !passkeyUsername.isEmpty() && !recordUsername.isEmpty()
-                        && passkeyUsername.equals(recordUsername);
+                        && passkeyUsername.equalsIgnoreCase(recordUsername);
                 boolean hasNoUsername = recordUsername.isEmpty();
 
                 if (usernameMatches || hasNoUsername) {
