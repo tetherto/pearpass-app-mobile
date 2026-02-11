@@ -6,14 +6,20 @@
  * @param {Array} b - Second array of file objects
  * @returns {boolean} True if arrays are equal, false otherwise
  */
-export const areFilesEqual = (a = [], b = []) =>
-  a.length === b.length &&
-  a.every((file, idx) => {
-    const existing = b[idx]
-    return (
-      existing &&
-      file.id === existing.id &&
-      file.name === existing.name &&
-      !!file.base64 === !!existing.base64
-    )
-  })
+export const areFilesEqual = (a, b) => {
+  const arr1 = a ?? []
+  const arr2 = b ?? []
+
+  return (
+    arr1.length === arr2.length &&
+    arr1.every((file, idx) => {
+      const existing = arr2[idx]
+      return (
+        existing &&
+        file.id === existing.id &&
+        file.name === existing.name &&
+        !!file.base64 === !!existing.base64
+      )
+    })
+  )
+}
