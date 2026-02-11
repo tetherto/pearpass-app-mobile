@@ -181,8 +181,8 @@ struct PasskeyRegistrationView: View {
             return
         }
 
-        // Initialize with readOnly: false to allow passkey storage
-        let client = PearPassVaultClient(debugMode: true, readOnly: false)
+        // Initialize with readOnly: true — all writes go through the job queue
+        let client = PearPassVaultClient(debugMode: true, readOnly: true)
 
         vaultClient = client
 
@@ -319,58 +319,43 @@ struct PasskeyRegistrationView: View {
                 // 1. Generate passkey
                 let (credential, attestationObject, credentialIdData) = try generatePasskey()
 
-                // 2. Save file attachments first (matching main app order)
-                var attachmentMetadata: [AttachmentMetadata] = []
-                let recordId: String
-
-                if let existingRecord = formData.existingRecord {
-                    recordId = existingRecord.id
-                } else {
-                    recordId = UUID().uuidString
+                // 2. Get the hashed password for job file encryption
+                guard let hashedPassword = await PasskeyJobCreator.getHashedPassword(from: client) else {
+                    throw PasskeyJobError.noHashedPassword
                 }
 
-                for attachment in formData.attachments {
-                    let fileId = attachment.id
-                    try await client.activeVaultAddFile(
-                        recordId: recordId,
-                        fileId: fileId,
-                        buffer: attachment.data,
-                        name: attachment.name
-                    )
-                    attachmentMetadata.append(AttachmentMetadata(id: fileId, name: attachment.name))
-                }
-
-                // 3. Save or update record
+                // 3. Create job via the job queue (deferred write)
                 if let existingRecord = formData.existingRecord {
-                    // Update existing record with passkey
-                    _ = try await client.updateRecordWithPasskey(
-                        existingRecord: existingRecord,
+                    // UPDATE_PASSKEY: merge passkey into existing record
+                    _ = try PasskeyJobCreator.createUpdatePasskeyJob(
+                        vaultId: vault.id,
+                        existingRecordId: existingRecord.id,
                         credential: credential,
-                        title: formData.title,
-                        userName: formData.username,
-                        websites: formData.websites,
-                        note: formData.note,
-                        folder: formData.folder,
-                        attachmentMetadata: attachmentMetadata,
+                        rpId: request.rpId,
+                        rpName: request.rpName,
+                        userId: request.userId.base64URLEncodedString(),
+                        userName: request.userName,
+                        userDisplayName: request.userDisplayName,
+                        hashedPassword: hashedPassword,
                         passkeyCreatedAt: formData.passkeyCreatedAt
                     )
                 } else {
-                    // Create new record
-                    _ = try await client.savePasskey(
+                    // ADD_PASSKEY: create new record
+                    _ = try PasskeyJobCreator.createAddPasskeyJob(
                         vaultId: vault.id,
                         credential: credential,
-                        title: formData.title,
-                        userName: formData.username,
-                        websites: formData.websites,
-                        note: formData.note,
-                        folder: formData.folder,
-                        attachmentMetadata: attachmentMetadata,
-                        passkeyCreatedAt: formData.passkeyCreatedAt,
-                        recordId: recordId
+                        formData: formData,
+                        rpId: request.rpId,
+                        rpName: request.rpName,
+                        userId: request.userId.base64URLEncodedString(),
+                        userName: request.userName,
+                        userDisplayName: request.userDisplayName,
+                        hashedPassword: hashedPassword
                     )
                 }
 
-                // 4. Complete registration
+                // 4. Complete registration — the passkey is returned to the system
+                //    immediately. The main app will process the job on next launch/resume.
                 await MainActor.run {
                     onComplete(credential, attestationObject, credentialIdData)
                 }

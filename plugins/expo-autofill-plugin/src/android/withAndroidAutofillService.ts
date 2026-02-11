@@ -61,6 +61,25 @@ preBuild.dependsOn copyAutofillBundle
     return cfg;
   });
 
+  // Add lazysodium-android + JNA dependencies for job queue encryption (crypto_secretbox)
+  config = withAppBuildGradle(config, (cfg) => {
+    if (!cfg.modResults.contents.includes('lazysodium-android')) {
+      const dependenciesIndex = cfg.modResults.contents.indexOf('dependencies {');
+      if (dependenciesIndex !== -1) {
+        const insertIndex = cfg.modResults.contents.indexOf('{', dependenciesIndex) + 1;
+        const sodiumDeps = `
+    // Lazysodium for job queue encryption (crypto_secretbox / XSalsa20-Poly1305)
+    implementation "com.goterl:lazysodium-android:5.1.0@aar"
+    implementation "net.java.dev.jna:jna:5.14.0@aar"`;
+        cfg.modResults.contents =
+          cfg.modResults.contents.slice(0, insertIndex) +
+          sodiumDeps +
+          cfg.modResults.contents.slice(insertIndex);
+      }
+    }
+    return cfg;
+  });
+
   return withDangerousMod(config, ['android', async (cfg) => {
     const packageName = cfg.android?.package || 'com.pears.pass';
     const packagePath = packageName.replace(/\./g, '/');

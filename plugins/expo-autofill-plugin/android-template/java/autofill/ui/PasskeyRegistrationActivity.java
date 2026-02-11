@@ -20,6 +20,9 @@ import com.pears.pass.autofill.data.PasskeyCredential;
 import com.pears.pass.autofill.data.PasskeyFormData;
 import com.pears.pass.autofill.data.PasskeyResponse;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.jobs.JobEncryption;
+import com.pears.pass.autofill.jobs.JobFileManager;
+import com.pears.pass.autofill.jobs.PasskeyJobCreator;
 import com.pears.pass.autofill.utils.SecureLog;
 import com.pears.pass.autofill.utils.VaultInitializer;
 
@@ -39,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Launched by PearPassCredentialProviderService when a website requests passkey creation.
  * Flow: Loading -> MasterPassword -> VaultSelection -> VaultPassword -> SearchExisting -> Form -> Save -> Return
  *
- * Uses readOnly=false for the vault client since we need to write to the vault.
+ * Uses readOnly=true for the vault client. All writes go through the job queue.
  */
 @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 public class PasskeyRegistrationActivity extends AppCompatActivity implements NavigationListener {
@@ -94,7 +97,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         // Parse the passkey creation request
         parsePasskeyRequest();
 
-        // Initialize vault client with readOnly=false
+        // Initialize vault client with readOnly=true (writes go through job queue)
         initialize();
     }
 
@@ -172,8 +175,8 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
     private void initialize() {
         if (vaultClient != null) return;
 
-        // readOnly=false for registration (need to write passkey to vault)
-        vaultClient = new PearPassVaultClient(this, null, true, false);
+        // readOnly=true — all writes go through the encrypted job queue
+        vaultClient = new PearPassVaultClient(this, null, true, true);
 
         VaultInitializer.initialize(vaultClient, new VaultInitializer.Callback() {
             @Override
@@ -421,6 +424,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         replaceFragment(new LoadingFragment(), true);
 
         CompletableFuture.runAsync(() -> {
+            byte[] hashedPasswordBytes = null;
             try {
                 // Wait for vault to be ready (important after onResume reinitializes the vault)
                 if (vaultReadyFuture != null) {
@@ -465,50 +469,39 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                         Base64URLUtils.encode(userId)
                 );
 
-                // 2. Determine record ID
-                String recordId;
-                if (formData.getExistingRecordId() != null) {
-                    recordId = formData.getExistingRecordId();
-                } else {
-                    recordId = UUID.randomUUID().toString();
+                // 2. Get hashed password for job file encryption
+                if (storedHashedPassword == null || storedHashedPassword.isEmpty()) {
+                    throw new RuntimeException("No hashed password available for job encryption");
                 }
+                hashedPasswordBytes = JobEncryption.hexToBytes(storedHashedPassword);
 
-                // 3. Save file attachments first (matching iOS order)
-                List<Map<String, String>> attachmentMetadata = new ArrayList<>();
-                for (PasskeyFormData.AttachmentFile attachment : formData.getAttachments()) {
-                    String fileId = attachment.getId();
-                    vaultClient.activeVaultAddFile(
-                            recordId, fileId, attachment.getData(), attachment.getName()
-                    ).get();
+                // 3. Create job via PasskeyJobCreator (deferred write to main app)
+                JobFileManager jobFileManager = new JobFileManager(this);
+                PasskeyJobCreator jobCreator = new PasskeyJobCreator(jobFileManager);
 
-                    Map<String, String> meta = new java.util.HashMap<>();
-                    meta.put("id", fileId);
-                    meta.put("name", attachment.getName());
-                    attachmentMetadata.add(meta);
-                }
-
-                // 4. Save or update record
                 if (selectedExistingRecord != null && formData.getExistingRecordId() != null) {
-                    // Update existing record
-                    vaultClient.updateRecordWithPasskey(
-                            selectedExistingRecord, credential,
-                            formData.getTitle(), formData.getUsername(),
-                            formData.getWebsites(), formData.getNote(),
-                            formData.getFolder(), formData.getPasskeyCreatedAt(),
-                            attachmentMetadata
-                    ).get();
+                    // Update existing record with passkey
+                    jobCreator.createUpdatePasskeyJob(
+                            selectedVaultId,
+                            formData.getExistingRecordId(),
+                            credential,
+                            rpId, rpName,
+                            Base64URLUtils.encode(userId), userName, userDisplayName,
+                            hashedPasswordBytes
+                    );
                 } else {
-                    // Create new record
-                    vaultClient.savePasskey(
-                            selectedVaultId, credential,
-                            formData.getTitle(), formData.getUsername(),
-                            formData.getWebsites(), formData.getNote(),
-                            formData.getFolder(), formData.getPasskeyCreatedAt(),
-                            recordId, attachmentMetadata
-                    ).get();
+                    // Create new record with passkey
+                    jobCreator.createAddPasskeyJob(
+                            selectedVaultId,
+                            credential,
+                            formData,
+                            rpId, rpName,
+                            Base64URLUtils.encode(userId), userName, userDisplayName,
+                            hashedPasswordBytes
+                    );
                 }
 
-                // 5. Build response and return
+                // 4. Build response and return immediately
                 this.generatedCredential = credential;
                 this.generatedAttestationObject = attestationObject;
                 this.generatedCredentialId = credentialIdBytes;
@@ -528,6 +521,10 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                     android.widget.Toast.makeText(PasskeyRegistrationActivity.this,
                             "Failed to save passkey. Please try again.", android.widget.Toast.LENGTH_SHORT).show();
                 });
+            } finally {
+                if (hashedPasswordBytes != null) {
+                    JobEncryption.secureZero(hashedPasswordBytes);
+                }
             }
         });
     }
