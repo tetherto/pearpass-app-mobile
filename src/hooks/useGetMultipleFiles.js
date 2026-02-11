@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { vaultGetFile } from 'pearpass-lib-vault'
 
 import { useLoadingContext } from '../context/LoadingContext'
+import { areFilesEqual } from '../utils/areFilesEqual'
 import { fileCache, MAX_CACHE_SIZE } from '../utils/filesCache'
 import { logger } from '../utils/logger'
 
@@ -120,19 +121,7 @@ export const useGetMultipleFiles = ({
         )
         const mergedFiles = [...files, ...newItems]
 
-        const isSameData =
-          mergedFiles.length === existingValues.length &&
-          mergedFiles.every((file, idx) => {
-            const existing = existingValues[idx]
-            return (
-              existing &&
-              file.id === existing.id &&
-              file.name === existing.name &&
-              !!file.base64 === !!existing.base64
-            )
-          })
-
-        if (!isSameData) {
+        if (!areFilesEqual(mergedFiles, existingValues)) {
           updateValues(fieldName, mergedFiles)
         }
       }
