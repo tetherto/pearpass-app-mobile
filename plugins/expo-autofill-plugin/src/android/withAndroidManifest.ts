@@ -55,8 +55,50 @@ export const withAndroidManifest: ConfigPlugin<AutofillPluginOptions> = (config,
       } as any);
     }
 
-    // NOTE: Passkey support temporarily disabled
-    // Passkey Registration Activity and Credential Provider Service are not registered
+    // Add Passkey Registration Activity
+    const passkeyActivityExists = mainApplication.activity.some(
+      (a: any) => a.$?.['android:name'] === '.autofill.ui.PasskeyRegistrationActivity'
+    );
+
+    if (!passkeyActivityExists) {
+      mainApplication.activity.push({
+        $: {
+          'android:name': '.autofill.ui.PasskeyRegistrationActivity',
+          'android:theme': '@style/Theme.PearPass.Autofill.Fullscreen',
+          'android:taskAffinity': '',
+          'android:excludeFromRecents': 'true',
+          'android:exported': 'false',
+          'android:windowSoftInputMode': 'adjustResize',
+          'android:launchMode': 'singleTop',
+        },
+      } as any);
+    }
+
+    // Add Credential Provider Service (Android 14+ passkey support)
+    const credProviderExists = mainApplication.service.some(
+      (s: any) => s.$?.['android:name'] === '.autofill.service.PearPassCredentialProviderService'
+    );
+
+    if (!credProviderExists) {
+      mainApplication.service.push({
+        $: {
+          'android:name': '.autofill.service.PearPassCredentialProviderService',
+          'android:enabled': 'true',
+          'android:exported': 'true',
+          'android:label': '@string/app_name',
+          'android:permission': 'android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE',
+        },
+        'intent-filter': [{
+          action: [{ $: { 'android:name': 'android.service.credentials.CredentialProviderService' } }],
+        }],
+        'meta-data': [{
+          $: {
+            'android:name': 'android.credentials.provider',
+            'android:resource': '@xml/credential_provider_config',
+          },
+        }],
+      } as any);
+    }
 
     return cfg;
   });
