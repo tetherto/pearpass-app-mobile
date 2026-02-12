@@ -621,7 +621,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
             if (current instanceof PasskeyFormFragment || current instanceof ExistingCredentialSelectionFragment) {
                 // User was on a form - reinitialize vault silently, keep current fragment
                 SecureLog.d(TAG, "Resuming with form visible, reinitializing vault client silently");
-                vaultClient = new PearPassVaultClient(this, null, true, false);
+                vaultClient = new PearPassVaultClient(this, null, true, true);
 
                 // Create a future that will be completed when the vault is ready
                 final CompletableFuture<Boolean> readyFuture = new CompletableFuture<>();
