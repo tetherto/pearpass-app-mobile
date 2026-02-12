@@ -1,100 +1,98 @@
-import { useState } from 'react'
-
 import { useLingui } from '@lingui/react/macro'
-import { PRIVACY_POLICY, TERMS_OF_USE } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider'
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-
+import { useNavigation } from '@react-navigation/native'
 import {
-  Container,
-  ContentContainer,
-  Header,
-  ScreenTitle,
-  TabPanelContainer,
-  Tabs,
-  TabTitle
-} from './styles'
-import { TabExport } from './TabExport'
-import { TabGeneralSettings } from './TabGeneralSettings'
-import { TabImport } from './TabImport'
-import { TabPrivacy } from './TabPrivacy'
-import { TabVaultsSettings } from './TabVaultsSettings'
+  AboutIcon,
+  AppearanceIcon,
+  AutoFillIcon,
+  SecurityIcon,
+  SyncingIcon,
+  VaultIcon
+} from 'pearpass-lib-ui-react-native-components'
+import { colors } from 'pearpass-lib-ui-theme-provider'
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+const MenuItem = ({ label, icon: Icon, onPress }) => (
+  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+    <Icon size="20" color={colors.grey100.mode1} />
+    <Text style={styles.menuItemText}>{label}</Text>
+  </TouchableOpacity>
+)
 
 export const Settings = () => {
   const { t } = useLingui()
+  const navigation = useNavigation()
 
-  const [activeTab, setActiveTab] = useState('general')
-
-  const handleActiveTabChange = (tab) => {
-    setActiveTab(tab)
-  }
+  const menuItems = [
+    { label: t`Security`, screen: 'Security', icon: SecurityIcon },
+    { label: t`Syncing`, screen: 'Syncing', icon: SyncingIcon },
+    { label: t`Autofill`, screen: 'Autofill', icon: AutoFillIcon },
+    { label: t`Vault`, screen: 'Vaults', icon: VaultIcon },
+    { label: t`Appearance`, screen: 'Appearance', icon: AppearanceIcon },
+    { label: t`About`, screen: 'About', icon: AboutIcon }
+  ]
 
   return (
-    <Container>
-      <Header>
-        <ScreenTitle>{t`Settings`}</ScreenTitle>
-      </Header>
-      <ContentContainer>
-        <Tabs>
-          <TouchableOpacity onPress={() => handleActiveTabChange('general')}>
-            <TabTitle isActive={activeTab === 'general'}>{t`General`}</TabTitle>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleActiveTabChange('vaults')}>
-            <TabTitle isActive={activeTab === 'vaults'}>{t`Vaults`}</TabTitle>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleActiveTabChange('export')}>
-            <TabTitle isActive={activeTab === 'export'}>{t`Export`}</TabTitle>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleActiveTabChange('import')}>
-            <TabTitle isActive={activeTab === 'import'}>{t`Import`}</TabTitle>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleActiveTabChange('privacy')}>
-            <TabTitle
-              isActive={activeTab === 'privacy'}
-            >{t`Advanced`}</TabTitle>
-          </TouchableOpacity>
-        </Tabs>
-        <TabPanelContainer>
-          {activeTab === 'general' ? (
-            <TabGeneralSettings />
-          ) : activeTab === 'vaults' ? (
-            <TabVaultsSettings />
-          ) : activeTab === 'export' ? (
-            <TabExport />
-          ) : activeTab === 'import' ? (
-            <TabImport />
-          ) : (
-            <TabPrivacy />
-          )}
-        </TabPanelContainer>
-        <View style={styles.footer}>
-          <TouchableOpacity onPress={() => Linking.openURL(TERMS_OF_USE)}>
-            <Text as="Text" isActive={false} style={styles.textUnderline}>
-              {t`Terms of Use`}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL(PRIVACY_POLICY)}>
-            <Text as="Text" isActive={false} style={styles.textUnderline}>
-              {t`Privacy Statement`}
-            </Text>
-          </TouchableOpacity>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <View style={styles.header}>
+        <Text style={styles.screenTitle}>{t`Settings`}</Text>
+      </View>
+      <ScrollView>
+        <View>
+          {menuItems.map((item) => (
+            <MenuItem
+              key={item.screen}
+              label={item.label}
+              icon={item.icon}
+              onPress={() => navigation.navigate(item.screen)}
+            />
+          ))}
         </View>
-      </ContentContainer>
-    </Container>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  footer: {
-    marginTop: 20,
-    paddingBottom: 10,
-    justifyContent: 'center',
-    flex: 1,
-    flexDirection: 'row',
-    gap: 20
+  container: {
+    padding: 8,
+    paddingHorizontal: 20,
+    paddingBottom: 0,
+    height: '100%',
+    gap: 20,
+    backgroundColor: colors.grey500.mode1
   },
-  textUnderline: {
-    textDecorationLine: 'underline',
-    color: colors.primary200.mode1
+  header: {
+    flexDirection: 'row',
+    gap: 20,
+    alignItems: 'center'
+  },
+  screenTitle: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    fontSize: 24,
+    fontWeight: '700'
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 10,
+    backgroundColor: colors.grey400.mode1
+  },
+  menuItemText: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '700',
+    marginLeft: 10
   }
 })

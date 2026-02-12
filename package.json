@@ -1,6 +1,6 @@
 {
   "name": "pearpass-app-mobile",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "index.js",
   "type": "module",
   "license": "Apache-2.0",
@@ -119,6 +119,10 @@
     "react-test-renderer": "19.0.0",
     "tether-dev-docs": "file:packages/tether-dev-docs",
     "typescript": "~5.8.3"
+  },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
   },
   "private": true
 }

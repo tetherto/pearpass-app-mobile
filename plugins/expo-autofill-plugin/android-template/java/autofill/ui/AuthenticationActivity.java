@@ -21,9 +21,18 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.pears.pass.R;
+import com.pears.pass.autofill.crypto.AuthenticatorDataBuilder;
+import com.pears.pass.autofill.crypto.Base64URLUtils;
+import com.pears.pass.autofill.crypto.PasskeyCrypto;
 import com.pears.pass.autofill.data.CredentialItem;
+import com.pears.pass.autofill.data.PasskeyCredential;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.utils.SecureLog;
+import com.pears.pass.autofill.utils.VaultInitializer;
 
+import org.json.JSONObject;
+
+import java.security.PrivateKey;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,6 +43,12 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     private AutofillId passwordId;
     private String webDomain;
     private String packageName;
+
+    // Passkey assertion mode
+    private boolean isPasskeyAssertion = false;
+    private String passkeyRpId;
+    private byte[] passkeyChallenge;
+    private byte[] passkeyClientDataHash;
 
     // Vault client and initialization state
     private PearPassVaultClient vaultClient;
@@ -48,6 +63,10 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     private boolean isLoggedIn = false;
     private boolean isVaultOpen = false;
     private boolean isLoading = true;
+
+    // Secure password buffer for passing between fragments
+    // This avoids passing password as String through Bundle arguments
+    private byte[] pendingPasswordBuffer = null;
 
     // State keys for savedInstanceState
     private static final String STATE_HAS_PASSWORD_SET = "hasPasswordSet";
@@ -75,18 +94,54 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         webDomain = intent.getStringExtra("web_domain");
         packageName = intent.getStringExtra("package_name");
 
+        // Check for passkey assertion mode
+        isPasskeyAssertion = intent.getBooleanExtra("is_passkey_assertion", false);
+
+        if (isPasskeyAssertion && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            SecureLog.d(TAG, "Passkey assertion mode enabled");
+            try {
+                androidx.credentials.provider.ProviderGetCredentialRequest providerRequest =
+                        androidx.credentials.provider.PendingIntentHandler.retrieveProviderGetCredentialRequest(intent);
+                if (providerRequest != null) {
+                    for (androidx.credentials.CredentialOption option : providerRequest.getCredentialOptions()) {
+                        if (option instanceof androidx.credentials.GetPublicKeyCredentialOption) {
+                            androidx.credentials.GetPublicKeyCredentialOption pkOption =
+                                    (androidx.credentials.GetPublicKeyCredentialOption) option;
+                            String requestJson = pkOption.getRequestJson();
+                            SecureLog.d(TAG, "Passkey request JSON: " + requestJson);
+                            JSONObject json = new JSONObject(requestJson);
+                            passkeyRpId = json.optString("rpId", "");
+                            webDomain = passkeyRpId; // Use rpId as domain for credential filtering
+
+                            // Extract challenge for fallback clientDataJSON construction
+                            String challengeB64 = json.optString("challenge", "");
+                            if (!challengeB64.isEmpty()) {
+                                passkeyChallenge = Base64URLUtils.decode(challengeB64);
+                            }
+
+                            passkeyClientDataHash = pkOption.getClientDataHash();
+                            SecureLog.d(TAG, "Passkey rpId: " + passkeyRpId);
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                SecureLog.e(TAG, "Error parsing passkey request: " + e.getMessage());
+            }
+        }
+
         if (webDomain != null) {
-            android.util.Log.d(TAG, "Received web domain: " + webDomain);
+            SecureLog.d(TAG, "Received web domain: " + webDomain);
         }
         if (packageName != null) {
-            android.util.Log.d(TAG, "Received package name: " + packageName);
+            SecureLog.d(TAG, "Received package name: " + packageName);
         }
 
         // Restore critical state if activity was recreated
         if (savedInstanceState != null) {
             hasPasswordSet = savedInstanceState.getBoolean(STATE_HAS_PASSWORD_SET, false);
             hasInitializedOnce = savedInstanceState.getBoolean(STATE_HAS_INITIALIZED_ONCE, false);
-            android.util.Log.d(TAG, "Restored state - hasPasswordSet: " + hasPasswordSet +
+            SecureLog.d(TAG, "Restored state - hasPasswordSet: " + hasPasswordSet +
                                ", hasInitializedOnce: " + hasInitializedOnce);
         }
 
@@ -98,7 +153,7 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         super.onSaveInstanceState(outState);
         outState.putBoolean(STATE_HAS_PASSWORD_SET, hasPasswordSet);
         outState.putBoolean(STATE_HAS_INITIALIZED_ONCE, hasInitializedOnce);
-        android.util.Log.d(TAG, "Saved state - hasPasswordSet: " + hasPasswordSet);
+        SecureLog.d(TAG, "Saved state - hasPasswordSet: " + hasPasswordSet);
     }
 
     private void makeFullscreen() {
@@ -133,7 +188,7 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
             }
         } catch (Exception e) {
             // Log the error but don't crash - fullscreen is not critical
-            android.util.Log.e("AuthenticationActivity", "Error setting fullscreen", e);
+            SecureLog.e("AuthenticationActivity", "Error setting fullscreen", e);
         }
     }
 
@@ -142,7 +197,7 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         // Check if we're already showing MasterPasswordFragment
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (currentFragment instanceof MasterPasswordFragment) {
-            android.util.Log.d(TAG, "Already on MasterPasswordFragment, skipping navigation");
+            SecureLog.d(TAG, "Already on MasterPasswordFragment, skipping navigation");
             return;
         }
 
@@ -169,9 +224,35 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     }
 
     @Override
-    public void navigateToCredentialsList(String vaultId, String password) {
-        Fragment fragment = CredentialsListFragment.newInstance(vaultId, password, webDomain, packageName);
+    public void navigateToCredentialsList(String vaultId, byte[] passwordBuffer) {
+        // Store password buffer securely - it will be retrieved by CredentialsListFragment
+        // and cleared after vault activation
+        clearPendingPasswordBuffer(); // Clear any existing buffer first
+        this.pendingPasswordBuffer = passwordBuffer;
+        Fragment fragment = CredentialsListFragment.newInstance(vaultId, webDomain, packageName);
         replaceFragment(fragment, true);
+    }
+
+    /**
+     * Get the pending password buffer for vault activation.
+     * This retrieves and clears the buffer in one operation to prevent multiple uses.
+     *
+     * @return The password buffer, or null if not set. Caller is responsible for clearing after use.
+     */
+    public byte[] consumePendingPasswordBuffer() {
+        byte[] buffer = this.pendingPasswordBuffer;
+        this.pendingPasswordBuffer = null; // Clear reference but don't zero - caller will use it
+        return buffer;
+    }
+
+    /**
+     * Clear any pending password buffer from memory.
+     */
+    private void clearPendingPasswordBuffer() {
+        if (pendingPasswordBuffer != null) {
+            com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(pendingPasswordBuffer);
+            pendingPasswordBuffer = null;
+        }
     }
 
     @Override
@@ -203,6 +284,123 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
         setResult(Activity.RESULT_OK, replyIntent);
         finish();
+    }
+
+    @Override
+    public void onPasskeySelected(CredentialItem credential) {
+        if (!isPasskeyAssertion) {
+            SecureLog.w(TAG, "onPasskeySelected called but not in passkey assertion mode");
+            return;
+        }
+        completePasskeyAssertion(credential);
+    }
+
+    /**
+     * Complete passkey assertion by signing with the private key and returning the response.
+     */
+    private void completePasskeyAssertion(CredentialItem credential) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            SecureLog.e(TAG, "Passkey assertion requires API 34+");
+            onCancel();
+            return;
+        }
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                SecureLog.d(TAG, "Starting passkey assertion for credential: " + credential.getCredentialId());
+
+                // Import the private key from the credential
+                String privateKeyB64 = credential.getPrivateKeyBuffer();
+                if (privateKeyB64 == null || privateKeyB64.isEmpty()) {
+                    throw new Exception("No private key found in credential");
+                }
+
+                PrivateKey privateKey = PasskeyCrypto.importPrivateKey(privateKeyB64);
+
+                // Build authenticator data for assertion
+                String rpId = passkeyRpId != null ? passkeyRpId : webDomain;
+                byte[] authData = AuthenticatorDataBuilder.buildForAssertion(rpId);
+
+                // Get or compute client data hash and build clientDataJSON for response
+                byte[] clientDataHash;
+                byte[] clientDataJSON;
+                if (passkeyClientDataHash != null) {
+                    // System provided clientDataHash — it handles clientDataJSON construction
+                    clientDataHash = passkeyClientDataHash;
+                    clientDataJSON = null; // System fills this in the final response
+                } else if (passkeyChallenge != null && passkeyChallenge.length > 0) {
+                    // Build our own clientDataJSON from the parsed challenge
+                    String origin = "android:apk-key-hash:" + getPackageName();
+                    clientDataJSON = AuthenticatorDataBuilder.buildClientDataJSONForAssertion(
+                            passkeyChallenge, origin);
+                    clientDataHash = PasskeyCrypto.sha256(clientDataJSON);
+                } else {
+                    throw new Exception("No clientDataHash from system and no challenge in request");
+                }
+
+                // Sign the assertion
+                String signature = PasskeyCrypto.signAssertion(privateKey, authData, clientDataHash);
+
+                // Build response JSON
+                JSONObject responseJson = new JSONObject();
+                responseJson.put("id", credential.getCredentialId());
+                responseJson.put("rawId", credential.getCredentialId());
+                responseJson.put("type", "public-key");
+
+                JSONObject responseBody = new JSONObject();
+                responseBody.put("authenticatorData", Base64URLUtils.encode(authData));
+                // Include clientDataJSON if we built it ourselves; otherwise empty (system fills it)
+                responseBody.put("clientDataJSON",
+                        clientDataJSON != null ? Base64URLUtils.encode(clientDataJSON) : "");
+                responseBody.put("signature", signature);
+                responseBody.put("userHandle", credential.getUserId() != null ? credential.getUserId() : "");
+                responseJson.put("response", responseBody);
+
+                JSONObject clientExtResults = new JSONObject();
+                responseJson.put("clientExtensionResults", clientExtResults);
+                responseJson.put("authenticatorAttachment", "platform");
+
+                String jsonResponse = responseJson.toString();
+                SecureLog.d(TAG, "Passkey assertion response built successfully");
+
+                runOnUiThread(() -> {
+                    try {
+                        Intent resultData = new Intent();
+                        androidx.credentials.PublicKeyCredential publicKeyCredential =
+                                new androidx.credentials.PublicKeyCredential(jsonResponse);
+                        androidx.credentials.GetCredentialResponse getCredentialResponse =
+                                new androidx.credentials.GetCredentialResponse(publicKeyCredential);
+                        androidx.credentials.provider.PendingIntentHandler.setGetCredentialResponse(
+                                resultData, getCredentialResponse);
+
+                        setResult(Activity.RESULT_OK, resultData);
+                        finish();
+                    } catch (Exception e) {
+                        SecureLog.e(TAG, "Error setting passkey response: " + e.getMessage());
+                        onCancel();
+                    }
+                });
+
+            } catch (Exception e) {
+                SecureLog.e(TAG, "Error completing passkey assertion: " + e.getMessage());
+                e.printStackTrace();
+                runOnUiThread(this::onCancel);
+            }
+        });
+    }
+
+    /**
+     * Check if this activity is in passkey assertion mode.
+     */
+    public boolean isPasskeyAssertionMode() {
+        return isPasskeyAssertion;
+    }
+
+    /**
+     * Get the passkey RP ID for filtering credentials.
+     */
+    public String getPasskeyRpId() {
+        return passkeyRpId;
     }
 
     @Override
@@ -240,7 +438,7 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     @Override
     protected void onPause() {
         super.onPause();
-        android.util.Log.d(TAG, "Activity paused - resetting to initial state");
+        SecureLog.d(TAG, "Activity paused - resetting to initial state");
 
         // Clean up vault client to release database
         cleanup();
@@ -269,13 +467,13 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
                 .commitNow();
         }
 
-        android.util.Log.d(TAG, "Extension completely reset to initial state");
+        SecureLog.d(TAG, "Extension completely reset to initial state");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        android.util.Log.d(TAG, "Activity resumed - starting fresh initialization");
+        SecureLog.d(TAG, "Activity resumed - starting fresh initialization");
 
         // Show loading fragment - user must stay in loading state until initialization completes
         getSupportFragmentManager().beginTransaction()
@@ -296,217 +494,166 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
         vaultClient = new PearPassVaultClient(this, null, true);
 
-        // Initialize user after vault client is ready
-        CompletableFuture.runAsync(() -> {
-            try {
-                // Wait for vault client to be fully initialized with timeout
-                android.util.Log.d(TAG, "Waiting for vault client initialization...");
-                vaultClient.waitForInitialization().get(30, java.util.concurrent.TimeUnit.SECONDS);
-                android.util.Log.d(TAG, "Vault client is ready");
+        SecureLog.d(TAG, "Starting vault initialization...");
+        VaultInitializer.initialize(vaultClient, new VaultInitializer.Callback() {
+            @Override
+            public void onSuccess(VaultInitializer.VaultInitState state) {
+                runOnUiThread(() -> handleInitSuccess(state));
+            }
 
-                // Now initialize the user
-                initializeUser();
-            } catch (java.util.concurrent.TimeoutException e) {
-                android.util.Log.e(TAG, "Vault client initialization timed out");
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping timeout error navigation");
-                        return;
-                    }
-                    isLoading = false;
-                    navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.TIMEOUT_ERROR);
-                });
-            } catch (Exception e) {
-                android.util.Log.e(TAG, "Failed to initialize vault client: " + e.getMessage());
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping init failed error navigation");
-                        return;
-                    }
-                    isLoading = false;
-                    navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.INITIALIZATION_FAILED);
-                });
+            @Override
+            public void onError(VaultInitializer.VaultInitError error, Exception exception) {
+                SecureLog.e(TAG, "Initialization error: " + error + " - " + exception.getMessage());
+                exception.printStackTrace();
+                handleInitError(error, exception);
             }
         });
     }
 
     /**
-     * Initializes the user by checking password, login and vault status
+     * Handle successful initialization
      */
-    private void initializeUser() {
-        if (vaultClient == null) {
-            android.util.Log.e(TAG, "Cannot initialize user - vault client is null");
+    private void handleInitSuccess(VaultInitializer.VaultInitState state) {
+        // Only navigate if we haven't already navigated
+        if (!hasNavigated.compareAndSet(false, true)) {
+            SecureLog.d(TAG, "Already navigated, skipping navigation");
             return;
         }
 
-        // Prevent concurrent initialization
-        if (!isInitializing.compareAndSet(false, true)) {
-            android.util.Log.d(TAG, "Initialization skipped due to concurrent call");
+        this.hasPasswordSet = state.hasPasswordSet;
+        this.isLoggedIn = state.isLoggedIn;
+        this.isVaultOpen = state.isVaultOpen;
+        this.isLoading = false;
+
+        SecureLog.d(TAG, "User initialization complete");
+        SecureLog.d(TAG, "  - hasPasswordSet: " + state.hasPasswordSet);
+        SecureLog.d(TAG, "  - isLoggedIn: " + state.isLoggedIn);
+        SecureLog.d(TAG, "  - isVaultOpen: " + state.isVaultOpen);
+
+        // Set the appropriate flow based on password configuration
+        if (!state.hasPasswordSet) {
+            SecureLog.d(TAG, "Setting flow to missingConfiguration (passwordSet=false)");
+            navigateToMissingConfiguration();
+        } else if (!state.isLoggedIn) {
+            SecureLog.d(TAG, "Setting flow to masterPassword (passwordSet=true, loggedIn=false)");
+            navigateToMasterPassword();
+        } else {
+            SecureLog.d(TAG, "User is logged in, navigating to vault selection");
+            navigateToVaultSelection();
+        }
+
+        // Reset initialization state after flow is set
+        isInitializing.set(false);
+        initRetryCount = 0; // Reset retry counter on success
+        hasInitializedOnce = true;
+    }
+
+    /**
+     * Handle initialization error with retry logic for lock errors
+     */
+    private void handleInitError(VaultInitializer.VaultInitError error, Exception exception) {
+        boolean isLockError = error == VaultInitializer.VaultInitError.VAULT_LOCKED;
+
+        if (isLockError && initRetryCount < MAX_INIT_RETRIES) {
+            // Database lock error - retry after a delay
+            initRetryCount++;
+            int delayMs = initRetryCount * 300; // 300ms, 600ms, 900ms, etc.
+
+            SecureLog.w(TAG, "Database lock detected, retrying in " + delayMs + "ms (attempt " + initRetryCount + "/" + MAX_INIT_RETRIES + ")");
+
+            runOnUiThread(() -> {
+                isInitializing.set(false);
+                // Keep loading state - don't set isLoading = false
+            });
+
+            // Retry after delay
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                SecureLog.d(TAG, "Retrying initialization after database lock");
+                retryInitializeUser();
+            }, delayMs);
+
             return;
         }
 
-        android.util.Log.d(TAG, "Calling initializeUser");
+        // Not a lock error or max retries reached - handle normally
+        if (isLockError) {
+            SecureLog.e(TAG, "Max retries reached for database lock, showing error");
+        }
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                // Get vault status and active vault status sequentially to avoid race conditions
-                PearPassVaultClient.VaultStatus vaultsStatusRes = vaultClient.vaultsGetStatus().get();
-                PearPassVaultClient.VaultStatus activeVaultStatusRes = vaultClient.activeVaultGetStatus().get();
+        // Try to at least check if password is set
+        boolean passwordSet = VaultInitializer.tryCheckPasswordSet(vaultClient);
+        boolean couldCheckPassword = passwordSet || vaultClient != null;
 
-                // Now get master password encryption, passing the vault status to avoid duplicate call
-                PearPassVaultClient.MasterPasswordEncryption masterPasswordEncryption =
-                    vaultClient.getMasterPasswordEncryption(vaultsStatusRes).get();
+        final boolean finalPasswordSet = passwordSet;
+        final boolean finalCouldCheck = couldCheckPassword;
+        final boolean finalIsLockError = isLockError;
 
-                // Check if password is set by verifying all required fields exist
-                boolean passwordSet = masterPasswordEncryption != null &&
-                                     masterPasswordEncryption.ciphertext != null &&
-                                     masterPasswordEncryption.nonce != null &&
-                                     masterPasswordEncryption.salt != null;
-
-                // Check if user is logged in (vault is initialized and unlocked)
-                boolean loggedIn = vaultsStatusRes.isInitialized && !vaultsStatusRes.isLocked;
-
-                // Check if active vault is open
-                boolean vaultOpen = loggedIn &&
-                                   activeVaultStatusRes.isInitialized &&
-                                   !activeVaultStatusRes.isLocked;
-
-                // Update state on UI thread
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping navigation");
-                        return;
-                    }
-
-                    this.hasPasswordSet = passwordSet;
-                    this.isLoggedIn = loggedIn;
-                    this.isVaultOpen = vaultOpen;
-                    this.isLoading = false;
-
-                    android.util.Log.d(TAG, "User initialization complete");
-                    android.util.Log.d(TAG, "  - hasPasswordSet: " + passwordSet);
-                    android.util.Log.d(TAG, "  - isLoggedIn: " + loggedIn);
-                    android.util.Log.d(TAG, "  - isVaultOpen: " + vaultOpen);
-
-                    // Set the appropriate flow based on password configuration
-                    if (!passwordSet) {
-                        android.util.Log.d(TAG, "Setting flow to missingConfiguration (passwordSet=false)");
-                        navigateToMissingConfiguration();
-                    } else if (!loggedIn) {
-                        android.util.Log.d(TAG, "Setting flow to masterPassword (passwordSet=true, loggedIn=false)");
-                        navigateToMasterPassword();
-                    } else {
-                        android.util.Log.d(TAG, "User is logged in, navigating to vault selection");
-                        navigateToVaultSelection();
-                    }
-
-                    // Reset initialization state after flow is set
-                    isInitializing.set(false);
-                    initRetryCount = 0; // Reset retry counter on success
-                    hasInitializedOnce = true;
-                });
-
-            } catch (Exception e) {
-                android.util.Log.e(TAG, "Error initializing user: " + e.getMessage());
-                e.printStackTrace();
-
-                // Check if this is a database lock error
-                String errorMsg = e.getMessage();
-                boolean isDatabaseLockError = errorMsg != null &&
-                    (errorMsg.contains("lock hold by current process") ||
-                     errorMsg.contains("LOCK") ||
-                     errorMsg.contains("No record locks available"));
-
-                if (isDatabaseLockError && initRetryCount < MAX_INIT_RETRIES) {
-                    // Database lock error - retry after a delay
-                    initRetryCount++;
-                    int delayMs = initRetryCount * 300; // 300ms, 600ms, 900ms, etc.
-
-                    android.util.Log.w(TAG, "Database lock detected, retrying in " + delayMs + "ms (attempt " + initRetryCount + "/" + MAX_INIT_RETRIES + ")");
-
-                    runOnUiThread(() -> {
-                        isInitializing.set(false);
-                        // Keep loading state - don't set isLoading = false
-                    });
-
-                    // Retry after delay
-                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                        android.util.Log.d(TAG, "Retrying initialization after database lock");
-                        initializeUser();
-                    }, delayMs);
-
-                    return;
-                }
-
-                // Not a lock error or max retries reached - handle normally
-                if (isDatabaseLockError) {
-                    android.util.Log.e(TAG, "Max retries reached for database lock, showing error");
-                }
-
-                // Try to at least check if password is set
-                boolean passwordSet = false;
-                boolean couldCheckPassword = false;
-                try {
-                    PearPassVaultClient.MasterPasswordEncryption masterPasswordEncryption =
-                        vaultClient.getMasterPasswordEncryption(null).get();
-                    passwordSet = masterPasswordEncryption != null &&
-                                 masterPasswordEncryption.ciphertext != null &&
-                                 masterPasswordEncryption.nonce != null &&
-                                 masterPasswordEncryption.salt != null;
-                    couldCheckPassword = true;
-                } catch (Exception ex) {
-                    android.util.Log.e(TAG, "Could not check password status: " + ex.getMessage());
-                }
-
-                // Set default values on error
-                final boolean finalPasswordSet = passwordSet;
-                final boolean finalCouldCheck = couldCheckPassword;
-
-                runOnUiThread(() -> {
-                    // Only navigate if we haven't already navigated
-                    if (!hasNavigated.compareAndSet(false, true)) {
-                        android.util.Log.d(TAG, "Already navigated, skipping error navigation");
-                        return;
-                    }
-
-                    // Only update hasPasswordSet if we could actually check it
-                    // Otherwise keep the saved state or assume password is set (safer default)
-                    if (finalCouldCheck) {
-                        this.hasPasswordSet = finalPasswordSet;
-                    } else if (!hasInitializedOnce) {
-                        // No saved state and couldn't check - assume password is set
-                        // This is safer than assuming it's not set and showing onboarding
-                        this.hasPasswordSet = true;
-                        android.util.Log.d(TAG, "Error handler - Could not verify password status, assuming set to avoid onboarding");
-                    }
-                    this.isLoggedIn = false;
-                    this.isVaultOpen = false;
-                    this.isLoading = false;
-
-                    // Only show missing configuration if we're CERTAIN password is not set
-                    if (!this.hasPasswordSet && finalCouldCheck) {
-                        android.util.Log.d(TAG, "Error handler - Setting flow to missingConfiguration (passwordSet=false, confirmed)");
-                        navigateToMissingConfiguration();
-                    } else if (this.hasPasswordSet && finalCouldCheck) {
-                        // Password is set and we confirmed it - show master password screen
-                        android.util.Log.d(TAG, "Error handler - Setting flow to masterPassword (passwordSet=true, confirmed)");
-                        navigateToMasterPassword();
-                    } else {
-                        // Could not determine state reliably - show error boundary
-                        android.util.Log.d(TAG, "Error handler - Could not reliably determine user state, showing error boundary");
-                        navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_CLIENT_ERROR);
-                    }
-
-                    // Reset initialization state after flow is set
-                    isInitializing.set(false);
-                    initRetryCount = 0; // Reset retry counter
-                    hasInitializedOnce = true;
-                });
+        runOnUiThread(() -> {
+            // Only navigate if we haven't already navigated
+            if (!hasNavigated.compareAndSet(false, true)) {
+                SecureLog.d(TAG, "Already navigated, skipping error navigation");
+                return;
             }
+
+            // Only update hasPasswordSet if we could actually check it
+            // Otherwise keep the saved state or assume password is set (safer default)
+            if (finalCouldCheck) {
+                this.hasPasswordSet = finalPasswordSet;
+            } else if (!hasInitializedOnce) {
+                // No saved state and couldn't check - assume password is set
+                // This is safer than assuming it's not set and showing onboarding
+                this.hasPasswordSet = true;
+                SecureLog.d(TAG, "Error handler - Could not verify password status, assuming set to avoid onboarding");
+            }
+            this.isLoggedIn = false;
+            this.isVaultOpen = false;
+            this.isLoading = false;
+
+            // Only show missing configuration if we're CERTAIN password is not set
+            if (!this.hasPasswordSet && finalCouldCheck) {
+                SecureLog.d(TAG, "Error handler - Setting flow to missingConfiguration (passwordSet=false, confirmed)");
+                navigateToMissingConfiguration();
+            } else if (this.hasPasswordSet && finalCouldCheck) {
+                // Password is set and we confirmed it - show master password screen
+                SecureLog.d(TAG, "Error handler - Setting flow to masterPassword (passwordSet=true, confirmed)");
+                navigateToMasterPassword();
+            } else if (finalIsLockError) {
+                // Lock error and couldn't determine state - show vault locked error
+                SecureLog.d(TAG, "Error handler - Vault locked by another instance, showing lock error");
+                navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_LOCKED_ERROR);
+            } else {
+                // Could not determine state reliably - show error boundary
+                SecureLog.d(TAG, "Error handler - Could not reliably determine user state, showing error boundary");
+                navigateToErrorBoundary(ErrorBoundaryFragment.ErrorType.VAULT_CLIENT_ERROR);
+            }
+
+            // Reset initialization state after flow is set
+            isInitializing.set(false);
+            initRetryCount = 0; // Reset retry counter
+            hasInitializedOnce = true;
         });
+    }
+
+    /**
+     * Retry user initialization (used for lock error retries)
+     */
+    private void retryInitializeUser() {
+        if (vaultClient == null) {
+            SecureLog.e(TAG, "Cannot retry initialization - vault client is null");
+            return;
+        }
+
+        VaultInitializer.initializeUser(vaultClient)
+            .whenComplete((state, error) -> {
+                if (error != null) {
+                    Exception ex = error instanceof Exception ?
+                            (Exception) error : new Exception(error);
+                    VaultInitializer.VaultInitError errorType = VaultInitializer.classifyError(ex);
+                    handleInitError(errorType, ex);
+                } else {
+                    runOnUiThread(() -> handleInitSuccess(state));
+                }
+            });
     }
 
     /**
@@ -516,7 +663,7 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         // Check if we're already showing MissingConfigurationFragment
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (currentFragment instanceof MissingConfigurationFragment) {
-            android.util.Log.d(TAG, "Already on MissingConfigurationFragment, skipping navigation");
+            SecureLog.d(TAG, "Already on MissingConfigurationFragment, skipping navigation");
             return;
         }
 
@@ -557,10 +704,10 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         // Only cleanup if the activity is actually finishing
         // Don't cleanup if user just backgrounds the app - they might resume
         if (isFinishing()) {
-            android.util.Log.d(TAG, "Activity is finishing, performing cleanup");
+            SecureLog.d(TAG, "Activity is finishing, performing cleanup");
             cleanup();
         } else {
-            android.util.Log.d(TAG, "Activity destroyed but not finishing (might resume) - keeping vault client");
+            SecureLog.d(TAG, "Activity destroyed but not finishing (might resume) - keeping vault client");
         }
     }
 
@@ -568,11 +715,14 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
      * Cleanup the vault client resources
      */
     private void cleanup() {
+        // Clear any pending password buffer
+        clearPendingPasswordBuffer();
+
         if (vaultClient == null) {
             return;
         }
 
-        android.util.Log.d(TAG, "Cleaning up vault client...");
+        SecureLog.d(TAG, "Cleaning up vault client...");
 
         final PearPassVaultClient clientToClose = vaultClient;
         vaultClient = null; // Clear reference immediately to prevent reuse
@@ -582,11 +732,11 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
             // We MUST wait to ensure the database is released before onResume creates a new worklet
             // Shutdown is now synchronous so it should complete quickly (< 500ms)
             clientToClose.closeAllInstances().get(500, java.util.concurrent.TimeUnit.MILLISECONDS);
-            android.util.Log.d(TAG, "Cleanup completed successfully");
+            SecureLog.d(TAG, "Cleanup completed successfully");
         } catch (java.util.concurrent.TimeoutException e) {
-            android.util.Log.w(TAG, "Cleanup timed out after 500ms, continuing anyway");
+            SecureLog.w(TAG, "Cleanup timed out after 500ms, continuing anyway");
         } catch (Exception e) {
-            android.util.Log.w(TAG, "Error during cleanup: " + e.getMessage());
+            SecureLog.w(TAG, "Error during cleanup: " + e.getMessage());
         }
     }
 }

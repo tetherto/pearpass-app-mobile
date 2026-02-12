@@ -7,7 +7,6 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.UserNotAuthenticatedException;
 import android.util.Base64;
-import android.util.Log;
 
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
@@ -136,7 +135,7 @@ public class BiometricAuthHelper {
         try {
             String enabledValue = sharedPrefs.getString(BIOMETRIC_ENABLED_KEY, null);
             if (enabledValue == null) {
-                Log.d(TAG, "isBiometricsEnabled - no BIOMETRIC_ENABLED_KEY found");
+                SecureLog.d(TAG, "isBiometricsEnabled - no BIOMETRIC_ENABLED_KEY found");
                 return false;
             }
 
@@ -167,10 +166,10 @@ public class BiometricAuthHelper {
             while (aliases.hasMoreElements()) {
                 allAliases.append(aliases.nextElement()).append(", ");
             }
-            Log.d(TAG, allAliases.toString());
+            SecureLog.d(TAG, allAliases.toString());
 
             if (!keyStore.containsAlias(keyAlias)) {
-                Log.e(TAG, "Keystore key not found: " + keyAlias);
+                SecureLog.e(TAG, "Keystore key not found: " + keyAlias);
                 return false;
             }
 
@@ -186,12 +185,12 @@ public class BiometricAuthHelper {
             byte[] plaintextBytes = cipher.doFinal(ciphertextBytes);
             String plaintext = new String(plaintextBytes, StandardCharsets.UTF_8);
 
-            Log.d(TAG, "isBiometricsEnabled - decrypted value: " + plaintext);
+            SecureLog.d(TAG, "isBiometricsEnabled - decrypted value: " + plaintext);
 
             // The decrypted value should be "true" or "false"
             return Boolean.parseBoolean(plaintext);
         } catch (Exception e) {
-            Log.e(TAG, "isBiometricsEnabled - error: " + e.getMessage(), e);
+            SecureLog.e(TAG, "isBiometricsEnabled - error: " + e.getMessage(), e);
             return false;
         }
     }

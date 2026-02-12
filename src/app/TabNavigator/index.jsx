@@ -9,16 +9,23 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { BottomSheetRecordCreateContent } from '../../containers/BottomSheetRecordCreateContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
-import { Settings } from '../../screens/Settings'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { DrawerNavigator } from '../DrawerNavigator'
+import { SettingsNavigator } from '../SettingsNavigator'
 
 const Tab = createBottomTabNavigator()
 
 export const TabNavigator = () => {
   const { expand } = useBottomSheet()
+  const { hapticButtonPrimary } = useHapticFeedback()
 
   return (
     <Tab.Navigator
+      screenListeners={{
+        tabPress: () => {
+          hapticButtonPrimary()
+        }
+      }}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarHideOnKeyboard: true,
@@ -84,12 +91,13 @@ export const TabNavigator = () => {
               <TouchableOpacity
                 testID="button-create-record"
                 style={styles.tabBarButton}
-                onPress={() =>
+                onPress={() => {
+                  hapticButtonPrimary()
                   expand({
                     children: <BottomSheetRecordCreateContent />,
                     snapPoints: ['1%', '80%']
                   })
-                }
+                }}
               >
                 <PlusIcon size="28" color={colors.black.mode1} />
               </TouchableOpacity>
@@ -103,7 +111,7 @@ export const TabNavigator = () => {
           tabBarLabel: 'Settings'
         }}
         name="Settings"
-        component={Settings}
+        component={SettingsNavigator}
       />
     </Tab.Navigator>
   )

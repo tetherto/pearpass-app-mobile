@@ -55,6 +55,9 @@ export const withAndroidManifest: ConfigPlugin<AutofillPluginOptions> = (config,
       } as any);
     }
 
+    // NOTE: Passkey support temporarily disabled
+    // Passkey Registration Activity and Credential Provider Service are not registered
+
     return cfg;
   });
 };

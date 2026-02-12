@@ -14,6 +14,7 @@ import { App } from './app/App'
 import { AutoLockTouchCapture } from './components/AutoLockHandler'
 import { AutoLockProvider } from './context/AutoLockContext'
 import { BottomSheetProvider } from './context/BottomSheetContext'
+import { HapticsProvider } from './context/HapticsContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
 import { SharedFilterProvider } from './context/SharedFilterContext'
@@ -55,25 +56,27 @@ export const Main = () => {
 
       <I18nProvider i18n={i18n}>
         <ThemeProvider>
-          <LoadingProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <VaultProvider>
-                <SharedFilterProvider>
-                  <NavigationContainer>
-                    <AutoLockProvider>
-                      <AutoLockTouchCapture>
-                        <ModalProvider>
-                          <BottomSheetProvider>
-                            <App />
-                          </BottomSheetProvider>
-                        </ModalProvider>
-                      </AutoLockTouchCapture>
-                    </AutoLockProvider>
-                  </NavigationContainer>
-                </SharedFilterProvider>
-              </VaultProvider>
-            </GestureHandlerRootView>
-          </LoadingProvider>
+          <HapticsProvider>
+            <LoadingProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <VaultProvider>
+                  <SharedFilterProvider>
+                    <NavigationContainer>
+                      <AutoLockProvider>
+                        <AutoLockTouchCapture>
+                          <ModalProvider>
+                            <BottomSheetProvider>
+                              <App />
+                            </BottomSheetProvider>
+                          </ModalProvider>
+                        </AutoLockTouchCapture>
+                      </AutoLockProvider>
+                    </NavigationContainer>
+                  </SharedFilterProvider>
+                </VaultProvider>
+              </GestureHandlerRootView>
+            </LoadingProvider>
+          </HapticsProvider>
         </ThemeProvider>
       </I18nProvider>
     </>

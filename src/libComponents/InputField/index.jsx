@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 
-import { ErrorIcon, CopyIcon } from 'pearpass-lib-ui-react-native-components'
+import { ErrorIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider'
 import {
   Platform,
@@ -13,6 +13,7 @@ import {
 } from 'react-native'
 import { useTheme } from 'styled-components/native'
 
+import { CopyButton } from '../CopyButton'
 import { HighlightString } from '../HighlightString'
 
 /**
@@ -245,16 +246,11 @@ export const InputField = ({
           </View>
         )}
       </View>
-      {(!!additionalItems || (isDisabled && onClick)) && (
-        <View style={styles.additionalItems}>
-          {additionalItems}
-          {isDisabled && onClick && (
-            <TouchableOpacity onPress={onClick} activeOpacity={0.7}>
-              <CopyIcon size="20" color={theme.colors.white.mode1} />
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
+
+      <View style={styles.additionalItems}>
+        {additionalItems}
+        {isDisabled && <CopyButton value={value} />}
+      </View>
     </View>
   )
 

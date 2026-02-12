@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Rive from 'rive-react-native'
 
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { LogoTextWithLock } from '../../svgs/LogoTextWithLock'
 import { InitialVideo } from '../InitialVideo'
 
@@ -44,6 +45,7 @@ export const OnboardingContainer = ({
 }) => {
   const { t } = useLingui()
   const insets = useSafeAreaInsets()
+  const { hapticButtonPrimary, hapticButtonSecondary } = useHapticFeedback()
   const [, setTimeLeft] = useState(90)
   const intervalRef = useRef(null)
 
@@ -261,14 +263,20 @@ export const OnboardingContainer = ({
               styles.paginationDot,
               currentStep === step && styles.paginationDotActive
             ]}
-            onPress={() => onStepSelect && onStepSelect(step)}
+            onPress={() => {
+              hapticButtonSecondary()
+              onStepSelect?.(step)
+            }}
             testID={`onboarding-progress-step-${step}`}
           />
         ))}
       </View>
       <View style={styles.actionButtonsContainer}>
         <TouchableOpacity
-          onPress={onContinue}
+          onPress={() => {
+            hapticButtonPrimary()
+            onContinue?.()
+          }}
           style={styles.continueButton}
           testID="onboarding-continue-button"
         >
@@ -279,7 +287,10 @@ export const OnboardingContainer = ({
         </TouchableOpacity>
         {currentStep !== SCREENS[SCREENS.length - 1] && (
           <TouchableOpacity
-            onPress={onSkip}
+            onPress={() => {
+              hapticButtonSecondary()
+              onSkip?.()
+            }}
             style={styles.skipButton}
             testID="onboarding-skip-button"
           >

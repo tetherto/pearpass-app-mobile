@@ -39,12 +39,22 @@ import Foundation
         case ENCRYPTION_ENCRYPT_VAULT_WITH_KEY = 30
         case ENCRYPTION_DECRYPT_VAULT_KEY = 31
         case ENCRYPTION_GET_DECRYPTION_KEY = 32
-        case CLOSE = 33
+        case CLOSE_ALL_INSTANCES = 33
         case CANCEL_PAIR_ACTIVE_VAULT = 34
+        case BLIND_MIRRORS_GET = 35
+        case BLIND_MIRRORS_ADD = 36
+        case BLIND_MIRROR_REMOVE = 37
+        case BLIND_MIRRORS_ADD_DEFAULTS = 38
+        case BLIND_MIRRORS_REMOVE_ALL = 39
+        case MASTER_PASSWORD_STATUS = 40
+        case RECORD_FAILED_MASTER_PASSWORD = 41
+        case RESET_FAILED_ATTEMPTS = 42
         case MASTER_PASSWORD_CREATE = 43
         case MASTER_PASSWORD_INIT_WITH_PASSWORD = 44
         case MASTER_PASSWORD_UPDATE = 45
         case MASTER_PASSWORD_INIT_WITH_CREDENTIALS = 46
+        case BACKGROUND_BEGIN = 47
+        case BACKGROUND_END = 48
         case SET_CORE_STORE_OPTIONS = 49
     }
     
@@ -84,34 +94,36 @@ import Foundation
     }
     
     // MARK: - Initialization
-    
-    init(storagePath: String? = nil, debugMode: Bool = false) {
+
+    /// Initialize the vault client
+    /// - Parameters:
+    ///   - storagePath: Custom storage path (optional)
+    ///   - debugMode: Enable debug logging
+    ///   - readOnly: Set to true for credential lookup, false for passkey registration
+    init(storagePath: String? = nil, debugMode: Bool = false, readOnly: Bool = true) {
         self.debugMode = debugMode
         self.storagePath = storagePath
         super.init()
-        
+
         // Get the storage path using the utility function
         guard let pathToUse = Utils.getVaultStoragePath(customPath: storagePath) else {
             logError("Failed to determine storage path")
             return
         }
-        
+
         // Store the initialization task so we can await it later
         self.initializationTask = Task {
             do {
                 // First initialize the worklet
                 try await initializeWorklet()
 
-                // Then set the storage path
+                // Set storage path and core store options BEFORE any vault initialization
+                // These must be set before Corestore is created as options can't be changed after
                 try await setStoragePath(pathToUse)
+                try await setCoreStoreOptions(readOnly: readOnly)
 
-                // Set readOnly mode for autofill extension to avoid file lock conflicts
-                log("Setting core store options: readOnly=true")
-                try await setCoreStoreOptions(readOnly: true)
-
-                log("Vault client fully initialized with readOnly mode")
+                log("Vault client fully initialized (readOnly: \(readOnly))")
             } catch {
-                logError("Failed to initialize: \(error.localizedDescription)")
                 throw error
             }
         }
@@ -176,10 +188,28 @@ import Foundation
             helper.send(jsonString) { reply, error in
                 if let error = error {
                     continuation.resume(throwing: PearPassVaultError.unknown(error.localizedDescription))
-                } else if let reply = reply,
-                          let replyData = reply.data(using: .utf8),
-                          let json = try? JSONSerialization.jsonObject(with: replyData) as? [String: Any] {
-                    
+                } else if let reply = reply {
+                    guard let replyData = reply.data(using: .utf8) else {
+                        NSLog("[PearPassVaultClient] cmd=\(command): reply.data(using: .utf8) failed, reply length=\(reply.count)")
+                        continuation.resume(returning: nil)
+                        return
+                    }
+
+                    let jsonObj: Any
+                    do {
+                        jsonObj = try JSONSerialization.jsonObject(with: replyData)
+                    } catch {
+                        NSLog("[PearPassVaultClient] cmd=\(command): JSON parse FAILED: \(error), reply length=\(reply.count)")
+                        continuation.resume(returning: nil)
+                        return
+                    }
+
+                    guard let json = jsonObj as? [String: Any] else {
+                        NSLog("[PearPassVaultClient] cmd=\(command): jsonObj is not [String:Any], type=\(type(of: jsonObj))")
+                        continuation.resume(returning: nil)
+                        return
+                    }
+
                     // Check for errors in response
                     if let errorMsg = json["error"] as? String {
                         if errorMsg.contains("ELOCKED") {
@@ -193,16 +223,17 @@ import Foundation
                         if let dictData = data as? [String: Any] {
                             continuation.resume(returning: dictData)
                         } else if let stringData = data as? String {
-                            // If it's a string, wrap it in a dictionary or return as-is
                             continuation.resume(returning: ["value": stringData] as [String: Any])
                         } else if let arrayData = data as? [[String: Any]] {
-                            // If it's an array, wrap it for consistency
+                            NSLog("[PearPassVaultClient] cmd=\(command): parsed array with \(arrayData.count) elements")
                             continuation.resume(returning: ["array": arrayData] as [String: Any])
                         } else {
+                            NSLog("[PearPassVaultClient] cmd=\(command): data type=\(type(of: data as Any)), falling through to nil")
                             continuation.resume(returning: data as? [String: Any])
                         }
                     }
                 } else {
+                    NSLog("[PearPassVaultClient] cmd=\(command): reply is nil")
                     continuation.resume(returning: nil)
                 }
             }
@@ -218,13 +249,15 @@ import Foundation
         log("Storage path set to: \(path)")
     }
 
-    /// Sets core store options (e.g., readOnly mode for autofill extension)
-    func setCoreStoreOptions(readOnly: Bool) async throws {
-        let coreStoreOptions: [String: Any] = ["readOnly": readOnly]
-        _ = try await sendRequest(command: API.SET_CORE_STORE_OPTIONS.rawValue, data: ["coreStoreOptions": coreStoreOptions])
+    /// Sets the core store options
+    /// IMPORTANT: Must be called BEFORE any vault initialization (vaultsInit, encryptionInit, activeVaultInit)
+    /// Once Corestore is initialized, these options cannot be changed
+    /// - Parameter readOnly: When true, prevents write operations to the vault
+    private func setCoreStoreOptions(readOnly: Bool) async throws {
+        _ = try await sendRequest(command: API.SET_CORE_STORE_OPTIONS.rawValue, data: ["readOnly": readOnly])
         log("Core store options set: readOnly=\(readOnly)")
     }
-    
+
     // MARK: - Master Vault Methods
 
     /// Initializes the vault with an encryption key and hashed password
@@ -526,34 +559,33 @@ import Foundation
     
     
     /// Lists all records in the active vault
-    func activeVaultList(filterKey: String? = nil) async throws -> [[String: Any]] {
+    func activeVaultList(filterKey: String? = nil) async throws -> [VaultRecord] {
         let filter = filterKey ?? "record/"
         log("Listing active vault records with filter: \(filter)")
-        
+
         let result = try await sendRequest(
             command: API.ACTIVE_VAULT_LIST.rawValue,
             data: ["filterKey": filter]
         )
-        
-        // Parse the response similar to vaultsList
+
+        var rawRecords: [[String: Any]] = []
+
         if let resultDict = result, let arrayWrapper = resultDict["array"] as? [[String: Any]] {
-            log("Found \(arrayWrapper.count) records in active vault")
-            return arrayWrapper
+            rawRecords = arrayWrapper
         } else if let resultDict = result, let data = resultDict["data"] as? [[String: Any]] {
-            log("Found \(data.count) records in active vault")
-            return data
+            rawRecords = data
         } else if let directArray = result as? [[String: Any]] {
-            log("Found \(directArray.count) records in active vault")
-            return directArray
+            rawRecords = directArray
         }
-        
-        log("No records found in active vault")
-        return []
+
+        let records = rawRecords.compactMap { VaultRecord(from: $0) }
+        log("Found \(records.count) records in active vault")
+        return records
     }
     
     /// Initialize active vault and fetch records for a specific vault
     /// This follows the RN app pattern for getting vault records
-    func initializeVaultAndFetchRecords(vault: Vault) async throws -> [[String: Any]] {
+    func initializeVaultAndFetchRecords(vault: Vault) async throws -> [VaultRecord] {
         log("Initializing vault \(vault.name) and fetching records")
         
         // Step 1: Get the vault's encryption key
@@ -1104,7 +1136,7 @@ import Foundation
             }
 
             // Send close command to worklet
-            _ = try await sendRequestToHelper(helper: helper, command: API.CLOSE.rawValue)
+            _ = try await sendRequestToHelper(helper: helper, command: API.CLOSE_ALL_INSTANCES.rawValue)
             log("Close command sent successfully")
         } catch {
             logError("Failed to send close command (will shutdown anyway): \(error.localizedDescription)")
@@ -1164,9 +1196,337 @@ import Foundation
             }
         }
     }
-    
+
+    // MARK: - Record Search Methods
+
+    /// Search for login records matching an rpId and username
+    /// Mirrors web extension logic: returns records where username matches OR record has no username
+    func searchLoginRecords(rpId: String, username: String) async throws -> [VaultRecord] {
+        log("Searching login records for rpId: \(rpId), username: \(username)")
+
+        let allRecords = try await activeVaultList(filterKey: "record/")
+        var matches: [VaultRecord] = []
+
+        for record in allRecords {
+            guard record.type == "login" else { continue }
+            guard let data = record.data else { continue }
+
+            let recordUsername = data.username.trimmingCharacters(in: .whitespaces)
+            let passkeyUsername = username.trimmingCharacters(in: .whitespaces)
+
+            let usernameMatches = !passkeyUsername.isEmpty && !recordUsername.isEmpty && passkeyUsername.caseInsensitiveCompare(recordUsername) == .orderedSame
+            let hasNoUsername = recordUsername.isEmpty
+
+            if usernameMatches || hasNoUsername {
+                matches.append(record)
+            }
+        }
+
+        log("Found \(matches.count) matching login records")
+        return matches
+    }
+
+    /// List all login records in the active vault
+    func listAllLoginRecords() async throws -> [VaultRecord] {
+        log("Listing all login records")
+
+        let allRecords = try await activeVaultList(filterKey: "record/")
+        let loginRecords = allRecords.filter { record in
+            record.type == "login" && record.data != nil
+        }
+
+        log("Found \(loginRecords.count) login records")
+        return loginRecords
+    }
+
+    /// List all folders in the active vault
+    /// Folders are records with a "folder" field but no "data" field
+    func listFolders() async throws -> [String] {
+        NSLog("[PearPassVaultClient] listFolders: starting")
+
+        let status = try await activeVaultGetStatus()
+        NSLog("[PearPassVaultClient] listFolders: vault status initialized=\(status.isInitialized), locked=\(status.isLocked)")
+
+        guard status.isInitialized && !status.isLocked else {
+            NSLog("[PearPassVaultClient] listFolders: vault not active, returning empty")
+            return []
+        }
+
+        let allRecords = try await activeVaultList(filterKey: "record/")
+        NSLog("[PearPassVaultClient] listFolders: got \(allRecords.count) total records")
+
+        var folderNames: [String] = []
+
+        for (index, record) in allRecords.enumerated() {
+            NSLog("[PearPassVaultClient] listFolders: record[\(index)] type=\(record.type) folder=\(String(describing: record.folder)) hasData=\(record.data != nil)")
+
+            if let folderName = record.folder,
+               record.data == nil,
+               !folderName.isEmpty {
+                folderNames.append(folderName)
+                NSLog("[PearPassVaultClient] listFolders: matched folder '\(folderName)'")
+            }
+        }
+
+        NSLog("[PearPassVaultClient] listFolders: returning \(folderNames.count) folders: \(folderNames)")
+        return folderNames
+    }
+
+    // MARK: - Passkey Methods
+
+    /// Save a passkey credential to the active vault with full form data
+    /// Matches the main app's createRecord data structure
+    /// - Parameters:
+    ///   - vaultId: The vault ID to save to (must be the currently active vault)
+    ///   - credential: The passkey credential to save
+    ///   - title: User-edited title
+    ///   - userName: User-edited username
+    ///   - websites: User-edited websites (already normalized with https://)
+    ///   - note: User-edited comment/note
+    ///   - folder: Selected folder name (nil for no folder)
+    ///   - attachmentMetadata: Array of AttachmentMetadata for files already saved via activeVaultAddFile
+    ///   - passkeyCreatedAt: Timestamp in milliseconds when passkey was created
+    /// - Returns: The record ID of the saved passkey
+    func savePasskey(
+        vaultId: String,
+        credential: PasskeyCredential,
+        title: String,
+        userName: String,
+        websites: [String],
+        note: String = "",
+        folder: String? = nil,
+        attachmentMetadata: [AttachmentMetadata] = [],
+        passkeyCreatedAt: Int64? = nil,
+        recordId: String? = nil
+    ) async throws -> String {
+        log("Saving passkey for websites: \(websites)")
+
+        let recordId = recordId ?? UUID().uuidString
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+
+        // Format websites with https:// prefix if not present
+        let formattedWebsites = websites.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.map { website -> String in
+            let lower = website.lowercased()
+            if lower.hasPrefix("http://") || lower.hasPrefix("https://") {
+                return lower
+            }
+            return "https://\(lower)"
+        }
+
+        // Build record using typed models
+        let data = RecordData(
+            title: title,
+            username: userName,
+            password: "",
+            passwordUpdatedAt: now,
+            passkeyCreatedAt: passkeyCreatedAt ?? now,
+            credential: credential,
+            note: note,
+            websites: formattedWebsites,
+            customFields: [],
+            attachments: attachmentMetadata
+        )
+
+        let record = VaultRecord(
+            id: recordId,
+            version: 1,
+            type: "login",
+            vaultId: vaultId,
+            data: data,
+            isFavorite: false,
+            createdAt: now,
+            updatedAt: now,
+            folder: folder
+        )
+
+        let key = "record/\(recordId)"
+        _ = try await sendRequest(
+            command: API.ACTIVE_VAULT_ADD.rawValue,
+            data: ["key": key, "data": record.toDictionary()]
+        )
+
+        log("Passkey saved with ID: \(recordId)")
+        return recordId
+    }
+
+    /// Update an existing record to add a passkey credential
+    /// Preserves existing record data while merging in passkey and form edits
+    func updateRecordWithPasskey(
+        existingRecord: VaultRecord,
+        credential: PasskeyCredential,
+        title: String,
+        userName: String,
+        websites: [String],
+        note: String,
+        folder: String?,
+        attachmentMetadata: [AttachmentMetadata],
+        passkeyCreatedAt: Int64
+    ) async throws -> String {
+        let recordId = existingRecord.id
+
+        log("Updating existing record \(recordId) with passkey")
+
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+
+        // Format websites
+        let formattedWebsites = websites.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.map { website -> String in
+            let lower = website.lowercased()
+            if lower.hasPrefix("http://") || lower.hasPrefix("https://") {
+                return lower
+            }
+            return "https://\(lower)"
+        }
+
+        // Merge existing attachments with new ones
+        let existingAttachments = existingRecord.data?.attachments ?? []
+        var mergedAttachments = existingAttachments
+        for meta in attachmentMetadata {
+            let alreadyExists = existingAttachments.contains { $0.id == meta.id }
+            if !alreadyExists {
+                mergedAttachments.append(meta)
+            }
+        }
+
+        // Build updated record using typed models
+        let updatedData = RecordData(
+            title: title,
+            username: userName,
+            password: existingRecord.data?.password ?? "",
+            passwordUpdatedAt: existingRecord.data?.passwordUpdatedAt ?? now,
+            passkeyCreatedAt: passkeyCreatedAt,
+            credential: credential,
+            note: note,
+            websites: formattedWebsites,
+            customFields: existingRecord.data?.customFields ?? [],
+            attachments: mergedAttachments
+        )
+
+        let updatedRecord = VaultRecord(
+            id: recordId,
+            version: existingRecord.version,
+            type: "login",
+            vaultId: existingRecord.vaultId,
+            data: updatedData,
+            isFavorite: existingRecord.isFavorite,
+            createdAt: existingRecord.createdAt,
+            updatedAt: now,
+            folder: folder
+        )
+
+        let key = "record/\(recordId)"
+        _ = try await sendRequest(
+            command: API.ACTIVE_VAULT_ADD.rawValue,
+            data: ["key": key, "data": updatedRecord.toDictionary()]
+        )
+
+        log("Record \(recordId) updated with passkey")
+        return recordId
+    }
+
+    /// Add a file to the active vault (encrypted by vault core)
+    /// Files are stored at: record/{recordId}/file/{fileId}
+    func activeVaultAddFile(recordId: String, fileId: String, buffer: Data, name: String) async throws {
+        log("Adding file '\(name)' (\(buffer.count) bytes) to record \(recordId)")
+
+        let key = "record/\(recordId)/file/\(fileId)"
+
+        // Write file to a temp location in the shared app group container
+        // so the Bare worklet can read it from disk (avoids IPC size limits)
+        guard let containerURL = Utils.sharedContainerURL else {
+            throw PearPassVaultError.unknown("Cannot access shared container for temp file")
+        }
+        let tempFileURL = containerURL.appendingPathComponent("temp_upload_\(fileId)")
+        try buffer.write(to: tempFileURL)
+
+        defer {
+            try? FileManager.default.removeItem(at: tempFileURL)
+        }
+
+        _ = try await sendRequest(
+            command: API.ACTIVE_VAULT_FILE_ADD.rawValue,
+            data: [
+                "key": key,
+                "filePath": tempFileURL.path,
+                "name": name
+            ]
+        )
+
+        log("File '\(name)' added successfully")
+    }
+
+    /// List all passkeys in the active vault, optionally filtered by RP ID
+    /// - Parameter rpId: Optional relying party ID to filter by
+    /// - Returns: Array of passkey credentials
+    func listPasskeys(rpId: String? = nil) async throws -> [PasskeyCredential] {
+        log("Listing passkeys" + (rpId != nil ? " for RP: \(rpId!)" : ""))
+
+        let records = try await activeVaultList(filterKey: "record/")
+        var passkeys: [PasskeyCredential] = []
+
+        for record in records {
+            guard let recordData = record.data,
+                  let credential = recordData.credential else {
+                continue
+            }
+
+            if let filterRpId = rpId {
+                let matches = recordData.websites.contains(where: { normalizedDomainMatch($0, filterRpId) })
+                if matches {
+                    passkeys.append(credential)
+                }
+            } else {
+                passkeys.append(credential)
+            }
+        }
+
+        log("Found \(passkeys.count) passkeys")
+        return passkeys
+    }
+
+    /// Get a specific passkey by credential ID
+    /// - Parameter credentialId: The credential ID (Base64URL encoded)
+    /// - Returns: The passkey credential if found
+    func getPasskey(credentialId: String) async throws -> PasskeyCredential? {
+        log("Getting passkey with ID: \(credentialId)")
+
+        let passkeys = try await listPasskeys()
+
+        return passkeys.first { $0.id == credentialId }
+    }
+
+    /// Delete a passkey from the active vault
+    /// - Parameter recordId: The record ID of the passkey to delete
+    func deletePasskey(recordId: String) async throws {
+        log("Deleting passkey record: \(recordId)")
+
+        let key = "record/\(recordId)"
+        _ = try await sendRequest(
+            command: API.ACTIVE_VAULT_REMOVE.rawValue,
+            data: ["key": key]
+        )
+
+        log("Passkey deleted")
+    }
+
+    /// Helper to check if two domains match (handles subdomains)
+    private func normalizedDomainMatch(_ domain1: String, _ domain2: String) -> Bool {
+        let d1 = domain1.lowercased()
+            .replacingOccurrences(of: "https://", with: "")
+            .replacingOccurrences(of: "http://", with: "")
+            .replacingOccurrences(of: "www.", with: "")
+            .components(separatedBy: "/").first ?? ""
+
+        let d2 = domain2.lowercased()
+            .replacingOccurrences(of: "https://", with: "")
+            .replacingOccurrences(of: "http://", with: "")
+            .replacingOccurrences(of: "www.", with: "")
+            .components(separatedBy: "/").first ?? ""
+
+        return d1 == d2 || d1.hasSuffix(".\(d2)") || d2.hasSuffix(".\(d1)")
+    }
+
     // MARK: - Helper Methods
-    
+
     private func log(_ message: String) {
         if debugMode {
             print("[PearPassVaultClient] \(message)")

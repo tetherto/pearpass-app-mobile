@@ -90,7 +90,7 @@ export const FolderList = ({
         <Folder
           key={folder.name}
           onFolderSelect={(folder) => onFolderSelect(folder)}
-          onLongPress={() => onLongPress(folder.name)}
+          onLongPress={() => onLongPress?.(folder.name)}
           onCreateNewFolder={handleCreateNewFolder}
           folder={folder}
           isLast={index === filteredFolderList.length - 1}

@@ -43,7 +43,7 @@ export const ModifyVaultsModaContentWrapper = ({
         ) : (
           <>
             <ButtonPrimary onPress={primaryAction} size="sm">
-              {t`Continue`}
+              {t`Save`}
             </ButtonPrimary>
 
             <ButtonSecondary onPress={secondaryAction} size="sm">

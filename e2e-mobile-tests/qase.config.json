@@ -1,0 +1,16 @@
+{
+  "debug": false,
+  "testops": {
+    "api": {
+      "token": ""
+    },
+    "project": "PAS",
+    "plan": {
+      "id": 2
+    },
+    "run": {
+      "complete": true,
+      "id": 0
+    }
+  }
+}

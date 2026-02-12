@@ -19,7 +19,6 @@ import { FormGroup } from '../../../components/FormGroup'
 import { InputFieldNote } from '../../../components/InputFieldNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { ImagesField } from '../../../containers/ImagesField'
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { InputField } from '../../../libComponents'
 
@@ -129,12 +128,6 @@ export const IdentityRecordDetailsForm = ({
     setValues(preservedValues)
   }, [initialValues, setValues])
 
-  const { copyToClipboard } = useCopyToClipboard()
-
-  const handleTapToCopy = (name) => {
-    copyToClipboard(values[name])
-  }
-
   const hasFullName = !!values?.fullName?.length
   const hasEmail = !!values?.email?.length
   const hasPhoneNumber = !!values?.phoneNumber?.length
@@ -199,7 +192,6 @@ export const IdentityRecordDetailsForm = ({
         <FormGroup title={t`Personal information`} isCollapse>
           {hasFullName && (
             <InputField
-              onClick={() => handleTapToCopy('fullName')}
               icon={UserIcon}
               label={t`Full name`}
               placeholder={t`John Smith`}
@@ -211,7 +203,6 @@ export const IdentityRecordDetailsForm = ({
 
           {hasEmail && (
             <InputField
-              onClick={() => handleTapToCopy('email')}
               icon={EmailIcon}
               label={t`Email`}
               placeholder={t`Insert email`}
@@ -223,7 +214,6 @@ export const IdentityRecordDetailsForm = ({
 
           {hasPhoneNumber && (
             <InputField
-              onClick={() => handleTapToCopy('phoneNumber')}
               icon={PhoneIcon}
               label={t`Phone number`}
               placeholder={t`Insert phone number`}
@@ -239,7 +229,6 @@ export const IdentityRecordDetailsForm = ({
         <FormGroup title={t`Detail of address`} isCollapse>
           {hasAddress && (
             <InputField
-              onClick={() => handleTapToCopy('address')}
               label={t`Address`}
               placeholder={t`Insert address`}
               variant="outline"
@@ -250,7 +239,6 @@ export const IdentityRecordDetailsForm = ({
 
           {hasZip && (
             <InputField
-              onClick={() => handleTapToCopy('zip')}
               label={t`ZIP`}
               placeholder={t`Insert ZIP`}
               variant="outline"
@@ -261,7 +249,6 @@ export const IdentityRecordDetailsForm = ({
 
           {hasCity && (
             <InputField
-              onClick={() => handleTapToCopy('city')}
               label={t`City`}
               placeholder={t`Insert city`}
               variant="outline"
@@ -272,7 +259,6 @@ export const IdentityRecordDetailsForm = ({
 
           {hasRegion && (
             <InputField
-              onClick={() => handleTapToCopy('region')}
               label={t`Region`}
               placeholder={t`Insert region`}
               variant="outline"
@@ -283,7 +269,6 @@ export const IdentityRecordDetailsForm = ({
 
           {hasCountry && (
             <InputField
-              onClick={() => handleTapToCopy('country')}
               label={t`Country`}
               placeholder={t`Insert country`}
               variant="outline"
@@ -303,7 +288,6 @@ export const IdentityRecordDetailsForm = ({
         >
           {hasPassportFullName && (
             <InputField
-              onClick={() => handleTapToCopy('passportFullName')}
               label={t`Full name`}
               placeholder={t`John Smith`}
               variant="outline"
@@ -314,7 +298,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasPassportNumber && (
             <InputField
-              onClick={() => handleTapToCopy('passportNumber')}
               label={t`Passport number`}
               placeholder={t`Insert numbers`}
               variant="outline"
@@ -325,7 +308,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasPassportIssuingCountry && (
             <InputField
-              onClick={() => handleTapToCopy('passportIssuingCountry')}
               label={t`Issuing country`}
               placeholder={t`Insert country`}
               variant="outline"
@@ -336,7 +318,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasPassportDateOfIssue && (
             <InputField
-              onClick={() => handleTapToCopy('passportDateOfIssue')}
               label={t`Date of issue`}
               placeholder={DATE_FORMAT}
               variant="outline"
@@ -347,7 +328,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasPassportExpiryDate && (
             <InputField
-              onClick={() => handleTapToCopy('passportExpiryDate')}
               label={t`Expiry date`}
               placeholder={DATE_FORMAT}
               variant="outline"
@@ -358,7 +338,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasPassportNationality && (
             <InputField
-              onClick={() => handleTapToCopy('passportNationality')}
               label={t`Nationality`}
               placeholder={t`Insert your nationality`}
               variant="outline"
@@ -369,7 +348,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasPassportDob && (
             <InputField
-              onClick={() => handleTapToCopy('passportDob')}
               label={t`Date of birth`}
               placeholder={DATE_FORMAT}
               variant="outline"
@@ -380,7 +358,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasPassportGender && (
             <InputField
-              onClick={() => handleTapToCopy('passportGender')}
               label={t`Gender`}
               placeholder={t`M/F`}
               variant="outline"
@@ -408,7 +385,6 @@ export const IdentityRecordDetailsForm = ({
         >
           {hasIdCardNumber && (
             <InputField
-              onClick={() => handleTapToCopy('idCardNumber')}
               label={t`ID number`}
               placeholder={'123456789'}
               variant="outline"
@@ -419,7 +395,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasIdCardDateOfIssue && (
             <InputField
-              onClick={() => handleTapToCopy('idCardDateOfIssue')}
               label={t`Creation date`}
               placeholder={DATE_FORMAT}
               variant="outline"
@@ -430,7 +405,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasIdCardExpiryDate && (
             <InputField
-              onClick={() => handleTapToCopy('idCardExpiryDate')}
               label={t`Expiry date`}
               placeholder={DATE_FORMAT}
               variant="outline"
@@ -441,7 +415,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasIdCardIssuingCountry && (
             <InputField
-              onClick={() => handleTapToCopy('idCardIssuingCountry')}
               label={t`Issuing country`}
               placeholder={t`Insert country`}
               variant="outline"
@@ -469,7 +442,6 @@ export const IdentityRecordDetailsForm = ({
         >
           {hasDrivingLicenseNumber && (
             <InputField
-              onClick={() => handleTapToCopy('drivingLicenseNumber')}
               label={t`ID number`}
               placeholder={t`123456789`}
               variant="outline"
@@ -480,7 +452,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasDrivingLicenseDateOfIssue && (
             <InputField
-              onClick={() => handleTapToCopy('drivingLicenseDateOfIssue')}
               label={t`Creation date`}
               placeholder={DATE_FORMAT}
               variant="outline"
@@ -491,7 +462,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasDrivingLicenseExpiryDate && (
             <InputField
-              onClick={() => handleTapToCopy('drivingLicenseExpiryDate')}
               label={t`Expiry date`}
               placeholder={DATE_FORMAT}
               variant="outline"
@@ -502,7 +472,6 @@ export const IdentityRecordDetailsForm = ({
           )}
           {hasDrivingLicenseIssuingCountry && (
             <InputField
-              onClick={() => handleTapToCopy('drivingLicenseIssuingCountry')}
               label={t`Issuing country`}
               placeholder={t`Insert country`}
               variant="outline"
@@ -535,17 +504,12 @@ export const IdentityRecordDetailsForm = ({
 
       {hasNote && (
         <FormGroup>
-          <InputFieldNote
-            onClick={() => handleTapToCopy('note')}
-            isDisabled
-            {...register('note')}
-          />
+          <InputFieldNote isDisabled {...register('note')} />
         </FormGroup>
       )}
 
       {hasCustomFields && (
         <CustomFields
-          onClick={copyToClipboard}
           areInputsDisabled
           customFields={list}
           register={registerItem}

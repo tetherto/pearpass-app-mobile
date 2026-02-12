@@ -1,4 +1,5 @@
 import { Button, ButtonText } from './styles'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
 /**
  * @param {{
@@ -20,16 +21,25 @@ export const ButtonSecondary = ({
   disabled = false,
   testID,
   textTestID
-}) => (
-  <Button
-    size={size}
-    onPress={disabled ? undefined : onPress}
-    stretch={stretch}
-    disabled={disabled}
-    testID={testID}
-  >
-    <ButtonText size={size} testID={textTestID}>
-      {children}
-    </ButtonText>
-  </Button>
-)
+}) => {
+  const { hapticButtonSecondary } = useHapticFeedback()
+
+  const handlePress = () => {
+    hapticButtonSecondary()
+    onPress?.()
+  }
+
+  return (
+    <Button
+      size={size}
+      onPress={disabled ? undefined : handlePress}
+      stretch={stretch}
+      disabled={disabled}
+      testID={testID}
+    >
+      <ButtonText size={size} testID={textTestID}>
+        {children}
+      </ButtonText>
+    </Button>
+  )
+}

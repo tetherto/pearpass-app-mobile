@@ -8,6 +8,7 @@ import Toast from 'react-native-toast-message'
 import { IOS_APP_GROUP_ID } from '../../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../../constants/secureStorageKeys'
 import { useBiometricsAuthentication } from '../../hooks/useBiometricsAuthentication'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import {
   isFacialRecognitionSupported,
   isFingerprintSupported as getIsFingerprintSupported
@@ -30,6 +31,7 @@ export const ButtonBiometricLogin = ({ onBiometricLogin }) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false)
   const { isBiometricsEnabled, isBiometricsSupported, biometricTypes } =
     useBiometricsAuthentication()
+  const { hapticSuccess, hapticError } = useHapticFeedback()
 
   const handlePressBiometric = async () => {
     if (isAuthenticating) return
@@ -48,9 +50,11 @@ export const ButtonBiometricLogin = ({ onBiometricLogin }) => {
         ? JSON.parse(encryptionData)
         : undefined
 
+      hapticSuccess()
       await onBiometricLogin(parsedEncryptionData)
     } catch (error) {
       logger.error('Biometric login error:', error)
+      hapticError()
 
       Toast.show({
         type: 'baseToast',

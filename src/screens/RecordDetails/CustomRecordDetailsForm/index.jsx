@@ -5,7 +5,6 @@ import { useForm } from 'pear-apps-lib-ui-react-hooks'
 import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { AttachmentField } from '../../../containers/AttachmentField'
-import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 
 export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
@@ -34,13 +33,10 @@ export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const { copyToClipboard } = useCopyToClipboard()
-
   return (
     <>
       {!!list?.length && (
         <CustomFields
-          onClick={copyToClipboard}
           areInputsDisabled
           customFields={list}
           register={registerItem}

@@ -41,6 +41,26 @@ preBuild.dependsOn copyAutofillBundle
     });
   }
 
+  // Keep androidx.credentials dependencies for compilation (passkey code exists but is not registered)
+  config = withAppBuildGradle(config, (cfg) => {
+    const credentialsDep = 'implementation "androidx.credentials:credentials:1.6.0-beta03"';
+    if (!cfg.modResults.contents.includes('androidx.credentials:credentials')) {
+      const dependenciesIndex = cfg.modResults.contents.indexOf('dependencies {');
+      if (dependenciesIndex !== -1) {
+        const insertIndex = cfg.modResults.contents.indexOf('{', dependenciesIndex) + 1;
+        const credentialsDeps = `
+    // Passkey / Credential Provider support (code compiled but services not registered)
+    ${credentialsDep}
+    implementation "androidx.credentials:credentials-play-services-auth:1.6.0-beta03"`;
+        cfg.modResults.contents =
+          cfg.modResults.contents.slice(0, insertIndex) +
+          credentialsDeps +
+          cfg.modResults.contents.slice(insertIndex);
+      }
+    }
+    return cfg;
+  });
+
   return withDangerousMod(config, ['android', async (cfg) => {
     const packageName = cfg.android?.package || 'com.pears.pass';
     const packagePath = packageName.replace(/\./g, '/');

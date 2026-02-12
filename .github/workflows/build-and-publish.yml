@@ -7,6 +7,7 @@ on:
       - dev
       - staging
 
+
 jobs:
   android:
     runs-on: ubuntu-24.04
@@ -72,9 +73,6 @@ jobs:
       - name: Generate worklet bundle and translations
         run: npm run build
 
-      - name: Generate worklet bundle for Autofill
-        run: npm run bundle:autofill
-
       - name: Install EAS CLI
         run: npm install --global eas-cli
 
@@ -113,6 +111,8 @@ jobs:
           jq --arg v "$DEV_VERSION" '.expo.version = $v' app.json > "$tmp"
           mv "$tmp" app.json
           echo "expo.version updated to: $DEV_VERSION (Android dev build)"
+      - name: Run expo prebuild
+        run: npx expo prebuild --platform android --clean
 
       - name: EAS build (Android local) with auto submit
         env:
@@ -272,16 +272,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Generate worklet bundle for iOS
-        run: npm run bundle:ios
-  
-      - name: Generate worklet bundle for Autofill
-        run: npm run bundle:autofill
-
-      - name: Extract translations
-        run: |
-          npm run lingui:extract
-          npm run lingui:compile
+      - name: Generate worklet bundle and translations 
+        run: npm run build
 
       - name: Install EAS CLI
         run: npm install --global eas-cli
@@ -295,6 +287,9 @@ jobs:
             PROFILE=preview
           fi
           echo "PROFILE=$PROFILE" >> "$GITHUB_OUTPUT"
+
+      - name: Run expo prebuild
+        run: npx expo prebuild --platform ios --clean
 
       - name: EAS build (iOS local) with auto submit
         env:

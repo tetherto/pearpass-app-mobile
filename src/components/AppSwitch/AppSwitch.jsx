@@ -10,6 +10,8 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
+
 const SWITCH_WIDTH = 50
 const SWITCH_HEIGHT = 28
 const THUMB_SIZE = 24
@@ -31,6 +33,7 @@ export const AppSwitch = ({
   accessibilityLabelOff
 }) => {
   const progress = useSharedValue(value ? 1 : 0)
+  const { hapticToggle } = useHapticFeedback()
 
   useEffect(() => {
     progress.value = withTiming(value ? 1 : 0, { duration: ANIMATION_DURATION })
@@ -38,6 +41,7 @@ export const AppSwitch = ({
 
   const handlePress = () => {
     if (disabled) return
+    hapticToggle()
     onChange?.(!value)
   }
 

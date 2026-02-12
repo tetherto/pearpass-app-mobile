@@ -4,7 +4,7 @@ export const Button = styled.TouchableOpacity`
   padding: 15px;
   width: 100%;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: ${({ hasIcon }) => (hasIcon ? 'space-between' : 'center')};
   align-items: center;
   align-self: stretch;
   border-radius: 10px;
