@@ -257,7 +257,7 @@ struct PasskeyFormView: View {
                     Text(selectedFolder ?? NSLocalizedString("No folder", comment: "No folder label"))
                         .font(.system(size: 14))
                 }
-                .foregroundColor(.white)
+                .foregroundColor(preloadedFolders.isEmpty ? .gray : .white)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(
@@ -265,6 +265,7 @@ struct PasskeyFormView: View {
                         .fill(Color.white.opacity(0.1))
                 )
             }
+            .disabled(preloadedFolders.isEmpty)
 
             Spacer()
 
