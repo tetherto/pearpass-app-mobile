@@ -32,6 +32,7 @@ struct PasskeyRegistrationView: View {
     @State private var matchingRecords: [VaultRecord] = []
     @State private var selectedExistingRecord: VaultRecord? = nil
     @State private var loadedFolders: [String] = []
+    @State private var isClosing = false
 
     enum RegistrationStep {
         case initializing
@@ -54,12 +55,12 @@ struct PasskeyRegistrationView: View {
                 loadingView
 
             case .initializationError:
-                MissingConfigurationView(onCancel: onCancel)
+                MissingConfigurationView(onCancel: handleCancel)
 
             case .masterPassword:
                 MasterPasswordView(
                     viewModel: viewModel,
-                    onCancel: onCancel,
+                    onCancel: handleCancel,
                     vaultClient: vaultClient,
                     presentationWindow: presentationWindow
                 )
@@ -67,7 +68,7 @@ struct PasskeyRegistrationView: View {
             case .vaultSelection:
                 VaultSelectionView(
                     viewModel: viewModel,
-                    onCancel: onCancel,
+                    onCancel: handleCancel,
                     vaultClient: vaultClient
                 )
 
@@ -76,7 +77,7 @@ struct PasskeyRegistrationView: View {
                     VaultPasswordView(
                         viewModel: viewModel,
                         vault: vault,
-                        onCancel: onCancel,
+                        onCancel: handleCancel,
                         vaultClient: vaultClient
                     )
                 }
@@ -97,7 +98,7 @@ struct PasskeyRegistrationView: View {
                         selectedExistingRecord = nil
                         currentStep = .editingForm
                     },
-                    onCancel: onCancel
+                    onCancel: handleCancel
                 )
 
             case .editingForm:
@@ -110,7 +111,7 @@ struct PasskeyRegistrationView: View {
                     onSave: { formData in
                         handleFormSave(formData: formData)
                     },
-                    onCancel: onCancel
+                    onCancel: handleCancel
                 )
 
             case .saving:
@@ -118,12 +119,32 @@ struct PasskeyRegistrationView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: currentStep)
+        .overlay {
+            if isClosing {
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Constants.Colors.primaryGreen))
+                        .scaleEffect(1.2)
+                    Text("Closing...")
+                        .foregroundColor(.white.opacity(0.8))
+                        .font(.subheadline)
+                }
+                .padding(24)
+                .background(Color(.black).opacity(0.8))
+                .cornerRadius(12)
+            }
+        }
         .onAppear {
             initialize()
         }
         .onChange(of: viewModel.currentFlow) { newFlow in
             handleFlowChange(newFlow)
         }
+    }
+    
+    private func handleCancel() {
+        isClosing = true
+        onCancel()
     }
 
     // MARK: - Views

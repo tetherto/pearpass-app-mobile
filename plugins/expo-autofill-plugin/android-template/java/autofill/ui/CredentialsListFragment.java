@@ -162,6 +162,7 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 }
             }
 
+<<<<<<< HEAD
             // If we have matching credentials, show only those; otherwise show all
             if (!matchingCredentials.isEmpty()) {
                 filtered = matchingCredentials;
@@ -169,6 +170,10 @@ public class CredentialsListFragment extends BaseAutofillFragment {
             } else {
                 SecureLog.d(TAG, "No matching credentials found, showing all " + allCredentials.size() + " credentials");
             }
+=======
+            filtered = matchingCredentials;
+            SecureLog.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
+>>>>>>> dev
         }
         // If hasUserSearched is true and query is empty, show all credentials (no filtering)
 
@@ -323,12 +328,19 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 recordData = record;
             }
 
+            // Skip folder records - they have "folder" field but no "title"/"type"
+            if (recordData.containsKey("folder") && !recordData.containsKey("title") && !recordData.containsKey("type")) {
+                SecureLog.d(TAG, "Skipping folder record: " + id);
+                continue;
+            }
+
             String name = (String) recordData.get("title");
             if (name == null) {
                 name = (String) recordData.get("name");
             }
-            if (name == null) {
-                name = "Unknown";
+            if (name == null || name.isEmpty()) {
+                SecureLog.d(TAG, "Skipping record without valid title/name: " + id);
+                continue;
             }
 
             String username = (String) recordData.get("username");

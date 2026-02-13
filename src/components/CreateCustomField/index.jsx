@@ -11,7 +11,11 @@ import {
 import { ArrowIconWrapper, DropDown, Label, LabelText, Wrapper } from './styles'
 import { ButtonFilter } from '../../libComponents'
 
-export const CreateCustomField = ({ onCreateCustom }) => {
+export const CreateCustomField = ({
+  onCreateCustom,
+  testID,
+  accessibilityLabel
+}) => {
   const { t } = useLingui()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -61,7 +65,7 @@ export const CreateCustomField = ({ onCreateCustom }) => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper testID={testID} accessibilityLabel={accessibilityLabel}>
       <Label onPress={() => setIsOpen(!isOpen)}>
         <PlusIcon size="21" />
 
