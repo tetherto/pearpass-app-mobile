@@ -162,18 +162,8 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 }
             }
 
-<<<<<<< HEAD
-            // If we have matching credentials, show only those; otherwise show all
-            if (!matchingCredentials.isEmpty()) {
-                filtered = matchingCredentials;
-                SecureLog.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
-            } else {
-                SecureLog.d(TAG, "No matching credentials found, showing all " + allCredentials.size() + " credentials");
-            }
-=======
             filtered = matchingCredentials;
             SecureLog.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
->>>>>>> dev
         }
         // If hasUserSearched is true and query is empty, show all credentials (no filtering)
 

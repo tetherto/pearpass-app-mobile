@@ -166,13 +166,6 @@ export const Security = () => {
     []
   )
 
-  useEffect(
-    () => () => {
-      clearTimeout(timeoutRef.current)
-    },
-    []
-  )
-
   const handleMasterEditClick = () => {
     openModal(
       <ModifyMasterVaultModalContent
