@@ -392,6 +392,9 @@ struct PasskeyFormView: View {
     // MARK: - Initialization
 
     private func initializeForm() {
+        // Always use current time since this is a new passkey being created
+        passkeyCreatedAt = Int64(Date().timeIntervalSince1970 * 1000)
+
         if let record = existingRecord {
             // Pre-populate from existing record
             let data = record.data
@@ -401,11 +404,6 @@ struct PasskeyFormView: View {
             website = websites.first ?? ""
             comment = data?.note ?? ""
             selectedFolder = record.folder
-            if let existingPasskeyCreatedAt = data?.passkeyCreatedAt {
-                passkeyCreatedAt = existingPasskeyCreatedAt
-            } else {
-                passkeyCreatedAt = Int64(Date().timeIntervalSince1970 * 1000)
-            }
         } else {
             // Pre-populate from passkey request
             title = request.rpName
@@ -413,7 +411,6 @@ struct PasskeyFormView: View {
             website = "https://\(request.rpId)"
             comment = ""
             selectedFolder = nil
-            passkeyCreatedAt = Int64(Date().timeIntervalSince1970 * 1000)
         }
     }
 

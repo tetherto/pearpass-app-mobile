@@ -142,6 +142,9 @@ public class PasskeyFormFragment extends Fragment {
         PasskeyRegistrationActivity activity = (PasskeyRegistrationActivity) getActivity();
         Map<String, Object> existingRecord = activity.getSelectedExistingRecord();
 
+        // Always use current time since this is a new passkey being created
+        passkeyCreatedAt = System.currentTimeMillis();
+
         if (existingRecord != null) {
             // Pre-populate from existing record
             Map<String, Object> data = null;
@@ -159,14 +162,6 @@ public class PasskeyFormFragment extends Fragment {
                 }
 
                 commentInput.setText(data.get("note") != null ? (String) data.get("note") : "");
-
-                // Parse existing passkey timestamp
-                Object passkeyTs = data.get("passkeyCreatedAt");
-                if (passkeyTs instanceof Number) {
-                    passkeyCreatedAt = ((Number) passkeyTs).longValue();
-                } else {
-                    passkeyCreatedAt = System.currentTimeMillis();
-                }
             }
 
             selectedFolder = (String) existingRecord.get("folder");
@@ -175,7 +170,6 @@ public class PasskeyFormFragment extends Fragment {
             titleInput.setText(activity.getRpName());
             usernameInput.setText(activity.getUserName());
             websiteInput.setText("https://" + activity.getRpId());
-            passkeyCreatedAt = System.currentTimeMillis();
         }
 
         // Update folder display
