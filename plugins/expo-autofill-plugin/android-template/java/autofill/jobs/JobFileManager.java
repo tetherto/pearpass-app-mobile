@@ -265,6 +265,79 @@ public class JobFileManager {
     }
 
     /**
+     * Removes all pending/in-progress jobs that target the given record ID.
+     * Used when replacing a passkey on a record that has a pending job (not yet in vault).
+     *
+     * @param recordId       The record ID to match (recordId in ADD_PASSKEY, existingRecordId in UPDATE_PASSKEY)
+     * @param hashedPassword 32-byte encryption key
+     * @return The number of jobs removed
+     * @throws Exception if reading or writing fails
+     */
+    public int removeJobsForRecord(String recordId, byte[] hashedPassword) throws Exception {
+        List<Job> jobs = readJobs(hashedPassword);
+        int originalCount = jobs.size();
+
+        jobs.removeIf(job -> {
+            if (job.getStatus() != Job.JobStatus.PENDING && job.getStatus() != Job.JobStatus.IN_PROGRESS) {
+                return false;
+            }
+            try {
+                if (job.getType() == Job.JobType.ADD_PASSKEY) {
+                    AddPasskeyPayload payload = AddPasskeyPayload.fromJSON(job.getPayload());
+                    return recordId.equals(payload.getRecordId());
+                } else if (job.getType() == Job.JobType.UPDATE_PASSKEY) {
+                    UpdatePasskeyPayload payload = UpdatePasskeyPayload.fromJSON(job.getPayload());
+                    return recordId.equals(payload.getExistingRecordId());
+                }
+            } catch (JSONException e) {
+                SecureLog.e(TAG, "Failed to parse job payload during removal: " + e.getMessage());
+            }
+            return false;
+        });
+
+        int removedCount = originalCount - jobs.size();
+        if (removedCount > 0) {
+            if (jobs.isEmpty()) {
+                deleteJobFile();
+            } else {
+                writeJobs(jobs, hashedPassword);
+            }
+            SecureLog.d(TAG, "Removed " + removedCount + " pending job(s) for record " + recordId);
+        }
+
+        return removedCount;
+    }
+
+    /**
+     * Checks whether there is a pending ADD_PASSKEY job for the given record ID.
+     * Used to determine if an "update" should actually be a new ADD (record not yet in vault).
+     *
+     * @param recordId       The record ID to look up
+     * @param hashedPassword 32-byte encryption key
+     * @return true if a pending ADD_PASSKEY job exists for this record ID
+     * @throws Exception if reading fails
+     */
+    public boolean hasPendingAddJob(String recordId, byte[] hashedPassword) throws Exception {
+        List<Job> jobs = readJobs(hashedPassword);
+        for (Job job : jobs) {
+            if (job.getStatus() != Job.JobStatus.PENDING && job.getStatus() != Job.JobStatus.IN_PROGRESS) {
+                continue;
+            }
+            if (job.getType() == Job.JobType.ADD_PASSKEY) {
+                try {
+                    AddPasskeyPayload payload = AddPasskeyPayload.fromJSON(job.getPayload());
+                    if (recordId.equals(payload.getRecordId())) {
+                        return true;
+                    }
+                } catch (JSONException e) {
+                    // Skip malformed jobs
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Delete the encrypted job file.
      */
     public void deleteJobFile() {

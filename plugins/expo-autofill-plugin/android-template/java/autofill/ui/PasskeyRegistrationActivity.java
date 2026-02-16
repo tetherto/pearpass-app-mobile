@@ -20,9 +20,12 @@ import com.pears.pass.autofill.data.PasskeyCredential;
 import com.pears.pass.autofill.data.PasskeyFormData;
 import com.pears.pass.autofill.data.PasskeyResponse;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.jobs.AddPasskeyPayload;
+import com.pears.pass.autofill.jobs.Job;
 import com.pears.pass.autofill.jobs.JobEncryption;
 import com.pears.pass.autofill.jobs.JobFileManager;
 import com.pears.pass.autofill.jobs.PasskeyJobCreator;
+import com.pears.pass.autofill.jobs.UpdatePasskeyPayload;
 import com.pears.pass.autofill.utils.SecureLog;
 import com.pears.pass.autofill.utils.VaultInitializer;
 
@@ -31,8 +34,11 @@ import org.json.JSONObject;
 import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -374,6 +380,12 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 // Search for matching records
                 List<Map<String, Object>> matches = vaultClient.searchLoginRecords(rpId, userName).get();
 
+                // Also include pending passkey records from the job queue
+                List<Map<String, Object>> pendingRecords = loadPendingRecordsFromJobs(matches);
+                if (!pendingRecords.isEmpty()) {
+                    matches.addAll(pendingRecords);
+                }
+
                 // Preload folders
                 List<String> folders = vaultClient.listFolders().get();
 
@@ -407,6 +419,142 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
             com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(selectedVaultPasswordBuffer);
             selectedVaultPasswordBuffer = null;
         }
+    }
+
+    /**
+     * Load pending passkey records from the job queue that match the current RP ID/username,
+     * so they appear in the existing credential selection screen.
+     */
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> loadPendingRecordsFromJobs(List<Map<String, Object>> existingMatches) {
+        List<Map<String, Object>> pendingRecords = new ArrayList<>();
+
+        JobFileManager jobFileManager = new JobFileManager(this);
+        if (!jobFileManager.jobFileExists()) {
+            return pendingRecords;
+        }
+
+        // Build set of existing record IDs
+        Set<String> existingIds = new HashSet<>();
+        for (Map<String, Object> record : existingMatches) {
+            String id = (String) record.get("id");
+            if (id != null) existingIds.add(id);
+        }
+
+        byte[] hashedPasswordBytes = null;
+        try {
+            Map<String, Object> masterEncryptionData = vaultClient.vaultsGet("masterEncryption").get();
+            String hashedPasswordHex = (String) masterEncryptionData.get("hashedPassword");
+            if (hashedPasswordHex == null || hashedPasswordHex.isEmpty()) {
+                return pendingRecords;
+            }
+            hashedPasswordBytes = JobEncryption.hexToBytes(hashedPasswordHex);
+
+            List<Job> jobs = jobFileManager.readJobs(hashedPasswordBytes);
+            String passkeyUsername = userName != null ? userName.trim() : "";
+
+            for (Job job : jobs) {
+                if (job.getStatus() != Job.JobStatus.PENDING && job.getStatus() != Job.JobStatus.IN_PROGRESS) {
+                    continue;
+                }
+
+                try {
+                    if (job.getType() == Job.JobType.ADD_PASSKEY) {
+                        AddPasskeyPayload payload = AddPasskeyPayload.fromJSON(job.getPayload());
+                        if (existingIds.contains(payload.getRecordId())) continue;
+
+                        String recordUsername = payload.getUserName() != null ? payload.getUserName().trim() : "";
+                        boolean usernameMatches = !passkeyUsername.isEmpty() && !recordUsername.isEmpty() &&
+                                passkeyUsername.equalsIgnoreCase(recordUsername);
+                        boolean hasNoUsername = recordUsername.isEmpty();
+                        if (!usernameMatches && !hasNoUsername) continue;
+
+                        Map<String, Object> record = buildRecordMapFromAddPayload(payload, job);
+                        pendingRecords.add(record);
+                        SecureLog.d(TAG, "Added pending ADD_PASSKEY job " + job.getId() + " to existing credential selection");
+
+                    } else if (job.getType() == Job.JobType.UPDATE_PASSKEY) {
+                        UpdatePasskeyPayload payload = UpdatePasskeyPayload.fromJSON(job.getPayload());
+                        if (existingIds.contains(payload.getExistingRecordId())) continue;
+
+                        String recordUsername = payload.getUserName() != null ? payload.getUserName().trim() : "";
+                        boolean usernameMatches = !passkeyUsername.isEmpty() && !recordUsername.isEmpty() &&
+                                passkeyUsername.equalsIgnoreCase(recordUsername);
+                        boolean hasNoUsername = recordUsername.isEmpty();
+                        if (!usernameMatches && !hasNoUsername) continue;
+
+                        Map<String, Object> record = buildRecordMapFromUpdatePayload(payload, job);
+                        pendingRecords.add(record);
+                        SecureLog.d(TAG, "Added pending UPDATE_PASSKEY job " + job.getId() + " to existing credential selection");
+                    }
+                } catch (Exception e) {
+                    SecureLog.e(TAG, "Failed to parse job " + job.getId() + ": " + e.getMessage());
+                }
+            }
+
+            if (!pendingRecords.isEmpty()) {
+                SecureLog.d(TAG, "Found " + pendingRecords.size() + " pending record(s) from job queue");
+            }
+        } catch (Exception e) {
+            SecureLog.e(TAG, "Failed to read pending jobs: " + e.getMessage());
+        } finally {
+            if (hashedPasswordBytes != null) {
+                JobEncryption.secureZero(hashedPasswordBytes);
+            }
+        }
+
+        return pendingRecords;
+    }
+
+    /**
+     * Build a vault record map from an AddPasskeyPayload for display in the existing credential selection.
+     */
+    private Map<String, Object> buildRecordMapFromAddPayload(AddPasskeyPayload payload, Job job) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("title", payload.getTitle() != null ? payload.getTitle() : payload.getRpName());
+        data.put("username", payload.getUserName());
+        data.put("password", "");
+        data.put("websites", payload.getWebsites() != null ? payload.getWebsites() : Arrays.asList("https://" + payload.getRpId()));
+
+        // Mark as having a passkey credential
+        Map<String, Object> credentialMap = new HashMap<>();
+        credentialMap.put("id", payload.getCredentialId());
+        credentialMap.put("_privateKeyBuffer", payload.getPrivateKey());
+        credentialMap.put("_userId", payload.getUserId());
+        data.put("credential", credentialMap);
+        data.put("passkeyCreatedAt", payload.getCreatedAt());
+
+        Map<String, Object> record = new HashMap<>();
+        record.put("id", payload.getRecordId());
+        record.put("type", "login");
+        record.put("vaultId", job.getVaultId());
+        record.put("data", data);
+        return record;
+    }
+
+    /**
+     * Build a vault record map from an UpdatePasskeyPayload for display in the existing credential selection.
+     */
+    private Map<String, Object> buildRecordMapFromUpdatePayload(UpdatePasskeyPayload payload, Job job) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("title", payload.getRpName());
+        data.put("username", payload.getUserName());
+        data.put("password", "");
+        data.put("websites", Arrays.asList("https://" + payload.getRpId()));
+
+        Map<String, Object> credentialMap = new HashMap<>();
+        credentialMap.put("id", payload.getCredentialId());
+        credentialMap.put("_privateKeyBuffer", payload.getPrivateKey());
+        credentialMap.put("_userId", payload.getUserId());
+        data.put("credential", credentialMap);
+        data.put("passkeyCreatedAt", payload.getCreatedAt());
+
+        Map<String, Object> record = new HashMap<>();
+        record.put("id", payload.getExistingRecordId());
+        record.put("type", "login");
+        record.put("vaultId", payload.getVaultId());
+        record.put("data", data);
+        return record;
     }
 
     private void navigateToExistingCredentialSelection(List<Map<String, Object>> matchingRecords) {
@@ -480,16 +628,46 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                 PasskeyJobCreator jobCreator = new PasskeyJobCreator(jobFileManager);
 
                 if (selectedExistingRecord != null && formData.getExistingRecordId() != null) {
-                    // Update existing record with passkey
-                    jobCreator.createUpdatePasskeyJob(
-                            selectedVaultId,
-                            formData.getExistingRecordId(),
-                            credential,
-                            formData,
-                            rpId, rpName,
-                            Base64URLUtils.encode(userId), userName, userDisplayName,
-                            hashedPasswordBytes
-                    );
+                    String existingRecordId = formData.getExistingRecordId();
+
+                    // Check if the "existing" record is actually a pending job (not yet in vault)
+                    boolean isPendingAdd = false;
+                    try {
+                        isPendingAdd = jobFileManager.hasPendingAddJob(existingRecordId, hashedPasswordBytes);
+                    } catch (Exception e) {
+                        SecureLog.e(TAG, "Failed to check pending job status: " + e.getMessage());
+                    }
+
+                    // Remove any old pending jobs for this record before creating the replacement
+                    try {
+                        jobFileManager.removeJobsForRecord(existingRecordId, hashedPasswordBytes);
+                    } catch (Exception e) {
+                        SecureLog.e(TAG, "Failed to remove old pending jobs: " + e.getMessage());
+                    }
+
+                    if (isPendingAdd) {
+                        // Record only exists as a pending ADD job — create a new ADD_PASSKEY
+                        // with the updated passkey (not UPDATE, since the record isn't in the DB)
+                        jobCreator.createAddPasskeyJob(
+                                selectedVaultId,
+                                credential,
+                                formData,
+                                rpId, rpName,
+                                Base64URLUtils.encode(userId), userName, userDisplayName,
+                                hashedPasswordBytes
+                        );
+                    } else {
+                        // Update existing vault record with passkey
+                        jobCreator.createUpdatePasskeyJob(
+                                selectedVaultId,
+                                existingRecordId,
+                                credential,
+                                formData,
+                                rpId, rpName,
+                                Base64URLUtils.encode(userId), userName, userDisplayName,
+                                hashedPasswordBytes
+                        );
+                    }
                 } else {
                     // Create new record with passkey
                     jobCreator.createAddPasskeyJob(

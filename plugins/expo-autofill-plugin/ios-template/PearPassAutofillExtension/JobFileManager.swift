@@ -252,6 +252,64 @@ enum JobFileManager {
         return filename
     }
 
+    // MARK: - Remove Jobs by Record ID
+
+    /// Removes all pending/in-progress jobs that target the given record ID.
+    /// Used when replacing a passkey on a record that has a pending job (not yet in vault).
+    ///
+    /// - Parameters:
+    ///   - recordId: The record ID to match against (matches `recordId` in ADD_PASSKEY
+    ///               or `existingRecordId` in UPDATE_PASSKEY payloads).
+    ///   - hashedPassword: The 32-byte encryption key.
+    /// - Returns: The number of jobs removed.
+    /// - Throws: `JobFileError` or `JobEncryptionError` on failure.
+    @discardableResult
+    static func removeJobsForRecord(_ recordId: String, hashedPassword: Data) throws -> Int {
+        var jobs = try readJobs(hashedPassword: hashedPassword)
+        let originalCount = jobs.count
+
+        jobs.removeAll { job in
+            guard job.status == .pending || job.status == .inProgress else { return false }
+
+            switch job.payload {
+            case .addPasskey(let payload):
+                return payload.recordId == recordId
+            case .updatePasskey(let payload):
+                return payload.existingRecordId == recordId
+            }
+        }
+
+        let removedCount = originalCount - jobs.count
+        if removedCount > 0 {
+            if jobs.isEmpty {
+                try deleteJobFile()
+            } else {
+                try writeJobs(jobs, hashedPassword: hashedPassword)
+            }
+            NSLog("[JobFileManager] Removed \(removedCount) pending job(s) for record \(recordId)")
+        }
+
+        return removedCount
+    }
+
+    /// Checks whether there is a pending ADD_PASSKEY job for the given record ID.
+    /// Used to determine if an "update" should actually be a new ADD (record not yet in vault).
+    ///
+    /// - Parameters:
+    ///   - recordId: The record ID to look up.
+    ///   - hashedPassword: The 32-byte encryption key.
+    /// - Returns: `true` if a pending ADD_PASSKEY job exists for this record ID.
+    static func hasPendingAddJob(forRecordId recordId: String, hashedPassword: Data) throws -> Bool {
+        let jobs = try readJobs(hashedPassword: hashedPassword)
+        return jobs.contains { job in
+            guard job.status == .pending || job.status == .inProgress else { return false }
+            if case .addPasskey(let payload) = job.payload {
+                return payload.recordId == recordId
+            }
+            return false
+        }
+    }
+
     // MARK: - Cleanup
 
     /// Deletes the encrypted job file.
