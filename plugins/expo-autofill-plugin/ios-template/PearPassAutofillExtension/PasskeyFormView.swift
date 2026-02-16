@@ -159,7 +159,7 @@ struct PasskeyFormView: View {
 
                     // Existing attachments display (read-only, from the record)
                     if !existingAttachments.isEmpty {
-                        VStack(spacing: 4) {
+                        VStack(spacing: 12) {
                             ForEach(existingAttachments, id: \.id) { attachment in
                                 existingAttachmentRow(attachment)
                             }
@@ -168,7 +168,7 @@ struct PasskeyFormView: View {
 
                     // New attachments display
                     if !attachments.isEmpty {
-                        VStack(spacing: 4) {
+                        VStack(spacing: 12) {
                             ForEach(attachments) { attachment in
                                 attachmentRow(attachment)
                             }
