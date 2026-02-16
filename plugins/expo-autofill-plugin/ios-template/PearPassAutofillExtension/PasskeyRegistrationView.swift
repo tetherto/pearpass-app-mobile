@@ -331,6 +331,7 @@ struct PasskeyRegistrationView: View {
                         vaultId: vault.id,
                         existingRecordId: existingRecord.id,
                         credential: credential,
+                        formData: formData,
                         rpId: request.rpId,
                         rpName: request.rpName,
                         userId: request.userId.base64URLEncodedString(),

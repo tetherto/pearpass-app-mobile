@@ -11,9 +11,6 @@ import java.util.List;
  * Payload for UPDATE_PASSKEY jobs.
  * Contains the fields needed to merge a new passkey credential into an existing login record.
  *
- * Unlike AddPasskeyPayload, this does not include user-edited fields (title, note, folder,
- * websites) or attachments, since the existing record already has those.
- *
  * All binary fields are stored as base64URL strings.
  */
 public class UpdatePasskeyPayload {
@@ -46,6 +43,11 @@ public class UpdatePasskeyPayload {
     // Target vault
     private final String vaultId;
 
+    // User-edited fields
+    private final String note;
+    private final List<JobAttachment> attachments;
+    private final List<String> keepAttachmentIds;
+
     public UpdatePasskeyPayload(String existingRecordId,
                                 String rpId, String rpName,
                                 String userId, String userName, String userDisplayName,
@@ -53,7 +55,10 @@ public class UpdatePasskeyPayload {
                                 String clientDataJSON, String attestationObject,
                                 String authenticatorData,
                                 int algorithm, long createdAt, List<String> transports,
-                                String vaultId) {
+                                String vaultId,
+                                String note,
+                                List<JobAttachment> attachments,
+                                List<String> keepAttachmentIds) {
         this.existingRecordId = existingRecordId;
         this.rpId = rpId;
         this.rpName = rpName;
@@ -70,6 +75,9 @@ public class UpdatePasskeyPayload {
         this.createdAt = createdAt;
         this.transports = transports != null ? transports : new ArrayList<>();
         this.vaultId = vaultId;
+        this.note = note;
+        this.attachments = attachments != null ? attachments : new ArrayList<>();
+        this.keepAttachmentIds = keepAttachmentIds != null ? keepAttachmentIds : new ArrayList<>();
     }
 
     // Getters
@@ -90,6 +98,9 @@ public class UpdatePasskeyPayload {
     public long getCreatedAt() { return createdAt; }
     public List<String> getTransports() { return transports; }
     public String getVaultId() { return vaultId; }
+    public String getNote() { return note; }
+    public List<JobAttachment> getAttachments() { return attachments; }
+    public List<String> getKeepAttachmentIds() { return keepAttachmentIds; }
 
     /**
      * Serialize to JSON for inclusion in the encrypted job file.
@@ -128,6 +139,26 @@ public class UpdatePasskeyPayload {
 
         json.put("vaultId", vaultId);
 
+        if (note != null) {
+            json.put("note", note);
+        }
+
+        JSONArray attachmentsArray = new JSONArray();
+        for (JobAttachment attachment : attachments) {
+            JSONObject attachmentJson = new JSONObject();
+            attachmentJson.put("id", attachment.getId());
+            attachmentJson.put("name", attachment.getName());
+            attachmentJson.put("relativePath", attachment.getRelativePath());
+            attachmentsArray.put(attachmentJson);
+        }
+        json.put("attachments", attachmentsArray);
+
+        JSONArray keepIdsArray = new JSONArray();
+        for (String id : keepAttachmentIds) {
+            keepIdsArray.put(id);
+        }
+        json.put("keepAttachmentIds", keepIdsArray);
+
         return json;
     }
 
@@ -141,6 +172,29 @@ public class UpdatePasskeyPayload {
         if (transportsArray != null) {
             for (int i = 0; i < transportsArray.length(); i++) {
                 transports.add(transportsArray.getString(i));
+            }
+        }
+
+        // Attachments
+        List<JobAttachment> attachments = new ArrayList<>();
+        JSONArray attachmentsArray = json.optJSONArray("attachments");
+        if (attachmentsArray != null) {
+            for (int i = 0; i < attachmentsArray.length(); i++) {
+                JSONObject attachmentJson = attachmentsArray.getJSONObject(i);
+                attachments.add(new JobAttachment(
+                        attachmentJson.getString("id"),
+                        attachmentJson.getString("name"),
+                        attachmentJson.getString("relativePath")
+                ));
+            }
+        }
+
+        // Keep attachment IDs
+        List<String> keepAttachmentIds = new ArrayList<>();
+        JSONArray keepIdsArray = json.optJSONArray("keepAttachmentIds");
+        if (keepIdsArray != null) {
+            for (int i = 0; i < keepIdsArray.length(); i++) {
+                keepAttachmentIds.add(keepIdsArray.getString(i));
             }
         }
 
@@ -160,7 +214,10 @@ public class UpdatePasskeyPayload {
                 json.optInt("algorithm", -7),
                 json.getLong("createdAt"),
                 transports,
-                json.getString("vaultId")
+                json.getString("vaultId"),
+                json.optString("note", null),
+                attachments,
+                keepAttachmentIds
         );
     }
 }

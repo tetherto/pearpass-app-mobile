@@ -75,6 +75,9 @@ public class PasskeyFormFragment extends Fragment {
     // File attachments (matching iOS AttachmentFile)
     private final List<PasskeyFormData.AttachmentFile> attachments = new ArrayList<>();
 
+    // Existing attachments from the record (id + name, for keepAttachmentIds)
+    private final List<ExistingAttachment> existingAttachments = new ArrayList<>();
+
     // File picker launcher
     private ActivityResultLauncher<Intent> filePickerLauncher;
 
@@ -131,6 +134,7 @@ public class PasskeyFormFragment extends Fragment {
 
         initializeForm();
         setupListeners();
+        refreshAttachmentsDisplay();
 
         return view;
     }
@@ -162,6 +166,20 @@ public class PasskeyFormFragment extends Fragment {
                 }
 
                 commentInput.setText(data.get("note") != null ? (String) data.get("note") : "");
+
+                // Load existing attachments from record
+                Object attachmentsObj = data.get("attachments");
+                if (attachmentsObj instanceof List) {
+                    for (Object item : (List<?>) attachmentsObj) {
+                        if (item instanceof Map) {
+                            Map<String, Object> attachmentMap = (Map<String, Object>) item;
+                            String id = attachmentMap.get("id") != null ? (String) attachmentMap.get("id") :
+                                    (attachmentMap.get("name") != null ? (String) attachmentMap.get("name") : "");
+                            String name = attachmentMap.get("name") != null ? (String) attachmentMap.get("name") : "file";
+                            existingAttachments.add(new ExistingAttachment(id, name));
+                        }
+                    }
+                }
             }
 
             selectedFolder = (String) existingRecord.get("folder");
@@ -322,12 +340,16 @@ public class PasskeyFormFragment extends Fragment {
     private void refreshAttachmentsDisplay() {
         attachmentsContainer.removeAllViews();
 
-        if (attachments.isEmpty()) {
+        if (existingAttachments.isEmpty() && attachments.isEmpty()) {
             attachmentsContainer.setVisibility(View.GONE);
             return;
         }
 
         attachmentsContainer.setVisibility(View.VISIBLE);
+
+        for (ExistingAttachment existing : existingAttachments) {
+            attachmentsContainer.addView(createExistingAttachmentRow(existing));
+        }
 
         for (PasskeyFormData.AttachmentFile attachment : attachments) {
             attachmentsContainer.addView(createAttachmentRow(attachment));
@@ -436,10 +458,15 @@ public class PasskeyFormFragment extends Fragment {
             }
         }
 
+        List<String> keepAttachmentIds = new ArrayList<>();
+        for (ExistingAttachment existing : existingAttachments) {
+            keepAttachmentIds.add(existing.id);
+        }
+
         PasskeyFormData formData = new PasskeyFormData(
                 title, username, websites, comment,
                 selectedFolder, existingRecordId, passkeyCreatedAt,
-                attachments
+                attachments, keepAttachmentIds
         );
 
         if (getActivity() instanceof PasskeyRegistrationActivity) {
@@ -464,6 +491,70 @@ public class PasskeyFormFragment extends Fragment {
         if (dotIndex < 0) return false;
         String ext = name.substring(dotIndex + 1).toLowerCase();
         return IMAGE_EXTENSIONS.contains(ext);
+    }
+
+    /**
+     * Represents an existing attachment from the record (read-only metadata).
+     */
+    private static class ExistingAttachment {
+        final String id;
+        final String name;
+
+        ExistingAttachment(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    private View createExistingAttachmentRow(ExistingAttachment attachment) {
+        Context context = requireContext();
+        float density = context.getResources().getDisplayMetrics().density;
+
+        // Container
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        int padding = (int) (12 * density);
+        row.setPadding(padding, padding, padding, padding);
+
+        // Background
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(8 * density);
+        bg.setColor(Color.parseColor("#0DFFFFFF"));
+        bg.setStroke((int) (1 * density), Color.parseColor("#1AFFFFFF"));
+        row.setBackground(bg);
+
+        LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        rowParams.bottomMargin = (int) (4 * density);
+        row.setLayoutParams(rowParams);
+
+        // File name
+        TextView nameText = new TextView(context);
+        nameText.setText(attachment.name);
+        nameText.setTextColor(Color.WHITE);
+        nameText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        nameText.setMaxLines(1);
+        nameText.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        nameText.setLayoutParams(nameParams);
+        row.addView(nameText);
+
+        // Delete button
+        TextView deleteBtn = new TextView(context);
+        deleteBtn.setText("\u2715");
+        deleteBtn.setTextColor(Color.parseColor("#B3FF4444"));
+        deleteBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        int deletePadding = (int) (8 * density);
+        deleteBtn.setPadding(deletePadding, 0, 0, 0);
+        deleteBtn.setOnClickListener(v -> {
+            existingAttachments.removeIf(a -> a.id.equals(attachment.id));
+            refreshAttachmentsDisplay();
+        });
+        row.addView(deleteBtn);
+
+        return row;
     }
 
     /**

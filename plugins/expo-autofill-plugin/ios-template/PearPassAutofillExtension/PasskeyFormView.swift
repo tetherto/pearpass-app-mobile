@@ -33,6 +33,7 @@ struct PasskeyFormView: View {
     @State private var comment: String = ""
     @State private var selectedFolder: String? = nil
     @State private var attachments: [AttachmentFile] = []
+    @State private var existingAttachments: [AttachmentMetadata] = []
     @State private var passkeyCreatedAt: Int64 = 0
 
     // Validation errors (set on submit, cleared on edit)
@@ -156,7 +157,16 @@ struct PasskeyFormView: View {
                         }
                     }
 
-                    // Attachments display
+                    // Existing attachments display (read-only, from the record)
+                    if !existingAttachments.isEmpty {
+                        VStack(spacing: 4) {
+                            ForEach(existingAttachments, id: \.id) { attachment in
+                                existingAttachmentRow(attachment)
+                            }
+                        }
+                    }
+
+                    // New attachments display
                     if !attachments.isEmpty {
                         VStack(spacing: 4) {
                             ForEach(attachments) { attachment in
@@ -360,6 +370,35 @@ struct PasskeyFormView: View {
         .padding(.top, 2)
     }
 
+    private func existingAttachmentRow(_ attachment: AttachmentMetadata) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: isImageFile(attachment.name) ? "photo" : "doc.fill")
+                .foregroundColor(.white.opacity(0.5))
+                .frame(width: 24)
+            Text(attachment.name)
+                .font(.system(size: 14))
+                .foregroundColor(.white)
+                .lineLimit(1)
+            Spacer()
+            Button(action: {
+                existingAttachments.removeAll { $0.id == attachment.id }
+            }) {
+                Image(systemName: "trash.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.red.opacity(0.7))
+            }
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
+                .fill(Color.white.opacity(0.05))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
+                .stroke(Color.white.opacity(0.1), lineWidth: 1)
+        )
+    }
+
     private func attachmentRow(_ attachment: AttachmentFile) -> some View {
         HStack(spacing: 12) {
             Image(systemName: isImageFile(attachment.name) ? "photo" : "doc.fill")
@@ -404,6 +443,7 @@ struct PasskeyFormView: View {
             website = websites.first ?? ""
             comment = data?.note ?? ""
             selectedFolder = record.folder
+            existingAttachments = data?.attachments ?? []
         } else {
             // Pre-populate from passkey request
             title = request.rpName
@@ -467,6 +507,7 @@ struct PasskeyFormView: View {
             note: comment,
             folder: selectedFolder,
             attachments: attachments,
+            keepAttachmentIds: existingAttachments.map { $0.id },
             passkeyCreatedAt: passkeyCreatedAt,
             existingRecord: existingRecord
         )
@@ -536,6 +577,7 @@ struct PasskeyFormData {
     let note: String
     let folder: String?
     let attachments: [AttachmentFile]
+    let keepAttachmentIds: [String]
     let passkeyCreatedAt: Int64
     let existingRecord: VaultRecord?
 }

@@ -132,13 +132,14 @@ enum PasskeyJobCreator {
 
     // MARK: - Create UPDATE_PASSKEY Job
 
-    /// Creates an UPDATE_PASSKEY job and appends it to the job queue.
+    /// Creates an UPDATE_PASSKEY job, saves any new file attachments, and appends to the job queue.
     /// Used when adding a passkey to an existing login record.
     ///
     /// - Parameters:
     ///   - vaultId: The target vault ID.
     ///   - existingRecordId: The ID of the existing record to merge the passkey into.
     ///   - credential: The generated passkey credential.
+    ///   - formData: The user-edited form data (attachments, keepAttachmentIds).
     ///   - rpId: Relying party identifier.
     ///   - rpName: Relying party display name.
     ///   - userId: WebAuthn user handle (base64URL).
@@ -152,6 +153,7 @@ enum PasskeyJobCreator {
         vaultId: String,
         existingRecordId: String,
         credential: PasskeyCredential,
+        formData: PasskeyFormData,
         rpId: String,
         rpName: String,
         userId: String,
@@ -162,6 +164,21 @@ enum PasskeyJobCreator {
     ) throws -> String {
         let jobId = UUID().uuidString
         let now = Date().timeIntervalSince1970 * 1000
+
+        // Save new file attachments to pearpass_jobs/attachments/
+        var jobAttachments: [JobAttachment] = []
+        for attachment in formData.attachments {
+            let relativePath = try JobFileManager.saveAttachment(
+                data: attachment.data,
+                attachmentId: attachment.id,
+                originalFilename: attachment.name
+            )
+            jobAttachments.append(JobAttachment(
+                id: attachment.id,
+                name: attachment.name,
+                relativePath: relativePath
+            ))
+        }
 
         let payload = UpdatePasskeyPayload(
             existingRecordId: existingRecordId,
@@ -179,7 +196,10 @@ enum PasskeyJobCreator {
             algorithm: credential.response.publicKeyAlgorithm,
             createdAt: Double(passkeyCreatedAt),
             transports: credential.response.transports,
-            vaultId: vaultId
+            vaultId: vaultId,
+            note: formData.note.isEmpty ? nil : formData.note,
+            attachments: jobAttachments,
+            keepAttachmentIds: formData.keepAttachmentIds
         )
 
         let job = Job(

@@ -485,6 +485,7 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
                             selectedVaultId,
                             formData.getExistingRecordId(),
                             credential,
+                            formData,
                             rpId, rpName,
                             Base64URLUtils.encode(userId), userName, userDisplayName,
                             hashedPasswordBytes

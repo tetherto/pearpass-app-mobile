@@ -117,12 +117,13 @@ public class PasskeyJobCreator {
     }
 
     /**
-     * Create an UPDATE_PASSKEY job: builds the payload and appends an encrypted job
-     * to the queue file. No attachments are saved for update jobs.
+     * Create an UPDATE_PASSKEY job: saves any new file attachments, builds the payload,
+     * and appends an encrypted job to the queue file.
      *
      * @param vaultId          Target vault ID
      * @param existingRecordId ID of the existing login record to merge the passkey into
      * @param credential       The generated PasskeyCredential
+     * @param formData         User-entered form data (note, attachments, keepAttachmentIds)
      * @param rpId             Relying party ID
      * @param rpName           Relying party display name
      * @param userId           User handle as base64URL
@@ -130,21 +131,34 @@ public class PasskeyJobCreator {
      * @param userDisplayName  User display name
      * @param hashedPassword   32-byte encryption key from vault masterEncryption
      * @return The job ID (UUID string)
-     * @throws Exception if encryption or file I/O fails
+     * @throws Exception if attachment saving, encryption, or file I/O fails
      */
     public String createUpdatePasskeyJob(
             String vaultId,
             String existingRecordId,
             PasskeyCredential credential,
+            PasskeyFormData formData,
             String rpId, String rpName,
             String userId, String userName, String userDisplayName,
             byte[] hashedPassword) throws Exception {
 
         SecureLog.d(TAG, "Creating UPDATE_PASSKEY job for record: " + existingRecordId);
 
+        // 1. Save new attachment files to pearpass_jobs/attachments/
+        List<JobAttachment> attachments = new ArrayList<>();
+        if (formData.getAttachments() != null) {
+            for (PasskeyFormData.AttachmentFile attachment : formData.getAttachments()) {
+                String attachmentId = UUID.randomUUID().toString();
+                String relativePath = jobFileManager.saveAttachment(
+                        attachment.getData(), attachmentId, attachment.getName());
+                attachments.add(new JobAttachment(attachmentId, attachment.getName(), relativePath));
+            }
+        }
+
         long createdAt = System.currentTimeMillis();
 
-        // Build the payload
+        // 2. Build the payload
+        String note = formData.getNote();
         UpdatePasskeyPayload payload = new UpdatePasskeyPayload(
                 existingRecordId,
                 rpId, rpName,
@@ -158,10 +172,13 @@ public class PasskeyJobCreator {
                 credential.getResponse().getPublicKeyAlgorithm(),
                 createdAt,
                 credential.getResponse().getTransports(),
-                vaultId
+                vaultId,
+                (note != null && !note.isEmpty()) ? note : null,
+                attachments,
+                formData.getKeepAttachmentIds()
         );
 
-        // Create the job and append to the encrypted queue
+        // 3. Create the job and append to the encrypted queue
         Job job = new Job(
                 UUID.randomUUID().toString(),
                 Job.JobType.UPDATE_PASSKEY,
@@ -176,7 +193,8 @@ public class PasskeyJobCreator {
         jobFileManager.appendJob(job, hashedPassword);
 
         SecureLog.d(TAG, "Created UPDATE_PASSKEY job " + job.getId()
-                + " for existing record " + existingRecordId);
+                + " for existing record " + existingRecordId
+                + " with " + attachments.size() + " attachment(s)");
         return job.getId();
     }
 }
