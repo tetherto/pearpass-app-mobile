@@ -22,7 +22,9 @@ jest.mock('pearpass-lib-vault-core', () => ({
   PearpassVaultClient: jest
     .fn()
     .mockImplementation(function PearpassVaultClient() {
-      return {}
+      return {
+        setJobStoragePath: jest.fn()
+      }
     })
 }))
 
