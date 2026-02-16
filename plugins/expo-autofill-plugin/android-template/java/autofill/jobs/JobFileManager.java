@@ -24,7 +24,7 @@ import java.util.List;
  * <pre>
  *   [Header 16 bytes]
  *     Magic: "PPJQ" (4 bytes ASCII)
- *     Version: uint16 LE (2 bytes) — currently 2
+ *     Version: uint16 LE (2 bytes) — currently 1
  *     Job Count: uint16 LE (2 bytes)
  *     Reserved: (8 bytes of zeros)
  *   [Nonce 24 bytes]
@@ -45,7 +45,7 @@ public class JobFileManager {
     private static final byte[] MAGIC = "PPJQ".getBytes(StandardCharsets.US_ASCII);
 
     /** Current file format version. */
-    private static final int VERSION = 2;
+    private static final int VERSION = 1;
 
     /** Total header size in bytes. */
     private static final int HEADER_SIZE = 16;
