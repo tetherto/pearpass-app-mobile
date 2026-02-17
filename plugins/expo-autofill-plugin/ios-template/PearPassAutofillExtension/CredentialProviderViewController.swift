@@ -82,6 +82,25 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
         } else if cleanupCompleted {
         }
     }
+    
+    private func performCleanupAsync() async {
+        guard !hasCleanedUp else { return }
+        
+        isSettingUpPasskeyRegistration = false
+        
+        guard let client = vaultClient else {
+            hasCleanedUp = true
+            return
+        }
+        
+        hasCleanedUp = true
+        vaultClient = nil
+        
+        do {
+            _ = try await client.close()
+        } catch {
+        }
+    }
 
     private func setupSwiftUIView() {
         let mainView = ExtensionMainView(
@@ -229,9 +248,12 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
                 )
             },
             onCancel: { [weak self] in
-                self?.isSettingUpPasskeyRegistration = false
-                self?.performCleanupSync()
-                self?.extensionContext.cancelRequest(withError: ASExtensionError(.userCanceled))
+                guard let self = self else { return }
+                Task { @MainActor in
+                    self.isSettingUpPasskeyRegistration = false
+                    await self.performCleanupAsync()
+                    self.extensionContext.cancelRequest(withError: ASExtensionError(.userCanceled))
+                }
             },
             onVaultClientCreated: { [weak self] client in
                 self?.vaultClient = client

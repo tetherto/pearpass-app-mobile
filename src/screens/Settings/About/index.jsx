@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import NetInfo from '@react-native-community/netinfo'
 import { useNavigation } from '@react-navigation/native'
 import {
   sendGoogleFormFeedback,
@@ -59,20 +60,28 @@ export const About = () => {
         appVersion: version
       }
 
-      await sendSlackFeedback({
+      const slackResult = await sendSlackFeedback({
         webhookUrPath: SLACK_WEBHOOK_URL_PATH,
         ...payload
       })
 
-      await sendGoogleFormFeedback({
+      const googleResult = await sendGoogleFormFeedback({
         formKey: GOOGLE_FORM_KEY,
         mapping: GOOGLE_FORM_MAPPING,
         ...payload
       })
 
-      setMessage('')
+      if (!slackResult && !googleResult) {
+        const { isConnected } = await NetInfo.fetch()
 
-      setIsLoading(false)
+        if (!isConnected) {
+          throw new Error('OFFLINE')
+        }
+
+        throw new Error('SEND_FAILED')
+      }
+
+      setMessage('')
 
       Toast.show({
         type: 'baseToast',
@@ -83,14 +92,17 @@ export const About = () => {
     } catch (error) {
       logger.error('Error sending feedback:', error)
 
-      setIsLoading(false)
-
       Toast.show({
         type: 'baseToast',
-        text1: t`ERROR: Feedback not sent`,
+        text1:
+          error.message === 'OFFLINE'
+            ? t`You are offline, please check your internet connection`
+            : t`ERROR: Feedback not sent`,
         position: 'bottom',
         bottomOffset: 100
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 

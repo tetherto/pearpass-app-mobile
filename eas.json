@@ -8,12 +8,18 @@
       "developmentClient": true,
       "distribution": "internal",
       "credentialsSource": "local",
-      "node": "22.12.0"
+      "node": "22.12.0",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.0"
+      }
     },
     "preview": {
       "autoIncrement": true,
       "credentialsSource": "local",
-      "node": "22.12.0"
+      "node": "22.12.0",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.0"
+      }
     },
     "preview-apk": {
       "extends": "preview",
@@ -26,7 +32,8 @@
       "credentialsSource": "local",
       "node": "22.12.0",
       "ios": {
-        "scheme": "pearpassappmobile"
+        "scheme": "pearpassappmobile",
+        "image": "macos-sequoia-15.6-xcode-26.0"
       }
     },
     "production-apk": {

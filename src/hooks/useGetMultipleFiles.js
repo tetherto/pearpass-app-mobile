@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { vaultGetFile } from 'pearpass-lib-vault'
 
 import { useLoadingContext } from '../context/LoadingContext'
+import { areFilesEqual } from '../utils/areFilesEqual'
 import { fileCache, MAX_CACHE_SIZE } from '../utils/filesCache'
 import { logger } from '../utils/logger'
 
@@ -111,23 +112,17 @@ export const useGetMultipleFiles = ({
 
       // Only update if component is still mounted
       if (isMountedRef.current) {
-        // Merge with existing form values to preserve newly added pictures
-        // that aren't in initialRecord yet
         const currentFormValues = currentValuesRef.current
-        if (currentFormValues) {
-          const existingValues = currentFormValues[fieldName] || []
-          const loadedIds = new Set(files.map((item) => item.id))
+        const existingValues = currentFormValues?.[fieldName] || []
 
-          // Keep items from form that aren't in initialRecord (newly added)
-          const newItems = existingValues.filter(
-            (item) => !loadedIds.has(item.id)
-          )
+        const loadedIds = new Set(files.map((item) => item.id))
+        const newItems = existingValues.filter(
+          (item) => !loadedIds.has(item.id)
+        )
+        const mergedFiles = [...files, ...newItems]
 
-          // Combine loaded files with newly added items
-          const mergedFiles = [...files, ...newItems]
+        if (!areFilesEqual(mergedFiles, existingValues)) {
           updateValues(fieldName, mergedFiles)
-        } else {
-          updateValues(fieldName, files)
         }
       }
     } catch (error) {

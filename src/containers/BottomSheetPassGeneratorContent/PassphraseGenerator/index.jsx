@@ -36,10 +36,38 @@ export const PassphraseGenerator = ({ onRuleChange, rules }) => {
 
   const ruleOptions = useMemo(
     () => [
-      { name: 'all', label: t`Select All` },
-      { name: 'capitalLetters', label: t`Capital Letters` },
-      { name: 'symbols', label: t`Symbols` },
-      { name: 'numbers', label: t`Numbers` }
+      {
+        name: 'all',
+        label: t`Select All`,
+        testIDOn: 'generate-password-popup-select-all-toggle-on',
+        testIDOff: 'generate-password-popup-select-all-toggle-off',
+        accessibilityLabelOn: t`Select All toggle`,
+        accessibilityLabelOff: t`Select All toggle`
+      },
+      {
+        name: 'capitalLetters',
+        label: t`Capital Letters`,
+        testIDOn: 'generate-password-popup-capital-letters-toggle-on',
+        testIDOff: 'generate-password-popup-capital-letters-toggle-off',
+        accessibilityLabelOn: t`Capital Letters toggle`,
+        accessibilityLabelOff: t`Capital Letters toggle`
+      },
+      {
+        name: 'symbols',
+        label: t`Symbols`,
+        testIDOn: 'generate-password-popup-symbols-toggle-on',
+        testIDOff: 'generate-password-popup-symbols-toggle-off',
+        accessibilityLabelOn: t`Symbols toggle`,
+        accessibilityLabelOff: t`Symbols toggle`
+      },
+      {
+        name: 'numbers',
+        label: t`Numbers`,
+        testIDOn: 'generate-password-popup-numbers-toggle-on',
+        testIDOff: 'generate-password-popup-numbers-toggle-off',
+        accessibilityLabelOn: t`Numbers toggle`,
+        accessibilityLabelOff: t`Numbers toggle`
+      }
     ],
     []
   )
@@ -58,13 +86,18 @@ export const PassphraseGenerator = ({ onRuleChange, rules }) => {
     <>
       <SliderWrapper>
         <View>
-          <SliderText>
+          <SliderText
+            testID="generate-password-popup-length-label"
+            accessibilityLabel={t`Generate password popup length label`}
+          >
             {words} {t`words`}
           </SliderText>
         </View>
 
         <View>
           <Slider
+            testID="generate-password-popup-length-slider"
+            accessibilityLabel={t`Password length slider`}
             style={{ width: 240, height: 50 }}
             minimumValue={6}
             maximumValue={36}

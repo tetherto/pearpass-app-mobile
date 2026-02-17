@@ -1,27 +1,26 @@
+import { ReactNode } from 'react'
 import { ButtonText, Button } from './styles'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
-/**
- * @param {{
- *  children: ReactNode
- *  startIcon?: ElementType
- *  size?: 'sm' | 'md'
- *  stretch: boolean
- *  onPress: () => void
- *  disabled?: boolean
- *  testID?: string
- *  textTestID?: string
- * }} props
- */
+interface ButtonPrimaryProps {
+  children: ReactNode
+  onPress?: () => void
+  size?: 'sm' | 'md'
+  stretch?: boolean
+  disabled?: boolean
+  testID?: string
+  textTestID?: string
+}
+
 export const ButtonPrimary = ({
   children,
   onPress,
   size = 'md',
-  stretch,
-  disabled,
+  stretch = false,
+  disabled = false,
   testID,
   textTestID
-}) => {
+}: ButtonPrimaryProps) => {
   const { hapticButtonPrimary } = useHapticFeedback()
 
   const handlePress = () => {

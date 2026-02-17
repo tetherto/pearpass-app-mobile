@@ -6,7 +6,6 @@ export const Container = styled.View`
   gap: 20px;
   align-items: center;
   align-self: center;
-  gap: 5px;
 `
 
 export const Title = styled.Text`
@@ -15,12 +14,4 @@ export const Title = styled.Text`
   font-family: 'Inter';
   font-size: 16px;
   font-weight: 600;
-`
-
-export const SubTitle = styled.Text`
-  color: ${({ theme }) => theme.colors.white.mode1};
-  text-align: center;
-  font-family: 'Inter';
-  font-size: 14px;
-  font-weight: 400;
 `

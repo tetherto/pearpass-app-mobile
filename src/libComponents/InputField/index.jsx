@@ -42,6 +42,8 @@ import { HighlightString } from '../HighlightString'
  *  belowInputContent?: React.ReactNode,
  *  shouldDisplayCustomPlaceholder?: boolean
  *  testID?: string
+ *  accessibilityLabel?: string
+ *  inputAccessibilityLabel?: string
  * }} props
  */
 export const InputField = ({
@@ -68,7 +70,9 @@ export const InputField = ({
   isTransparent = false,
   belowInputContent,
   shouldDisplayCustomPlaceholder = false,
-  testID
+  testID,
+  accessibilityLabel,
+  inputAccessibilityLabel
 }) => {
   const inputRef = useRef(null)
   const [isFocused, setIsFocused] = useState(false)
@@ -217,6 +221,7 @@ export const InputField = ({
               numberOfLines={1}
               ellipsizeMode="tail"
               testID={testID ? `${testID}-input` : undefined}
+              accessibilityLabel={inputAccessibilityLabel}
             />
           )}
 
@@ -256,7 +261,11 @@ export const InputField = ({
 
   if (isDisabled && onClick) {
     return (
-      <View style={getWrapperStyle()} testID={testID}>
+      <View
+        style={getWrapperStyle()}
+        testID={testID}
+        accessibilityLabel={accessibilityLabel}
+      >
         {InputContent}
         {!!belowInputContent && belowInputContent}
       </View>
@@ -270,6 +279,7 @@ export const InputField = ({
       accessible={false}
       activeOpacity={1}
       testID={testID}
+      accessibilityLabel={accessibilityLabel}
     >
       {InputContent}
       {!!belowInputContent && belowInputContent}

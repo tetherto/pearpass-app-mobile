@@ -50,6 +50,9 @@ const PASSWORD_STRENGTH_ICONS = {
  *  shouldDisplayCustomPlaceholder?: boolean,
  *  testID?: string
  *  toggleVisibilityTestID?: string
+ *  accessibilityLabel?: string
+ *  inputAccessibilityLabel?: string
+ *  toggleVisibilityAccessibilityLabel?: string
  * }} props
  */
 export const PasswordField = ({
@@ -75,7 +78,10 @@ export const PasswordField = ({
   belowInputContent,
   shouldDisplayCustomPlaceholder = false,
   testID,
-  toggleVisibilityTestID
+  toggleVisibilityTestID,
+  accessibilityLabel,
+  inputAccessibilityLabel,
+  toggleVisibilityAccessibilityLabel
 }) => {
   const { t } = useLingui()
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -144,6 +150,8 @@ export const PasswordField = ({
         belowInputContent={belowInputContent}
         shouldDisplayCustomPlaceholder={shouldDisplayCustomPlaceholder}
         testID={testID}
+        accessibilityLabel={accessibilityLabel}
+        inputAccessibilityLabel={inputAccessibilityLabel}
         additionalItems={
           <>
             {!!hasStrongness && getPasswordStrength()}
@@ -154,6 +162,7 @@ export const PasswordField = ({
               startIcon={isPasswordVisible ? EyeClosedIcon : EyeIcon}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
               testID={toggleVisibilityTestID}
+              accessibilityLabel={toggleVisibilityAccessibilityLabel}
             />
           </>
         }
