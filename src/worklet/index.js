@@ -49,6 +49,13 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
     debugMode: debugMode
   })
 
+  const jobStoragePath = sharedDirectory
+    ? `file://${sharedDirectory}/pearpass_jobs`
+    : `${FileSystem.documentDirectory}pearpass_jobs`
+
+  await ensureDirectoryExist(jobStoragePath)
+  await client.setJobStoragePath(jobStoragePath)
+
   const suspender = new Suspendify({
     async suspend() {
       await client.beginBackground()

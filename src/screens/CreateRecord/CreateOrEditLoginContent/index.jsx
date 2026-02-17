@@ -218,6 +218,9 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                 variant="outline"
                 isLast
                 isFirst
+                testID="title-field"
+                accessibilityLabel={t`Title field`}
+                inputAccessibilityLabel={t`Title input field`}
                 {...register('title')}
               />
             </FormGroup>
@@ -228,6 +231,9 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                 placeholder={t`Email or username`}
                 isFirst
                 variant="outline"
+                testID="email-username-field"
+                accessibilityLabel={t`Email or Username field`}
+                inputAccessibilityLabel={t`Email or username input field`}
                 {...register('username')}
               />
 
@@ -238,12 +244,19 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                 variant="outline"
                 isLast
                 hasStrongness
+                testID="password-field"
+                accessibilityLabel={t`Password input field`}
+                inputAccessibilityLabel={t`Password input field`}
+                toggleVisibilityTestID="toggle-password-visibility-button"
+                toggleVisibilityAccessibilityLabel={t`Toggle password visibility`}
                 {...register('password')}
                 additionalItems={
                   <ButtonLittle
                     startIcon={PasswordIcon}
                     variant="secondary"
                     borderRadius="md"
+                    testID="password-generator-button"
+                    accessibilityLabel={t`Password generator button`}
                     onPress={() =>
                       expand({
                         children: (
@@ -289,6 +302,9 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                     label={t`Website`}
                     placeholder={t`https://`}
                     isFirst={index === 0}
+                    testID="website-field"
+                    accessibilityLabel={t`Website URL input field`}
+                    inputAccessibilityLabel={t`Website URL input field`}
                     {...registerItem('website', index)}
                     additionalItems={
                       index === 0 ? (
@@ -296,6 +312,8 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                           startIcon={PlusIcon}
                           variant="secondary"
                           borderRadius="md"
+                          testID="add-website-field-button"
+                          accessibilityLabel={t`Add another website field`}
                           onPress={() => addItem({ name: 'website' })}
                         />
                       ) : (
@@ -317,6 +335,12 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                 onUpload={handleFileUpload}
                 isLast
                 label={'File'}
+                testID="file-field"
+                accessibilityLabel={t`File field`}
+                inputTestID="file-input-field"
+                inputAccessibilityLabel={t`File input field`}
+                addButtonTestID="add-file-button"
+                addButtonAccessibilityLabel={t`Add file button`}
               />
               {values.attachments.map((attachment, index) => (
                 <AttachmentField
@@ -324,6 +348,10 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                   attachment={attachment}
                   isLast
                   label={'File'}
+                  testID="file-field"
+                  accessibilityLabel={t`File field`}
+                  inputTestID="file-input-field"
+                  inputAccessibilityLabel={t`File input field`}
                   additionalItems={
                     <ButtonLittle
                       startIcon={DeleteIcon}
@@ -337,7 +365,14 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote
+                isFirst
+                isLast
+                testID="add-note-field"
+                accessibilityLabel={t`Add note field`}
+                inputAccessibilityLabel={t`Add note input field`}
+                {...register('note')}
+              />
             </FormGroup>
 
             <CustomFields
@@ -351,6 +386,8 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                 onCreateCustom={(type) =>
                   addCustomField({ type: type, name: type })
                 }
+                testID="create-custom-field"
+                accessibilityLabel={t`Create custom field`}
               />
             </FormGroup>
           </FormWrapper>
