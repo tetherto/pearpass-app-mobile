@@ -17,6 +17,7 @@ export const withIosPodfile: ConfigPlugin<AutofillPluginOptions> = (config, _opt
   target 'PearPassAutoFillExtension' do
     inherit! :search_paths
     pod 'BareKit', :path => '../node_modules/react-native-bare-kit/ios'
+    pod 'Sodium', '~> 0.9'
   end
 `;
 
@@ -41,6 +42,42 @@ export const withIosPodfile: ConfigPlugin<AutofillPluginOptions> = (config, _opt
       provider_path = File.join(extension_dir, 'ExpoModulesProvider.swift')
       if File.exist?(provider_path)
         File.write(provider_path, "import Foundation\\n\\n@objc(ExpoModulesProvider)\\npublic class ExpoModulesProvider: NSObject {\\n}\\n")
+      end
+
+      # Fix 3: Add Clibsodium paths and linker flags to extension xcconfig
+      # With inherit! :search_paths, we get the paths but NOT the library linking
+      # The Sodium pod's Clibsodium.xcframework contains libsodium.a
+      ['debug', 'release'].each do |config_name|
+        xcconfig_path = File.join(extension_dir, "Pods-PearPassAutoFillExtension.#\{config_name}.xcconfig")
+        if File.exist?(xcconfig_path)
+          content = File.read(xcconfig_path)
+
+          # Fix SWIFT_INCLUDE_PATHS to include Clibsodium headers path
+          unless content.include?('Sodium/Headers')
+            content.gsub!(/^(SWIFT_INCLUDE_PATHS = .*)$/) do |match|
+              match.gsub(/""s*$/, '').strip + ' "$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium/Headers"'
+            end
+          end
+
+          # Force load libsodium.a so all its symbols are available for libSodium.a
+          if content.include?('-l"Sodium"') && !content.include?('-force_load')
+            content.gsub!(/ -l"sodium"/, '')
+            content.gsub!('-l"Sodium"', '-Wl,-force_load,"$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium/libsodium.a" -l"Sodium"')
+          end
+
+          # Ensure LIBRARY_SEARCH_PATHS includes the Sodium xcframework and build paths
+          unless content.include?('PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium"')
+            if content.include?('LIBRARY_SEARCH_PATHS')
+              content.gsub!(/^(LIBRARY_SEARCH_PATHS = .*)$/) do |match|
+                match.strip + ' "$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium" "$\{PODS_CONFIGURATION_BUILD_DIR}/Sodium"'
+              end
+            else
+              content += "\\nLIBRARY_SEARCH_PATHS = $(inherited) \\"$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium\\" \\"$\{PODS_CONFIGURATION_BUILD_DIR}/Sodium\\""
+            end
+          end
+
+          File.write(xcconfig_path, content)
+        end
       end
     end
 

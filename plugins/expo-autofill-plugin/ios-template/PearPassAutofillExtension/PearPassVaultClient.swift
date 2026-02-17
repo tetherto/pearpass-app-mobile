@@ -254,7 +254,7 @@ import Foundation
     /// Once Corestore is initialized, these options cannot be changed
     /// - Parameter readOnly: When true, prevents write operations to the vault
     private func setCoreStoreOptions(readOnly: Bool) async throws {
-        _ = try await sendRequest(command: API.SET_CORE_STORE_OPTIONS.rawValue, data: ["readOnly": readOnly])
+        _ = try await sendRequest(command: API.SET_CORE_STORE_OPTIONS.rawValue, data: ["coreStoreOptions": ["readOnly": readOnly]])
         log("Core store options set: readOnly=\(readOnly)")
     }
 

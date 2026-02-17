@@ -41,7 +41,7 @@ preBuild.dependsOn copyAutofillBundle
     });
   }
 
-  // Keep androidx.credentials dependencies for compilation (passkey code exists but is not registered)
+  // Add androidx.credentials dependencies for passkey support
   config = withAppBuildGradle(config, (cfg) => {
     const credentialsDep = 'implementation "androidx.credentials:credentials:1.6.0-beta03"';
     if (!cfg.modResults.contents.includes('androidx.credentials:credentials')) {
@@ -49,12 +49,31 @@ preBuild.dependsOn copyAutofillBundle
       if (dependenciesIndex !== -1) {
         const insertIndex = cfg.modResults.contents.indexOf('{', dependenciesIndex) + 1;
         const credentialsDeps = `
-    // Passkey / Credential Provider support (code compiled but services not registered)
+    // Passkey / Credential Provider support
     ${credentialsDep}
     implementation "androidx.credentials:credentials-play-services-auth:1.6.0-beta03"`;
         cfg.modResults.contents =
           cfg.modResults.contents.slice(0, insertIndex) +
           credentialsDeps +
+          cfg.modResults.contents.slice(insertIndex);
+      }
+    }
+    return cfg;
+  });
+
+  // Add lazysodium-android + JNA dependencies for job queue encryption (crypto_secretbox)
+  config = withAppBuildGradle(config, (cfg) => {
+    if (!cfg.modResults.contents.includes('lazysodium-android')) {
+      const dependenciesIndex = cfg.modResults.contents.indexOf('dependencies {');
+      if (dependenciesIndex !== -1) {
+        const insertIndex = cfg.modResults.contents.indexOf('{', dependenciesIndex) + 1;
+        const sodiumDeps = `
+    // Lazysodium for job queue encryption (crypto_secretbox / XSalsa20-Poly1305)
+    implementation "com.goterl:lazysodium-android:5.1.0@aar"
+    implementation "net.java.dev.jna:jna:5.14.0@aar"`;
+        cfg.modResults.contents =
+          cfg.modResults.contents.slice(0, insertIndex) +
+          sodiumDeps +
           cfg.modResults.contents.slice(insertIndex);
       }
     }

@@ -13,6 +13,7 @@ import {
   INITIAL_STATE,
   useSharedFilter
 } from '../../context/SharedFilterContext'
+import { useJobQueueProcessor } from '../../jobQueue'
 
 const SORT_BY_TYPE = {
   Recent: {
@@ -30,6 +31,8 @@ const SORT_BY_TYPE = {
 }
 
 export const Home = () => {
+  useJobQueueProcessor()
+
   const [recordType, setRecordType] = useState('all')
   const [searchValue, setSearchValue] = useState('')
   const [isMultiSelectOn, setIsMultiSelectOn] = useState(false)
