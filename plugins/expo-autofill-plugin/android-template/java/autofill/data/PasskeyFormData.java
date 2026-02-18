@@ -16,6 +16,7 @@ public class PasskeyFormData {
     private final String existingRecordId;
     private final long passkeyCreatedAt;
     private final List<AttachmentFile> attachments;
+    private final List<String> keepAttachmentIds;
 
     /**
      * File attachment model matching iOS AttachmentFile struct.
@@ -38,7 +39,8 @@ public class PasskeyFormData {
 
     public PasskeyFormData(String title, String username, List<String> websites,
                            String note, String folder, String existingRecordId,
-                           long passkeyCreatedAt, List<AttachmentFile> attachments) {
+                           long passkeyCreatedAt, List<AttachmentFile> attachments,
+                           List<String> keepAttachmentIds) {
         this.title = title;
         this.username = username;
         this.websites = websites;
@@ -47,6 +49,7 @@ public class PasskeyFormData {
         this.existingRecordId = existingRecordId;
         this.passkeyCreatedAt = passkeyCreatedAt;
         this.attachments = attachments != null ? attachments : new ArrayList<>();
+        this.keepAttachmentIds = keepAttachmentIds != null ? keepAttachmentIds : new ArrayList<>();
     }
 
     public String getTitle() { return title; }
@@ -57,4 +60,5 @@ public class PasskeyFormData {
     public String getExistingRecordId() { return existingRecordId; }
     public long getPasskeyCreatedAt() { return passkeyCreatedAt; }
     public List<AttachmentFile> getAttachments() { return attachments; }
+    public List<String> getKeepAttachmentIds() { return keepAttachmentIds; }
 }

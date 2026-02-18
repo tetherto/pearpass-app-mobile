@@ -181,8 +181,8 @@ struct PasskeyRegistrationView: View {
             return
         }
 
-        // Initialize with readOnly: false to allow passkey storage
-        let client = PearPassVaultClient(debugMode: true, readOnly: false)
+        // Initialize with readOnly: true — all writes go through the job queue
+        let client = PearPassVaultClient(debugMode: true, readOnly: true)
 
         vaultClient = client
 
@@ -274,10 +274,19 @@ struct PasskeyRegistrationView: View {
                 // Ensure vault is active
                 try await activateVaultIfNeeded(client: client, vault: vault)
 
-                let matches = try await client.searchLoginRecords(
+                var matches = try await client.searchLoginRecords(
                     rpId: request.rpId,
                     username: request.userName
                 )
+
+                // Also include pending passkey records from the job queue
+                let pendingRecords = await loadPendingRecordsFromJobs(
+                    vaultClient: client,
+                    rpId: request.rpId,
+                    username: request.userName,
+                    existingRecordIds: Set(matches.map { $0.id })
+                )
+                matches.append(contentsOf: pendingRecords)
 
                 // Preload folders while vault is active
                 let folders = try await client.listFolders()
@@ -305,6 +314,153 @@ struct PasskeyRegistrationView: View {
         }
     }
 
+    /// Loads pending passkey records from the job queue that match the given RP ID/username,
+    /// so they appear in the existing credential selection screen.
+    private func loadPendingRecordsFromJobs(
+        vaultClient: PearPassVaultClient,
+        rpId: String,
+        username: String,
+        existingRecordIds: Set<String>
+    ) async -> [VaultRecord] {
+        guard JobFileManager.jobFileExists() else { return [] }
+
+        guard let hashedPassword = await PasskeyJobCreator.getHashedPassword(from: vaultClient) else {
+            return []
+        }
+
+        do {
+            let jobs = try JobFileManager.readJobs(hashedPassword: hashedPassword)
+            var pendingRecords: [VaultRecord] = []
+            let passkeyUsername = username.trimmingCharacters(in: .whitespaces)
+
+            for job in jobs where job.status == .pending || job.status == .inProgress {
+                switch job.payload {
+                case .addPasskey(let payload):
+                    // Skip if already in vault matches
+                    guard !existingRecordIds.contains(payload.recordId) else { continue }
+
+                    // Match by username (same logic as searchLoginRecords)
+                    let recordUsername = payload.userName.trimmingCharacters(in: .whitespaces)
+                    let usernameMatches = !passkeyUsername.isEmpty && !recordUsername.isEmpty &&
+                        passkeyUsername.caseInsensitiveCompare(recordUsername) == .orderedSame
+                    let hasNoUsername = recordUsername.isEmpty
+
+                    guard usernameMatches || hasNoUsername else { continue }
+
+                    guard let credential = passkeyCredentialFromJobPayload(payload) else { continue }
+
+                    let websites = payload.websites ?? ["https://\(payload.rpId)"]
+                    let recordData = RecordData(
+                        title: payload.title ?? payload.rpName,
+                        username: payload.userName,
+                        password: "",
+                        passwordUpdatedAt: 0,
+                        passkeyCreatedAt: Int64(payload.createdAt),
+                        credential: credential,
+                        note: payload.note ?? "",
+                        websites: websites,
+                        customFields: [],
+                        attachments: []
+                    )
+                    let record = VaultRecord(
+                        id: payload.recordId,
+                        version: 1,
+                        type: "login",
+                        vaultId: job.vaultId,
+                        data: recordData,
+                        isFavorite: false,
+                        createdAt: Int64(payload.createdAt),
+                        updatedAt: Int64(job.updatedAt),
+                        folder: payload.folder
+                    )
+                    pendingRecords.append(record)
+
+                case .updatePasskey(let payload):
+                    guard !existingRecordIds.contains(payload.existingRecordId) else { continue }
+
+                    let recordUsername = payload.userName.trimmingCharacters(in: .whitespaces)
+                    let usernameMatches = !passkeyUsername.isEmpty && !recordUsername.isEmpty &&
+                        passkeyUsername.caseInsensitiveCompare(recordUsername) == .orderedSame
+                    let hasNoUsername = recordUsername.isEmpty
+
+                    guard usernameMatches || hasNoUsername else { continue }
+
+                    guard let credential = passkeyCredentialFromJobPayload(payload) else { continue }
+
+                    let websites = ["https://\(payload.rpId)"]
+                    let recordData = RecordData(
+                        title: payload.rpName,
+                        username: payload.userName,
+                        password: "",
+                        passwordUpdatedAt: 0,
+                        passkeyCreatedAt: Int64(payload.createdAt),
+                        credential: credential,
+                        note: payload.note ?? "",
+                        websites: websites,
+                        customFields: [],
+                        attachments: []
+                    )
+                    let record = VaultRecord(
+                        id: payload.existingRecordId,
+                        version: 1,
+                        type: "login",
+                        vaultId: payload.vaultId,
+                        data: recordData,
+                        isFavorite: false,
+                        createdAt: Int64(payload.createdAt),
+                        updatedAt: Int64(job.updatedAt),
+                        folder: nil
+                    )
+                    pendingRecords.append(record)
+                }
+            }
+
+            if !pendingRecords.isEmpty {
+                NSLog("[PasskeyRegistrationView] Found \(pendingRecords.count) pending record(s) from job queue")
+            }
+            return pendingRecords
+        } catch {
+            NSLog("[PasskeyRegistrationView] Failed to read pending jobs: \(error.localizedDescription)")
+            return []
+        }
+    }
+
+    /// Converts job payload passkey fields into a PasskeyCredential object.
+    private func passkeyCredentialFromJobPayload(_ payload: AddPasskeyPayload) -> PasskeyCredential? {
+        guard let privateKeyData = Data(base64URLEncoded: payload.privateKey) else { return nil }
+        return PasskeyCredential.create(
+            credentialId: payload.credentialId,
+            response: PasskeyResponse(
+                clientDataJSON: payload.clientDataJSON,
+                attestationObject: payload.attestationObject,
+                authenticatorData: payload.authenticatorData,
+                publicKey: payload.publicKey,
+                publicKeyAlgorithm: payload.algorithm,
+                transports: payload.transports
+            ),
+            privateKeyBuffer: privateKeyData,
+            userId: payload.userId
+        )
+    }
+
+    /// Converts UpdatePasskeyPayload fields into a PasskeyCredential object.
+    private func passkeyCredentialFromJobPayload(_ payload: UpdatePasskeyPayload) -> PasskeyCredential? {
+        guard let privateKeyData = Data(base64URLEncoded: payload.privateKey) else { return nil }
+        return PasskeyCredential.create(
+            credentialId: payload.credentialId,
+            response: PasskeyResponse(
+                clientDataJSON: payload.clientDataJSON,
+                attestationObject: payload.attestationObject,
+                authenticatorData: payload.authenticatorData,
+                publicKey: payload.publicKey,
+                publicKeyAlgorithm: payload.algorithm,
+                transports: payload.transports
+            ),
+            privateKeyBuffer: privateKeyData,
+            userId: payload.userId
+        )
+    }
+
     // MARK: - Form Save Handler
 
     private func handleFormSave(formData: PasskeyFormData) {
@@ -319,58 +475,69 @@ struct PasskeyRegistrationView: View {
                 // 1. Generate passkey
                 let (credential, attestationObject, credentialIdData) = try generatePasskey()
 
-                // 2. Save file attachments first (matching main app order)
-                var attachmentMetadata: [AttachmentMetadata] = []
-                let recordId: String
-
-                if let existingRecord = formData.existingRecord {
-                    recordId = existingRecord.id
-                } else {
-                    recordId = UUID().uuidString
+                // 2. Get the hashed password for job file encryption
+                guard let hashedPassword = await PasskeyJobCreator.getHashedPassword(from: client) else {
+                    throw PasskeyJobError.noHashedPassword
                 }
 
-                for attachment in formData.attachments {
-                    let fileId = attachment.id
-                    try await client.activeVaultAddFile(
-                        recordId: recordId,
-                        fileId: fileId,
-                        buffer: attachment.data,
-                        name: attachment.name
-                    )
-                    attachmentMetadata.append(AttachmentMetadata(id: fileId, name: attachment.name))
-                }
-
-                // 3. Save or update record
+                // 3. Create job via the job queue (deferred write)
                 if let existingRecord = formData.existingRecord {
-                    // Update existing record with passkey
-                    _ = try await client.updateRecordWithPasskey(
-                        existingRecord: existingRecord,
-                        credential: credential,
-                        title: formData.title,
-                        userName: formData.username,
-                        websites: formData.websites,
-                        note: formData.note,
-                        folder: formData.folder,
-                        attachmentMetadata: attachmentMetadata,
-                        passkeyCreatedAt: formData.passkeyCreatedAt
-                    )
+                    // Check if the "existing" record is actually a pending job (not yet in vault)
+                    let isPendingAdd = (try? JobFileManager.hasPendingAddJob(
+                        forRecordId: existingRecord.id,
+                        hashedPassword: hashedPassword
+                    )) ?? false
+
+                    // Remove any old pending jobs for this record before creating the replacement
+                    try JobFileManager.removeJobsForRecord(existingRecord.id, hashedPassword: hashedPassword)
+
+                    if isPendingAdd {
+                        // Record only exists as a pending ADD job — create a new ADD_PASSKEY
+                        // with the updated passkey (not UPDATE, since the record isn't in the DB)
+                        _ = try PasskeyJobCreator.createAddPasskeyJob(
+                            vaultId: vault.id,
+                            credential: credential,
+                            formData: formData,
+                            rpId: request.rpId,
+                            rpName: request.rpName,
+                            userId: request.userId.base64URLEncodedString(),
+                            userName: request.userName,
+                            userDisplayName: request.userDisplayName,
+                            hashedPassword: hashedPassword
+                        )
+                    } else {
+                        // UPDATE_PASSKEY: merge passkey into existing vault record
+                        _ = try PasskeyJobCreator.createUpdatePasskeyJob(
+                            vaultId: vault.id,
+                            existingRecordId: existingRecord.id,
+                            credential: credential,
+                            formData: formData,
+                            rpId: request.rpId,
+                            rpName: request.rpName,
+                            userId: request.userId.base64URLEncodedString(),
+                            userName: request.userName,
+                            userDisplayName: request.userDisplayName,
+                            hashedPassword: hashedPassword,
+                            passkeyCreatedAt: formData.passkeyCreatedAt
+                        )
+                    }
                 } else {
-                    // Create new record
-                    _ = try await client.savePasskey(
+                    // ADD_PASSKEY: create new record
+                    _ = try PasskeyJobCreator.createAddPasskeyJob(
                         vaultId: vault.id,
                         credential: credential,
-                        title: formData.title,
-                        userName: formData.username,
-                        websites: formData.websites,
-                        note: formData.note,
-                        folder: formData.folder,
-                        attachmentMetadata: attachmentMetadata,
-                        passkeyCreatedAt: formData.passkeyCreatedAt,
-                        recordId: recordId
+                        formData: formData,
+                        rpId: request.rpId,
+                        rpName: request.rpName,
+                        userId: request.userId.base64URLEncodedString(),
+                        userName: request.userName,
+                        userDisplayName: request.userDisplayName,
+                        hashedPassword: hashedPassword
                     )
                 }
 
-                // 4. Complete registration
+                // 4. Complete registration — the passkey is returned to the system
+                //    immediately. The main app will process the job on next launch/resume.
                 await MainActor.run {
                     onComplete(credential, attestationObject, credentialIdData)
                 }
