@@ -44,36 +44,31 @@ export const withIosPodfile: ConfigPlugin<AutofillPluginOptions> = (config, _opt
         File.write(provider_path, "import Foundation\\n\\n@objc(ExpoModulesProvider)\\npublic class ExpoModulesProvider: NSObject {\\n}\\n")
       end
 
-      # Fix 3: Add Clibsodium paths and linker flags to extension xcconfig
-      # With inherit! :search_paths, we get the paths but NOT the library linking
-      # The Sodium pod's Clibsodium.xcframework contains libsodium.a
+      # Fix 3: Fix libsodium (C library) linking for the extension target.
+      # On case-insensitive filesystems (macOS/iOS default), -l"sodium" resolves
+      # to libSodium.a (the Swift wrapper) instead of libsodium.a (the C library)
+      # because PODS_CONFIGURATION_BUILD_DIR/Sodium is searched first.
+      # Fix: remove -l"sodium" and use -force_load with an explicit path to the
+      # xcframework slice under PODS_ROOT. Use SDK-conditional variable so the
+      # correct slice (device vs simulator) is picked at build time.
       ['debug', 'release'].each do |config_name|
         xcconfig_path = File.join(extension_dir, "Pods-PearPassAutoFillExtension.#\{config_name}.xcconfig")
         if File.exist?(xcconfig_path)
           content = File.read(xcconfig_path)
 
-          # Fix SWIFT_INCLUDE_PATHS to include Clibsodium headers path
-          unless content.include?('Sodium/Headers')
-            content.gsub!(/^(SWIFT_INCLUDE_PATHS = .*)$/) do |match|
-              match.gsub(/""s*$/, '').strip + ' "$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium/Headers"'
-            end
-          end
+          # Remove -l"sodium" (case-insensitive FS causes it to find the wrong lib)
+          content.gsub!(/ -l"sodium"/, '')
 
-          # Force load libsodium.a so all its symbols are available for libSodium.a
-          if content.include?('-l"Sodium"') && !content.include?('-force_load')
-            content.gsub!(/ -l"sodium"/, '')
-            content.gsub!('-l"Sodium"', '-Wl,-force_load,"$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium/libsodium.a" -l"Sodium"')
-          end
+          # Remove any existing force_load for libsodium
+          content.gsub!(/ -Wl,-force_load,"[^"]*libsodium\\.a"/, '')
 
-          # Ensure LIBRARY_SEARCH_PATHS includes the Sodium xcframework and build paths
-          unless content.include?('PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium"')
-            if content.include?('LIBRARY_SEARCH_PATHS')
-              content.gsub!(/^(LIBRARY_SEARCH_PATHS = .*)$/) do |match|
-                match.strip + ' "$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium" "$\{PODS_CONFIGURATION_BUILD_DIR}/Sodium"'
-              end
-            else
-              content += "\\nLIBRARY_SEARCH_PATHS = $(inherited) \\"$\{PODS_XCFRAMEWORKS_BUILD_DIR}/Sodium\\" \\"$\{PODS_CONFIGURATION_BUILD_DIR}/Sodium\\""
-            end
+          # Add SDK-conditional variable for the correct xcframework slice
+          content += "CLIBSODIUM_PATH[sdk=iphoneos*] = $\{PODS_ROOT}/Sodium/Clibsodium.xcframework/ios-arm64_armv7_armv7s/libsodium.a\\n"
+          content += "CLIBSODIUM_PATH[sdk=iphonesimulator*] = $\{PODS_ROOT}/Sodium/Clibsodium.xcframework/ios-arm64_i386_x86_64-simulator/libsodium.a\\n"
+
+          # Add -force_load using the conditional variable
+          content.gsub!(/^(OTHER_LDFLAGS = .*)$/) do |match|
+            match + ' -Wl,-force_load,"$(CLIBSODIUM_PATH)"'
           end
 
           File.write(xcconfig_path, content)
