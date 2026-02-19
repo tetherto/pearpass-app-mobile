@@ -1,4 +1,5 @@
 import { parseDataToCsvText, parseDataToJson } from 'pearpass-lib-data-export'
+import { encryptExportData } from 'pearpass-lib-vault'
 
 import { downloadFile } from './downloadFile'
 import { downloadZip } from './downloadZip'
@@ -7,7 +8,7 @@ import { downloadZip } from './downloadZip'
  * Handles the download of vaults, either as a single file or a zip archive.
  *
  * @param {Array} vaultsToExport - The array of vault data objects to export.
- * @param {string} exportType - The type of export (e.g., 'csv', 'json').
+ * @param {string} exportType - The type of export (e.g., 'csv', 'json', 'pearpass').
  * @returns {Promise<boolean>} Returns true if the download was successful, false otherwise.
  */
 const handleDownloadVaults = async (vaultsToExport, exportType) => {
@@ -54,9 +55,32 @@ export const handleExportCSVPerVault = async (data) => {
  * Exports vault data as JSON files.
  *
  * @param {any} data - The data to be parsed and exported.
+ * @param {string|null} encryptionPassword - Optional password to encrypt the exported data.
  * @returns {Promise<boolean>} Returns true if the export was successful.
  */
-export const handleExportJsonPerVault = async (data) => {
+export const handleExportJsonPerVault = async (
+  data,
+  encryptionPassword = null
+) => {
   const vaultsToExport = await parseDataToJson(data)
-  return handleDownloadVaults(vaultsToExport, 'json')
+
+  const processedVaults = encryptionPassword
+    ? await Promise.all(
+        vaultsToExport.map(async (vault) => {
+          const encryptedData = await encryptExportData(
+            vault.data,
+            encryptionPassword
+          )
+          return {
+            filename: vault.filename.replace('.json', '.pearpass'),
+            data: JSON.stringify(encryptedData, null, 2)
+          }
+        })
+      )
+    : vaultsToExport
+
+  return handleDownloadVaults(
+    processedVaults,
+    encryptionPassword ? 'pearpass' : 'json'
+  )
 }

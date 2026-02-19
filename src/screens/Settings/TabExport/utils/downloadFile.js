@@ -3,7 +3,17 @@ import * as Sharing from 'expo-sharing'
 
 export const downloadFile = async ({ filename, content }, type) => {
   const fileUri = FileSystem.documentDirectory + filename
-  const mimeType = type === 'json' ? 'application/json' : 'text/csv'
+
+  let mimeType = 'text/csv'
+  let uti = 'public.comma-separated-values-text'
+
+  if (type === 'json') {
+    mimeType = 'application/json'
+    uti = 'public.json'
+  } else if (type === 'pearpass') {
+    mimeType = 'application/json'
+    uti = 'public.data'
+  }
 
   await FileSystem.writeAsStringAsync(fileUri, content, {
     encoding: FileSystem.EncodingType.UTF8
@@ -14,8 +24,7 @@ export const downloadFile = async ({ filename, content }, type) => {
       await Sharing.shareAsync(fileUri, {
         mimeType,
         dialogTitle: 'Share file',
-        UTI:
-          type === 'json' ? 'public.json' : 'public.comma-separated-values-text'
+        UTI: uti
       })
     } catch (error) {
       throw error

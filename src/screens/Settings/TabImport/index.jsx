@@ -1,3 +1,5 @@
+import { useCallback, useRef } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { MAX_IMPORT_RECORDS } from 'pearpass-lib-constants'
@@ -10,26 +12,28 @@ import {
   parseProtonPassData
 } from 'pearpass-lib-data-import'
 import { BackIcon } from 'pearpass-lib-ui-react-native-components'
-import { useCreateRecord } from 'pearpass-lib-vault'
+import { decryptExportData, useCreateRecord } from 'pearpass-lib-vault'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
+import { BottomSheetImportVaultContent } from 'src/containers/BottomSheetImportVaultContent'
+import { useBottomSheet } from 'src/context/BottomSheetContext'
 
+import { CardSingleSetting } from '../../../components/CardSingleSetting'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { ButtonLittle } from '../../../libComponents'
+import { logger } from '../../../utils/logger'
+import { settingsStyles } from '../styles'
 import {
   AcceptedFormats,
-  Container as ImportContainer,
   Description,
+  Container as ImportContainer,
   ImportOptionImage,
   ImportOptionItem,
   ImportOptionsList,
   SubTitle
 } from './styles'
 import { readFileContent } from './utils/readFileContent'
-import { CardSingleSetting } from '../../../components/CardSingleSetting'
-import { useAutoLockContext } from '../../../context/AutoLockContext'
-import { ButtonLittle } from '../../../libComponents'
-import { logger } from '../../../utils/logger'
-import { settingsStyles } from '../styles'
 
 const importOptions = [
   {
@@ -62,12 +66,12 @@ const importOptions = [
     accepts: ['.csv', '.json'],
     imgKey: 'protonpass'
   },
-  // {
-  //   title: 'Encrypted file',
-  //   type: 'encrypted',
-  //   accepts: ['.json'],
-  //   icon: LockIcon
-  // },
+  {
+    title: 'Encrypted file',
+    type: 'encrypted',
+    accepts: ['.pearpass'],
+    imgKey: 'encrypted'
+  },
   {
     title: 'Unencrypted file',
     type: 'unencrypted',
@@ -90,43 +94,115 @@ const images = {
   lastpass: require('../../../../assets/images/LastPass.png'),
   protonpass: require('../../../../assets/images/ProtonPass.png'),
   nordpass: require('../../../../assets/images/NordPass.png'),
-  unencrypted: require('../../../../assets/images/VaultIcon.png')
+  unencrypted: require('../../../../assets/images/VaultIcon.png'),
+  encrypted: require('../../../../assets/images/VaultIcon.png')
 }
 
 export const ImportSection = () => {
   const { t } = useLingui()
   const { setShouldBypassAutoLock } = useAutoLockContext()
   const { createRecord } = useCreateRecord()
+  const { expand, collapse } = useBottomSheet()
+  const currentOptionRef = useRef(null)
 
-  const handleFileChange = async ({ type, accepts }) => {
-    let result = []
+  const getSnapPointsForStep = useCallback((step) => {
+    switch (step) {
+      case 0:
+        return ['10%', '25%']
+      case 1:
+        return ['20%', '35%']
+      case 2:
+        return ['10%', '35%']
+      default:
+        return ['10%', '40%']
+    }
+  }, [])
+
+  const handleStepChange = useCallback(
+    (step) => {
+      if (currentOptionRef.current) {
+        expand({
+          ...currentOptionRef.current,
+          snapPoints: getSnapPointsForStep(step)
+        })
+      }
+    },
+    [expand, getSnapPointsForStep]
+  )
+
+  const handleFileChange = async ({ accepts }) => {
     setShouldBypassAutoLock(true)
-
     try {
-      const { fileContent, fileType } = await readFileContent(accepts)
+      const fileInfo = await readFileContent(accepts)
 
-      if (!isAllowedType(fileType, accepts)) {
+      if (!isAllowedType(fileInfo.fileType, accepts)) {
         throw new Error('Invalid file type')
       }
 
+      return fileInfo
+    } catch (error) {
+      const isFileError = error.message?.includes('File too large')
+
+      Toast.show({
+        type: 'baseToast',
+        text1: isFileError ? error.message : t`File selection failed!`,
+        position: 'bottom',
+        bottomOffset: 100
+      })
+      logger.error('Error selecting file:', error.message || error)
+      throw error
+    } finally {
+      setShouldBypassAutoLock(false)
+    }
+  }
+
+  const onImport = async ({
+    type,
+    fileContent,
+    fileType,
+    password,
+    isEncrypted
+  }) => {
+    let result = []
+    let dataToProcess = fileContent
+
+    if (type === 'encrypted' || isEncrypted) {
+      if (!password) {
+        throw new Error('Password is required for encrypted files')
+      }
+
+      try {
+        const encryptedData = JSON.parse(fileContent)
+        dataToProcess = await decryptExportData(encryptedData, password)
+      } catch {
+        throw new Error(
+          'Failed to decrypt file. Please check your password and try again.'
+        )
+      }
+    }
+
+    try {
       switch (type) {
         case '1password':
-          result = await parse1PasswordData(fileContent, fileType)
+          result = await parse1PasswordData(dataToProcess, fileType)
           break
         case 'bitwarden':
-          result = await parseBitwardenData(fileContent, fileType)
+          result = await parseBitwardenData(dataToProcess, fileType)
           break
         case 'lastpass':
-          result = await parseLastPassData(fileContent, fileType)
+          result = await parseLastPassData(dataToProcess, fileType)
           break
         case 'nordpass':
-          result = await parseNordPassData(fileContent, fileType)
+          result = await parseNordPassData(dataToProcess, fileType)
           break
         case 'protonpass':
-          result = await parseProtonPassData(fileContent, fileType)
+          result = await parseProtonPassData(dataToProcess, fileType)
           break
         case 'unencrypted':
-          result = await parsePearPassData(fileContent, fileType)
+          result = await parsePearPassData(dataToProcess, fileType)
+          break
+        case 'encrypted':
+          result = await parsePearPassData(dataToProcess, 'json')
           break
         default:
           throw new Error(
@@ -204,12 +280,42 @@ export const ImportSection = () => {
           {importOptions.map((option) => (
             <ImportOptionItem
               key={option.type}
-              onPress={() =>
-                handleFileChange({
-                  type: option.type,
-                  accepts: option.accepts
-                })
-              }
+              onPress={() => {
+                const bottomSheetOptions = {
+                  children: (
+                    <BottomSheetImportVaultContent
+                      passwordManagerName={
+                        option.title === 'Encrypted file' ||
+                        option.title === 'Unencrypted file'
+                          ? 'PearPass'
+                          : option.title
+                      }
+                      onClose={collapse}
+                      onBrowseFolder={() =>
+                        handleFileChange({
+                          accepts: option.accepts
+                        })
+                      }
+                      onImport={(
+                        { fileContent, fileType, isEncrypted },
+                        password
+                      ) =>
+                        onImport({
+                          type: option.type,
+                          fileContent,
+                          fileType,
+                          isEncrypted,
+                          password
+                        })
+                      }
+                      onStepChange={handleStepChange}
+                    />
+                  ),
+                  snapPoints: getSnapPointsForStep(0)
+                }
+                currentOptionRef.current = bottomSheetOptions
+                expand(bottomSheetOptions)
+              }}
             >
               {option.imgKey ? (
                 <ImportOptionImage source={images[option.imgKey]} />

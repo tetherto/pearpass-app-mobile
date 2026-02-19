@@ -8,6 +8,8 @@ export const readFileContent = async (acceptedTypes) => {
       return ['text/csv', 'text/comma-separated-values']
     } else if (type === '.json') {
       return ['application/json']
+    } else if (type === '.pearpass') {
+      return ['application/json', 'application/octet-stream', '*/*']
     } else {
       return [type]
     }
@@ -29,9 +31,22 @@ export const readFileContent = async (acceptedTypes) => {
     const filename = file.name || ''
     const fileType = filename.split('.').pop()?.toLowerCase() || 'unknown'
 
+    let isEncrypted = false
+    if (fileType === 'pearpass') {
+      try {
+        const parsed = JSON.parse(fileContent)
+        isEncrypted = parsed.encrypted === true
+      } catch {
+        isEncrypted = true
+      }
+    }
+
     return {
+      filename,
+      size: file.size,
       fileContent,
-      fileType
+      fileType,
+      isEncrypted
     }
   } else {
     throw new Error('File picking was canceled.')
