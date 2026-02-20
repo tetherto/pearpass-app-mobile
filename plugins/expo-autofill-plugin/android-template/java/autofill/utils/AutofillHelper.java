@@ -3,10 +3,13 @@ package com.pears.pass.autofill.utils;
 import android.app.assist.AssistStructure;
 import android.os.Build;
 import android.text.InputType;
-import android.view.View;
+import android.util.Pair;
+import android.view.ViewStructure;
 import android.view.autofill.AutofillId;
 
 import androidx.annotation.RequiresApi;
+
+import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class AutofillHelper {
@@ -125,7 +128,7 @@ public class AutofillHelper {
         }
 
         // Check HTML info for web content
-        if (hasUsernameHtmlHints(node)) {
+        if (hasUsernameHtmlAttributes(node)) {
             return true;
         }
 
@@ -149,7 +152,7 @@ public class AutofillHelper {
         boolean hasPasswordVariation = (inputType & InputType.TYPE_TEXT_VARIATION_PASSWORD) != 0 ||
             (inputType & InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) != 0 ||
             (inputType & InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD) != 0;
-        
+
         if (hasPasswordVariation) {
             boolean isMultiline = (inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0;
             if (!isMultiline) {
@@ -180,7 +183,7 @@ public class AutofillHelper {
         }
 
         // Check HTML info for web content
-        return hasPasswordHtmlHints(node);
+        return hasPasswordHtmlAttributes(node);
     }
 
     /**
@@ -189,7 +192,7 @@ public class AutofillHelper {
     private static boolean containsIgnoredHints(AssistStructure.ViewNode node) {
         String hintText = node.getHint() != null ? node.getHint().toString().toLowerCase() : "";
         String idEntry = node.getIdEntry() != null ? node.getIdEntry().toLowerCase() : "";
-        
+
         return containsAnyTerm(hintText, IGNORED_HINTS) || containsAnyTerm(idEntry, IGNORED_HINTS);
     }
 
@@ -209,101 +212,83 @@ public class AutofillHelper {
     }
 
     /**
-     * Check if the node's HTML info contains username hints.
+     * Check if the node's HTML attributes indicate a username/email field.
+     * Inspects type, autocomplete, and name attributes.
      */
-    private static boolean hasUsernameHtmlHints(AssistStructure.ViewNode node) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+    private static boolean hasUsernameHtmlAttributes(AssistStructure.ViewNode node) {
+        ViewStructure.HtmlInfo htmlInfo = node.getHtmlInfo();
+        if (htmlInfo == null) {
             return false;
         }
-        
-        return hasUsernameHtmlHintsApi26(node);
-    }
-    
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private static boolean hasUsernameHtmlHintsApi26(AssistStructure.ViewNode node) {
-        try {
-            Object htmlInfoObj = node.getHtmlInfo();
-            if (htmlInfoObj == null) {
-                return false;
-            }
-            
-            // Use reflection to access HtmlInfo methods
-            Class<?> htmlInfoClass = htmlInfoObj.getClass();
-            java.lang.reflect.Method getAttributeMethod = htmlInfoClass.getMethod("getAttribute", String.class);
-            
-            // Check HTML input type attribute
-            String htmlInputType = (String) getAttributeMethod.invoke(htmlInfoObj, "type");
-            if (htmlInputType != null) {
-                String htmlInputTypeLower = htmlInputType.toLowerCase();
-                if (htmlInputTypeLower.equals("email") || htmlInputTypeLower.equals("tel")) {
-                    return true;
-                }
-            }
-            
-            // Check autocomplete attribute
-            String autocomplete = (String) getAttributeMethod.invoke(htmlInfoObj, "autocomplete");
-            if (autocomplete != null && containsAnyTerm(autocomplete.toLowerCase(), USERNAME_HINTS)) {
-                return true;
-            }
-            
-            // Check name attribute
-            String name = (String) getAttributeMethod.invoke(htmlInfoObj, "name");
-            if (name != null && containsAnyTerm(name.toLowerCase(), USERNAME_HINTS)) {
-                return true;
-            }
-            
-            return false;
-        } catch (Exception e) {
-            SecureLog.e(TAG, "Error accessing HTML info", e);
+
+        List<Pair<String, String>> attributes = htmlInfo.getAttributes();
+        if (attributes == null) {
             return false;
         }
+
+        String htmlInputType = getHtmlAttribute(attributes, "type");
+        if (htmlInputType != null) {
+            String htmlInputTypeLower = htmlInputType.toLowerCase();
+            if (htmlInputTypeLower.equals("email") || htmlInputTypeLower.equals("tel")) {
+                return true;
+            }
+        }
+
+        String autocomplete = getHtmlAttribute(attributes, "autocomplete");
+        if (autocomplete != null && containsAnyTerm(autocomplete.toLowerCase(), USERNAME_HINTS)) {
+            return true;
+        }
+
+        String name = getHtmlAttribute(attributes, "name");
+        if (name != null && containsAnyTerm(name.toLowerCase(), USERNAME_HINTS)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Check if the node's HTML info contains password hints.
+     * Check if the node's HTML attributes indicate a password field.
+     * Inspects type, autocomplete, and name attributes.
      */
-    private static boolean hasPasswordHtmlHints(AssistStructure.ViewNode node) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+    private static boolean hasPasswordHtmlAttributes(AssistStructure.ViewNode node) {
+        ViewStructure.HtmlInfo htmlInfo = node.getHtmlInfo();
+        if (htmlInfo == null) {
             return false;
         }
-        
-        return hasPasswordHtmlHintsApi26(node);
+
+        List<Pair<String, String>> attributes = htmlInfo.getAttributes();
+        if (attributes == null) {
+            return false;
+        }
+
+        String htmlInputType = getHtmlAttribute(attributes, "type");
+        if (htmlInputType != null && htmlInputType.equalsIgnoreCase("password")) {
+            return true;
+        }
+
+        String autocomplete = getHtmlAttribute(attributes, "autocomplete");
+        if (autocomplete != null && containsAnyTerm(autocomplete.toLowerCase(), PASSWORD_HINTS)) {
+            return true;
+        }
+
+        String name = getHtmlAttribute(attributes, "name");
+        if (name != null && containsAnyTerm(name.toLowerCase(), PASSWORD_HINTS)) {
+            return true;
+        }
+
+        return false;
     }
-    
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private static boolean hasPasswordHtmlHintsApi26(AssistStructure.ViewNode node) {
-        try {
-            Object htmlInfoObj = node.getHtmlInfo();
-            if (htmlInfoObj == null) {
-                return false;
+
+    /**
+     * Get an HTML attribute value by name from the attributes list.
+     */
+    private static String getHtmlAttribute(List<Pair<String, String>> attributes, String name) {
+        for (Pair<String, String> attr : attributes) {
+            if (name.equalsIgnoreCase(attr.first)) {
+                return attr.second;
             }
-            
-            // Use reflection to access HtmlInfo methods
-            Class<?> htmlInfoClass = htmlInfoObj.getClass();
-            java.lang.reflect.Method getAttributeMethod = htmlInfoClass.getMethod("getAttribute", String.class);
-            
-            // Check HTML input type attribute
-            String htmlInputType = (String) getAttributeMethod.invoke(htmlInfoObj, "type");
-            if (htmlInputType != null && htmlInputType.equalsIgnoreCase("password")) {
-                return true;
-            }
-            
-            // Check autocomplete attribute
-            String autocomplete = (String) getAttributeMethod.invoke(htmlInfoObj, "autocomplete");
-            if (autocomplete != null && containsAnyTerm(autocomplete.toLowerCase(), PASSWORD_HINTS)) {
-                return true;
-            }
-            
-            // Check name attribute
-            String name = (String) getAttributeMethod.invoke(htmlInfoObj, "name");
-            if (name != null && containsAnyTerm(name.toLowerCase(), PASSWORD_HINTS)) {
-                return true;
-            }
-            
-            return false;
-        } catch (Exception e) {
-            SecureLog.e(TAG, "Error accessing HTML info", e);
-            return false;
         }
+        return null;
     }
 }
