@@ -1865,9 +1865,10 @@ public class PearPassVaultClient {
     }
 
     /**
-     * Search login records matching username.
+     * Search login records matching rpId and/or username.
      * Port of iOS PearPassVaultClient.searchLoginRecords().
-     * Returns records where username matches OR record has no username.
+     * Returns records where website matches OR username matches.
+     * Records with BOTH empty website AND empty username are excluded.
      */
     @SuppressWarnings("unchecked")
     public CompletableFuture<List<Map<String, Object>>> searchLoginRecords(String rpId, String username) {
@@ -1892,11 +1893,40 @@ public class PearPassVaultClient {
                         ? ((String) recordData.get("username")).trim() : "";
                 String passkeyUsername = username != null ? username.trim() : "";
 
+                // Get websites from record
+                List<String> recordWebsites = new ArrayList<>();
+                Object websitesObj = recordData.get("websites");
+                if (websitesObj instanceof List) {
+                    for (Object w : (List<?>) websitesObj) {
+                        if (w instanceof String) {
+                            recordWebsites.add((String) w);
+                        }
+                    }
+                }
+
+                // Check if any website matches the rpId
+                boolean websiteMatches = false;
+                for (String website : recordWebsites) {
+                    if (normalizedDomainMatch(website, rpId)) {
+                        websiteMatches = true;
+                        break;
+                    }
+                }
+
+                // Check if username matches (both must be non-empty)
                 boolean usernameMatches = !passkeyUsername.isEmpty() && !recordUsername.isEmpty()
                         && passkeyUsername.equalsIgnoreCase(recordUsername);
-                boolean hasNoUsername = recordUsername.isEmpty();
 
-                if (usernameMatches || hasNoUsername) {
+                // Skip records with both empty website and empty username
+                boolean hasNoWebsites = recordWebsites.isEmpty() || recordWebsites.stream()
+                        .allMatch(w -> w == null || w.trim().isEmpty());
+                boolean hasNoUsername = recordUsername.isEmpty();
+                if (hasNoWebsites && hasNoUsername) {
+                    continue;
+                }
+
+                // Include if website matches OR username matches
+                if (websiteMatches || usernameMatches) {
                     matches.add(record);
                 }
             }
