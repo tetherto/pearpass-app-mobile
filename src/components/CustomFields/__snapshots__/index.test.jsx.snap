@@ -160,9 +160,9 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                 }
               }
             >
-                
+               
               Comment
-                
+               
             </Text>
             <View
               style={
@@ -481,9 +481,9 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                 }
               }
             >
-                
+               
               Comment
-                
+               
             </Text>
             <View
               style={
