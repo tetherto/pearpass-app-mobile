@@ -7,7 +7,7 @@ import {
   parse1PasswordData,
   parseBitwardenData,
   parseKeePassData,
-  parseKeePassKdbx,
+  decryptKeepassKdbx,
   parseLastPassData,
   parseNordPassData,
   parsePearPassData,
@@ -188,7 +188,7 @@ export const ImportSection = () => {
           throw new Error('Password is required for encrypted files')
         }
 
-        dataToProcess = await parseKeePassKdbx(fileContent, password)
+        dataToProcess = await decryptKeepassKdbx(fileContent, password)
         type = 'keepass-kdbx'
       }
 
