@@ -1199,8 +1199,8 @@ import Foundation
 
     // MARK: - Record Search Methods
 
-    /// Search for login records matching an rpId and/or username
-    /// Returns records where website matches OR username matches
+    /// Search for login records matching an rpId AND username
+    /// Returns records where BOTH website AND username match
     /// Records with BOTH empty website AND empty username are excluded
     func searchLoginRecords(rpId: String, username: String) async throws -> [VaultRecord] {
         log("Searching login records for rpId: \(rpId), username: \(username)")
@@ -1229,8 +1229,8 @@ import Foundation
                 continue
             }
 
-            // Include if website matches OR username matches
-            if websiteMatches || usernameMatches {
+            // Include only if BOTH website AND username match
+            if websiteMatches && usernameMatches {
                 matches.append(record)
             }
         }
