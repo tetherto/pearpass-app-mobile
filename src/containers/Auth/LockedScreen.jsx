@@ -86,7 +86,7 @@ export const LockedScreen = () => {
                 {t`Too many failed attempts.`}
               </Text>
               <Text style={styles.descriptionText}>
-                {t`For your security, access is locked for 5 minutes.`}
+                {t`For your security, access is temporarily locked.`}
               </Text>
             </View>
           </View>
