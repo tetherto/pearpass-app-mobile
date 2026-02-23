@@ -1925,8 +1925,8 @@ public class PearPassVaultClient {
                     continue;
                 }
 
-                // Include if website matches OR username matches
-                if (websiteMatches || usernameMatches) {
+                // Include only if BOTH website AND username match
+                if (websiteMatches && usernameMatches) {
                     matches.add(record);
                 }
             }
