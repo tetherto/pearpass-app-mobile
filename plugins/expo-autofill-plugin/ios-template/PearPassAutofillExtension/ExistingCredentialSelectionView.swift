@@ -89,20 +89,23 @@ struct ExistingCredentialSelectionView: View {
 
                     // Existing credentials list or empty state
                     if filteredRecords.isEmpty {
-                        Spacer().frame(height: 80)
-                        HStack {
-                            Spacer()
-                            Text(NSLocalizedString("No matching login found, search it or create a new login to store this passkey.", comment: "Empty state message"))
-                                .font(.system(size: 14))
-                                .foregroundColor(.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 16)
-                                .background(
-                                    RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                                        .fill(Color(red: 0x30/255, green: 0x30/255, blue: 0x30/255))
-                                )
-                            Spacer()
+                        // Only show empty state message when user has searched (not on initial empty state)
+                        if !searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+                            Spacer().frame(height: 80)
+                            HStack {
+                                Spacer()
+                                Text(NSLocalizedString("No matching login found, search it or create a new login to store this passkey.", comment: "Empty state message"))
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white.opacity(0.7))
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 16)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
+                                            .fill(Color(red: 0x30/255, green: 0x30/255, blue: 0x30/255))
+                                    )
+                                Spacer()
+                            }
                         }
                     } else {
                         VStack(spacing: 0) {
