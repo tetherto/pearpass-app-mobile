@@ -29,7 +29,14 @@ export const PasswordGenerator = ({ onRuleChange, rules }) => {
   const { t } = useLingui()
 
   const ruleOptions = [
-    { name: 'specialCharacters', label: t`Special character` + ' (!&*)' }
+    {
+      name: 'specialCharacters',
+      label: t`Special character` + ' (!&*)',
+      testIDOn: 'generate-password-popup-special-character-toggle-on',
+      testIDOff: 'generate-password-popup-special-character-toggle-off',
+      accessibilityLabelOn: t`Special character toggle`,
+      accessibilityLabelOff: t`Special character toggle`
+    }
   ]
 
   const handleRuleChange = (newRules) => {
@@ -46,13 +53,18 @@ export const PasswordGenerator = ({ onRuleChange, rules }) => {
     <>
       <SliderWrapper>
         <View>
-          <SliderText>
+          <SliderText
+            testID="generate-password-popup-length-label"
+            accessibilityLabel={t`Generate password popup length label`}
+          >
             {characters} {t`characters`}
           </SliderText>
         </View>
 
         <View>
           <Slider
+            testID="generate-password-popup-length-slider"
+            accessibilityLabel={t`Password length slider`}
             style={{ width: 240, height: 50 }}
             minimumValue={4}
             maximumValue={32}

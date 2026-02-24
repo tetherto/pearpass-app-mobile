@@ -12,13 +12,14 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { PairAnotherDeviceContent } from './PairAnotherDeviceContent'
 import { PairThisDeviceContent } from './PairThisDeviceContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { withAutoLockBypass } from '../../HOCs'
 
 const TAB = {
   PAIR_THIS: 'pairThis',
   PAIR_ANOTHER: 'pairAnother'
 }
 
-export const BottomSheetAddDeviceContent = () => {
+const BottomSheetAddDeviceContentBase = () => {
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
 
@@ -116,6 +117,10 @@ export const BottomSheetAddDeviceContent = () => {
     </BottomSheetScrollView>
   )
 }
+
+export const BottomSheetAddDeviceContent = withAutoLockBypass(
+  BottomSheetAddDeviceContentBase
+)
 
 const styles = StyleSheet.create({
   container: {

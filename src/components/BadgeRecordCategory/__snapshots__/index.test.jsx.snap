@@ -2,6 +2,7 @@
 
 exports[`BadgeRecordCategory applies correct colors based on active state 1`] = `
 <View
+  accessibilityLabel="Logins category button"
   accessibilityState={
     {
       "busy": undefined,
@@ -50,8 +51,10 @@ exports[`BadgeRecordCategory applies correct colors based on active state 1`] = 
       "paddingTop": 11.450643776824034,
     }
   }
+  testID="home-category-logins-button"
 >
   <Text
+    accessibilityLabel="Logins category count"
     active={false}
     style={
       {
@@ -61,6 +64,7 @@ exports[`BadgeRecordCategory applies correct colors based on active state 1`] = 
         "paddingLeft": 11.450643776824034,
       }
     }
+    testID="home-category-logins-button-text"
   >
     Logins
      
@@ -70,6 +74,7 @@ exports[`BadgeRecordCategory applies correct colors based on active state 1`] = 
 
 exports[`BadgeRecordCategory applies correct colors based on active state 2`] = `
 <View
+  accessibilityLabel="Logins category button"
   accessibilityState={
     {
       "busy": undefined,
@@ -118,8 +123,10 @@ exports[`BadgeRecordCategory applies correct colors based on active state 2`] = 
       "paddingTop": 11.450643776824034,
     }
   }
+  testID="home-category-logins-button"
 >
   <Text
+    accessibilityLabel="Logins category count"
     active={true}
     style={
       {
@@ -129,6 +136,7 @@ exports[`BadgeRecordCategory applies correct colors based on active state 2`] = 
         "paddingLeft": 11.450643776824034,
       }
     }
+    testID="home-category-logins-button-text"
   >
     Logins
      
@@ -138,6 +146,7 @@ exports[`BadgeRecordCategory applies correct colors based on active state 2`] = 
 
 exports[`BadgeRecordCategory renders correctly with active state 1`] = `
 <View
+  accessibilityLabel=""
   accessibilityState={
     {
       "busy": undefined,
@@ -188,6 +197,7 @@ exports[`BadgeRecordCategory renders correctly with active state 1`] = `
   }
 >
   <Text
+    accessibilityLabel=""
     active={true}
     style={
       {
@@ -207,6 +217,7 @@ exports[`BadgeRecordCategory renders correctly with active state 1`] = `
 
 exports[`BadgeRecordCategory renders correctly with inactive state 1`] = `
 <View
+  accessibilityLabel="Logins category button"
   accessibilityState={
     {
       "busy": undefined,
@@ -255,8 +266,10 @@ exports[`BadgeRecordCategory renders correctly with inactive state 1`] = `
       "paddingTop": 11.450643776824034,
     }
   }
+  testID="home-category-logins-button"
 >
   <Text
+    accessibilityLabel="Logins category count"
     active={false}
     style={
       {
@@ -266,6 +279,7 @@ exports[`BadgeRecordCategory renders correctly with inactive state 1`] = `
         "paddingLeft": 11.450643776824034,
       }
     }
+    testID="home-category-logins-button-text"
   >
     Logins
      

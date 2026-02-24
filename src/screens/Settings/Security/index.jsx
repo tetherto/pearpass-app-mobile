@@ -20,6 +20,7 @@ import { BottomSheetBiometricsLoginPrompt } from '../../../containers/BottomShee
 import { RuleSelector } from '../../../containers/BottomSheetPassGeneratorContent/RuleSelector'
 import { ModifyMasterVaultModalContent } from '../../../containers/Modal/ModifyMasterVaultModalContent'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
+import { useHapticsContext } from '../../../context/HapticsContext'
 import { useModal } from '../../../context/ModalContext'
 import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
@@ -32,6 +33,7 @@ export const Security = () => {
   const { openModal } = useModal()
   const { expand, collapse } = useBottomSheet()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
+  const { isHapticsEnabled, setIsHapticsEnabled } = useHapticsContext()
   const {
     isBiometricsSupported,
     isBiometricsEnabled,
@@ -45,7 +47,8 @@ export const Security = () => {
   const [selectedRules, setSelectedRules] = useState({
     biometrics: false,
     copyToClipboard: true,
-    passwordChangeReminder: true
+    passwordChangeReminder: true,
+    haptics: true
   })
 
   const ruleOptions = useMemo(() => {
@@ -67,6 +70,15 @@ export const Security = () => {
         testIDOff: 'copy-to-clipboard-toggle-off',
         accessibilityLabelOn: t`Copy to clipboard enabled`,
         accessibilityLabelOff: t`Copy to clipboard disabled`
+      },
+      {
+        name: 'haptics',
+        label: t`Haptic feedback`,
+        description: t`Enable vibration feedback when interacting with the app.`,
+        testIDOn: 'haptics-toggle-on',
+        testIDOff: 'haptics-toggle-off',
+        accessibilityLabelOn: t`Haptic feedback enabled`,
+        accessibilityLabelOff: t`Haptic feedback disabled`
       }
     ]
 
@@ -120,6 +132,10 @@ export const Security = () => {
       }
     }
 
+    if (newRules.haptics !== selectedRules.haptics) {
+      await setIsHapticsEnabled(newRules.haptics)
+    }
+
     setSelectedRules({ ...newRules })
   }
 
@@ -135,12 +151,13 @@ export const Security = () => {
       setSelectedRules({
         biometrics: isBiometricsEnabled,
         copyToClipboard: copyToClipboard !== 'false',
-        passwordChangeReminder: isPasswordChangeReminderEnabled
+        passwordChangeReminder: isPasswordChangeReminderEnabled,
+        haptics: isHapticsEnabled
       })
     }
 
     getInitialSettings()
-  }, [isBiometricsEnabled, isPasswordChangeReminderEnabled])
+  }, [isBiometricsEnabled, isPasswordChangeReminderEnabled, isHapticsEnabled])
 
   useEffect(
     () => () => {

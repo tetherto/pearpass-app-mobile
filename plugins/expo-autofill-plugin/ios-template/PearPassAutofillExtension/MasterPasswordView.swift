@@ -8,10 +8,12 @@ struct MasterPasswordView: View {
     let presentationWindow: UIWindow?
     
     @State private var isLoading: Bool = false
-    @State private var errorMessage: String?
     @State private var isAuthenticatingBiometric: Bool = false
     @State private var isAuthenticatingPasskey: Bool = false
     @State private var keyboardHeight: CGFloat = 0
+    @State private var showToast: Bool = false
+    @State private var toastMessage: String = ""
+    @State private var toastWorkItem: DispatchWorkItem?
     
     private var showFaceIDButton: Bool {
         KeychainHelper.shared.canUseBiometrics()
@@ -54,12 +56,23 @@ struct MasterPasswordView: View {
                                 VStack(spacing: 20) {
                                     PasswordInput(password: $viewModel.masterPassword)
 
-                                    if let errorMessage = errorMessage {
-                                        Text(errorMessage)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.red)
-                                            .multilineTextAlignment(.center)
-                                            .padding(.horizontal)
+                                    // Error message (Android-style toast design)
+                                    if showToast {
+                                        HStack(spacing: 10) {
+                                            Image("AppIcon")
+                                                .resizable()
+                                                .frame(width: 28, height: 28)
+                                                .clipShape(Circle())
+                                            Text(toastMessage)
+                                                .font(.system(size: 14, weight: .medium))
+                                                .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
+                                        }
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 25)
+                                                .fill(Color(red: 0xec/255, green: 0xeb/255, blue: 0xf2/255))
+                                        )
                                     }
 
                                     Button(action: {
@@ -143,12 +156,12 @@ struct MasterPasswordView: View {
                     }
                     .animation(.easeInOut(duration: 0.3), value: keyboardHeight)
                 }
+
             }
         }
         .onAppear {
-            // Clear password and error state when view appears to prevent blinking
+            // Clear password when view appears to prevent blinking
             viewModel.masterPassword = ""
-            errorMessage = nil
 
             // Listen for keyboard notifications
             NotificationCenter.default.addObserver(
@@ -180,11 +193,9 @@ struct MasterPasswordView: View {
     
     private func handleLogin() {
         guard let client = vaultClient else {
-            errorMessage = NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized")
+            showToastMessage(NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized"))
             return
         }
-
-        errorMessage = nil
 
         // Capture password and clear from viewModel immediately
         let password = viewModel.masterPassword
@@ -203,14 +214,35 @@ struct MasterPasswordView: View {
             } catch {
                 await MainActor.run {
                     isLoading = false
-                    errorMessage = error.localizedDescription.isEmpty ?
-                        NSLocalizedString("Invalid password", comment: "Invalid password error") :
-                        error.localizedDescription
+                    showToastMessage(NSLocalizedString("Invalid master password", comment: "Invalid master password error"))
                 }
             }
         }
     }
-    
+
+    // MARK: - Toast Helper
+
+    private func showToastMessage(_ message: String) {
+        // Cancel any existing timer
+        toastWorkItem?.cancel()
+
+        toastMessage = message
+        withAnimation {
+            showToast = true
+        }
+
+        // Create new work item for auto-hide
+        let workItem = DispatchWorkItem {
+            withAnimation {
+                showToast = false
+            }
+        }
+        toastWorkItem = workItem
+
+        // Auto-hide after 3 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: workItem)
+    }
+
     // MARK: - Authentication Functions
 
     private func authenticateWithPassword(_ password: String, client: PearPassVaultClient) async throws {
@@ -304,24 +336,23 @@ struct MasterPasswordView: View {
     
     private func handleFaceIDLogin() {
         guard let client = vaultClient else {
-            errorMessage = NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized")
+            showToastMessage(NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized"))
             return
         }
-        
-        errorMessage = nil
+
         isAuthenticatingBiometric = true
-        
+
         Task {
             do {
                 // Get encryption data with biometric authentication
                 guard let encryptionData = try await KeychainHelper.shared.getEncryptionData(withBiometricAuth: true) else {
                     await MainActor.run {
                         isAuthenticatingBiometric = false
-                        errorMessage = NSLocalizedString("Failed to retrieve encryption data", comment: "Failed to retrieve encryption data error")
+                        showToastMessage(NSLocalizedString("Failed to retrieve encryption data", comment: "Failed to retrieve encryption data error"))
                     }
                     return
                 }
-                
+
                 try await initialize(
                     ciphertext: encryptionData.ciphertext,
                     nonce: encryptionData.nonce,
@@ -330,23 +361,24 @@ struct MasterPasswordView: View {
                     password: Data(), // No password needed for biometric auth
                     client: client
                 )
-                
+
                 let vaults = try await client.listVaults()
-                
+
                 await MainActor.run {
                     isAuthenticatingBiometric = false
                     viewModel.vaults = vaults
                     // Move to vault selection
                     viewModel.currentFlow = .vaultSelection
                 }
-                
+
             } catch {
                 await MainActor.run {
                     isAuthenticatingBiometric = false
-                    
-                    errorMessage = (error as NSError).code == -128 ?
+
+                    let message = (error as NSError).code == -128 ?
                         NSLocalizedString("Authentication canceled", comment: "Authentication canceled by user") :
                         NSLocalizedString("Face ID authentication failed", comment: "Face ID authentication failed")
+                    showToastMessage(message)
                 }
             }
         }
@@ -356,54 +388,54 @@ struct MasterPasswordView: View {
     @available(iOS 16.0, *)
     private func handlePasskeyLogin() {
         guard let client = vaultClient else {
-            errorMessage = NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized")
+            showToastMessage(NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized"))
             return
         }
-        
+
         guard let window = presentationWindow else {
-            errorMessage = NSLocalizedString("Unable to get presentation window", comment: "Error when unable to get window")
+            showToastMessage(NSLocalizedString("Unable to get presentation window", comment: "Error when unable to get window"))
             return
         }
-        
-        errorMessage = nil
+
         isAuthenticatingPasskey = true
-        
+
         Task {
             do {
                 let encryptionData = try await PasskeyHelper.shared.authenticateWithPasskey(presentationAnchor: window)
-                
+
                 guard let encryptionData = encryptionData else {
                     await MainActor.run {
                         isAuthenticatingPasskey = false
-                        errorMessage = NSLocalizedString("Failed to retrieve encryption data from passkey. The passkey may not have the master password stored.", comment: "No largeBlob data error")
+                        showToastMessage(NSLocalizedString("Failed to retrieve encryption data from passkey", comment: "No largeBlob data error"))
                     }
                     return
                 }
-                    try await initialize(
-                        ciphertext: encryptionData.ciphertext,
-                        nonce: encryptionData.nonce,
-                        salt: encryptionData.salt,
-                        hashedPassword: encryptionData.hashedPassword,
-                        password: Data(), // No password needed for passkey auth
-                        client: client
-                    )
-                
+                try await initialize(
+                    ciphertext: encryptionData.ciphertext,
+                    nonce: encryptionData.nonce,
+                    salt: encryptionData.salt,
+                    hashedPassword: encryptionData.hashedPassword,
+                    password: Data(), // No password needed for passkey auth
+                    client: client
+                )
+
                 let vaults = try await client.listVaults()
-                
+
                 await MainActor.run {
                     isAuthenticatingPasskey = false
                     viewModel.vaults = vaults
                     // Move to vault selection
                     viewModel.currentFlow = .vaultSelection
                 }
-                
+
             } catch {
                 await MainActor.run {
                     isAuthenticatingPasskey = false
-                    
-                    errorMessage = (error as NSError).code == -128 ?
+
+                    let message = (error as NSError).code == -128 ?
                         NSLocalizedString("Authentication canceled", comment: "Authentication canceled by user") :
-                        error.localizedDescription
+                        NSLocalizedString("Passkey authentication failed", comment: "Passkey authentication failed")
+                    showToastMessage(message)
                 }
             }
         }

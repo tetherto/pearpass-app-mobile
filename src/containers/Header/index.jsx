@@ -116,10 +116,19 @@ export const Header = ({
         <LogoLock width={30} height={40} />
       </LockContainer>
 
-      <InputContainer>
-        <SearchIcon size={21} />
+      <InputContainer
+        testID="search-field"
+        accessibilityLabel={t`Search field`}
+      >
+        <SearchIcon
+          size={21}
+          testID="search-field-icon"
+          accessibilityLabel={t`Search field icon`}
+        />
 
         <SearchTextInput
+          testID="search-field-input"
+          accessibilityLabel={t`Search field input`}
           placeholder={t`Search...`}
           placeholderTextColor={colors.grey100.mode1}
           value={searchValue}

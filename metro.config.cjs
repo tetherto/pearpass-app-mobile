@@ -23,7 +23,16 @@ config.resolver = {
     ...config.resolver.assetExts.filter((ext) => ext !== 'svg'),
     'bundle'
   ],
-  sourceExts: [...config.resolver.sourceExts, 'svg', 'd.ts']
+  sourceExts: [...config.resolver.sourceExts, 'svg', 'd.ts'],
+  resolveRequest: (context, moduleName, platform) => {
+    // kdbxweb's UMD bundle does require("crypto") at load time but
+    // only uses it as a fallback when Web Crypto API is unavailable.
+    // Return an empty module so Metro can bundle without Node built-ins.
+    if (moduleName === 'crypto') {
+      return { type: 'empty' }
+    }
+    return context.resolveRequest(context, moduleName, platform)
+  }
 }
 
 module.exports = config
