@@ -304,14 +304,17 @@ struct CredentialsListView: View {
                 let (parsedCredentials, parsedPasskeys) = parseAllRecords(records)
 
                 // Load pending passkeys from job queue (not yet processed by main app)
-                let pendingPasskeys = await loadPendingPasskeysFromJobs(
+                let (pendingPasskeys, replacedRecordIds) = await loadPendingPasskeysFromJobs(
                     vaultClient: client,
                     existingRecords: records
                 )
 
+                // Filter out DB passkeys that have a pending UPDATE_PASSKEY job (job version is newer)
+                let filteredParsedPasskeys = parsedPasskeys.filter { !replacedRecordIds.contains($0.id) }
+
                 await MainActor.run {
                     self.credentials = parsedCredentials
-                    self.passkeyRecords = parsedPasskeys + pendingPasskeys
+                    self.passkeyRecords = filteredParsedPasskeys + pendingPasskeys
                     self.isLoading = false
                 }
 
@@ -329,15 +332,16 @@ struct CredentialsListView: View {
     /// Loads pending passkey creation jobs from the encrypted job file and converts them
     /// to VaultRecord objects so they can be used for passkey assertion before the main
     /// app processes the job queue.
+    /// Returns a tuple of (pending passkey records, record IDs replaced by UPDATE_PASSKEY jobs).
     private func loadPendingPasskeysFromJobs(
         vaultClient: PearPassVaultClient,
         existingRecords: [VaultRecord]
-    ) async -> [VaultRecord] {
-        guard JobFileManager.jobFileExists() else { return [] }
+    ) async -> (pendingPasskeys: [VaultRecord], replacedRecordIds: Set<String>) {
+        guard JobFileManager.jobFileExists() else { return ([], []) }
 
         guard let hashedPassword = await PasskeyJobCreator.getHashedPassword(from: vaultClient) else {
             NSLog("CredentialsListView: Could not get hashed password for job file decryption")
-            return []
+            return ([], [])
         }
 
         do {
@@ -349,6 +353,7 @@ struct CredentialsListView: View {
             })
 
             var pendingPasskeys: [VaultRecord] = []
+            var replacedRecordIds: Set<String> = []
 
             for job in jobs where job.status == .pending || job.status == .inProgress {
                 switch job.payload {
@@ -396,9 +401,6 @@ struct CredentialsListView: View {
                     NSLog("CredentialsListView: Added pending ADD_PASSKEY job \(job.id) as passkey credential")
 
                 case .updatePasskey(let payload):
-                    // Skip if the existing record already has a passkey in the vault
-                    guard !existingRecordIds.contains(payload.existingRecordId) else { continue }
-
                     guard let credential = passkeyCredentialFromJobPayload(
                         credentialId: payload.credentialId,
                         publicKey: payload.publicKey,
@@ -410,6 +412,11 @@ struct CredentialsListView: View {
                         transports: payload.transports,
                         userId: payload.userId
                     ) else { continue }
+
+                    // Track that this DB record should be replaced by the job version
+                    if existingRecordIds.contains(payload.existingRecordId) {
+                        replacedRecordIds.insert(payload.existingRecordId)
+                    }
 
                     // Find the existing record in vault and augment it with the pending passkey
                     if let existingRecord = existingRecords.first(where: { $0.id == payload.existingRecordId }),
@@ -470,11 +477,11 @@ struct CredentialsListView: View {
                 }
             }
 
-            NSLog("CredentialsListView: Found \(pendingPasskeys.count) pending passkey(s) from job queue")
-            return pendingPasskeys
+            NSLog("CredentialsListView: Found \(pendingPasskeys.count) pending passkey(s) from job queue, \(replacedRecordIds.count) replaced from DB")
+            return (pendingPasskeys, replacedRecordIds)
         } catch {
             NSLog("CredentialsListView: Failed to read pending jobs: \(error.localizedDescription)")
-            return []
+            return ([], [])
         }
     }
 
