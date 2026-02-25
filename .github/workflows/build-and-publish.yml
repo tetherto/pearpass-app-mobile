@@ -198,12 +198,12 @@ jobs:
           EXPO_GOOGLE_SERVICE_ACCOUNT_KEY_PATH: "${{ env.GITHUB_WORKSPACE }}/google-service-account.json"
           CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
           GOOGLE_PLAY_KEYSTORE: ${{ secrets.GOOGLE_PLAY_KEYSTORE }}
-        # run: |
-        #   if [ -n "${{ steps.find_android.outputs.AAB_PATH }}" ]; then
-        #     eas submit -p android --path ${{ steps.find_android.outputs.AAB_PATH }} --non-interactive
-        #   else
-        #     echo "No AAB found; skipping Android submit."
-        #   fi
+        run: |
+          if [ -n "${{ steps.find_android.outputs.AAB_PATH }}" ]; then
+            eas submit -p android --path ${{ steps.find_android.outputs.AAB_PATH }} --non-interactive
+          else
+            echo "No AAB found; skipping Android submit."
+          fi
 
   ios:
     runs-on: macos-latest
@@ -318,9 +318,9 @@ jobs:
           CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
           APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
           APPLE_DISTRIBUTION_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
-        # run: |
-        #   echo $APPLE_APIKEY | base64 -d > apple-asc-api-key.p8
-        #   eas submit -p ios --path ${{ steps.find_ipa.outputs.IPA_PATH }} --non-interactive
+        run: |
+          echo $APPLE_APIKEY | base64 -d > apple-asc-api-key.p8
+          eas submit -p ios --path ${{ steps.find_ipa.outputs.IPA_PATH }} --non-interactive
 
   mobile_release:
     name: Create unified Mobile release (IPA & AAB)
