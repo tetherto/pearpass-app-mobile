@@ -19,6 +19,7 @@ import Toast from 'react-native-toast-message'
 import { PassPhraseSettings } from './PassPhraseSettings'
 import { BadgeTextItem } from '../../components/BadgeTextItem'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { usePasteFromClipboard } from '../../hooks/usePasteFromClipboard'
 
 /**
@@ -36,6 +37,7 @@ export const PassPhrase = ({ isCreateOrEdit, onChange, value, error }) => {
   const [withRandomWord, setWithRandomWord] = useState(false)
   const [passphraseWords, setPassphraseWords] = useState([])
 
+  const { hapticButtonSecondary } = useHapticFeedback()
   const { copyToClipboard } = useCopyToClipboard()
   const { pasteFromClipboard } = usePasteFromClipboard()
 
@@ -109,11 +111,14 @@ export const PassPhrase = ({ isCreateOrEdit, onChange, value, error }) => {
 
       <TouchableOpacity
         style={styles.copyContainer}
-        onPress={
-          isCreateOrEdit
-            ? handlePasteFromClipboard
-            : () => copyToClipboard(value)
-        }
+        onPress={() => {
+          hapticButtonSecondary()
+          if (isCreateOrEdit) {
+            handlePasteFromClipboard()
+          } else {
+            copyToClipboard(value)
+          }
+        }}
       >
         {isCreateOrEdit ? (
           <>
