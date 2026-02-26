@@ -261,8 +261,8 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                     for (CredentialItem pending : pendingPasskeys) {
                         pendingPasskeyIds.add(pending.getId());
                     }
-                    // Remove DB credentials that have a pending update (job version is newer)
-                    parsedCredentials.removeIf(item -> item.hasPasskey() && pendingPasskeyIds.contains(item.getId()));
+                    // Remove DB credentials that have a pending job (job version is newer or augmented with passkey)
+                    parsedCredentials.removeIf(item -> pendingPasskeyIds.contains(item.getId()));
                     parsedCredentials.addAll(pendingPasskeys);
                 }
 
