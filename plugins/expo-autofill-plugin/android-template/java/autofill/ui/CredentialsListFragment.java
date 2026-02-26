@@ -256,6 +256,13 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 // Load pending passkeys from job queue (not yet processed by main app)
                 List<CredentialItem> pendingPasskeys = loadPendingPasskeysFromJobs(parsedCredentials);
                 if (!pendingPasskeys.isEmpty()) {
+                    // Build set of IDs from pending passkeys to remove stale DB versions
+                    Set<String> pendingPasskeyIds = new HashSet<>();
+                    for (CredentialItem pending : pendingPasskeys) {
+                        pendingPasskeyIds.add(pending.getId());
+                    }
+                    // Remove DB credentials that have a pending job (job version is newer or augmented with passkey)
+                    parsedCredentials.removeIf(item -> pendingPasskeyIds.contains(item.getId()));
                     parsedCredentials.addAll(pendingPasskeys);
                 }
 
@@ -389,11 +396,6 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
                     } else if (job.getType() == Job.JobType.UPDATE_PASSKEY) {
                         UpdatePasskeyPayload payload = UpdatePasskeyPayload.fromJSON(job.getPayload());
-
-                        // Skip if the existing record already has a passkey in the vault
-                        if (existingPasskeyIds.contains(payload.getExistingRecordId())) {
-                            continue;
-                        }
 
                         // Build credential map
                         Map<String, Object> credentialMap = buildCredentialMapFromPayload(
