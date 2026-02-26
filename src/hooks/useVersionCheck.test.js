@@ -1,7 +1,12 @@
 import { renderHook, waitFor } from '@testing-library/react-native'
 import { Platform } from 'react-native'
 
-import { compareVersions, parseParts, useVersionCheck } from './useVersionCheck'
+import {
+  compareVersions,
+  isWithinGracePeriod,
+  parseParts,
+  useVersionCheck
+} from './useVersionCheck'
 
 jest.mock('expo-constants', () => ({
   expoConfig: {
@@ -162,11 +167,16 @@ describe('useVersionCheck', () => {
 
   it('should set needsUpdate to true when store version is higher (iOS)', async () => {
     Platform.OS = 'ios'
+    const pastGracePeriod = new Date(
+      Date.now() - 25 * 60 * 60 * 1000
+    ).toISOString()
     global.fetch.mockResolvedValue({
       json: () =>
         Promise.resolve({
           resultCount: 1,
-          results: [{ version: '2.0.0' }]
+          results: [
+            { version: '2.0.0', currentVersionReleaseDate: pastGracePeriod }
+          ]
         })
     })
 
@@ -186,7 +196,12 @@ describe('useVersionCheck', () => {
       json: () =>
         Promise.resolve({
           resultCount: 1,
-          results: [{ version: '1.0.0' }]
+          results: [
+            {
+              version: '1.0.0',
+              currentVersionReleaseDate: '2025-01-01T00:00:00Z'
+            }
+          ]
         })
     })
 
@@ -215,6 +230,59 @@ describe('useVersionCheck', () => {
     })
   })
 
+  it('should set needsUpdate to false when store version is higher but within grace period (iOS)', async () => {
+    Platform.OS = 'ios'
+    const withinGracePeriod = new Date(
+      Date.now() - 12 * 60 * 60 * 1000
+    ).toISOString()
+    global.fetch.mockResolvedValue({
+      json: () =>
+        Promise.resolve({
+          resultCount: 1,
+          results: [
+            {
+              version: '2.0.0',
+              currentVersionReleaseDate: withinGracePeriod
+            }
+          ]
+        })
+    })
+
+    const { result } = renderHook(() => useVersionCheck())
+
+    jest.advanceTimersByTime(1000)
+
+    await waitFor(() => {
+      expect(result.current.needsUpdate).toBe(false)
+      expect(result.current.isChecking).toBe(false)
+    })
+  })
+
+  it('should set needsUpdate to true when store version is higher and past grace period (iOS)', async () => {
+    Platform.OS = 'ios'
+    const pastGracePeriod = new Date(
+      Date.now() - 48 * 60 * 60 * 1000
+    ).toISOString()
+    global.fetch.mockResolvedValue({
+      json: () =>
+        Promise.resolve({
+          resultCount: 1,
+          results: [
+            { version: '2.0.0', currentVersionReleaseDate: pastGracePeriod }
+          ]
+        })
+    })
+
+    const { result } = renderHook(() => useVersionCheck())
+
+    jest.advanceTimersByTime(1000)
+
+    await waitFor(() => {
+      expect(result.current.needsUpdate).toBe(true)
+      expect(result.current.isChecking).toBe(false)
+    })
+  })
+
   it('should cleanup timers on unmount', () => {
     const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
 
@@ -224,5 +292,46 @@ describe('useVersionCheck', () => {
 
     expect(clearTimeoutSpy).toHaveBeenCalled()
     clearTimeoutSpy.mockRestore()
+  })
+})
+
+describe('isWithinGracePeriod', () => {
+  it('should return true if release was less than 24 hours ago', () => {
+    const twelveHoursAgo = new Date(
+      Date.now() - 12 * 60 * 60 * 1000
+    ).toISOString()
+    expect(isWithinGracePeriod(twelveHoursAgo)).toBe(true)
+  })
+
+  it('should return true if release was just now', () => {
+    const now = new Date().toISOString()
+    expect(isWithinGracePeriod(now)).toBe(true)
+  })
+
+  it('should return false if release was more than 24 hours ago', () => {
+    const fortyEightHoursAgo = new Date(
+      Date.now() - 48 * 60 * 60 * 1000
+    ).toISOString()
+    expect(isWithinGracePeriod(fortyEightHoursAgo)).toBe(false)
+  })
+
+  it('should return false if release was exactly 24 hours ago', () => {
+    const exactlyTwentyFourHoursAgo = new Date(
+      Date.now() - 24 * 60 * 60 * 1000
+    ).toISOString()
+    expect(isWithinGracePeriod(exactlyTwentyFourHoursAgo)).toBe(false)
+  })
+
+  it('should return false if releaseDateString is null', () => {
+    expect(isWithinGracePeriod(null)).toBe(false)
+  })
+
+  it('should return false if releaseDateString is undefined', () => {
+    expect(isWithinGracePeriod(undefined)).toBe(false)
+  })
+
+  it('should return false if releaseDateString is an invalid date', () => {
+    expect(isWithinGracePeriod('not-a-date')).toBe(false)
+    expect(isWithinGracePeriod('')).toBe(false)
   })
 })
