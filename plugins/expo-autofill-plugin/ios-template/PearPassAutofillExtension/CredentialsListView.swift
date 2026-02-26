@@ -304,16 +304,19 @@ struct CredentialsListView: View {
                 let (parsedCredentials, parsedPasskeys) = parseAllRecords(records)
 
                 // Load pending passkeys from job queue (not yet processed by main app)
-                let (pendingPasskeys, replacedRecordIds) = await loadPendingPasskeysFromJobs(
+                let pendingPasskeys = await loadPendingPasskeysFromJobs(
                     vaultClient: client,
                     existingRecords: records
                 )
 
-                // Filter out DB passkeys that have a pending UPDATE_PASSKEY job (job version is newer)
-                let filteredParsedPasskeys = parsedPasskeys.filter { !replacedRecordIds.contains($0.id) }
+                // Build set of all record IDs covered by pending jobs
+                let pendingRecordIds = Set(pendingPasskeys.map { $0.id })
+                // Filter out DB records that have a pending job (job version is newer or augmented with passkey)
+                let filteredParsedPasskeys = parsedPasskeys.filter { !pendingRecordIds.contains($0.id) }
+                let filteredParsedCredentials = parsedCredentials.filter { !pendingRecordIds.contains($0.id) }
 
                 await MainActor.run {
-                    self.credentials = parsedCredentials
+                    self.credentials = filteredParsedCredentials
                     self.passkeyRecords = filteredParsedPasskeys + pendingPasskeys
                     self.isLoading = false
                 }
@@ -332,16 +335,15 @@ struct CredentialsListView: View {
     /// Loads pending passkey creation jobs from the encrypted job file and converts them
     /// to VaultRecord objects so they can be used for passkey assertion before the main
     /// app processes the job queue.
-    /// Returns a tuple of (pending passkey records, record IDs replaced by UPDATE_PASSKEY jobs).
     private func loadPendingPasskeysFromJobs(
         vaultClient: PearPassVaultClient,
         existingRecords: [VaultRecord]
-    ) async -> (pendingPasskeys: [VaultRecord], replacedRecordIds: Set<String>) {
-        guard JobFileManager.jobFileExists() else { return ([], []) }
+    ) async -> [VaultRecord] {
+        guard JobFileManager.jobFileExists() else { return [] }
 
         guard let hashedPassword = await PasskeyJobCreator.getHashedPassword(from: vaultClient) else {
             NSLog("CredentialsListView: Could not get hashed password for job file decryption")
-            return ([], [])
+            return []
         }
 
         do {
@@ -353,7 +355,6 @@ struct CredentialsListView: View {
             })
 
             var pendingPasskeys: [VaultRecord] = []
-            var replacedRecordIds: Set<String> = []
 
             for job in jobs where job.status == .pending || job.status == .inProgress {
                 switch job.payload {
@@ -412,11 +413,6 @@ struct CredentialsListView: View {
                         transports: payload.transports,
                         userId: payload.userId
                     ) else { continue }
-
-                    // Track that this DB record should be replaced by the job version
-                    if existingRecordIds.contains(payload.existingRecordId) {
-                        replacedRecordIds.insert(payload.existingRecordId)
-                    }
 
                     // Find the existing record in vault and augment it with the pending passkey
                     if let existingRecord = existingRecords.first(where: { $0.id == payload.existingRecordId }),
@@ -477,11 +473,11 @@ struct CredentialsListView: View {
                 }
             }
 
-            NSLog("CredentialsListView: Found \(pendingPasskeys.count) pending passkey(s) from job queue, \(replacedRecordIds.count) replaced from DB")
-            return (pendingPasskeys, replacedRecordIds)
+            NSLog("CredentialsListView: Found \(pendingPasskeys.count) pending passkey(s) from job queue")
+            return pendingPasskeys
         } catch {
             NSLog("CredentialsListView: Failed to read pending jobs: \(error.localizedDescription)")
-            return ([], [])
+            return []
         }
     }
 
