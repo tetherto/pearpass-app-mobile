@@ -30,13 +30,8 @@ struct CredentialsListView: View {
             }
         } else if !hasUserSearched && !serviceIdentifiers.isEmpty {
             // Only apply domain filtering if user hasn't searched yet
-            let matchingCredentials = credentials.filter { credential in
+            filtered = credentials.filter { credential in
                 matchesServiceIdentifiers(credential: credential)
-            }
-
-            // If we have matching credentials, show only those; otherwise show all
-            if !matchingCredentials.isEmpty {
-                filtered = matchingCredentials
             }
         }
         // If hasUserSearched is true and searchText is empty, show all credentials (no filtering)
@@ -308,9 +303,21 @@ struct CredentialsListView: View {
                 // Parse all records into passwords and passkeys
                 let (parsedCredentials, parsedPasskeys) = parseAllRecords(records)
 
+                // Load pending passkeys from job queue (not yet processed by main app)
+                let pendingPasskeys = await loadPendingPasskeysFromJobs(
+                    vaultClient: client,
+                    existingRecords: records
+                )
+
+                // Build set of all record IDs covered by pending jobs
+                let pendingRecordIds = Set(pendingPasskeys.map { $0.id })
+                // Filter out DB records that have a pending job (job version is newer or augmented with passkey)
+                let filteredParsedPasskeys = parsedPasskeys.filter { !pendingRecordIds.contains($0.id) }
+                let filteredParsedCredentials = parsedCredentials.filter { !pendingRecordIds.contains($0.id) }
+
                 await MainActor.run {
-                    self.credentials = parsedCredentials
-                    self.passkeyRecords = parsedPasskeys
+                    self.credentials = filteredParsedCredentials
+                    self.passkeyRecords = filteredParsedPasskeys + pendingPasskeys
                     self.isLoading = false
                 }
 
@@ -321,6 +328,189 @@ struct CredentialsListView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Pending Job Passkeys
+
+    /// Loads pending passkey creation jobs from the encrypted job file and converts them
+    /// to VaultRecord objects so they can be used for passkey assertion before the main
+    /// app processes the job queue.
+    private func loadPendingPasskeysFromJobs(
+        vaultClient: PearPassVaultClient,
+        existingRecords: [VaultRecord]
+    ) async -> [VaultRecord] {
+        guard JobFileManager.jobFileExists() else { return [] }
+
+        guard let hashedPassword = await PasskeyJobCreator.getHashedPassword(from: vaultClient) else {
+            NSLog("CredentialsListView: Could not get hashed password for job file decryption")
+            return []
+        }
+
+        do {
+            let jobs = try JobFileManager.readJobs(hashedPassword: hashedPassword)
+            let existingRecordIds = Set(existingRecords.compactMap { record -> String? in
+                // Only consider records that already have a passkey credential
+                guard record.data?.credential != nil else { return nil }
+                return record.id
+            })
+
+            var pendingPasskeys: [VaultRecord] = []
+
+            for job in jobs where job.status == .pending || job.status == .inProgress {
+                switch job.payload {
+                case .addPasskey(let payload):
+                    // Skip if a record with this ID already has a passkey in the vault
+                    guard !existingRecordIds.contains(payload.recordId) else { continue }
+
+                    guard let credential = passkeyCredentialFromJobPayload(
+                        credentialId: payload.credentialId,
+                        publicKey: payload.publicKey,
+                        privateKey: payload.privateKey,
+                        clientDataJSON: payload.clientDataJSON,
+                        attestationObject: payload.attestationObject,
+                        authenticatorData: payload.authenticatorData,
+                        algorithm: payload.algorithm,
+                        transports: payload.transports,
+                        userId: payload.userId
+                    ) else { continue }
+
+                    let websites = payload.websites ?? ["https://\(payload.rpId)"]
+                    let recordData = RecordData(
+                        title: payload.title ?? payload.rpName,
+                        username: payload.userName,
+                        password: "",
+                        passwordUpdatedAt: 0,
+                        passkeyCreatedAt: Int64(payload.createdAt),
+                        credential: credential,
+                        note: payload.note ?? "",
+                        websites: websites,
+                        customFields: [],
+                        attachments: []
+                    )
+                    let record = VaultRecord(
+                        id: payload.recordId,
+                        version: 1,
+                        type: "login",
+                        vaultId: job.vaultId,
+                        data: recordData,
+                        isFavorite: false,
+                        createdAt: Int64(payload.createdAt),
+                        updatedAt: Int64(job.updatedAt),
+                        folder: payload.folder
+                    )
+                    pendingPasskeys.append(record)
+                    NSLog("CredentialsListView: Added pending ADD_PASSKEY job \(job.id) as passkey credential")
+
+                case .updatePasskey(let payload):
+                    guard let credential = passkeyCredentialFromJobPayload(
+                        credentialId: payload.credentialId,
+                        publicKey: payload.publicKey,
+                        privateKey: payload.privateKey,
+                        clientDataJSON: payload.clientDataJSON,
+                        attestationObject: payload.attestationObject,
+                        authenticatorData: payload.authenticatorData,
+                        algorithm: payload.algorithm,
+                        transports: payload.transports,
+                        userId: payload.userId
+                    ) else { continue }
+
+                    // Find the existing record in vault and augment it with the pending passkey
+                    if let existingRecord = existingRecords.first(where: { $0.id == payload.existingRecordId }),
+                       let existingData = existingRecord.data {
+                        let augmentedData = RecordData(
+                            title: existingData.title,
+                            username: existingData.username,
+                            password: existingData.password,
+                            passwordUpdatedAt: existingData.passwordUpdatedAt,
+                            passkeyCreatedAt: Int64(payload.createdAt),
+                            credential: credential,
+                            note: existingData.note,
+                            websites: existingData.websites,
+                            customFields: existingData.customFields,
+                            attachments: existingData.attachments
+                        )
+                        let augmentedRecord = VaultRecord(
+                            id: existingRecord.id,
+                            version: existingRecord.version,
+                            type: existingRecord.type,
+                            vaultId: existingRecord.vaultId,
+                            data: augmentedData,
+                            isFavorite: existingRecord.isFavorite,
+                            createdAt: existingRecord.createdAt,
+                            updatedAt: existingRecord.updatedAt,
+                            folder: existingRecord.folder
+                        )
+                        pendingPasskeys.append(augmentedRecord)
+                    } else {
+                        // Existing record not found in vault — create a standalone entry
+                        let websites = ["https://\(payload.rpId)"]
+                        let recordData = RecordData(
+                            title: payload.rpName,
+                            username: payload.userName,
+                            password: "",
+                            passwordUpdatedAt: 0,
+                            passkeyCreatedAt: Int64(payload.createdAt),
+                            credential: credential,
+                            note: payload.note ?? "",
+                            websites: websites,
+                            customFields: [],
+                            attachments: []
+                        )
+                        let record = VaultRecord(
+                            id: payload.existingRecordId,
+                            version: 1,
+                            type: "login",
+                            vaultId: payload.vaultId,
+                            data: recordData,
+                            isFavorite: false,
+                            createdAt: Int64(payload.createdAt),
+                            updatedAt: Int64(job.updatedAt),
+                            folder: nil
+                        )
+                        pendingPasskeys.append(record)
+                    }
+                    NSLog("CredentialsListView: Added pending UPDATE_PASSKEY job \(job.id) as passkey credential")
+                }
+            }
+
+            NSLog("CredentialsListView: Found \(pendingPasskeys.count) pending passkey(s) from job queue")
+            return pendingPasskeys
+        } catch {
+            NSLog("CredentialsListView: Failed to read pending jobs: \(error.localizedDescription)")
+            return []
+        }
+    }
+
+    /// Converts job payload passkey fields into a PasskeyCredential object.
+    private func passkeyCredentialFromJobPayload(
+        credentialId: String,
+        publicKey: String,
+        privateKey: String,
+        clientDataJSON: String,
+        attestationObject: String,
+        authenticatorData: String,
+        algorithm: Int,
+        transports: [String],
+        userId: String
+    ) -> PasskeyCredential? {
+        guard let privateKeyData = Data(base64URLEncoded: privateKey) else {
+            NSLog("CredentialsListView: Failed to decode private key from job payload")
+            return nil
+        }
+
+        return PasskeyCredential.create(
+            credentialId: credentialId,
+            response: PasskeyResponse(
+                clientDataJSON: clientDataJSON,
+                attestationObject: attestationObject,
+                authenticatorData: authenticatorData,
+                publicKey: publicKey,
+                publicKeyAlgorithm: algorithm,
+                transports: transports
+            ),
+            privateKeyBuffer: privateKeyData,
+            userId: userId
+        )
     }
 
     /// Parse records into passwords and passkeys based on their structure
@@ -342,8 +532,20 @@ struct CredentialsListView: View {
                 // Don't continue - also parse as password credential if it has username/password
             }
 
+            // Skip folder records - they have no title and no type
+            if recordData.title.isEmpty && recordData.websites.isEmpty && recordData.username.isEmpty && recordData.password.isEmpty {
+                print("CredentialsListView: Skipping folder/empty record: \(record.id)")
+                continue
+            }
+
+            // Skip records without title
+            guard !recordData.title.isEmpty else {
+                print("CredentialsListView: Skipping record without title: \(record.id)")
+                continue
+            }
+
             // Also parse as a password credential
-            let name = recordData.title.isEmpty ? "Unknown" : recordData.title
+            let name = recordData.title
             let username = recordData.username
             let password = recordData.password
             let websites = recordData.websites

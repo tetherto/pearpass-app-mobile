@@ -20,7 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 const MenuItem = ({ label, icon: Icon, onPress }) => (
   <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-    <Icon size="20" color={colors.grey100.mode1} />
+    {Icon && <Icon size="20" color={colors.grey100.mode1} />}
     <Text style={styles.menuItemText}>{label}</Text>
   </TouchableOpacity>
 )

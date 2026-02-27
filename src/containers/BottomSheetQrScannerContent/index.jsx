@@ -19,6 +19,11 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
   const { t } = useLingui()
   const { setShouldBypassAutoLock } = useAutoLockContext()
 
+  useEffect(() => {
+    setShouldBypassAutoLock(true)
+    return () => setShouldBypassAutoLock(false)
+  }, [])
+
   const {
     hasPermission,
     isScanning,
@@ -37,12 +42,7 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
   })
 
   const handleRequestPermission = async () => {
-    setShouldBypassAutoLock(true)
-    try {
-      await requestPermission()
-    } finally {
-      setShouldBypassAutoLock(false)
-    }
+    await requestPermission()
   }
 
   useEffect(() => {
@@ -89,12 +89,7 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
             </CameraView>
             <ButtonSecondary
               onPress={async () => {
-                setShouldBypassAutoLock(true)
-                try {
-                  await pickImageForScan()
-                } finally {
-                  setShouldBypassAutoLock(false)
-                }
+                await pickImageForScan()
               }}
               stretch
             >

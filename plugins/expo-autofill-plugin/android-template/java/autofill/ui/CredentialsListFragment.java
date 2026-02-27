@@ -16,11 +16,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pears.pass.R;
 import com.pears.pass.autofill.data.CredentialItem;
 import com.pears.pass.autofill.data.PearPassVaultClient;
+import com.pears.pass.autofill.jobs.AddPasskeyPayload;
+import com.pears.pass.autofill.jobs.Job;
+import com.pears.pass.autofill.jobs.JobEncryption;
+import com.pears.pass.autofill.jobs.JobFileManager;
+import com.pears.pass.autofill.jobs.UpdatePasskeyPayload;
 import com.pears.pass.autofill.utils.SecureLog;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class CredentialsListFragment extends BaseAutofillFragment {
@@ -162,13 +169,8 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 }
             }
 
-            // If we have matching credentials, show only those; otherwise show all
-            if (!matchingCredentials.isEmpty()) {
-                filtered = matchingCredentials;
-                SecureLog.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
-            } else {
-                SecureLog.d(TAG, "No matching credentials found, showing all " + allCredentials.size() + " credentials");
-            }
+            filtered = matchingCredentials;
+            SecureLog.d(TAG, "Filtered to " + matchingCredentials.size() + " credentials matching domain/package");
         }
         // If hasUserSearched is true and query is empty, show all credentials (no filtering)
 
@@ -251,12 +253,26 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
                 List<CredentialItem> parsedCredentials = parseCredentials(records);
 
+                // Load pending passkeys from job queue (not yet processed by main app)
+                List<CredentialItem> pendingPasskeys = loadPendingPasskeysFromJobs(parsedCredentials);
+                if (!pendingPasskeys.isEmpty()) {
+                    // Build set of IDs from pending passkeys to remove stale DB versions
+                    Set<String> pendingPasskeyIds = new HashSet<>();
+                    for (CredentialItem pending : pendingPasskeys) {
+                        pendingPasskeyIds.add(pending.getId());
+                    }
+                    // Remove DB credentials that have a pending job (job version is newer or augmented with passkey)
+                    parsedCredentials.removeIf(item -> pendingPasskeyIds.contains(item.getId()));
+                    parsedCredentials.addAll(pendingPasskeys);
+                }
+
                 // Update UI on main thread
+                final List<CredentialItem> finalCredentials = parsedCredentials;
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        this.allCredentials = parsedCredentials;
+                        this.allCredentials = finalCredentials;
                         this.isLoading = false;
-                        SecureLog.d(TAG, "Loaded " + parsedCredentials.size() + " credentials from activated vault");
+                        SecureLog.d(TAG, "Loaded " + finalCredentials.size() + " credentials from activated vault");
 
                         // Hide loading indicator
                         if (loadingIndicator != null) {
@@ -303,6 +319,168 @@ public class CredentialsListFragment extends BaseAutofillFragment {
     }
 
     /**
+     * Load pending passkey creation jobs from the encrypted job file and convert them
+     * to CredentialItem objects so they can be used for passkey assertion before the main
+     * app processes the job queue.
+     */
+    @SuppressWarnings("unchecked")
+    private List<CredentialItem> loadPendingPasskeysFromJobs(List<CredentialItem> existingCredentials) {
+        List<CredentialItem> pendingPasskeys = new ArrayList<>();
+
+        if (getActivity() == null || vaultClient == null) {
+            return pendingPasskeys;
+        }
+
+        JobFileManager jobFileManager = new JobFileManager(getActivity());
+        if (!jobFileManager.jobFileExists()) {
+            return pendingPasskeys;
+        }
+
+        // Get hashed password from vault's masterEncryption
+        byte[] hashedPasswordBytes = null;
+        try {
+            Map<String, Object> masterEncryptionData = vaultClient.vaultsGet("masterEncryption").get();
+            String hashedPasswordHex = (String) masterEncryptionData.get("hashedPassword");
+            if (hashedPasswordHex == null || hashedPasswordHex.isEmpty()) {
+                SecureLog.d(TAG, "No hashed password available for job file decryption");
+                return pendingPasskeys;
+            }
+            hashedPasswordBytes = JobEncryption.hexToBytes(hashedPasswordHex);
+
+            // Build set of existing record IDs that already have passkeys
+            Set<String> existingPasskeyIds = new HashSet<>();
+            for (CredentialItem item : existingCredentials) {
+                if (item.hasPasskey()) {
+                    existingPasskeyIds.add(item.getId());
+                }
+            }
+
+            List<Job> jobs = jobFileManager.readJobs(hashedPasswordBytes);
+
+            for (Job job : jobs) {
+                if (job.getStatus() != Job.JobStatus.PENDING && job.getStatus() != Job.JobStatus.IN_PROGRESS) {
+                    continue;
+                }
+
+                try {
+                    if (job.getType() == Job.JobType.ADD_PASSKEY) {
+                        AddPasskeyPayload payload = AddPasskeyPayload.fromJSON(job.getPayload());
+
+                        // Skip if a record with this ID already has a passkey in the vault
+                        if (existingPasskeyIds.contains(payload.getRecordId())) {
+                            continue;
+                        }
+
+                        // Build credential map matching the vault record format
+                        Map<String, Object> credentialMap = buildCredentialMapFromPayload(
+                                payload.getCredentialId(), payload.getPublicKey(), payload.getPrivateKey(),
+                                payload.getClientDataJSON(), payload.getAttestationObject(),
+                                payload.getAuthenticatorData(), payload.getAlgorithm(),
+                                payload.getTransports(), payload.getUserId()
+                        );
+
+                        List<String> websites = payload.getWebsites();
+                        if (websites == null || websites.isEmpty()) {
+                            websites = new ArrayList<>();
+                            websites.add("https://" + payload.getRpId());
+                        }
+
+                        String title = payload.getTitle() != null ? payload.getTitle() : payload.getRpName();
+
+                        pendingPasskeys.add(new CredentialItem(
+                                payload.getRecordId(), title, payload.getUserName(), "",
+                                websites, true, payload.getCreatedAt(), credentialMap,
+                                payload.getPrivateKey(), payload.getUserId(), payload.getCredentialId()
+                        ));
+                        SecureLog.d(TAG, "Added pending ADD_PASSKEY job " + job.getId() + " as passkey credential");
+
+                    } else if (job.getType() == Job.JobType.UPDATE_PASSKEY) {
+                        UpdatePasskeyPayload payload = UpdatePasskeyPayload.fromJSON(job.getPayload());
+
+                        // Build credential map
+                        Map<String, Object> credentialMap = buildCredentialMapFromPayload(
+                                payload.getCredentialId(), payload.getPublicKey(), payload.getPrivateKey(),
+                                payload.getClientDataJSON(), payload.getAttestationObject(),
+                                payload.getAuthenticatorData(), payload.getAlgorithm(),
+                                payload.getTransports(), payload.getUserId()
+                        );
+
+                        // Try to find existing record to get its title/username/websites
+                        String title = payload.getRpName();
+                        String username = payload.getUserName();
+                        List<String> websites = new ArrayList<>();
+                        websites.add("https://" + payload.getRpId());
+
+                        for (CredentialItem existing : existingCredentials) {
+                            if (existing.getId().equals(payload.getExistingRecordId())) {
+                                title = existing.getTitle();
+                                username = existing.getUsername();
+                                if (existing.getWebsites() != null && !existing.getWebsites().isEmpty()) {
+                                    websites = existing.getWebsites();
+                                }
+                                break;
+                            }
+                        }
+
+                        pendingPasskeys.add(new CredentialItem(
+                                payload.getExistingRecordId(), title, username, "",
+                                websites, true, payload.getCreatedAt(), credentialMap,
+                                payload.getPrivateKey(), payload.getUserId(), payload.getCredentialId()
+                        ));
+                        SecureLog.d(TAG, "Added pending UPDATE_PASSKEY job " + job.getId() + " as passkey credential");
+                    }
+                } catch (Exception e) {
+                    SecureLog.e(TAG, "Failed to parse job payload for job " + job.getId() + ": " + e.getMessage());
+                }
+            }
+
+            SecureLog.d(TAG, "Found " + pendingPasskeys.size() + " pending passkey(s) from job queue");
+        } catch (Exception e) {
+            SecureLog.e(TAG, "Failed to read pending jobs: " + e.getMessage());
+        } finally {
+            if (hashedPasswordBytes != null) {
+                JobEncryption.secureZero(hashedPasswordBytes);
+            }
+        }
+
+        return pendingPasskeys;
+    }
+
+    /**
+     * Build a credential map from job payload fields, matching the vault record format
+     * expected by CredentialItem and PasskeyCredential.
+     */
+    private Map<String, Object> buildCredentialMapFromPayload(
+            String credentialId, String publicKey, String privateKey,
+            String clientDataJSON, String attestationObject, String authenticatorData,
+            int algorithm, List<String> transports, String userId) {
+        Map<String, Object> credentialMap = new java.util.HashMap<>();
+        credentialMap.put("id", credentialId);
+        credentialMap.put("rawId", credentialId);
+        credentialMap.put("type", "public-key");
+        credentialMap.put("_privateKeyBuffer", privateKey);
+        credentialMap.put("_userId", userId);
+        credentialMap.put("authenticatorAttachment", "platform");
+
+        Map<String, Object> responseMap = new java.util.HashMap<>();
+        responseMap.put("clientDataJSON", clientDataJSON);
+        responseMap.put("attestationObject", attestationObject);
+        responseMap.put("authenticatorData", authenticatorData);
+        responseMap.put("publicKey", publicKey);
+        responseMap.put("publicKeyAlgorithm", algorithm);
+        responseMap.put("transports", transports);
+        credentialMap.put("response", responseMap);
+
+        Map<String, Object> clientExtResults = new java.util.HashMap<>();
+        Map<String, Object> credProps = new java.util.HashMap<>();
+        credProps.put("rk", true);
+        clientExtResults.put("credProps", credProps);
+        credentialMap.put("clientExtensionResults", clientExtResults);
+
+        return credentialMap;
+    }
+
+    /**
      * Parse credentials from vault records
      */
     @SuppressWarnings("unchecked")
@@ -323,12 +501,19 @@ public class CredentialsListFragment extends BaseAutofillFragment {
                 recordData = record;
             }
 
+            // Skip folder records - they have "folder" field but no "title"/"type"
+            if (recordData.containsKey("folder") && !recordData.containsKey("title") && !recordData.containsKey("type")) {
+                SecureLog.d(TAG, "Skipping folder record: " + id);
+                continue;
+            }
+
             String name = (String) recordData.get("title");
             if (name == null) {
                 name = (String) recordData.get("name");
             }
-            if (name == null) {
-                name = "Unknown";
+            if (name == null || name.isEmpty()) {
+                SecureLog.d(TAG, "Skipping record without valid title/name: " + id);
+                continue;
             }
 
             String username = (String) recordData.get("username");
