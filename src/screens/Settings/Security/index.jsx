@@ -74,7 +74,7 @@ export const Security = () => {
       {
         name: 'haptics',
         label: t`Haptic feedback`,
-        description: t`Enable vibration feedback when interacting with the app.`,
+        description: t`Meaningful haptics for important actions`,
         testIDOn: 'haptics-toggle-on',
         testIDOff: 'haptics-toggle-off',
         accessibilityLabelOn: t`Haptic feedback enabled`,
