@@ -16,7 +16,21 @@ jest.mock('pearpass-lib-ui-react-native-components', () => ({
 }))
 
 jest.mock('pearpass-lib-vault', () => ({
-  getDefaultFavicon: jest.fn()
+  getDefaultFavicon: jest.fn(),
+  useFavicon: jest.fn(({ url }) => {
+    const { getDefaultFavicon } = require('pearpass-lib-vault')
+    const { extractDomainName } = require('../../utils/extractDomainName')
+
+    if (!url) return { faviconSrc: null }
+
+    const domain = extractDomainName(url)
+    const buffer = getDefaultFavicon(domain)
+
+    if (!buffer) return { faviconSrc: null }
+
+    const base64 = buffer.toString('base64')
+    return { faviconSrc: `data:image/png;base64,${base64}` }
+  })
 }))
 
 jest.mock('../../utils/extractDomainName', () => ({
