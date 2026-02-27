@@ -3,7 +3,7 @@
     "name": "PearPass",
     "slug": "pearpass",
     "icon": "./assets/images/appIcons/app-icon.png",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "android": {
       "package": "com.pears.pass",
       "permissions": [
@@ -115,7 +115,7 @@
       }]
     ],
     "extra": {
-      "appVersion": "1.5.0",
+      "appVersion": "1.6.0",
       "eas": {
         "projectId": "28facb62-e2a2-4b6c-bc3f-0f5469e79415",
         "build": {
