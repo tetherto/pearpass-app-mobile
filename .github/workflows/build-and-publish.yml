@@ -192,18 +192,18 @@ jobs:
           path: ${{ steps.find_android.outputs.APK_PATH }}
           if-no-files-found: error
 
-      - name: Submit to Google play via EAS
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EXPO_GOOGLE_SERVICE_ACCOUNT_KEY_PATH: "${{ env.GITHUB_WORKSPACE }}/google-service-account.json"
-          CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
-          GOOGLE_PLAY_KEYSTORE: ${{ secrets.GOOGLE_PLAY_KEYSTORE }}
-        # run: |
-        #   if [ -n "${{ steps.find_android.outputs.AAB_PATH }}" ]; then
-        #     eas submit -p android --path ${{ steps.find_android.outputs.AAB_PATH }} --non-interactive
-        #   else
-        #     echo "No AAB found; skipping Android submit."
-        #   fi
+      # - name: Submit to Google play via EAS
+      #   env:
+      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      #     EXPO_GOOGLE_SERVICE_ACCOUNT_KEY_PATH: "${{ env.GITHUB_WORKSPACE }}/google-service-account.json"
+      #     CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
+      #     GOOGLE_PLAY_KEYSTORE: ${{ secrets.GOOGLE_PLAY_KEYSTORE }}
+      #   run: |
+      #     if [ -n "${{ steps.find_android.outputs.AAB_PATH }}" ]; then
+      #       eas submit -p android --path ${{ steps.find_android.outputs.AAB_PATH }} --non-interactive
+      #     else
+      #       echo "No AAB found; skipping Android submit."
+      #     fi
 
   ios:
     runs-on: macos-latest
@@ -306,21 +306,21 @@ jobs:
           if-no-files-found: error
 
       # CHANGED: Submit to App Store only on main
-      - name: Submit to Apple App Store via EAS
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          APPLE_APIKEY: ${{ secrets.APPLE_APIKEY }}
-          EXPO_ASC_API_KEY_PATH: "${{ env.GITHUB_WORKSPACE }}/apple-asc-api-key.p8"
-          EXPO_ASC_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-          EXPO_ASC_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
-          EXPO_APPLE_TEAM_ID: "43QFHSJ5QR"
-          EXPO_APPLE_TEAM_TYPE: "COMPANY_OR_ORGANIZATION"
-          CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
-          APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
-          APPLE_DISTRIBUTION_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
-        # run: |
-        #   echo $APPLE_APIKEY | base64 -d > apple-asc-api-key.p8
-        #   eas submit -p ios --path ${{ steps.find_ipa.outputs.IPA_PATH }} --non-interactive
+      # - name: Submit to Apple App Store via EAS
+      #   env:
+      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      #     APPLE_APIKEY: ${{ secrets.APPLE_APIKEY }}
+      #     EXPO_ASC_API_KEY_PATH: "${{ env.GITHUB_WORKSPACE }}/apple-asc-api-key.p8"
+      #     EXPO_ASC_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      #     EXPO_ASC_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+      #     EXPO_APPLE_TEAM_ID: "43QFHSJ5QR"
+      #     EXPO_APPLE_TEAM_TYPE: "COMPANY_OR_ORGANIZATION"
+      #     CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
+      #     APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
+      #     APPLE_DISTRIBUTION_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
+      #   run: |
+      #     echo $APPLE_APIKEY | base64 -d > apple-asc-api-key.p8
+      #     eas submit -p ios --path ${{ steps.find_ipa.outputs.IPA_PATH }} --non-interactive
 
   mobile_release:
     name: Create unified Mobile release (IPA & AAB)
