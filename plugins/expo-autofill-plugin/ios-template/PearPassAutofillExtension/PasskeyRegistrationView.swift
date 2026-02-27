@@ -294,14 +294,8 @@ struct PasskeyRegistrationView: View {
                 await MainActor.run {
                     self.loadedFolders = folders
                     self.matchingRecords = matches
-                    if matches.isEmpty {
-                        // No matches — go directly to form
-                        self.selectedExistingRecord = nil
-                        self.currentStep = .editingForm
-                    } else {
-                        // Show selection screen
-                        self.currentStep = .selectingExisting
-                    }
+                    // Always show selection screen so user can search or create new
+                    self.currentStep = .selectingExisting
                 }
             } catch {
                 await MainActor.run {

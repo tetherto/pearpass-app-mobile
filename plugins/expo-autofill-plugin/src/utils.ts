@@ -42,7 +42,7 @@ export async function copyAndProcessSourceFiles(
       let content = await fs.promises.readFile(srcPath, 'utf-8');
 
       for (const templatePackage of templatePackages) {
-        const escapeRegex = (s: string) => s.replace(/\./g, '\\.');
+        const escapeRegex = (s: string) => s.replace(/[\\.*+?^${}()|[\]]/g, '\\$&');
         const templateEscaped = escapeRegex(templatePackage);
 
         // Replace package declarations

@@ -32,7 +32,7 @@ export const CreateCustomField = ({
     //   icon: ImageIcon
     // },
     {
-      name: t`Note`,
+      name: t`Comment`,
       type: 'note',
       icon: CommonFileIcon
     }

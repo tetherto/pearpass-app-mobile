@@ -43,7 +43,7 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
   return (
     <>
       {!!values?.note.length && (
-        <PressableNote label={t`Note`} text={values.note} />
+        <PressableNote label={t`Comment`} text={values.note} />
       )}
 
       {hasAttachments && (
