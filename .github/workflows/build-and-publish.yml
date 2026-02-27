@@ -6,6 +6,9 @@ on:
       - main
       - staging
 
+permissions:
+  contents: read
+  actions: write
 
 jobs:
   android:
@@ -327,6 +330,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
     needs: [android, ios]
     if: github.ref == 'refs/heads/main'
     steps:

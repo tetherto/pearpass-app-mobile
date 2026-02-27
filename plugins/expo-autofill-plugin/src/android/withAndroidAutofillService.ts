@@ -62,6 +62,9 @@ preBuild.dependsOn copyAutofillBundle
   });
 
   // Add lazysodium-android + JNA dependencies for job queue encryption (crypto_secretbox)
+  // NOTE: We use lazysodium-android:5.1.0 for Java API (Java 17 compatible) but exclude its
+  // bundled libsodium.so (4KB page-aligned) and instead ship 16KB-aligned .so files from 5.2.0
+  // in android-template/jniLibs/ to comply with Google Play's 16KB page size requirement.
   config = withAppBuildGradle(config, (cfg) => {
     if (!cfg.modResults.contents.includes('lazysodium-android')) {
       const dependenciesIndex = cfg.modResults.contents.indexOf('dependencies {');
@@ -77,6 +80,19 @@ preBuild.dependsOn copyAutofillBundle
           cfg.modResults.contents.slice(insertIndex);
       }
     }
+
+    // Exclude 4KB-aligned libsodium.so from the AAR; our 16KB-aligned copies take precedence
+    if (!cfg.modResults.contents.includes("pickFirsts += ['**/libsodium.so']")) {
+      const packagingBlock = `
+android {
+    packagingOptions {
+        jniLibs.pickFirsts += ['**/libsodium.so']
+    }
+}
+`;
+      cfg.modResults.contents += packagingBlock;
+    }
+
     return cfg;
   });
 
@@ -144,6 +160,25 @@ preBuild.dependsOn copyAutofillBundle
         const srcPath = path.join(valuesSrcDir, file);
         const destPath = path.join(valuesDestDir, file);
         await fs.promises.copyFile(srcPath, destPath);
+      }
+    }
+
+    // Copy 16KB-aligned libsodium.so native libs to jniLibs
+    const jniLibsSrcDir = path.join(templateDir, 'jniLibs');
+    if (fs.existsSync(jniLibsSrcDir)) {
+      const jniLibsDestDir = path.join(androidDir, 'app/src/main/jniLibs');
+      const arches = await fs.promises.readdir(jniLibsSrcDir);
+      for (const arch of arches) {
+        const archSrc = path.join(jniLibsSrcDir, arch);
+        const archDest = path.join(jniLibsDestDir, arch);
+        const stat = await fs.promises.stat(archSrc);
+        if (stat.isDirectory()) {
+          await fs.promises.mkdir(archDest, { recursive: true });
+          const files = await fs.promises.readdir(archSrc);
+          for (const file of files) {
+            await fs.promises.copyFile(path.join(archSrc, file), path.join(archDest, file));
+          }
+        }
       }
     }
 

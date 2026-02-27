@@ -46,7 +46,7 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string(),
@@ -172,7 +172,7 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
             <FormGroup>
               <TextArea
                 {...register('note')}
-                placeholder={t`Write a note...`}
+                placeholder={t`Write a comment...`}
               />
             </FormGroup>
 

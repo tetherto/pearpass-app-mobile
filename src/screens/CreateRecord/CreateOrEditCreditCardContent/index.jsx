@@ -61,7 +61,7 @@ export const CreateOrEditCreditCardContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string(),
