@@ -8,6 +8,7 @@ import { VAULT_ACTION } from '../../constants/vaultActions'
 import { ModifyVaultModalContent } from '../../containers/Modal/ModifyVaultModalContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useModal } from '../../context/ModalContext'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
 /**
  *
@@ -21,8 +22,10 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
   const { openModal } = useModal()
+  const { hapticButtonPrimary } = useHapticFeedback()
 
   const handleName = () => {
+    hapticButtonPrimary()
     collapse()
     openModal(
       <ModifyVaultModalContent
@@ -34,6 +37,7 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
   }
 
   const handlePassword = () => {
+    hapticButtonPrimary()
     collapse()
     openModal(
       <ModifyVaultModalContent

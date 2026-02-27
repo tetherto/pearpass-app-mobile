@@ -43,6 +43,7 @@ import {
 import { readFileContent } from './utils/readFileContent'
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
 import { ButtonLittle } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 import { settingsStyles } from '../styles'
@@ -127,6 +128,7 @@ export const ImportSection = () => {
   const { t } = useLingui()
   const { setShouldBypassAutoLock } = useAutoLockContext()
   const { createRecord } = useCreateRecord()
+  const { hapticButtonSecondary } = useHapticFeedback()
 
   const [kdbxPasswordModal, setKdbxPasswordModal] = useState({
     visible: false,
@@ -308,12 +310,13 @@ export const ImportSection = () => {
           {importOptions.map((option) => (
             <ImportOptionItem
               key={option.imgKey}
-              onPress={() =>
+              onPress={() => {
+                hapticButtonSecondary()
                 handleFileChange({
                   type: option.type,
                   accepts: option.accepts
                 })
-              }
+              }}
             >
               {option.imgKey ? (
                 <ImportOptionImage source={images[option.imgKey]} />
