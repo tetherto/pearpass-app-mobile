@@ -214,6 +214,9 @@ export const CreateOrEditCreditCardContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Title field"
+                inputAccessibilityLabel="Title input field"
+                testID="title-field-input"
                 label={t`Title`}
                 placeholder={t`No title`}
                 variant="outline"
@@ -222,6 +225,9 @@ export const CreateOrEditCreditCardContent = ({
             </FormGroup>
             <FormGroup>
               <InputField
+                accessibilityLabel="Name on card field"
+                inputAccessibilityLabel="Name on card input field"
+                testID="name-on-card-input-field"
                 icon={UserIcon}
                 label={t`Name on card`}
                 placeholder={t`John Smith`}
@@ -229,6 +235,9 @@ export const CreateOrEditCreditCardContent = ({
                 {...register('name')}
               />
               <InputField
+                accessibilityLabel="Number on card field"
+                inputAccessibilityLabel="Number on card input field"
+                testID="number-on-card-input-field"
                 icon={CreditCardIcon}
                 type="numeric"
                 label={t`Number on card`}
@@ -239,6 +248,9 @@ export const CreateOrEditCreditCardContent = ({
               />
 
               <InputField
+                accessibilityLabel="Date of expire field"
+                inputAccessibilityLabel="Date of expire input field"
+                testID="date-of-expire-input-field"
                 icon={CalendarIcon}
                 label={t`Date of expire`}
                 type="numeric"
@@ -248,6 +260,9 @@ export const CreateOrEditCreditCardContent = ({
                 onChange={handleExpireDateChange}
               />
               <PasswordField
+                accessibilityLabel="Security code field"
+                inputAccessibilityLabel="Security doe input field"
+                testID="security-code-input-field"
                 type="numeric"
                 icon={CreditCardIcon}
                 label={t`Security code`}
@@ -256,6 +271,9 @@ export const CreateOrEditCreditCardContent = ({
                 {...register('securityCode')}
               />
               <PasswordField
+                accessibilityLabel="Pin code field"
+                inputAccessibilityLabel="Pin code input field"
+                testID="pin-code-input-field"
                 type="numeric"
                 icon={NineDotsIcon}
                 label={t`Pin code`}
@@ -290,7 +308,12 @@ export const CreateOrEditCreditCardContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote {...register('note')} />
+              <InputFieldNote
+                accessibilityLabel="Note field"
+                inputAccessibilityLabel="Note input field"
+                testID="note-input-field"
+                {...register('note')}
+              />
             </FormGroup>
 
             <CustomFields

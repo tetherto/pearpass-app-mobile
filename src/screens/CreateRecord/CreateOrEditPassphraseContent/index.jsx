@@ -141,6 +141,9 @@ export const CreateOrEditPassphraseContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Application name field"
+                inputAccessibilityLabel="Application name input field"
+                testID="application-name-input-field"
                 label={t`Application`}
                 placeholder={t`Insert Application name`}
                 variant="outline"
@@ -155,7 +158,14 @@ export const CreateOrEditPassphraseContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote
+                accessibilityLabel="Note field"
+                inputAccessibilityLabel="Note input field"
+                testID="note-input-field"
+                isFirst
+                isLast
+                {...register('note')}
+              />
             </FormGroup>
 
             <CustomFields

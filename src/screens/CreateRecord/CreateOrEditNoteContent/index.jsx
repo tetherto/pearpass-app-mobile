@@ -163,6 +163,9 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Title field"
+                inputAccessibilityLabel="Title input field"
+                testID="title-input-field"
                 label={t`Title`}
                 placeholder={t`No title`}
                 variant="outline"
@@ -171,6 +174,9 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
             </FormGroup>
             <FormGroup>
               <TextArea
+                accessibilityLabel="Add note field"
+                inputAccessibilityLabel="Add note input field"
+                testID="add-note"
                 {...register('note')}
                 placeholder={t`Write a comment...`}
               />

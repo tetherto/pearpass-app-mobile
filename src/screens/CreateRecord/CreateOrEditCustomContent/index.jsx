@@ -161,6 +161,9 @@ export const CreateOrEditCustomContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Title field"
+                inputAccessibilityLabel="Title input field"
+                testID="title-input-field"
                 label={t`Title`}
                 placeholder={t`No title`}
                 variant="outline"
