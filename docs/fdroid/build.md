@@ -43,3 +43,6 @@ Expected output path (Gradle default):
 
 - `android/app/build/outputs/apk/fdroid/release/app-fdroid-release.apk`
 
+## Feature differences (current)
+
+- `fdroid`: excludes `androidx.credentials:credentials-play-services-auth` from the generated Android Gradle dependencies.

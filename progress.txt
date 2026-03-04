@@ -63,3 +63,20 @@
   * None for Task 3.
 * **Next recommended step:**
   * Task 4: gate/remove Play Services-backed credentials integration for `fdroid` (MVP).
+
+* **Iteration date/time:** 2026-03-04 18:20
+* **Branch:** feat/fdroid-setup
+* **Task(s) advanced:** Task 4 — GMS credentials gating (MVP)
+* **Changes made:**
+  * Updated the Expo autofill config plugin to exclude `androidx.credentials:credentials-play-services-auth` when building with `PEARPASS_DISTRIBUTION=fdroid`.
+* **Verification run:**
+  * `npm run build-plugins`
+  * `npx expo prebuild --platform android --no-install` (standard)
+  * `PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --no-install` (fdroid)
+* **Results:**
+  * Standard prebuild includes the Play Services-backed dependency.
+  * F-Droid prebuild excludes the Play Services-backed dependency while keeping base `androidx.credentials:credentials`.
+* **Open issues / blockers:**
+  * Full APK build is still blocked by missing Bare worklet bundles in this environment.
+* **Next recommended step:**
+  * Task 5 (conditional): only implement a non-GMS fallback if runtime testing shows it is required.
