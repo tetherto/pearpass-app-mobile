@@ -12,3 +12,16 @@
 * **Next recommended step:**
   * Task 2: add a dedicated `fdroid` channel/flavor and central channel flags usable by both JS and native prebuild steps.
 
+* **Iteration date/time:** 2026-03-04 16:48
+* **Branch:** feat/fdroid-setup
+* **Task(s) advanced:** Task 1 — Compatibility audit (persist + validation)
+* **Changes made:**
+  * Committed audit artifacts and added initial `AGENTS.md`.
+* **Verification run:**
+  * `npm run lint` (triggered by git hooks)
+* **Results:**
+  * Lint passed; commit `847b9bb` created.
+* **Open issues / blockers:**
+  * None for Task 1.
+* **Next recommended step:**
+  * Task 2: introduce an `fdroid` build channel via Expo config/prebuild.
