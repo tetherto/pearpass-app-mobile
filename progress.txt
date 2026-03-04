@@ -1,0 +1,48 @@
+* **Iteration date/time:** 2026-03-04 16:45
+* **Branch:** feat/fdroid-setup
+* **Task(s) advanced:** Task 1 — Compatibility audit
+* **Changes made:**
+  * Added ADR documenting F-Droid compatibility risks around AndroidX Credentials Play Services integration and Play Store-based version-check/redirect.
+* **Verification run:**
+  * Repo-wide source audit (static): located dependency injection, native template usages, and redirect code paths.
+* **Results:**
+  * Identified `androidx.credentials:credentials-play-services-auth` injected via Expo config plugin and Play Store-only update check/redirect flow.
+* **Open issues / blockers:**
+  * No `android/` directory committed; F-Droid/Gradle flavoring must be implemented via Expo prebuild/config-plugin strategy.
+* **Next recommended step:**
+  * Task 2: add a dedicated `fdroid` channel/flavor and central channel flags usable by both JS and native prebuild steps.
+
+* **Iteration date/time:** 2026-03-04 16:48
+* **Branch:** feat/fdroid-setup
+* **Task(s) advanced:** Task 1 — Compatibility audit (persist + validation)
+* **Changes made:**
+  * Committed audit artifacts and added initial `AGENTS.md`.
+* **Verification run:**
+  * `npm run lint` (triggered by git hooks)
+* **Results:**
+  * Lint passed; commit `847b9bb` created.
+* **Open issues / blockers:**
+  * None for Task 1.
+* **Next recommended step:**
+  * Task 2: introduce an `fdroid` build channel via Expo config/prebuild.
+
+* **Iteration date/time:** 2026-03-04 18:08
+* **Branch:** feat/fdroid-setup
+* **Task(s) advanced:** Task 2 — F-Droid flavor/channel (Android)
+* **Changes made:**
+  * Added dynamic Expo config (`app.config.ts`) exporting `extra.distribution` from `PEARPASS_DISTRIBUTION`.
+  * Added Android config plugin that injects `standard` + `fdroid` product flavors when `PEARPASS_DISTRIBUTION=fdroid`.
+  * Added `src/constants/distribution.js` for channel-aware runtime logic.
+  * Added `docs/fdroid/build.md` documenting build commands and expected APK path.
+* **Verification run:**
+  * `npx expo config --json` (standard + `PEARPASS_DISTRIBUTION=fdroid`) to confirm `extra.distribution`.
+  * `npx expo prebuild --platform android --no-install` (standard) to confirm no flavors.
+  * `PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --no-install` to confirm `productFlavors` injection.
+  * `./gradlew :app:tasks --all` (with `sdk.dir` set) to confirm `assembleFdroidRelease` task exists.
+* **Results:**
+  * Standard builds remain unchanged (no flavors generated).
+  * F-Droid builds generate `fdroidRelease` variant tasks (e.g., `assembleFdroidRelease`).
+* **Open issues / blockers:**
+  * Full APK build currently fails in this environment because `bundles/app-android.bundle.js` is missing, and `npm run bundle:android` fails due to missing `bare-fetch` in the installed dependency tree.
+* **Next recommended step:**
+  * Fix the bare bundle generation/install chain so `assembleFdroidRelease` can complete, then move to Task 3 (channel-aware version check).

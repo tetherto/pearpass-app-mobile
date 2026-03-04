@@ -1,0 +1,45 @@
+# F-Droid build channel (Android)
+
+## Channel selection
+
+The build channel is selected with the `PEARPASS_DISTRIBUTION` environment variable.
+
+- `standard` (default): no Android flavors are generated.
+- `fdroid`: Android Gradle product flavors are generated (`standard`, `fdroid`).
+
+The selected channel is also exported to the app config as `extra.distribution`.
+
+## Commands
+
+### Standard Android prebuild
+
+```bash
+npx expo prebuild --platform android --no-install
+```
+
+Expected: generated `android/app/build.gradle` does not contain a `productFlavors` block.
+
+### F-Droid Android prebuild
+
+```bash
+PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --no-install
+```
+
+Expected: generated `android/app/build.gradle` contains `productFlavors { fdroid { ... } }` and an `assembleFdroidRelease` task exists.
+
+### F-Droid APK build (local)
+
+Prerequisites:
+
+- Android SDK installed and `sdk.dir` configured in `android/local.properties`.
+
+```bash
+cd android
+GRADLE_USER_HOME=/tmp/pearpass-gradle-home \
+  ./gradlew :app:assembleFdroidRelease --no-daemon -Dorg.gradle.vfs.watch=false
+```
+
+Expected output path (Gradle default):
+
+- `android/app/build/outputs/apk/fdroid/release/app-fdroid-release.apk`
+
