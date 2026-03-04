@@ -1199,8 +1199,9 @@ import Foundation
 
     // MARK: - Record Search Methods
 
-    /// Search for login records matching an rpId and username
-    /// Mirrors web extension logic: returns records where username matches OR record has no username
+    /// Search for login records matching an rpId AND username
+    /// Returns records where BOTH website AND username match
+    /// Records with BOTH empty website AND empty username are excluded
     func searchLoginRecords(rpId: String, username: String) async throws -> [VaultRecord] {
         log("Searching login records for rpId: \(rpId), username: \(username)")
 
@@ -1213,11 +1214,23 @@ import Foundation
 
             let recordUsername = data.username.trimmingCharacters(in: .whitespaces)
             let passkeyUsername = username.trimmingCharacters(in: .whitespaces)
+            let recordWebsites = data.websites
 
+            // Check if any website matches the rpId
+            let websiteMatches = recordWebsites.contains { normalizedDomainMatch($0, rpId) }
+
+            // Check if username matches (both must be non-empty)
             let usernameMatches = !passkeyUsername.isEmpty && !recordUsername.isEmpty && passkeyUsername.caseInsensitiveCompare(recordUsername) == .orderedSame
-            let hasNoUsername = recordUsername.isEmpty
 
-            if usernameMatches || hasNoUsername {
+            // Skip records with both empty website and empty username
+            let hasNoWebsites = recordWebsites.isEmpty || recordWebsites.allSatisfy { $0.trimmingCharacters(in: .whitespaces).isEmpty }
+            let hasNoUsername = recordUsername.isEmpty
+            if hasNoWebsites && hasNoUsername {
+                continue
+            }
+
+            // Include only if BOTH website AND username match
+            if websiteMatches && usernameMatches {
                 matches.append(record)
             }
         }

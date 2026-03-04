@@ -12,6 +12,8 @@ import { TextAreaComponent } from './styles'
  *  isDisabled?: boolean
  *  onClick?: () => void
  *  testID?: string
+ *  accessibilityLabel?: string
+ *  inputAccessibilityLabel?: string
  * }} props
  */
 export const TextArea = ({
@@ -20,7 +22,9 @@ export const TextArea = ({
   placeholder,
   isDisabled,
   onClick,
-  testID
+  testID,
+  accessibilityLabel,
+  inputAccessibilityLabel
 }) => {
   const [isFocused, setIsFocused] = useState(false)
 
@@ -36,7 +40,11 @@ export const TextArea = ({
   }
 
   return (
-    <TouchableOpacity onPress={handleClick} testID={testID}>
+    <TouchableOpacity
+      onPress={handleClick}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+    >
       <TextAreaComponent
         value={value}
         onChangeText={handleChangeText}
@@ -46,6 +54,7 @@ export const TextArea = ({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         testID={testID ? `${testID}-input` : undefined}
+        accessibilityLabel={inputAccessibilityLabel}
       />
     </TouchableOpacity>
   )

@@ -4,10 +4,10 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { MAX_IMPORT_RECORDS } from 'pearpass-lib-constants'
 import {
+  decryptKeepassKdbx,
   parse1PasswordData,
   parseBitwardenData,
   parseKeePassData,
-  decryptKeepassKdbx,
   parseLastPassData,
   parseNordPassData,
   parsePearPassData,
@@ -23,6 +23,7 @@ import { useBottomSheet } from 'src/context/BottomSheetContext'
 
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
 import { ButtonLittle } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 import { settingsStyles } from '../styles'
@@ -120,6 +121,7 @@ export const ImportSection = () => {
   const { createRecord } = useCreateRecord()
   const { expand, collapse } = useBottomSheet()
   const currentOptionRef = useRef(null)
+  const { hapticButtonSecondary } = useHapticFeedback()
 
   const getSnapPointsForStep = useCallback((step) => {
     switch (step) {
@@ -147,10 +149,10 @@ export const ImportSection = () => {
   )
 
   const handleFileChange = async ({ accepts }) => {
+    hapticButtonSecondary()
     setShouldBypassAutoLock(true)
     try {
       const fileInfo = await readFileContent(accepts)
-
       if (!isAllowedType(fileInfo.fileType, accepts)) {
         throw new Error('Invalid file type')
       }
@@ -321,7 +323,7 @@ export const ImportSection = () => {
                           : option.title
                       }
                       onClose={collapse}
-                      onBrowseFolder={() =>
+                      onBrowseFolder={async () =>
                         handleFileChange({
                           accepts: option.accepts
                         })

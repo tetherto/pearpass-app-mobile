@@ -29,6 +29,7 @@ import {
 import { AvatarRecord } from '../../components/AvatarRecord'
 import { BottomSheetRecordActionsContent } from '../../containers/BottomSheetRecordActionsContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { ButtonLittle } from '../../libComponents'
 
 export const RecordDetails = ({ route }) => {
@@ -42,6 +43,7 @@ export const RecordDetails = ({ route }) => {
 
   const { updateFavoriteState } = useRecords()
 
+  const { hapticButtonSecondary } = useHapticFeedback()
   const { t } = useLingui()
 
   const navigation = useNavigation()
@@ -66,6 +68,7 @@ export const RecordDetails = ({ route }) => {
         <HeaderActions>
           <TouchableOpacity
             onPress={() => {
+              hapticButtonSecondary()
               updateFavoriteState([record?.id], !record?.isFavorite)
             }}
           >
@@ -91,6 +94,7 @@ export const RecordDetails = ({ route }) => {
 
           <ButtonLittle
             startIcon={KebabMenuIcon}
+            disableHaptics
             onPress={() =>
               expand({
                 children: (

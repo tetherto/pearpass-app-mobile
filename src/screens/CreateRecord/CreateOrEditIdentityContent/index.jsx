@@ -132,7 +132,7 @@ export const CreateOrEditIdentityContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string(),
@@ -348,6 +348,9 @@ export const CreateOrEditIdentityContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Title field"
+                inputAccessibilityLabel="Title input field"
+                testID="title-input-field"
                 label={t`Title`}
                 placeholder={t`No title`}
                 variant="outline"
@@ -356,6 +359,9 @@ export const CreateOrEditIdentityContent = ({
             </FormGroup>
             <FormGroup title={t`Personal information`} isCollapse>
               <InputField
+                accessibilityLabel="Full name field"
+                inputAccessibilityLabel="Full name input field"
+                testID="full-name-input-field"
                 icon={UserIcon}
                 label={t`Full name`}
                 placeholder={t`John Smith`}
@@ -363,6 +369,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('fullName')}
               />
               <InputField
+                accessibilityLabel="Email field"
+                inputAccessibilityLabel="Email input field"
+                testID="email-input-field"
                 type="email-address"
                 icon={EmailIcon}
                 label={t`Email`}
@@ -372,6 +381,9 @@ export const CreateOrEditIdentityContent = ({
               />
 
               <InputField
+                accessibilityLabel="Phone number field"
+                inputAccessibilityLabel="Phone number input field"
+                testID="phone-number-input-field"
                 type="numeric"
                 icon={PhoneIcon}
                 label={t`Phone number`}
@@ -382,12 +394,18 @@ export const CreateOrEditIdentityContent = ({
             </FormGroup>
             <FormGroup title={t`Detail of address`} isCollapse>
               <InputField
+                accessibilityLabel="Address field"
+                inputAccessibilityLabel="Address input field"
+                testID="address-input-field"
                 label={t`Address`}
                 placeholder={t`Insert address`}
                 variant="outline"
                 {...register('address')}
               />
               <InputField
+                accessibilityLabel="ZIP field"
+                inputAccessibilityLabel="ZIP input field"
+                testID="zip-input-field"
                 label={t`ZIP`}
                 placeholder={t`Insert ZIP`}
                 variant="outline"
@@ -395,18 +413,27 @@ export const CreateOrEditIdentityContent = ({
               />
 
               <InputField
+                accessibilityLabel="City field"
+                inputAccessibilityLabel="City input field"
+                testID="city-input-field"
                 label={t`City`}
                 placeholder={t`Insert city`}
                 variant="outline"
                 {...register('city')}
               />
               <InputField
+                accessibilityLabel="Region field"
+                inputAccessibilityLabel="Region input field"
+                testID="region-input-field"
                 label={t`Region`}
                 placeholder={t`Insert region`}
                 variant="outline"
                 {...register('region')}
               />
               <InputField
+                accessibilityLabel="Country field"
+                inputAccessibilityLabel="Country input field"
+                testID="country-input-field"
                 label={t`Country`}
                 placeholder={t`Insert country`}
                 variant="outline"
@@ -421,6 +448,9 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isPassportOpen}
             >
               <InputField
+                accessibilityLabel="Passport full name field"
+                inputAccessibilityLabel="Passport full name input field"
+                testID="passport-full-name-input-field"
                 label={t`Full name`}
                 placeholder={t`John Smith`}
                 variant="outline"
@@ -428,6 +458,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('passportFullName')}
               />
               <InputField
+                accessibilityLabel="Passport number field"
+                inputAccessibilityLabel="Passport number input field"
+                testID="passport-number-input-field"
                 label={t`Passport number`}
                 placeholder={t`Insert numbers`}
                 variant="outline"
@@ -435,6 +468,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('passportNumber')}
               />
               <InputField
+                accessibilityLabel="Passport issuing country field"
+                inputAccessibilityLabel="Passport issuing country input field"
+                testID="passport-issuing-country-input-field"
                 label={t`Issuing country`}
                 placeholder={t`Insert country`}
                 variant="outline"
@@ -442,6 +478,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('passportIssuingCountry')}
               />
               <InputField
+                accessibilityLabel="Passport date of issue field"
+                inputAccessibilityLabel="Passport date of issue input field"
+                testID="passport-date-of-issue-input-field"
                 label={t`Date of issue`}
                 placeholder={DATE_FORMAT}
                 variant="outline"
@@ -449,6 +488,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('passportDateOfIssue')}
               />
               <InputField
+                accessibilityLabel="Passport expiry date field"
+                inputAccessibilityLabel="Passport expiry date input field"
+                testID="passport-expiry-date-input-field"
                 label={t`Expiry date`}
                 placeholder={DATE_FORMAT}
                 variant="outline"
@@ -456,6 +498,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('passportExpiryDate')}
               />
               <InputField
+                accessibilityLabel="Passport nationality field"
+                inputAccessibilityLabel="Passport nationality input field"
+                testID="passport-nationality-input-field"
                 label={t`Nationality`}
                 placeholder={t`Insert your nationality`}
                 variant="outline"
@@ -463,6 +508,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('passportNationality')}
               />
               <InputField
+                accessibilityLabel="Passport date of birth field"
+                inputAccessibilityLabel="Passport date of birth input field"
+                testID="passport-date-of-birth-input-field"
                 label={t`Date of birth`}
                 placeholder={DATE_FORMAT}
                 variant="outline"
@@ -470,6 +518,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('passportDob')}
               />
               <InputField
+                accessibilityLabel="Passport gender field"
+                inputAccessibilityLabel="Passport gender input field"
+                testID="passport-gender-input-field"
                 label={t`Gender`}
                 placeholder={t`M/F`}
                 variant="outline"
@@ -496,6 +547,9 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isIdCardOpen}
             >
               <InputField
+                accessibilityLabel="ID number field"
+                inputAccessibilityLabel="ID number input field"
+                testID="id-number-input-field"
                 label={t`ID number`}
                 placeholder={'123456789'}
                 variant="outline"
@@ -503,6 +557,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('idCardNumber')}
               />
               <InputField
+                accessibilityLabel="Identity card creation date field"
+                inputAccessibilityLabel="Identity card creation date input field"
+                testID="identity-card-creation-date-input-field"
                 label={t`Creation date`}
                 placeholder={DATE_FORMAT}
                 variant="outline"
@@ -510,6 +567,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('idCardDateOfIssue')}
               />
               <InputField
+                accessibilityLabel="Identity card expiry date field"
+                inputAccessibilityLabel="Identity card expiry date input field"
+                testID="identity-card-expiry-date-input-field"
                 label={t`Expiry date`}
                 placeholder={DATE_FORMAT}
                 variant="outline"
@@ -517,6 +577,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('idCardExpiryDate')}
               />
               <InputField
+                accessibilityLabel="Identity card issuing country field"
+                inputAccessibilityLabel="Identity card issuing country input field"
+                testID="identity-card-issuing-country-input-field"
                 label={t`Issuing country`}
                 placeholder={t`Insert country`}
                 variant="outline"
@@ -542,6 +605,9 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isDrivingLicenseOpen}
             >
               <InputField
+                accessibilityLabel="Driving license ID number field"
+                inputAccessibilityLabel="Driving license ID number input field"
+                testID="driving-license-id-number-input-field"
                 label={t`ID number`}
                 placeholder={t`123456789`}
                 variant="outline"
@@ -549,6 +615,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('drivingLicenseNumber')}
               />
               <InputField
+                accessibilityLabel="Driving license creation date field"
+                inputAccessibilityLabel="Driving license creation date input field"
+                testID="driving-license-creation-date-input-field"
                 label={t`Creation date`}
                 placeholder={DATE_FORMAT}
                 variant="outline"
@@ -556,6 +625,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('drivingLicenseDateOfIssue')}
               />
               <InputField
+                accessibilityLabel="Driving license expiry date field"
+                inputAccessibilityLabel="Driving license expiry date input field"
+                testID="driving-license-expiry-date-input-field"
                 label={t`Expiry date`}
                 placeholder={DATE_FORMAT}
                 variant="outline"
@@ -563,6 +635,9 @@ export const CreateOrEditIdentityContent = ({
                 {...register('drivingLicenseExpiryDate')}
               />
               <InputField
+                accessibilityLabel="Driving license issuing country field"
+                inputAccessibilityLabel="Driving license issuing country input field"
+                testID="driving-license-issuing-country-input-field"
                 label={t`Issuing country`}
                 placeholder={t`Insert country`}
                 variant="outline"
@@ -613,7 +688,12 @@ export const CreateOrEditIdentityContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote {...register('note')} />
+              <InputFieldNote
+                accessibilityLabel="Note field"
+                inputAccessibilityLabel="Note input field"
+                testID="note-input-field"
+                {...register('note')}
+              />
             </FormGroup>
 
             <CustomFields

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -16,6 +16,7 @@ import {
   StyleSheet
 } from 'react-native'
 
+import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useKeyboardVisibility } from '../../hooks/useKeyboardVisibility'
 import {
@@ -39,6 +40,12 @@ export const LoadVault = () => {
 
   const { refetch: refetchVault, addDevice } = useVault()
   const { pairActiveVault, cancelPairActiveVault, isLoading } = usePair()
+  const { setShouldBypassAutoLock } = useAutoLockContext()
+
+  useEffect(() => {
+    setShouldBypassAutoLock(isLoading)
+    return () => setShouldBypassAutoLock(false)
+  }, [isLoading])
 
   const pairWithCode = async (code) => {
     try {

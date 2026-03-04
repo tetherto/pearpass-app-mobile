@@ -120,12 +120,12 @@ const createLoginLocators = {
     addFilePopupChooseMediaButton: '~Choose Photo / Video',
     addFilePopupChooseMediaButtonText: '//android.widget.TextView[@text="Choose Photo / Video"]',
     /* =====================================================
-        NOTE FIELD
+        COMMENT FIELD
     ===================================================== */
-    noteField: '~ Note ',
-    noteFieldIcon: '//android.view.ViewGroup[@content-desc=" Note "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    noteFieldTitle: '//android.widget.TextView[@text=" Note "]',
-    noteFieldInput: '//android.widget.EditText[@text="Add note"]',
+    noteField: '~ Comment ',
+    noteFieldIcon: '//android.view.ViewGroup[@content-desc=" Comment "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    noteFieldTitle: '//android.widget.TextView[@text=" Comment "]',
+    noteFieldInput: '//android.widget.EditText[@text="Add comment"]',
     /* =====================================================
         CUSTOM FIELD
     ===================================================== */
@@ -133,7 +133,7 @@ const createLoginLocators = {
     customFieldsIcon: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
     customFieldsIcon2: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
     customFieldsText: '//android.widget.TextView[@text="Create Custom"]',
-    customFieldsIcon3: '//android.view.ViewGroup[@content-desc="Note"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    customFieldsText2: '//android.widget.TextView[@text="Note"]',
+    customFieldsIcon3: '//android.view.ViewGroup[@content-desc="Comment"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    customFieldsText2: '//android.widget.TextView[@text="Comment"]',
 }
 export default createLoginLocators

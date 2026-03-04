@@ -391,15 +391,8 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
 
                 runOnUiThread(() -> {
                     preloadedFolders = folders;
-
-                    if (matches.isEmpty()) {
-                        // No matches, go directly to form
-                        selectedExistingRecord = null;
-                        navigateToPasskeyForm();
-                    } else {
-                        // Show existing credential selection
-                        navigateToExistingCredentialSelection(matches);
-                    }
+                    // Always show selection screen so user can search or create new
+                    navigateToExistingCredentialSelection(matches);
                 });
             } catch (Exception e) {
                 SecureLog.e(TAG, "Error searching credentials: " + e.getMessage());

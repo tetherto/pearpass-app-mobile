@@ -1,11 +1,9 @@
 import { Buffer } from 'buffer'
 
-import { useMemo } from 'react'
-
 import { generateAvatarInitials } from 'pear-apps-utils-avatar-initials'
 import { CheckIcon, StarIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { getDefaultFavicon } from 'pearpass-lib-vault'
+import { useFavicon } from 'pearpass-lib-vault'
 
 import {
   AvatarImage,
@@ -14,7 +12,6 @@ import {
   ItemImageContainer
 } from './styles'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'
-import { extractDomainName } from '../../utils/extractDomainName'
 
 global.Buffer = global.Buffer || Buffer
 
@@ -34,23 +31,7 @@ export const AvatarRecord = ({
   isSelected,
   websiteDomain
 }) => {
-  const avatarSrc = useMemo(() => {
-    if (!websiteDomain) {
-      return null
-    }
-
-    const website = extractDomainName(websiteDomain)
-
-    const avatarBuffer = getDefaultFavicon(website) || null
-
-    if (!avatarBuffer) {
-      return null
-    }
-
-    const base64 = Buffer.from(avatarBuffer).toString('base64')
-
-    return base64 ? `data:image/png;base64,${base64}` : null
-  }, [websiteDomain])
+  const { faviconSrc } = useFavicon({ url: websiteDomain })
 
   if (isSelected) {
     return (
@@ -62,10 +43,10 @@ export const AvatarRecord = ({
 
   return (
     <ItemImageContainer isSelected={isSelected} size={size}>
-      {avatarSrc ? (
+      {faviconSrc ? (
         <AvatarImage
           testID="avatar-image"
-          source={{ uri: avatarSrc }}
+          source={{ uri: faviconSrc }}
           size={size}
         />
       ) : (

@@ -17,11 +17,13 @@ import { BottomSheetBlindPeersContent } from '../../../containers/BottomSheetBli
 import { RuleSelector } from '../../../containers/BottomSheetPassGeneratorContent/RuleSelector'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useLoadingContext } from '../../../context/LoadingContext'
+import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
 
 export const BlindPeeringSection = () => {
   const { t } = useLingui()
   const { expand, collapse } = useBottomSheet()
   const { setIsLoading: setIsLoadingContext } = useLoadingContext()
+  const { hapticButtonSecondary } = useHapticFeedback()
   const [blindPeersRules, setBlindPeersRules] = useState({
     blindPeers: false
   })
@@ -176,7 +178,13 @@ export const BlindPeeringSection = () => {
               )}
             </View>
           </View>
-          <Pressable style={styles.editButton} onPress={handleEditPress}>
+          <Pressable
+            style={styles.editButton}
+            onPress={() => {
+              hapticButtonSecondary()
+              handleEditPress()
+            }}
+          >
             <EditIcon color={colors.grey500.mode1} />
             <Text style={styles.editButtonText}>{t`Edit`}</Text>
           </Pressable>

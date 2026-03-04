@@ -21,11 +21,6 @@ export const TabNavigator = () => {
 
   return (
     <Tab.Navigator
-      screenListeners={{
-        tabPress: () => {
-          hapticButtonPrimary()
-        }
-      }}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarHideOnKeyboard: true,

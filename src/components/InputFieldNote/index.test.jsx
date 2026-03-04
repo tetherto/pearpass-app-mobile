@@ -47,8 +47,8 @@ describe('InputFieldNote component', () => {
 
     const inputField = getByTestId('input-field')
     expect(inputField).toBeTruthy()
-    expect(inputField.props['data-label']).toBe('Note')
-    expect(inputField.props['data-placeholder']).toBe('Add note')
+    expect(inputField.props['data-label']).toBe('Comment')
+    expect(inputField.props['data-placeholder']).toBe('Add comment')
     expect(inputField.props['data-variant']).toBe('outline')
     expect(toJSON()).toMatchSnapshot()
   })

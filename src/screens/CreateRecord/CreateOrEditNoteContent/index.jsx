@@ -46,7 +46,7 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string(),
@@ -163,6 +163,9 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Title field"
+                inputAccessibilityLabel="Title input field"
+                testID="title-input-field"
                 label={t`Title`}
                 placeholder={t`No title`}
                 variant="outline"
@@ -171,8 +174,11 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
             </FormGroup>
             <FormGroup>
               <TextArea
+                accessibilityLabel="Add note field"
+                inputAccessibilityLabel="Add note input field"
+                testID="add-note"
                 {...register('note')}
-                placeholder={t`Write a note...`}
+                placeholder={t`Write a comment...`}
               />
             </FormGroup>
 

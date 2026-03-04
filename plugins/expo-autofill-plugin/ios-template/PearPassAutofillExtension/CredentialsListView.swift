@@ -309,9 +309,15 @@ struct CredentialsListView: View {
                     existingRecords: records
                 )
 
+                // Build set of all record IDs covered by pending jobs
+                let pendingRecordIds = Set(pendingPasskeys.map { $0.id })
+                // Filter out DB records that have a pending job (job version is newer or augmented with passkey)
+                let filteredParsedPasskeys = parsedPasskeys.filter { !pendingRecordIds.contains($0.id) }
+                let filteredParsedCredentials = parsedCredentials.filter { !pendingRecordIds.contains($0.id) }
+
                 await MainActor.run {
-                    self.credentials = parsedCredentials
-                    self.passkeyRecords = parsedPasskeys + pendingPasskeys
+                    self.credentials = filteredParsedCredentials
+                    self.passkeyRecords = filteredParsedPasskeys + pendingPasskeys
                     self.isLoading = false
                 }
 
@@ -396,9 +402,6 @@ struct CredentialsListView: View {
                     NSLog("CredentialsListView: Added pending ADD_PASSKEY job \(job.id) as passkey credential")
 
                 case .updatePasskey(let payload):
-                    // Skip if the existing record already has a passkey in the vault
-                    guard !existingRecordIds.contains(payload.existingRecordId) else { continue }
-
                     guard let credential = passkeyCredentialFromJobPayload(
                         credentialId: payload.credentialId,
                         publicKey: payload.publicKey,

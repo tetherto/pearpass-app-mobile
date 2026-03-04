@@ -49,8 +49,22 @@ export const compareVersions = (current, latest) => {
 }
 
 /**
+ * Checks if a release date is within the grace period
+ * @param {string} releaseDateString - ISO date string of the release
+ * @returns {boolean} True if the release is within the grace period
+ */
+export const isWithinGracePeriod = (releaseDateString) => {
+  if (!releaseDateString) return false
+  const releaseDate = new Date(releaseDateString)
+  if (isNaN(releaseDate.getTime())) return false
+  const hoursSinceRelease =
+    (Date.now() - releaseDate.getTime()) / (1000 * 60 * 60)
+  return hoursSinceRelease < 24
+}
+
+/**
  * Fetches latest iOS app version from iTunes API
- * @returns {Promise<string|null>}
+ * @returns {Promise<{version: string, releaseDate: string}|null>}
  */
 const getIOSVersion = async () => {
   try {
@@ -60,7 +74,9 @@ const getIOSVersion = async () => {
     const data = await response.json()
 
     if (data.resultCount > 0) {
-      return data.results[0].version
+      const { version, currentVersionReleaseDate: releaseDate } =
+        data.results[0]
+      return { version, releaseDate }
     }
     return null
   } catch (error) {
@@ -115,15 +131,34 @@ export const useVersionCheck = () => {
           Constants.expoConfig?.version ||
           Constants.expoConfig?.extra?.appVersion
 
-        const latestVersion =
-          Platform.OS === 'ios'
-            ? await getIOSVersion()
-            : await getAndroidVersion()
+        let updateNeeded = false
+
+        if (Platform.OS === 'ios') {
+          const iosResult = await getIOSVersion()
+
+          if (!isMounted) return
+
+          if (iosResult) {
+            const { version: latestVersion, releaseDate } = iosResult
+            updateNeeded =
+              compareVersions(currentVersion, latestVersion) &&
+              !isWithinGracePeriod(releaseDate)
+            setNeedsUpdate(updateNeeded)
+            setIsChecking(false)
+          } else if (retryCount < 2) {
+            retryTimer = setTimeout(() => checkVersion(retryCount + 1), 2000)
+          } else {
+            setIsChecking(false)
+          }
+          return
+        }
+
+        const latestVersion = await getAndroidVersion()
 
         if (!isMounted) return
 
         if (latestVersion) {
-          const updateNeeded = compareVersions(currentVersion, latestVersion)
+          updateNeeded = compareVersions(currentVersion, latestVersion)
           setNeedsUpdate(updateNeeded)
           setIsChecking(false)
         } else if (retryCount < 2) {

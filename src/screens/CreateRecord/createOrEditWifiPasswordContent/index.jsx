@@ -65,7 +65,7 @@ export const CreateOrEditWifiPasswordContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string()
@@ -143,6 +143,9 @@ export const CreateOrEditWifiPasswordContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Wi-Fi name field"
+                inputAccessibilityLabel="Wi-Fi name input field"
+                testID="wifi-name-input-field"
                 icon={WifiIcon}
                 label={t`Wi-Fi Name`}
                 placeholder={t`Insert Wi-Fi Name`}
@@ -154,6 +157,9 @@ export const CreateOrEditWifiPasswordContent = ({
             </FormGroup>
             <FormGroup>
               <PasswordField
+                accessibilityLabel="Wi-Fi password field"
+                inputAccessibilityLabel="Wi-Fi password input field"
+                testID="wifi-password-input-field"
                 icon={PasswordIcon}
                 label={t`Wi-Fi Password`}
                 placeholder={t`Insert Wi-Fi Password`}
@@ -185,7 +191,14 @@ export const CreateOrEditWifiPasswordContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote
+                accessibilityLabel="Note field"
+                inputAccessibilityLabel="Note input field"
+                testID="note-input-field"
+                isFirst
+                isLast
+                {...register('note')}
+              />
             </FormGroup>
 
             <CustomFields

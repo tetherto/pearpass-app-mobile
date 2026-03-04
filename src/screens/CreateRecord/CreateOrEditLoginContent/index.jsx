@@ -71,7 +71,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
     ),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string(),
@@ -369,8 +369,8 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                 isFirst
                 isLast
                 testID="add-note-field"
-                accessibilityLabel={t`Add note field`}
-                inputAccessibilityLabel={t`Add note input field`}
+                accessibilityLabel={t`Add comment field`}
+                inputAccessibilityLabel={t`Add comment input field`}
                 {...register('note')}
               />
             </FormGroup>
