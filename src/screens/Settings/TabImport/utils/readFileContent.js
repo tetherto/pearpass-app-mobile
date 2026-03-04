@@ -17,6 +17,8 @@ export const readFileContent = async (acceptedTypes) => {
       return ['text/csv', 'text/comma-separated-values']
     } else if (type === '.json') {
       return ['application/json']
+    } else if (type === '.pearpass') {
+      return ['application/json', 'application/octet-stream', '*/*']
     } else if (type === '.kdbx') {
       return ['application/octet-stream', '*/*']
     } else if (type === '.xml') {
@@ -44,7 +46,10 @@ export const readFileContent = async (acceptedTypes) => {
       })
       return {
         fileContent: base64ToArrayBuffer(base64Content),
-        fileType
+        fileType,
+        filename,
+        size: file.size,
+        isEncrypted: true
       }
     }
 
@@ -52,9 +57,22 @@ export const readFileContent = async (acceptedTypes) => {
       encoding: FileSystem.EncodingType.UTF8
     })
 
+    let isEncrypted = false
+    if (fileType === 'pearpass') {
+      try {
+        const parsed = JSON.parse(fileContent)
+        isEncrypted = parsed.encrypted === true
+      } catch {
+        isEncrypted = true
+      }
+    }
+
     return {
+      filename,
+      size: file.size,
       fileContent,
-      fileType
+      fileType,
+      isEncrypted
     }
   } else {
     throw new Error('File picking was canceled.')
