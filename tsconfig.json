@@ -1,4 +1,6 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "include": ["app.config.ts"],
   "compilerOptions": {
     "baseUrl": ".",
   },
