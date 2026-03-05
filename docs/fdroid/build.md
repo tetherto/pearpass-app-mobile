@@ -31,11 +31,18 @@ Expected: generated `android/app/build.gradle` contains `productFlavors { fdroid
 
 Prerequisites:
 
-- Android SDK installed and `sdk.dir` configured in `android/local.properties`.
+- Android SDK installed and configured via `ANDROID_HOME` or `android/local.properties`.
+
+Generate the required Bare bundles:
+
+```bash
+npm run bundle-bare
+```
 
 ```bash
 cd android
-GRADLE_USER_HOME=/tmp/pearpass-gradle-home \
+ANDROID_HOME=$HOME/Library/Android/sdk \
+  GRADLE_USER_HOME=/tmp/pearpass-gradle-home \
   ./gradlew :app:assembleFdroidRelease --no-daemon -Dorg.gradle.vfs.watch=false
 ```
 
