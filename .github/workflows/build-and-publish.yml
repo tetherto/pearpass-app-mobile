@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
       - staging
 
 permissions:
@@ -72,8 +73,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Generate worklet bundle and translations
-        run: npm run build
       - name: Generate worklet bundle and translations
         run: npm run build
 
@@ -226,8 +225,6 @@ jobs:
           scope: "@tetherto"
       - name: Select Xcode 26
         run: sudo xcode-select -s /Applications/Xcode_26.2.app/Contents/Developer
-      - name: Select Xcode 26
-        run: sudo xcode-select -s /Applications/Xcode_26.2.app/Contents/Developer
 
       - name: Install Apple WWDRC Authority
         run: |
@@ -243,8 +240,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: Generate worklet bundle and translations 
-        run: npm run build
       - name: Generate worklet bundle and translations 
         run: npm run build
 
@@ -380,4 +375,3 @@ jobs:
             dist/**/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
