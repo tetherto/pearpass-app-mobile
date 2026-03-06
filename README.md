@@ -43,15 +43,6 @@ git clone git@github.com:tetherto/pearpass-app-mobile.git
 # Navigate to the project directory
 cd pearpass-app-mobile
 
-# Initialize and update submodules
-git submodule update --init --recursive
-
-# To update all submodules to the latest `main` branch, use the provided script.
-npm run update-submodules
-
-# In case of specific remote use:
-npm run update-submodules -- [remote-name]
-
 # Install dependencies
 npm install
 

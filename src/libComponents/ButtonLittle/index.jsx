@@ -13,6 +13,7 @@ import { useHapticFeedback } from '../../hooks/useHapticFeedback'
  *  testID?: string
  *  textTestID?: string
  *  accessibilityLabel?: string
+ *  accessibilityLabel?: string
  * }} props
  */
 export const ButtonLittle = ({
@@ -47,6 +48,7 @@ export const ButtonLittle = ({
       onPress={handlePress}
       borderRadius={borderRadius}
       testID={testID}
+      accessibilityLabel={accessibilityLabel}
       accessibilityLabel={accessibilityLabel}
     >
       {Icon && (
