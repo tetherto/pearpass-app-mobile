@@ -1,22 +1,18 @@
-import fs from 'fs'
-import path from 'path'
+import { ConfigContext, ExpoConfig } from '@expo/config'
 
-const appJson = JSON.parse(
-  fs.readFileSync(path.join(__dirname, 'app.json'), 'utf-8')
-)
-
-export default () => {
+export default ({ config }: ConfigContext): ExpoConfig => {
   const distribution = process.env.PEARPASS_DISTRIBUTION || 'standard'
-  const base = appJson.expo
 
-  const plugins = Array.isArray(base.plugins) ? [...base.plugins] : []
+  const plugins = config.plugins ? [...config.plugins] : []
   plugins.push(['./plugins/withAndroidDistribution', { distribution }])
 
   return {
-    ...base,
+    ...config,
+    name: config.name || 'PearPass',
+    slug: config.slug || 'pearpass-app-mobile',
     plugins,
     extra: {
-      ...(base.extra || {}),
+      ...(config.extra || {}),
       distribution
     }
   }
