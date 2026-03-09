@@ -33,7 +33,6 @@ import com.pears.pass.autofill.ui.AuthenticationActivity;
 import com.pears.pass.autofill.utils.AutofillHelper;
 import com.pears.pass.autofill.utils.AutofillConstants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -51,7 +50,11 @@ public class PearPassAutofillService extends AutofillService {
         AssistStructure structure = fillContexts.get(fillContexts.size() - 1).getStructure();
         AutofillHelper.ParsedFields parsedFields = AutofillHelper.parseStructure(structure);
 
-        if (parsedFields == null || (!parsedFields.hasUsernameField() && !parsedFields.hasPasswordField())) {
+        boolean hasSpecificFields = parsedFields != null
+                && (parsedFields.hasUsernameField() || parsedFields.hasPasswordField());
+        boolean hasFallbackFields = parsedFields != null && parsedFields.hasAnyFallbackField();
+
+        if (!hasSpecificFields && !hasFallbackFields) {
             callback.onSuccess(null);
             return;
         }
@@ -194,6 +197,29 @@ public class PearPassAutofillService extends AutofillService {
                     AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
                     presentation
                 );
+            }
+
+            datasetBuilder.setAuthentication(sender);
+            responseBuilder.addDataset(datasetBuilder.build());
+        } else if (hasFallbackFields) {
+            // Fallback: no specific username/password fields detected, but editable text
+            // fields exist. This handles the case where the browser hasn't fully populated
+            // the AssistStructure on the first field tap (common with Chrome compatibility mode).
+            for (AutofillId fallbackId : parsedFields.getFallbackFieldIds()) {
+                if (inlinePresentation != null) {
+                    datasetBuilder.setValue(
+                        fallbackId,
+                        AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
+                        presentation,
+                        inlinePresentation
+                    );
+                } else {
+                    datasetBuilder.setValue(
+                        fallbackId,
+                        AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
+                        presentation
+                    );
+                }
             }
 
             datasetBuilder.setAuthentication(sender);
