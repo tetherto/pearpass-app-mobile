@@ -1,10 +1,10 @@
 export default {
   preset: 'react-native',
-  transform: {
-    '^.+\\.[jt]sx?$': 'babel-jest'
-  },
+  transform: { '^.+\\.[jt]sx?$': 'babel-jest' },
   moduleNameMapper: {
     '^pearpass-lib-ui-theme-provider/native$':
+      '<rootDir>/node_modules/pearpass-lib-ui-theme-provider/native/index.js',
+    '^pearpass-lib-ui-theme-provider$':
       '<rootDir>/node_modules/pearpass-lib-ui-theme-provider/native/index.js'
   },
   testPathIgnorePatterns: ['/node_modules/', '/.yalc/', '/packages/'],

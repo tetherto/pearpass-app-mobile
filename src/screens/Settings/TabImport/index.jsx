@@ -1,9 +1,10 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { MAX_IMPORT_RECORDS } from 'pearpass-lib-constants'
 import {
+  decryptKeepassKdbx,
   parse1PasswordData,
   parseBitwardenData,
   parseKeePassData,
@@ -13,40 +14,29 @@ import {
   parseProtonPassData
 } from 'pearpass-lib-data-import'
 import { BackIcon } from 'pearpass-lib-ui-react-native-components'
-import {
-  ButtonPrimary,
-  ButtonSecondary
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
-import { useCreateRecord } from 'pearpass-lib-vault'
-import {
-  ActivityIndicator,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
-} from 'react-native'
+import { decryptExportData, useCreateRecord } from 'pearpass-lib-vault'
+import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
+import { BottomSheetImportVaultContent } from 'src/containers/BottomSheetImportVaultContent'
+import { useBottomSheet } from 'src/context/BottomSheetContext'
 
-import {
-  AcceptedFormats,
-  Container as ImportContainer,
-  Description,
-  ImportOptionImage,
-  ImportOptionItem,
-  ImportOptionsList,
-  SubTitle
-} from './styles'
-import { readFileContent } from './utils/readFileContent'
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
 import { ButtonLittle } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 import { settingsStyles } from '../styles'
+import {
+  AcceptedFormats,
+  Description,
+  Container as ImportContainer,
+  ImportOptionImage,
+  ImportOptionItem,
+  ImportOptionsList,
+  SubTitle
+} from './styles'
+import { readFileContent } from './utils/readFileContent'
 
 const importOptions = [
   {
@@ -91,12 +81,12 @@ const importOptions = [
     accepts: ['.csv', '.json'],
     imgKey: 'protonpass'
   },
-  // {
-  //   title: 'Encrypted file',
-  //   type: 'encrypted',
-  //   accepts: ['.json'],
-  //   icon: LockIcon
-  // },
+  {
+    title: 'Encrypted file',
+    type: 'encrypted',
+    accepts: ['.pearpass'],
+    imgKey: 'encrypted'
+  },
   {
     title: 'Unencrypted file',
     type: 'unencrypted',
@@ -121,22 +111,145 @@ const images = {
   lastpass: require('../../../../assets/images/LastPass.png'),
   protonpass: require('../../../../assets/images/ProtonPass.png'),
   nordpass: require('../../../../assets/images/NordPass.png'),
-  unencrypted: require('../../../../assets/images/VaultIcon.png')
+  unencrypted: require('../../../../assets/images/VaultIcon.png'),
+  encrypted: require('../../../../assets/images/VaultIcon.png')
 }
 
 export const ImportSection = () => {
   const { t } = useLingui()
   const { setShouldBypassAutoLock } = useAutoLockContext()
   const { createRecord } = useCreateRecord()
+  const { expand, collapse } = useBottomSheet()
+  const currentOptionRef = useRef(null)
   const { hapticButtonSecondary } = useHapticFeedback()
 
-  const [kdbxPasswordModal, setKdbxPasswordModal] = useState({
-    visible: false,
-    fileBuffer: null,
-    error: ''
-  })
-  const [kdbxPassword, setKdbxPassword] = useState('')
-  const [isUnlocking, setIsUnlocking] = useState(false)
+  const getSnapPointsForStep = useCallback((step) => {
+    switch (step) {
+      case 0:
+        return ['10%', '25%']
+      case 1:
+        return ['20%', '35%']
+      case 2:
+        return ['10%', '35%']
+      default:
+        return ['10%', '40%']
+    }
+  }, [])
+
+  const handleStepChange = useCallback(
+    (step) => {
+      if (currentOptionRef.current) {
+        expand({
+          ...currentOptionRef.current,
+          snapPoints: getSnapPointsForStep(step)
+        })
+      }
+    },
+    [expand, getSnapPointsForStep]
+  )
+
+  const handleFileChange = async ({ accepts }) => {
+    hapticButtonSecondary()
+    setShouldBypassAutoLock(true)
+    try {
+      const fileInfo = await readFileContent(accepts)
+      if (!isAllowedType(fileInfo.fileType, accepts)) {
+        throw new Error('Invalid file type')
+      }
+
+      return fileInfo
+    } catch (error) {
+      const isFileError = error.message?.includes('File too large')
+
+      Toast.show({
+        type: 'baseToast',
+        text1: isFileError ? error.message : t`File selection failed!`,
+        position: 'bottom',
+        bottomOffset: 100
+      })
+      logger.error('Error selecting file:', error.message || error)
+      throw error
+    } finally {
+      setShouldBypassAutoLock(false)
+    }
+  }
+
+  const onImport = async ({
+    type,
+    fileContent,
+    fileType,
+    password,
+    isEncrypted
+  }) => {
+    let result = []
+    let dataToProcess = fileContent
+
+    try {
+      if (type === 'keepass' && fileType === 'kdbx') {
+        if (!password) {
+          throw new Error('Password is required for encrypted files')
+        }
+
+        dataToProcess = await decryptKeepassKdbx(fileContent, password)
+        type = 'keepass-kdbx'
+      }
+
+      if (type === 'encrypted' || isEncrypted) {
+        if (!password) {
+          throw new Error('Password is required for encrypted files')
+        }
+
+        const encryptedData = JSON.parse(fileContent)
+        dataToProcess = await decryptExportData(encryptedData, password)
+      }
+    } catch {
+      throw new Error(
+        'Failed to decrypt file. Please check your password and try again.'
+      )
+    }
+
+    try {
+      switch (type) {
+        case '1password':
+          result = await parse1PasswordData(dataToProcess, fileType)
+          break
+        case 'bitwarden':
+          result = await parseBitwardenData(dataToProcess, fileType)
+          break
+        case 'lastpass':
+          result = await parseLastPassData(dataToProcess, fileType)
+          break
+        case 'keepass':
+          result = await parseKeePassData(dataToProcess, fileType)
+          break
+        case 'keepass-kdbx':
+          result = await parseKeePassData(dataToProcess, 'kdbx')
+          break
+        case 'nordpass':
+          result = await parseNordPassData(dataToProcess, fileType)
+          break
+        case 'protonpass':
+          result = await parseProtonPassData(dataToProcess, fileType)
+          break
+        case 'unencrypted':
+          result = await parsePearPassData(dataToProcess, fileType)
+          break
+        case 'encrypted':
+          result = await parsePearPassData(dataToProcess, 'json')
+          break
+        default:
+          throw new Error(
+            'Unsupported template type. Please select a valid import option.'
+          )
+      }
+
+      await importRecords(result)
+    } catch (error) {
+      throw new Error(
+        error.message || 'Failed to parse file. Please ensure it is valid.'
+      )
+    }
+  }
 
   const importRecords = useCallback(
     async (result) => {
@@ -189,117 +302,6 @@ export const ImportSection = () => {
     [createRecord, t]
   )
 
-  const handleKdbxUnlock = useCallback(async () => {
-    if (!kdbxPassword || !kdbxPasswordModal.fileBuffer) return
-
-    setIsUnlocking(true)
-    setShouldBypassAutoLock(true)
-    await new Promise((r) => setTimeout(r, 0))
-    try {
-      const result = await parseKeePassData(
-        kdbxPasswordModal.fileBuffer,
-        'kdbx',
-        kdbxPassword
-      )
-      setKdbxPasswordModal({ visible: false, fileBuffer: null, error: '' })
-      setKdbxPassword('')
-      await importRecords(result)
-    } catch (err) {
-      if (err.message === 'Incorrect password') {
-        setKdbxPasswordModal((prev) => ({
-          ...prev,
-          error: t`Incorrect password. Please try again.`
-        }))
-        setKdbxPassword('')
-      } else {
-        setKdbxPasswordModal({ visible: false, fileBuffer: null, error: '' })
-        setKdbxPassword('')
-        Toast.show({
-          type: 'baseToast',
-          text1: err.message,
-          position: 'bottom',
-          bottomOffset: 100
-        })
-        logger.error('KeePass KDBX import', err.message)
-      }
-    } finally {
-      setIsUnlocking(false)
-      setShouldBypassAutoLock(false)
-    }
-  }, [
-    kdbxPassword,
-    kdbxPasswordModal.fileBuffer,
-    setShouldBypassAutoLock,
-    importRecords,
-    t
-  ])
-
-  const handleFileChange = async ({ type, accepts }) => {
-    let result = []
-    setShouldBypassAutoLock(true)
-
-    try {
-      const { fileContent, fileType } = await readFileContent(accepts)
-
-      if (!isAllowedType(fileType, accepts)) {
-        throw new Error('Invalid file type')
-      }
-
-      if (type === 'keepass' && fileType === 'kdbx') {
-        setShouldBypassAutoLock(false)
-        setKdbxPasswordModal({
-          visible: true,
-          fileBuffer: fileContent,
-          error: ''
-        })
-        setKdbxPassword('')
-        return
-      }
-
-      switch (type) {
-        case '1password':
-          result = await parse1PasswordData(fileContent, fileType)
-          break
-        case 'bitwarden':
-          result = await parseBitwardenData(fileContent, fileType)
-          break
-        case 'keepass':
-          result = await parseKeePassData(fileContent, fileType)
-          break
-        case 'lastpass':
-          result = await parseLastPassData(fileContent, fileType)
-          break
-        case 'nordpass':
-          result = await parseNordPassData(fileContent, fileType)
-          break
-        case 'protonpass':
-          result = await parseProtonPassData(fileContent, fileType)
-          break
-        case 'unencrypted':
-          result = await parsePearPassData(fileContent, fileType)
-          break
-        default:
-          throw new Error(
-            'Unsupported template type. Please select a valid import option.'
-          )
-      }
-
-      await importRecords(result)
-    } catch (error) {
-      const isFileError = error.message?.includes('File too large')
-
-      Toast.show({
-        type: 'baseToast',
-        text1: isFileError ? error.message : t`Vaults import failed!`,
-        position: 'bottom',
-        bottomOffset: 100
-      })
-      logger.error('Error importing:', error.message || error)
-    } finally {
-      setShouldBypassAutoLock(false)
-    }
-  }
-
   return (
     <CardSingleSetting title={t`Import Vault`}>
       <ImportContainer>
@@ -309,13 +311,38 @@ export const ImportSection = () => {
         <ImportOptionsList>
           {importOptions.map((option) => (
             <ImportOptionItem
-              key={option.imgKey}
+              key={option.title}
               onPress={() => {
-                hapticButtonSecondary()
-                handleFileChange({
-                  type: option.type,
-                  accepts: option.accepts
-                })
+                const bottomSheetOptions = {
+                  children: (
+                    <BottomSheetImportVaultContent
+                      passwordManagerName={
+                        option.title === 'Encrypted file' ||
+                        option.title === 'Unencrypted file'
+                          ? 'PearPass'
+                          : option.title
+                      }
+                      onClose={collapse}
+                      onBrowseFolder={async () =>
+                        handleFileChange({
+                          accepts: option.accepts
+                        })
+                      }
+                      onImport={async ({ fileContent, fileType }, password) =>
+                        await onImport({
+                          type: option.type,
+                          fileContent,
+                          fileType,
+                          password
+                        })
+                      }
+                      onStepChange={handleStepChange}
+                    />
+                  ),
+                  snapPoints: getSnapPointsForStep(0)
+                }
+                currentOptionRef.current = bottomSheetOptions
+                expand(bottomSheetOptions)
               }}
             >
               {option.imgKey ? (
@@ -329,108 +356,9 @@ export const ImportSection = () => {
           ))}
         </ImportOptionsList>
       </ImportContainer>
-
-      <Modal
-        visible={kdbxPasswordModal.visible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {
-          setKdbxPasswordModal({ visible: false, fileBuffer: null, error: '' })
-          setKdbxPassword('')
-        }}
-      >
-        <View style={modalStyles.overlay}>
-          <View style={modalStyles.container}>
-            <Text style={modalStyles.title}>{t`Enter KeePass Password`}</Text>
-            <TextInput
-              style={modalStyles.input}
-              placeholder={t`Database password`}
-              placeholderTextColor={colors.grey100.mode1}
-              secureTextEntry
-              autoFocus
-              editable={!isUnlocking}
-              value={kdbxPassword}
-              onChangeText={setKdbxPassword}
-              onSubmitEditing={handleKdbxUnlock}
-            />
-            {kdbxPasswordModal.error ? (
-              <Text style={modalStyles.error}>{kdbxPasswordModal.error}</Text>
-            ) : null}
-            <View style={modalStyles.buttons}>
-              {isUnlocking ? (
-                <ActivityIndicator
-                  size="small"
-                  color={colors.primary400.mode1}
-                />
-              ) : (
-                <>
-                  <ButtonPrimary
-                    onPress={handleKdbxUnlock}
-                    disabled={!kdbxPassword}
-                    stretch
-                  >
-                    {t`Unlock & Import`}
-                  </ButtonPrimary>
-                  <ButtonSecondary
-                    onPress={() => {
-                      setKdbxPasswordModal({
-                        visible: false,
-                        fileBuffer: null,
-                        error: ''
-                      })
-                      setKdbxPassword('')
-                    }}
-                    stretch
-                  >
-                    {t`Cancel`}
-                  </ButtonSecondary>
-                </>
-              )}
-            </View>
-          </View>
-        </View>
-      </Modal>
     </CardSingleSetting>
   )
 }
-
-const modalStyles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20
-  },
-  container: {
-    width: '100%',
-    backgroundColor: colors.grey400?.mode1 || '#1e1e1e',
-    borderRadius: 16,
-    padding: 24,
-    gap: 16
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.white.mode1,
-    textAlign: 'center'
-  },
-  input: {
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.grey100.mode1,
-    color: colors.white.mode1,
-    fontSize: 14
-  },
-  error: {
-    color: '#ff4d4f',
-    fontSize: 12
-  },
-  buttons: {
-    gap: 12
-  }
-})
 
 export const TabImport = () => {
   const { t } = useLingui()

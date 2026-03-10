@@ -17,7 +17,9 @@ import Toast from 'react-native-toast-message'
 
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { RadioSelect } from '../../../components/RadioSelect'
+import { BottomSheetCreateFilePasswordContent } from '../../../containers/BottomSheetCreateFilePasswordContent'
 import { BottomSheetMasterPassword } from '../../../containers/BottomSheetMasterPassword'
+import { RuleSelector } from '../../../containers/BottomSheetPassGeneratorContent/RuleSelector'
 import { VaultPasswordFormModalContent } from '../../../containers/Modal/VaultPasswordFormModalContent'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
@@ -49,18 +51,48 @@ export const ExportSection = () => {
   } = useVault()
 
   const [exportType, setExportType] = useState('json')
+  const [selectedRules, setSelectedRules] = useState({
+    encryption: false
+  })
 
   const radioOptions = [
     { label: t`csv`, value: 'csv' },
     { label: t`json`, value: 'json' }
   ]
 
-  const handleSubmitExport = async (vaultsToExport) => {
+  const ruleOptions = [
+    {
+      name: 'encryption',
+      label: t`Encrypted file`,
+      description: t`Encrypt the Vault file with the *specific encryption*`,
+      testIDOn: 'encryption-toggle-on',
+      testIDOff: 'encryption-toggle-off',
+      accessibilityLabelOn: t`Encryption enabled`,
+      accessibilityLabelOff: t`Encryption disabled`
+    }
+  ]
+
+  const handleSetRules = async (newRules) => {
+    if (newRules.encryption) {
+      setSelectedRules((prev) => ({ ...prev, encryption: true }))
+      setExportType('json')
+    } else {
+      setSelectedRules((prev) => ({ ...prev, encryption: false }))
+    }
+  }
+
+  const handleSubmitExport = async (
+    vaultsToExport,
+    encryptionPassword = null
+  ) => {
     try {
       let isSuccess = false
 
       if (exportType === 'json') {
-        isSuccess = await handleExportJsonPerVault(vaultsToExport)
+        isSuccess = await handleExportJsonPerVault(
+          vaultsToExport,
+          encryptionPassword
+        )
       } else if (exportType === 'csv') {
         isSuccess = await handleExportCSVPerVault(vaultsToExport)
       }
@@ -114,8 +146,24 @@ export const ExportSection = () => {
       }
 
       const records = (await listRecords()) ?? []
+      const vaultData = [{ ...vault, records }]
 
-      await handleSubmitExport([{ ...vault, records }])
+      if (selectedRules.encryption) {
+        expand({
+          children: (
+            <BottomSheetCreateFilePasswordContent
+              onClose={() => collapse()}
+              onConfirm={async (encryptionPassword) => {
+                collapse()
+                await handleSubmitExport(vaultData, encryptionPassword)
+              }}
+            />
+          ),
+          snapPoints: ['60%', '60%']
+        })
+      } else {
+        await handleSubmitExport(vaultData, null)
+      }
 
       await refetchVault(currentVaultId, currentEncryption)
     } catch (error) {
@@ -171,7 +219,25 @@ export const ExportSection = () => {
 
                 refetchVault(currentVaultId, currentEncryption)
 
-                await handleSubmitExport([vaultsToExport])
+                if (selectedRules.encryption) {
+                  expand({
+                    children: (
+                      <BottomSheetCreateFilePasswordContent
+                        onClose={() => collapse()}
+                        onConfirm={async (encryptionPassword) => {
+                          collapse()
+                          await handleSubmitExport(
+                            [vaultsToExport],
+                            encryptionPassword
+                          )
+                        }}
+                      />
+                    ),
+                    snapPoints: ['40%', '50%']
+                  })
+                } else {
+                  await handleSubmitExport([vaultsToExport])
+                }
               } catch (error) {
                 Toast.show({
                   type: 'error',
@@ -208,10 +274,22 @@ export const ExportSection = () => {
           <RadioSelect
             options={radioOptions}
             selectedOption={exportType}
-            onChange={(value) => setExportType(value)}
+            onChange={(value) => {
+              if (value === 'csv' && selectedRules.encryption) {
+                setSelectedRules((prev) => ({ ...prev, encryption: false }))
+              }
+              setExportType(value)
+            }}
             title={t`Choose the file format`}
           />
         </ExportFormat>
+
+        <RuleSelector
+          rules={ruleOptions}
+          selectedRules={selectedRules}
+          setRules={handleSetRules}
+        />
+
         <ExportButton>
           <ButtonSecondary onPress={handleExport} size="sm">
             {t`Export`}

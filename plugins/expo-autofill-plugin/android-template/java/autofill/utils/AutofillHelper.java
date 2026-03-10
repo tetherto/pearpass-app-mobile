@@ -9,6 +9,7 @@ import android.view.autofill.AutofillId;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -24,6 +25,7 @@ public class AutofillHelper {
         private AutofillId passwordId;
         private String packageName;
         private String webDomain;
+        private final List<AutofillId> fallbackFieldIds = new ArrayList<>();
 
         public boolean hasUsernameField() {
             return usernameId != null;
@@ -47,6 +49,18 @@ public class AutofillHelper {
 
         public String getWebDomain() {
             return webDomain;
+        }
+
+        /**
+         * Returns true if any editable text fields were found, even if they
+         * couldn't be classified as username or password fields.
+         */
+        public boolean hasAnyFallbackField() {
+            return !fallbackFieldIds.isEmpty();
+        }
+
+        public List<AutofillId> getFallbackFieldIds() {
+            return fallbackFieldIds;
         }
     }
 
@@ -93,6 +107,12 @@ public class AutofillHelper {
         } else if (autofillId != null && isPasswordField(autofillHints, inputType, node) && fields.passwordId == null) {
             fields.passwordId = autofillId;
             SecureLog.d(TAG, "Found password field");
+        } else if (autofillId != null && isEditableTextField(inputType, node)) {
+            // Collect any editable text field as a fallback target.
+            // On first page load, browsers may not fully populate the AssistStructure
+            // (missing HTML attributes, generic inputType), causing specific field detection
+            // to fail. These fallback IDs ensure we still show the PearPass suggestion.
+            fields.fallbackFieldIds.add(autofillId);
         }
 
         for (int i = 0; i < node.getChildCount(); i++) {
@@ -290,5 +310,28 @@ public class AutofillHelper {
             }
         }
         return null;
+    }
+
+    /**
+     * Check if a node is an editable single-line text field (potential fill target).
+     * Used as fallback when specific username/password detection fails.
+     */
+    private static boolean isEditableTextField(int inputType, AssistStructure.ViewNode node) {
+        if (containsIgnoredHints(node)) {
+            return false;
+        }
+
+        if (inputType == 0) {
+            return false;
+        }
+
+        int inputClass = inputType & InputType.TYPE_MASK_CLASS;
+        if (inputClass != InputType.TYPE_CLASS_TEXT) {
+            return false;
+        }
+
+        // Reject multi-line fields (text areas, comment boxes)
+        boolean isMultiline = (inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0;
+        return !isMultiline;
     }
 }
