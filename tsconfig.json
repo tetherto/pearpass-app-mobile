@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "include": ["app.config.ts"],
+  "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "baseUrl": ".",
   },
-  "exclude": ["node_modules", "android", "ios", "build", "dist"],
+  "exclude": ["node_modules", "android", "ios", "build", "dist", "e2e-mobile-tests"],
   "extends": "expo/tsconfig.base"
 }
