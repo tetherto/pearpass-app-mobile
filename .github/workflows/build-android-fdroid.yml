@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@tetherto"
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -27,11 +29,6 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - uses: actions/setup-node@v4
-        with:
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@tetherto"
 
       - name: Install dependencies
         run: |
@@ -63,4 +60,3 @@ jobs:
           name: PearPass-Android-fdroid-release.apk
           path: android/app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
           if-no-files-found: error
-
