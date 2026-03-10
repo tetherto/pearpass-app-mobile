@@ -21,7 +21,6 @@
     "bundle-bare": "npm run bundle:android && npm run bundle:ios && npm run bundle:autofill",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile",
-    "update-submodules": "bash scripts/update-submodules.sh",
     "eas-build-pre-install": "node -v && npm -v && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
     "eas-build-post-install": "npm run build-plugins && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
   },
