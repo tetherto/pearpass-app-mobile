@@ -11,6 +11,7 @@
     "ios": "expo run:ios",
     "lint:fix": "eslint --fix ./src",
     "lint": "eslint ./src",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky",
     "postinstall": "node scripts/build-plugins.cjs",
     "build-plugins": "node scripts/build-plugins.cjs",

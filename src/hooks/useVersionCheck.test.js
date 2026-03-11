@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react-native'
+import { act, renderHook, waitFor } from '@testing-library/react-native'
 import { Platform } from 'react-native'
 
 import {
@@ -10,7 +10,10 @@ import {
 
 jest.mock('expo-constants', () => ({
   expoConfig: {
-    version: '1.0.0'
+    version: '1.0.0',
+    extra: {
+      distribution: 'standard'
+    }
   }
 }))
 
@@ -182,7 +185,9 @@ describe('useVersionCheck', () => {
 
     const { result } = renderHook(() => useVersionCheck())
 
-    jest.advanceTimersByTime(1000)
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
 
     await waitFor(() => {
       expect(result.current.needsUpdate).toBe(true)
@@ -207,7 +212,9 @@ describe('useVersionCheck', () => {
 
     const { result } = renderHook(() => useVersionCheck())
 
-    jest.advanceTimersByTime(1000)
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
 
     await waitFor(() => {
       expect(result.current.needsUpdate).toBe(false)
@@ -223,11 +230,36 @@ describe('useVersionCheck', () => {
 
     const { result } = renderHook(() => useVersionCheck())
 
-    jest.advanceTimersByTime(1000)
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
 
     await waitFor(() => {
       expect(result.current.needsUpdate).toBe(true)
     })
+  })
+
+  it('should disable Android version check for fdroid distribution', async () => {
+    Platform.OS = 'android'
+    const Constants = require('expo-constants')
+    Constants.expoConfig.extra.distribution = 'fdroid'
+
+    global.fetch.mockResolvedValue({
+      text: () => Promise.resolve('some html [[["2.0.0"]]] more html')
+    })
+
+    const { result } = renderHook(() => useVersionCheck())
+
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    await waitFor(() => {
+      expect(result.current.needsUpdate).toBe(false)
+      expect(result.current.isChecking).toBe(false)
+    })
+
+    expect(global.fetch).not.toHaveBeenCalled()
   })
 
   it('should set needsUpdate to false when store version is higher but within grace period (iOS)', async () => {

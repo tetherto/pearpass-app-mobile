@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Constants from 'expo-constants'
 import { Platform } from 'react-native'
 
+import { isFdroid } from '../constants/distribution'
 import { VERSION_CHECK_CONFIG } from '../constants/versionCheck'
 import { logger } from '../utils/logger'
 
@@ -132,6 +133,13 @@ export const useVersionCheck = () => {
           Constants.expoConfig?.extra?.appVersion
 
         let updateNeeded = false
+
+        if (Platform.OS === 'android' && isFdroid()) {
+          if (!isMounted) return
+          setNeedsUpdate(false)
+          setIsChecking(false)
+          return
+        }
 
         if (Platform.OS === 'ios') {
           const iosResult = await getIOSVersion()

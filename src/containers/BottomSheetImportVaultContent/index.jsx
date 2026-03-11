@@ -117,7 +117,6 @@ export const BottomSheetImportVaultContent = ({
       )
       onClose()
     } catch (error) {
-      console.error('Import error:', error)
       if (currentStep === STEPS.PASSWORD_ENTRY) {
         setErrors({
           password:
