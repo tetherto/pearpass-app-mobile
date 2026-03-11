@@ -3,21 +3,13 @@ import { useCallback } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { KebabMenuIcon } from 'pearpass-lib-ui-react-native-components'
 import { formatOtpCode, useOtpCodes } from 'pearpass-lib-vault'
-import { TouchableOpacity } from 'react-native'
+import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 
+import { styles } from './styles'
 import { AvatarRecord } from '../../components/AvatarRecord'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { CopyButton } from '../../libComponents/CopyButton'
 import { BottomSheetRecordActionsContent } from '../BottomSheetRecordActionsContent'
-import {
-  Container,
-  Item,
-  ItemOtpCode,
-  ItemRow,
-  ItemSubText,
-  ItemText,
-  ItemTextContainer
-} from './styles'
 
 export const ItemList = ({
   records = [],
@@ -52,7 +44,8 @@ export const ItemList = ({
   }
 
   return (
-    <Container
+    <FlatList
+      style={styles.container}
       data={records}
       keyExtractor={(item) => item.id}
       extraData={selectedRecords}
@@ -61,32 +54,45 @@ export const ItemList = ({
         const websiteDomain =
           record.type === 'login' ? record?.data?.websites?.[0] : null
         return (
-          <Item
-            isSelected={isSelected}
+          <TouchableOpacity
+            style={[styles.item, isSelected && styles.itemSelected]}
             onPress={() => handleRecordPress(record.id)}
             accessible={false}
           >
-            <ItemRow>
+            <View style={styles.itemRow}>
               <AvatarRecord
                 websiteDomain={websiteDomain}
                 isSelected={isSelected}
                 record={record}
               />
 
-              <ItemTextContainer>
-                <ItemText accessible>{record.data?.title}</ItemText>
-                <ItemSubText>{record.folder}</ItemSubText>
-              </ItemTextContainer>
+              <View style={styles.itemTextContainer}>
+                <Text
+                  style={styles.itemText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  accessible
+                >
+                  {record.data?.title}
+                </Text>
+                <Text
+                  style={styles.itemSubText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {record.folder}
+                </Text>
+              </View>
 
               {otpCodes[record.id]?.code && (
                 <>
-                  <ItemOtpCode>
+                  <Text style={styles.itemOtpCode}>
                     {formatOtpCode(otpCodes[record.id].code)}
-                  </ItemOtpCode>
+                  </Text>
                   <CopyButton value={otpCodes[record.id].code} />
                 </>
               )}
-            </ItemRow>
+            </View>
 
             <TouchableOpacity
               onPress={() =>
@@ -104,7 +110,7 @@ export const ItemList = ({
             >
               <KebabMenuIcon size={21} />
             </TouchableOpacity>
-          </Item>
+          </TouchableOpacity>
         )
       }}
     />
