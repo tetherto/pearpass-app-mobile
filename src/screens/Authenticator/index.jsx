@@ -11,24 +11,12 @@ import {
   useOtpCodes,
   useRecords
 } from 'pearpass-lib-vault'
-import { FlatList, View } from 'react-native'
+import { FlatList, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-import {
-  Container,
-  EmptyStateContainer,
-  EmptyStateText,
-  EmptyStateTitle,
-  GroupDivider,
-  GroupHeader,
-  GroupLabelText,
-  GroupTimeValue,
-  OtpCode,
-  RecordItem,
-  RecordSubText,
-  RecordTextContainer,
-  RecordTitle
-} from './styles'
+import { styles } from './styles'
 import { AvatarRecord } from '../../components/AvatarRecord'
+import { getTimerColor } from '../../components/OtpCodeField/utils'
 import { TimerCircle } from '../../components/TimerCircle'
 import { Header } from '../../containers/Header'
 import { CopyButton } from '../../libComponents/CopyButton'
@@ -118,14 +106,19 @@ export const Authenticator = () => {
 
       return (
         <View>
-          {index > 0 && <GroupDivider />}
-          <GroupHeader>
+          {index > 0 && <View style={styles.groupDivider} />}
+          <View style={styles.groupHeader}>
             <TimerCircle timeRemaining={timeRemaining} period={item.period} />
-            <GroupLabelText>{t`Codes expiring in`} </GroupLabelText>
-            <GroupTimeValue $expiring={expiring}>
+            <Text style={styles.groupLabelText}>{t`Codes expiring in`} </Text>
+            <Text
+              style={[
+                styles.groupTimeValue,
+                { color: getTimerColor(expiring) }
+              ]}
+            >
               {timeRemaining !== null ? `${timeRemaining}s` : `${item.period}s`}
-            </GroupTimeValue>
-          </GroupHeader>
+            </Text>
+          </View>
         </View>
       )
     }
@@ -133,10 +126,10 @@ export const Authenticator = () => {
     if (item.type === 'hotp-header') {
       return (
         <View>
-          {index > 0 && <GroupDivider />}
-          <GroupHeader>
-            <GroupLabelText>{t`Counter-based`}</GroupLabelText>
-          </GroupHeader>
+          {index > 0 && <View style={styles.groupDivider} />}
+          <View style={styles.groupHeader}>
+            <Text style={styles.groupLabelText}>{t`Counter-based`}</Text>
+          </View>
         </View>
       )
     }
@@ -149,22 +142,27 @@ export const Authenticator = () => {
       record.type === 'login' ? record?.data?.websites?.[0] : null
 
     return (
-      <RecordItem onPress={() => handleRecordPress(record)}>
+      <TouchableOpacity
+        style={styles.recordItem}
+        onPress={() => handleRecordPress(record)}
+      >
         <AvatarRecord websiteDomain={websiteDomain} record={record} />
-        <RecordTextContainer>
-          <RecordTitle numberOfLines={1}>{record.data?.title}</RecordTitle>
-          <RecordSubText numberOfLines={1}>
+        <View style={styles.recordTextContainer}>
+          <Text style={styles.recordTitle} numberOfLines={1}>
+            {record.data?.title}
+          </Text>
+          <Text style={styles.recordSubText} numberOfLines={1}>
             {record.data?.username || record.folder}
-          </RecordSubText>
-        </RecordTextContainer>
-        <OtpCode>{formatOtpCode(code)}</OtpCode>
+          </Text>
+        </View>
+        <Text style={styles.otpCode}>{formatOtpCode(code)}</Text>
         <CopyButton value={code} />
-      </RecordItem>
+      </TouchableOpacity>
     )
   }
 
   return (
-    <Container>
+    <SafeAreaView style={styles.container}>
       <Header
         setSearchValue={setSearchValue}
         searchValue={searchValue}
@@ -176,13 +174,15 @@ export const Authenticator = () => {
       />
 
       {otpRecords.length === 0 ? (
-        <EmptyStateContainer>
+        <View style={styles.emptyStateContainer}>
           <LockIcon size="48" color={colors.grey100.mode1} />
-          <EmptyStateTitle>{t`No authenticator tokens`}</EmptyStateTitle>
-          <EmptyStateText>
+          <Text
+            style={styles.emptyStateTitle}
+          >{t`No authenticator tokens`}</Text>
+          <Text style={styles.emptyStateText}>
             {t`Add an authenticator secret key to a login record to see it here.`}
-          </EmptyStateText>
-        </EmptyStateContainer>
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={sections}
@@ -190,6 +190,6 @@ export const Authenticator = () => {
           renderItem={renderItem}
         />
       )}
-    </Container>
+    </SafeAreaView>
   )
 }

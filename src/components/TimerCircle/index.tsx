@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 
+import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { useTimerAnimation } from 'pearpass-lib-vault'
 import { View } from 'react-native'
 import Animated, {
@@ -9,7 +10,6 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 import Svg, { Circle } from 'react-native-svg'
-import { useTheme } from 'styled-components/native'
 
 import {
   getTimerColor,
@@ -30,7 +30,6 @@ interface TimerCircleProps {
 }
 
 export const TimerCircle = ({ timeRemaining, period }: TimerCircleProps) => {
-  const theme = useTheme()
   const { noTransition, expiring, targetTime } = useTimerAnimation(
     timeRemaining,
     period
@@ -52,8 +51,8 @@ export const TimerCircle = ({ timeRemaining, period }: TimerCircleProps) => {
     }
   }, [targetOffset, noTransition])
 
-  const color = getTimerColor(theme, expiring)
-  const bgColor = `${theme.colors.grey100.mode1}33`
+  const color = getTimerColor(expiring)
+  const bgColor = `${colors.grey100.mode1}33`
 
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: animatedOffset.value

@@ -1,9 +1,6 @@
-import { DefaultTheme } from 'styled-components/native'
+import { colors } from 'pearpass-lib-ui-theme-provider/native'
 
 export const TIMER_ANIMATION_DURATION = 1000
 
-export const getTimerColor = (
-  theme: DefaultTheme,
-  expiring: boolean
-): string =>
-  expiring ? theme.colors.errorRed.mode1 : theme.colors.primary400.mode1
+export const getTimerColor = (expiring: boolean): string =>
+  expiring ? colors.errorRed.mode1 : colors.primary400.mode1

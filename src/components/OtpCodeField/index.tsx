@@ -8,21 +8,15 @@ import {
   useOtp,
   useTimerAnimation
 } from 'pearpass-lib-vault'
+import { Text, TouchableOpacity, View } from 'react-native'
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated'
-import { useTheme } from 'styled-components/native'
 
-import {
-  NextCodeButton,
-  NextCodeButtonText,
-  TimerBarContainer,
-  TimerBarTrack,
-  TimerText
-} from './styles'
+import { styles } from './styles'
 import { getTimerColor, TIMER_ANIMATION_DURATION } from './utils'
 import { InputField } from '../../libComponents'
 
@@ -50,7 +44,6 @@ export const OtpCodeField = ({
   isLast
 }: OtpCodeFieldProps) => {
   const { t } = useLingui()
-  const theme = useTheme()
   const { code, timeRemaining, type, period, generateNext, isLoading } =
     useOtp({
       recordId,
@@ -81,7 +74,7 @@ export const OtpCodeField = ({
     }
   }, [progress, noTransition])
 
-  const fillColor = getTimerColor(theme, expiring)
+  const fillColor = getTimerColor(expiring)
 
   const fillStyle = useAnimatedStyle(() => ({
     width: `${widthProgress.value}%`,
@@ -91,14 +84,14 @@ export const OtpCodeField = ({
   }))
 
   const timerBar = isTOTP ? (
-    <TimerBarContainer>
-      <TimerBarTrack>
+    <View style={styles.timerBarContainer}>
+      <View style={styles.timerBarTrack}>
         <Animated.View style={fillStyle} />
-      </TimerBarTrack>
-      <TimerText $expiring={expiring}>
+      </View>
+      <Text style={[styles.timerText, { color: getTimerColor(expiring) }]}>
         {timeRemaining !== null ? `${timeRemaining}s` : ''}
-      </TimerText>
-    </TimerBarContainer>
+      </Text>
+    </View>
   ) : null
 
   return (
@@ -113,13 +106,17 @@ export const OtpCodeField = ({
       belowInputContent={timerBar}
       additionalItems={
         type === OTP_TYPE.HOTP && generateNext ? (
-          <NextCodeButton
+          <TouchableOpacity
+            style={[
+              styles.nextCodeButton,
+              isLoading && styles.nextCodeButtonDisabled
+            ]}
             onPress={generateNext}
             disabled={isLoading}
             activeOpacity={0.7}
           >
-            <NextCodeButtonText>{t`Next Code`}</NextCodeButtonText>
-          </NextCodeButton>
+            <Text style={styles.nextCodeButtonText}>{t`Next Code`}</Text>
+          </TouchableOpacity>
         ) : undefined
       }
     />
