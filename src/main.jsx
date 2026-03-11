@@ -7,6 +7,7 @@ import { I18nProvider } from '@lingui/react'
 import { NavigationContainer } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import { colors, ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider as UIKitProvider } from 'pearpass-lib-uikit'
 import { setPearpassVaultClient, VaultProvider } from 'pearpass-lib-vault'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
@@ -51,7 +52,7 @@ export const Main = () => {
   }
 
   return (
-    <>
+    <UIKitProvider>
       <StatusBar backgroundColor={colors.grey500.mode1} style="light" />
 
       <I18nProvider i18n={i18n}>
@@ -79,6 +80,6 @@ export const Main = () => {
           </HapticsProvider>
         </ThemeProvider>
       </I18nProvider>
-    </>
+    </UIKitProvider>
   )
 }
