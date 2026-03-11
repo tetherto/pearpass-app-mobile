@@ -5,6 +5,7 @@ import { Validator } from 'pear-apps-utils-validator'
 import {
   DeleteIcon,
   KeyIcon,
+  LockIcon,
   PasswordIcon,
   PlusIcon,
   UserIcon,
@@ -63,6 +64,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
     title: Validator.string().required(t`Title is required`),
     username: Validator.string(),
     password: Validator.string(),
+    otpSecret: Validator.string(),
     note: Validator.string(),
     websites: Validator.array().items(
       Validator.object({
@@ -88,6 +90,8 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
       title: initialRecord?.data?.title ?? '',
       username: initialRecord?.data?.username ?? '',
       password: initialRecord?.data?.password ?? '',
+      otpSecret:
+        initialRecord?.data?.otpInput ?? initialRecord?.data?.otp?.secret ?? '',
       note: initialRecord?.data?.note ?? '',
       websites: initialRecord?.data?.websites?.length
         ? initialRecord?.data?.websites.map((website) => ({ website }))
@@ -121,6 +125,8 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
       return
     }
 
+    const otpInput = values.otpSecret?.trim() || undefined
+
     const data = {
       type: RECORD_TYPES.LOGIN,
       folder: values.folder,
@@ -131,6 +137,7 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
         username: values.username,
         password: values.password,
         note: values.note,
+        otpInput,
         websites: values.websites
           .map((website) => {
             if (!!website?.website?.trim().length) {
@@ -271,6 +278,21 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                     }
                   />
                 }
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <PasswordField
+                icon={LockIcon}
+                label={t`Authenticator Secret Key`}
+                placeholder={t`Enter Secret Key or otpauth:// URI`}
+                variant="outline"
+                isFirst
+                isLast
+                testID="otp-secret-field"
+                accessibilityLabel={t`Authenticator secret key field`}
+                inputAccessibilityLabel={t`Authenticator secret key input field`}
+                {...register('otpSecret')}
               />
             </FormGroup>
 

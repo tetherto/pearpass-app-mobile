@@ -1,6 +1,7 @@
 import { createDrawerNavigator } from '@react-navigation/drawer'
 
 import { DrawerContent } from '../../containers/DrawerContent'
+import { Authenticator } from '../../screens/Authenticator'
 import { Home } from '../../screens/Home'
 
 const Drawer = createDrawerNavigator()
@@ -20,6 +21,13 @@ export const DrawerNavigator = () => (
     <Drawer.Screen
       name="Home"
       component={Home}
+      options={{
+        headerShown: false
+      }}
+    />
+    <Drawer.Screen
+      name="Authenticator"
+      component={Authenticator}
       options={{
         headerShown: false
       }}

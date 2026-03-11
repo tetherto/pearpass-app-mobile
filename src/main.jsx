@@ -7,7 +7,11 @@ import { I18nProvider } from '@lingui/react'
 import { NavigationContainer } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import { colors, ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
-import { setPearpassVaultClient, VaultProvider } from 'pearpass-lib-vault'
+import {
+  OtpRefreshProvider,
+  setPearpassVaultClient,
+  VaultProvider
+} from 'pearpass-lib-vault'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { App } from './app/App'
@@ -60,19 +64,21 @@ export const Main = () => {
             <LoadingProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
                 <VaultProvider>
-                  <SharedFilterProvider>
-                    <NavigationContainer>
-                      <AutoLockProvider>
-                        <AutoLockTouchCapture>
-                          <ModalProvider>
-                            <BottomSheetProvider>
-                              <App />
-                            </BottomSheetProvider>
-                          </ModalProvider>
-                        </AutoLockTouchCapture>
-                      </AutoLockProvider>
-                    </NavigationContainer>
-                  </SharedFilterProvider>
+                  <OtpRefreshProvider>
+                    <SharedFilterProvider>
+                      <NavigationContainer>
+                        <AutoLockProvider>
+                          <AutoLockTouchCapture>
+                            <ModalProvider>
+                              <BottomSheetProvider>
+                                <App />
+                              </BottomSheetProvider>
+                            </ModalProvider>
+                          </AutoLockTouchCapture>
+                        </AutoLockProvider>
+                      </NavigationContainer>
+                    </SharedFilterProvider>
+                  </OtpRefreshProvider>
                 </VaultProvider>
               </GestureHandlerRootView>
             </LoadingProvider>

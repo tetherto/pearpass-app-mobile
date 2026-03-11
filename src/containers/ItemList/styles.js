@@ -44,3 +44,11 @@ export const ItemSubText = styled.Text.attrs({
   font-size: 12px;
   font-family: 'Inter';
 `
+
+export const ItemOtpCode = styled.Text`
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter';
+  color: ${({ theme }) => theme.colors.white.mode1};
+  letter-spacing: 1px;
+`

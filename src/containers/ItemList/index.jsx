@@ -2,14 +2,17 @@ import { useCallback } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
 import { KebabMenuIcon } from 'pearpass-lib-ui-react-native-components'
+import { formatOtpCode, useOtpCodes } from 'pearpass-lib-vault'
 import { TouchableOpacity } from 'react-native'
 
 import { AvatarRecord } from '../../components/AvatarRecord'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { CopyButton } from '../../libComponents/CopyButton'
 import { BottomSheetRecordActionsContent } from '../BottomSheetRecordActionsContent'
 import {
   Container,
   Item,
+  ItemOtpCode,
   ItemRow,
   ItemSubText,
   ItemText,
@@ -25,6 +28,7 @@ export const ItemList = ({
   const navigation = useNavigation()
 
   const { expand } = useBottomSheet()
+  const { otpCodes } = useOtpCodes(records)
 
   const isRecordSelected = useCallback(
     (recordId) => selectedRecords.includes(recordId),
@@ -73,6 +77,15 @@ export const ItemList = ({
                 <ItemText accessible>{record.data?.title}</ItemText>
                 <ItemSubText>{record.folder}</ItemSubText>
               </ItemTextContainer>
+
+              {otpCodes[record.id]?.code && (
+                <>
+                  <ItemOtpCode>
+                    {formatOtpCode(otpCodes[record.id].code)}
+                  </ItemOtpCode>
+                  <CopyButton value={otpCodes[record.id].code} />
+                </>
+              )}
             </ItemRow>
 
             <TouchableOpacity
