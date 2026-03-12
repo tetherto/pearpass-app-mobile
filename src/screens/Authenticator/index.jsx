@@ -8,7 +8,6 @@ import {
   formatOtpCode,
   isExpiring,
   OTP_TYPE,
-  useOtpCodes,
   useRecords
 } from 'pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
@@ -41,8 +40,6 @@ export const Authenticator = () => {
     () => (records || []).filter((r) => r.otpPublic),
     [records]
   )
-
-  const { otpCodes } = useOtpCodes(otpRecords)
 
   const handleRecordPress = (record) => {
     navigation.navigate('RecordDetails', { recordId: record.id })
@@ -99,9 +96,7 @@ export const Authenticator = () => {
   const renderItem = ({ item, index }) => {
     if (item.type === 'totp-header') {
       const firstRecord = item.records[0]
-      const otpData = otpCodes[firstRecord?.id]
-      const timeRemaining =
-        otpData?.timeRemaining ?? firstRecord?.otpPublic?.timeRemaining ?? null
+      const timeRemaining = firstRecord?.otpPublic?.timeRemaining ?? null
       const expiring = isExpiring(timeRemaining)
 
       return (
@@ -136,8 +131,7 @@ export const Authenticator = () => {
 
     // Record item
     const { record } = item
-    const otpData = otpCodes[record.id]
-    const code = otpData?.code ?? record.otpPublic?.currentCode ?? null
+    const code = record.otpPublic?.currentCode ?? null
     const websiteDomain =
       record.type === 'login' ? record?.data?.websites?.[0] : null
 

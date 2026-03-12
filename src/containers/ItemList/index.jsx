@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
 import { KebabMenuIcon } from 'pearpass-lib-ui-react-native-components'
-import { formatOtpCode, useOtpCodes } from 'pearpass-lib-vault'
+import { formatOtpCode } from 'pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 
 import { styles } from './styles'
@@ -20,7 +20,6 @@ export const ItemList = ({
   const navigation = useNavigation()
 
   const { expand } = useBottomSheet()
-  const { otpCodes } = useOtpCodes(records)
 
   const isRecordSelected = useCallback(
     (recordId) => selectedRecords.includes(recordId),
@@ -84,12 +83,12 @@ export const ItemList = ({
                 </Text>
               </View>
 
-              {otpCodes[record.id]?.code && (
+              {record?.otpPublic?.currentCode && (
                 <>
                   <Text style={styles.itemOtpCode}>
-                    {formatOtpCode(otpCodes[record.id].code)}
+                    {formatOtpCode(record.otpPublic.currentCode)}
                   </Text>
-                  <CopyButton value={otpCodes[record.id].code} />
+                  <CopyButton value={record.otpPublic.currentCode} />
                 </>
               )}
             </View>
