@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { LockIcon } from 'pearpass-lib-ui-react-native-components'
+import { PlusIcon, SaveIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   formatOtpCode,
@@ -19,6 +19,7 @@ import { getTimerColor } from '../../components/OtpCodeField/utils'
 import { TimerCircle } from '../../components/TimerCircle'
 import { Header } from '../../containers/Header'
 import { CopyButton } from '../../libComponents/CopyButton'
+import { AuthenticatorIllustration } from '../../svgs/AuthenticatorIllustration'
 
 export const Authenticator = () => {
   const { t } = useLingui()
@@ -169,13 +170,37 @@ export const Authenticator = () => {
 
       {otpRecords.length === 0 ? (
         <View style={styles.emptyStateContainer}>
-          <LockIcon size="48" color={colors.grey100.mode1} />
-          <Text
-            style={styles.emptyStateTitle}
-          >{t`No authenticator tokens`}</Text>
-          <Text style={styles.emptyStateText}>
-            {t`Add an authenticator secret key to a login record to see it here.`}
-          </Text>
+          <AuthenticatorIllustration width="100%" height={140} />
+
+          <View style={styles.emptyTextGroup}>
+            <Text style={styles.emptyStateTitle}>{t`No codes saved`}</Text>
+            <Text style={styles.emptyStateText}>
+              {t`Save your first authenticator code or import your codes from another authenticator app.`}
+            </Text>
+          </View>
+
+          <View style={styles.emptyCTAs}>
+            <TouchableOpacity
+              style={styles.emptyPrimaryButton}
+              onPress={() =>
+                navigation.navigate('CreateRecord', { recordType: 'login' })
+              }
+            >
+              <PlusIcon size="16" color={colors.grey500.mode1} />
+              <Text style={styles.emptyPrimaryButtonText}>{t`Add Code`}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.emptySecondaryButton}
+              onPress={() =>
+                navigation.navigate('Settings', { screen: 'Vaults' })
+              }
+            >
+              <SaveIcon size="16" color={colors.primary400.mode1} />
+              <Text
+                style={styles.emptySecondaryButtonText}
+              >{t`Import Codes`}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       ) : (
         <FlatList

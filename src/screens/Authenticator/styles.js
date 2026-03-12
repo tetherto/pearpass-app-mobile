@@ -12,8 +12,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 20,
     paddingHorizontal: 32
+  },
+  emptyTextGroup: {
+    alignItems: 'center',
+    gap: 6
   },
   emptyStateTitle: {
     fontSize: 18,
@@ -23,7 +27,42 @@ export const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 14,
     color: colors.grey100.mode1,
-    textAlign: 'center'
+    textAlign: 'center',
+    lineHeight: 20
+  },
+  emptyCTAs: {
+    width: '100%',
+    gap: 10
+  },
+  emptyPrimaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    width: '100%',
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: colors.primary400.mode1
+  },
+  emptyPrimaryButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.grey500.mode1
+  },
+  emptySecondaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    width: '100%',
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: colors.grey300.mode1
+  },
+  emptySecondaryButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.primary400.mode1
   },
   groupHeader: {
     flexDirection: 'row',
