@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from 'pear-apps-lib-ui-react-hooks'
 import { Validator } from 'pear-apps-utils-validator'
+import { AUTHENTICATOR_ENABLED } from 'pearpass-lib-constants'
 import {
   DeleteIcon,
   KeyIcon,
@@ -281,20 +282,22 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
               />
             </FormGroup>
 
-            <FormGroup>
-              <PasswordField
-                icon={LockIcon}
-                label={t`Authenticator Secret Key`}
-                placeholder={t`Enter Secret Key or otpauth:// URI`}
-                variant="outline"
-                isFirst
-                isLast
-                testID="otp-secret-field"
-                accessibilityLabel={t`Authenticator secret key field`}
-                inputAccessibilityLabel={t`Authenticator secret key input field`}
-                {...register('otpSecret')}
-              />
-            </FormGroup>
+            {AUTHENTICATOR_ENABLED && (
+              <FormGroup>
+                <PasswordField
+                  icon={LockIcon}
+                  label={t`Authenticator Secret Key`}
+                  placeholder={t`Enter Secret Key or otpauth:// URI`}
+                  variant="outline"
+                  isFirst
+                  isLast
+                  testID="otp-secret-field"
+                  accessibilityLabel={t`Authenticator secret key field`}
+                  inputAccessibilityLabel={t`Authenticator secret key input field`}
+                  {...register('otpSecret')}
+                />
+              </FormGroup>
+            )}
 
             {!!values?.credential && (
               <FormGroup>
