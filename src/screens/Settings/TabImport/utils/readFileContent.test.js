@@ -10,7 +10,7 @@ jest.mock('expo-document-picker', () => ({
 
 jest.mock('expo-file-system', () => ({
   readAsStringAsync: jest.fn(),
-  EncodingType: { UTF8: 'utf8' }
+  EncodingType: { UTF8: 'utf8', Base64: 'base64' }
 }))
 
 jest.mock('pearpass-lib-constants', () => ({
@@ -99,6 +99,92 @@ describe('readFileContent', () => {
     })
   })
 
+  it('should read a KDBX file and return ArrayBuffer with isEncrypted true', async () => {
+    DocumentPicker.getDocumentAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file://test.kdbx', name: 'test.kdbx', size: 2048 }]
+    })
+    FileSystem.readAsStringAsync.mockResolvedValue('aGVsbG8=')
+
+    const result = await readFileContent(['.kdbx'])
+
+    expect(DocumentPicker.getDocumentAsync).toHaveBeenCalledWith({
+      type: ['application/octet-stream', '*/*']
+    })
+    expect(FileSystem.readAsStringAsync).toHaveBeenCalledWith(
+      'file://test.kdbx',
+      { encoding: FileSystem.EncodingType.Base64 }
+    )
+    expect(result).toMatchObject({
+      filename: 'test.kdbx',
+      size: 2048,
+      fileType: 'kdbx',
+      isEncrypted: true
+    })
+    expect(result.fileContent).toBeInstanceOf(ArrayBuffer)
+  })
+
+  it('should read an XML file and return its content', async () => {
+    DocumentPicker.getDocumentAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file://test.xml', name: 'test.xml', size: 512 }]
+    })
+    FileSystem.readAsStringAsync.mockResolvedValue('<root><item/></root>')
+
+    const result = await readFileContent(['.xml'])
+
+    expect(DocumentPicker.getDocumentAsync).toHaveBeenCalledWith({
+      type: ['text/xml', 'application/xml']
+    })
+    expect(result).toEqual({
+      filename: 'test.xml',
+      size: 512,
+      fileContent: '<root><item/></root>',
+      fileType: 'xml',
+      isEncrypted: false
+    })
+  })
+
+  it('should return isEncrypted true for JSON file with encrypted flag', async () => {
+    DocumentPicker.getDocumentAsync.mockResolvedValue({
+      canceled: false,
+      assets: [
+        { uri: 'file://encrypted.json', name: 'encrypted.json', size: 100 }
+      ]
+    })
+    FileSystem.readAsStringAsync.mockResolvedValue(
+      '{"encrypted":true,"data":"..."}'
+    )
+
+    const result = await readFileContent(['.json'])
+
+    expect(result).toEqual({
+      filename: 'encrypted.json',
+      size: 100,
+      fileContent: '{"encrypted":true,"data":"..."}',
+      fileType: 'json',
+      isEncrypted: true
+    })
+  })
+
+  it('should return isEncrypted true for invalid JSON content', async () => {
+    DocumentPicker.getDocumentAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file://bad.json', name: 'bad.json', size: 50 }]
+    })
+    FileSystem.readAsStringAsync.mockResolvedValue('not valid json {{{')
+
+    const result = await readFileContent(['.json'])
+
+    expect(result).toEqual({
+      filename: 'bad.json',
+      size: 50,
+      fileContent: 'not valid json {{{',
+      fileType: 'json',
+      isEncrypted: true
+    })
+  })
+
   it('should throw an error if file picking is canceled', async () => {
     DocumentPicker.getDocumentAsync.mockResolvedValue({
       canceled: true
@@ -124,55 +210,6 @@ describe('readFileContent', () => {
       fileContent: 'data',
       fileType: 'unknown',
       isEncrypted: false
-    })
-  })
-
-  it('should detect encrypted .pearpass files', async () => {
-    const encryptedContent = JSON.stringify({
-      encrypted: true,
-      version: '1.0',
-      ciphertext: 'encrypted-data'
-    })
-
-    DocumentPicker.getDocumentAsync.mockResolvedValue({
-      canceled: false,
-      assets: [
-        { uri: 'file://vault.pearpass', name: 'vault.pearpass', size: 1024 }
-      ]
-    })
-    FileSystem.readAsStringAsync.mockResolvedValue(encryptedContent)
-
-    const result = await readFileContent(['.pearpass'])
-
-    expect(DocumentPicker.getDocumentAsync).toHaveBeenCalledWith({
-      type: ['application/json', 'application/octet-stream', '*/*']
-    })
-    expect(result).toEqual({
-      filename: 'vault.pearpass',
-      size: 1024,
-      fileContent: encryptedContent,
-      fileType: 'pearpass',
-      isEncrypted: true
-    })
-  })
-
-  it('should handle .pearpass files with invalid JSON', async () => {
-    DocumentPicker.getDocumentAsync.mockResolvedValue({
-      canceled: false,
-      assets: [
-        { uri: 'file://vault.pearpass', name: 'vault.pearpass', size: 512 }
-      ]
-    })
-    FileSystem.readAsStringAsync.mockResolvedValue('not-valid-json')
-
-    const result = await readFileContent(['.pearpass'])
-
-    expect(result).toEqual({
-      filename: 'vault.pearpass',
-      size: 512,
-      fileContent: 'not-valid-json',
-      fileType: 'pearpass',
-      isEncrypted: true // Assumes encrypted if parsing fails
     })
   })
 

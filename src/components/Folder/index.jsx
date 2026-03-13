@@ -51,6 +51,7 @@ export const Folder = ({
   const getTestID = () => {
     if (folder.id === 'allFolder') return 'sidebar-all-folders'
     if (folder.id === 'favorite') return 'sidebar-favorites'
+    if (folder.id === 'authenticator') return 'sidebar-authenticator'
     if (folder.isCreateNew) return 'sidebar-create-new'
     return undefined
   }
@@ -64,6 +65,7 @@ export const Folder = ({
   const getActiveCheckTestID = () => {
     if (folder.id === 'allFolder') return 'sidebar-all-folders-active'
     if (folder.id === 'favorite') return 'sidebar-favorites-active'
+    if (folder.id === 'authenticator') return 'sidebar-authenticator-active'
     if (folder.isCreateNew) return 'sidebar-create-new-active'
     return `sidebar-folder-${folder.id}-active`
   }
@@ -81,7 +83,7 @@ export const Folder = ({
         <FolderContent>
           <FolderText>{folder.name}</FolderText>
 
-          {!folder.isCreateNew && (
+          {!folder.isCreateNew && !folder.isAuthenticator && (
             <FolderCount testID={getCountTestID()}>
               {folder.count ?? 0} {t`items`}
             </FolderCount>

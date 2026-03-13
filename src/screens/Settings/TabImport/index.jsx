@@ -84,7 +84,7 @@ const importOptions = [
   {
     title: 'Encrypted file',
     type: 'encrypted',
-    accepts: ['.pearpass'],
+    accepts: ['.json'],
     imgKey: 'encrypted'
   },
   {

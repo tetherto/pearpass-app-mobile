@@ -10,7 +10,9 @@ export const CreateRecord = ({ route }) => {
   const { state } = useSharedFilter()
 
   const folder =
-    state?.folder === 'allFolder' || state?.folder === 'favorite'
+    state?.folder === 'allFolder' ||
+    state?.folder === 'favorite' ||
+    state?.folder === 'authenticator'
       ? undefined
       : state?.folder
 

@@ -1,0 +1,5 @@
+Initial F-Droid release.
+
+- F-Droid distribution build channel
+- Removed Play Services–specific auth dependency from F-Droid flavor
+- Disabled Play Store based update checks for F-Droid builds

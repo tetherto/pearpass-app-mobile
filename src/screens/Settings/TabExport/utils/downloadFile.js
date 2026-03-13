@@ -10,9 +10,6 @@ export const downloadFile = async ({ filename, content }, type) => {
   if (type === 'json') {
     mimeType = 'application/json'
     uti = 'public.json'
-  } else if (type === 'pearpass') {
-    mimeType = 'application/json'
-    uti = 'public.data'
   }
 
   await FileSystem.writeAsStringAsync(fileUri, content, {

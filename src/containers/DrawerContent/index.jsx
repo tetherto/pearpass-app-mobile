@@ -111,7 +111,11 @@ export const DrawerContent = ({ navigation }) => {
   }
 
   const handleFolderMenuOpen = (folderName) => {
-    if (folderName !== 'Favorites' && folderName !== 'All Folders') {
+    if (
+      folderName !== 'Favorites' &&
+      folderName !== 'All Folders' &&
+      folderName !== 'Authenticator'
+    ) {
       expand({
         children: <BottomSheetFolderMenuContent folderName={folderName} />,
         snapPoints: ['10%', '20%', '20%']
@@ -129,11 +133,22 @@ export const DrawerContent = ({ navigation }) => {
             selectedFolder={state?.folder}
             onLongPress={handleFolderMenuOpen}
             onFolderSelect={(folder) => {
+              if (folder?.id === 'authenticator') {
+                setState({
+                  folder: 'authenticator',
+                  isFavorite: false,
+                  sort: 'recent'
+                })
+                navigation.navigate('Authenticator')
+                navigation.closeDrawer()
+                return
+              }
               setState({
                 folder: folder?.id ?? folder.name,
                 isFavorite: folder?.id && folder?.id === 'favorite',
                 sort: 'recent'
               })
+              navigation.navigate('Home')
               navigation.closeDrawer()
             }}
           />

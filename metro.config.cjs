@@ -18,7 +18,6 @@ config.transformer = {
 
 config.resolver = {
   ...config.resolver,
-  unstable_enablePackageExports: false,
   assetExts: [
     ...config.resolver.assetExts.filter((ext) => ext !== 'svg'),
     'bundle'

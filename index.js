@@ -1,3 +1,6 @@
+import './strict.css';
+import '@expo/metro-runtime';
+
 import { registerRootComponent } from 'expo'
 
 import { Main } from './src/main'

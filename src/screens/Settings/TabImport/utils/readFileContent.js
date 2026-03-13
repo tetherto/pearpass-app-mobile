@@ -17,8 +17,6 @@ export const readFileContent = async (acceptedTypes) => {
       return ['text/csv', 'text/comma-separated-values']
     } else if (type === '.json') {
       return ['application/json']
-    } else if (type === '.pearpass') {
-      return ['application/json', 'application/octet-stream', '*/*']
     } else if (type === '.kdbx') {
       return ['application/octet-stream', '*/*']
     } else if (type === '.xml') {
@@ -58,7 +56,7 @@ export const readFileContent = async (acceptedTypes) => {
     })
 
     let isEncrypted = false
-    if (fileType === 'pearpass') {
+    if (fileType === 'json') {
       try {
         const parsed = JSON.parse(fileContent)
         isEncrypted = parsed.encrypted === true

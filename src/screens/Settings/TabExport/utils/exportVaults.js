@@ -72,15 +72,12 @@ export const handleExportJsonPerVault = async (
             encryptionPassword
           )
           return {
-            filename: vault.filename.replace('.json', '.pearpass'),
+            filename: vault?.filename,
             data: JSON.stringify(encryptedData, null, 2)
           }
         })
       )
     : vaultsToExport
 
-  return handleDownloadVaults(
-    processedVaults,
-    encryptionPassword ? 'pearpass' : 'json'
-  )
+  return handleDownloadVaults(processedVaults, 'json')
 }

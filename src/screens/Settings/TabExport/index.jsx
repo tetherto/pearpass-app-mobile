@@ -11,7 +11,7 @@ import {
   listRecords,
   useVault
 } from 'pearpass-lib-vault'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 
@@ -30,8 +30,7 @@ import {
   Description,
   ExportButton,
   Container as ExportContainer,
-  ExportFormat,
-  VaultsList
+  ExportFormat
 } from './styles'
 import {
   handleExportCSVPerVault,
@@ -56,15 +55,15 @@ export const ExportSection = () => {
   })
 
   const radioOptions = [
-    { label: t`csv`, value: 'csv' },
-    { label: t`json`, value: 'json' }
+    { label: t`CSV`, value: 'csv' },
+    { label: t`JSON (Recommended)`, value: 'json' }
   ]
 
   const ruleOptions = [
     {
       name: 'encryption',
-      label: t`Encrypted file`,
-      description: t`Encrypt the Vault file with the *specific encryption*`,
+      label: t`Protect with Password`,
+      description: t`Protect your exported file so it can only be opened with the password you set`,
       testIDOn: 'encryption-toggle-on',
       testIDOff: 'encryption-toggle-off',
       accessibilityLabelOn: t`Encryption enabled`,
@@ -75,7 +74,6 @@ export const ExportSection = () => {
   const handleSetRules = async (newRules) => {
     if (newRules.encryption) {
       setSelectedRules((prev) => ({ ...prev, encryption: true }))
-      setExportType('json')
     } else {
       setSelectedRules((prev) => ({ ...prev, encryption: false }))
     }
@@ -269,26 +267,26 @@ export const ExportSection = () => {
         <Description>
           {t`Choose the file format to export your Vault`}
         </Description>
-        <VaultsList></VaultsList>
         <ExportFormat>
           <RadioSelect
+            radioOptionStyle={styles.radioOptionTitle}
             options={radioOptions}
             selectedOption={exportType}
             onChange={(value) => {
-              if (value === 'csv' && selectedRules.encryption) {
-                setSelectedRules((prev) => ({ ...prev, encryption: false }))
-              }
+              setSelectedRules((prev) => ({ ...prev, encryption: false }))
               setExportType(value)
             }}
             title={t`Choose the file format`}
           />
         </ExportFormat>
 
-        <RuleSelector
-          rules={ruleOptions}
-          selectedRules={selectedRules}
-          setRules={handleSetRules}
-        />
+        {exportType === 'json' && (
+          <RuleSelector
+            rules={ruleOptions}
+            selectedRules={selectedRules}
+            setRules={handleSetRules}
+          />
+        )}
 
         <ExportButton>
           <ButtonSecondary onPress={handleExport} size="sm">
@@ -324,3 +322,9 @@ export const TabExport = () => {
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  radioOptionTitle: {
+    fontSize: 14
+  }
+})

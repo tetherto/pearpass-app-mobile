@@ -1,4 +1,5 @@
 import { parseDataToCsvText, parseDataToJson } from 'pearpass-lib-data-export'
+import { encryptExportData } from 'pearpass-lib-vault'
 
 import { downloadFile } from './downloadFile'
 import { downloadZip } from './downloadZip'
@@ -8,6 +9,9 @@ import {
 } from './exportVaults'
 
 jest.mock('pearpass-lib-data-export')
+jest.mock('pearpass-lib-vault', () => ({
+  encryptExportData: jest.fn()
+}))
 jest.mock('./downloadFile', () => ({
   downloadFile: jest.fn()
 }))
@@ -151,6 +155,62 @@ describe('exportVaults', () => {
       await expect(handleExportJsonPerVault({})).rejects.toThrow(
         'Download failed'
       )
+    })
+
+    it('should encrypt vault data when encryptionPassword is provided', async () => {
+      const mockData = [{ filename: 'vault', data: 'json-content' }]
+      const encryptedPayload = { encrypted: true, data: 'encrypted-blob' }
+      parseDataToJson.mockResolvedValue(mockData)
+      encryptExportData.mockResolvedValue(encryptedPayload)
+
+      const result = await handleExportJsonPerVault({}, 'secret')
+
+      expect(encryptExportData).toHaveBeenCalledWith('json-content', 'secret')
+      expect(downloadFile).toHaveBeenCalledWith(
+        {
+          filename: 'vault',
+          content: JSON.stringify(encryptedPayload, null, 2)
+        },
+        'json'
+      )
+      expect(result).toBe(true)
+    })
+
+    it('should encrypt all vaults and zip when multiple vaults with password', async () => {
+      const mockData = [
+        { filename: 'vault1', data: 'json-content-1' },
+        { filename: 'vault2', data: 'json-content-2' }
+      ]
+      const encryptedPayload1 = { encrypted: true, data: 'blob-1' }
+      const encryptedPayload2 = { encrypted: true, data: 'blob-2' }
+      parseDataToJson.mockResolvedValue(mockData)
+      encryptExportData
+        .mockResolvedValueOnce(encryptedPayload1)
+        .mockResolvedValueOnce(encryptedPayload2)
+
+      const result = await handleExportJsonPerVault({}, 'secret')
+
+      expect(encryptExportData).toHaveBeenCalledTimes(2)
+      expect(downloadZip).toHaveBeenCalledWith([
+        {
+          filename: 'vault1',
+          data: JSON.stringify(encryptedPayload1, null, 2)
+        },
+        {
+          filename: 'vault2',
+          data: JSON.stringify(encryptedPayload2, null, 2)
+        }
+      ])
+      expect(result).toBe(true)
+    })
+
+    it('should not encrypt when encryptionPassword is null', async () => {
+      const mockData = [{ filename: 'vault', data: 'json-content' }]
+      parseDataToJson.mockResolvedValue(mockData)
+
+      await handleExportJsonPerVault({}, null)
+
+      expect(encryptExportData).not.toHaveBeenCalled()
     })
   })
 })

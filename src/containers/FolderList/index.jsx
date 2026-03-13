@@ -2,8 +2,10 @@ import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { AUTHENTICATOR_ENABLED } from 'pearpass-lib-constants'
 import {
   FolderIcon,
+  LockIcon,
   PlusIcon,
   StarIcon
 } from 'pearpass-lib-ui-react-native-components'
@@ -65,7 +67,17 @@ export const FolderList = ({
           count: folders?.favorites?.records.length || 0,
           icon: <StarIcon size="26" />
         },
-        ...customFolders
+        ...customFolders,
+        ...(AUTHENTICATOR_ENABLED
+          ? [
+              {
+                name: t`Authenticator`,
+                id: 'authenticator',
+                icon: <LockIcon size="26" color={colors.primary400.mode1} />,
+                isAuthenticator: true
+              }
+            ]
+          : [])
       ]
     }
 
