@@ -6,8 +6,8 @@ import { PlusIcon, SaveIcon } from 'pearpass-lib-ui-react-native-components'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   formatOtpCode,
+  groupOtpRecords,
   isExpiring,
-  OTP_TYPE,
   useRecords
 } from 'pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
@@ -46,33 +46,12 @@ export const Authenticator = () => {
     navigation.navigate('RecordDetails', { recordId: record.id })
   }
 
-  // Separate TOTP and HOTP records, group TOTP by period
   const sections = useMemo(() => {
-    const groupMap = {}
-    const hotp = []
-
-    for (const record of otpRecords) {
-      if (record.otpPublic?.type === OTP_TYPE.HOTP) {
-        hotp.push(record)
-      } else {
-        const period = record.otpPublic?.period ?? 30
-        if (!groupMap[period]) {
-          groupMap[period] = []
-        }
-        groupMap[period].push(record)
-      }
-    }
+    const { totpGroups, hotpRecords } = groupOtpRecords(otpRecords)
 
     const result = []
 
-    const groups = Object.entries(groupMap)
-      .map(([period, groupRecords]) => ({
-        period: Number(period),
-        records: groupRecords
-      }))
-      .sort((a, b) => a.period - b.period)
-
-    for (const group of groups) {
+    for (const group of totpGroups) {
       result.push({
         type: 'totp-header',
         key: `totp-header-${group.period}`,
@@ -84,9 +63,9 @@ export const Authenticator = () => {
       }
     }
 
-    if (hotp.length > 0) {
+    if (hotpRecords.length > 0) {
       result.push({ type: 'hotp-header', key: 'hotp-header' })
-      for (const record of hotp) {
+      for (const record of hotpRecords) {
         result.push({ type: 'record', key: record.id, record })
       }
     }

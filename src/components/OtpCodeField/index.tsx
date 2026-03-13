@@ -16,19 +16,11 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 
+import type { OtpPublic } from 'pearpass-lib-vault/src/types'
+
 import { styles } from './styles'
 import { getTimerColor, TIMER_ANIMATION_DURATION } from './utils'
 import { InputField } from '../../libComponents'
-
-interface OtpPublic {
-  type: 'TOTP' | 'HOTP'
-  digits: number
-  period?: number
-  issuer?: string
-  label?: string
-  currentCode: string | null
-  timeRemaining?: number | null
-}
 
 interface OtpCodeFieldProps {
   recordId: string
