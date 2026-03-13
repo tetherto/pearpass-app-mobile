@@ -1,0 +1,28 @@
+PearPass is a fully local, open-source password manager designed for complete privacy and control. Unlike traditional cloud-based managers, PearPass never sends your data to external servers. All credentials are stored and encrypted directly on your device using strong end-to-end encryption. Whether you’re syncing between your phone and laptop or managing hundreds of logins, PearPass gives you full ownership of your digital identity. There is no central infrastructure to target, no hidden storage, and no third-party access.
+
+Key Features
+
+- Device-Only Storage
+Your passwords are stored locally on your devices, not in the cloud. You decide which devices have access. PearPass never uploads or stores your data externally.
+
+- Peer-to-Peer Sync
+Secure syncing between your own devices without using a central server. Your data moves directly and securely between devices you control.
+
+- End-to-End Encryption
+All data is encrypted using proven cryptographic primitives from Libsodium. No one else can access or read your vault—not even us.
+
+- Open Source and Independently Audited
+PearPass is fully open source and has been independently reviewed by Secfault Security, a respected firm specializing in cryptography and offensive security.
+
+- Offline-First Design
+Works without an internet connection. Your password vault is available at all times, even during outages or when you’re traveling.
+
+- Password Generator
+Generate strong, unique passwords with one tap. Reduce the risks of reused or weak credentials.
+
+- Minimal and Fast
+PearPass is lightweight, efficient, and designed for users who value both privacy and simplicity.
+
+F-Droid build notes:
+- The Android “fdroid” build channel removes Play Services–specific auth dependencies.
+- In F-Droid builds, in-app version checking and Play Store redirects are disabled.
