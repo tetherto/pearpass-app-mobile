@@ -113,6 +113,12 @@ export default abstract class BasePage {
     return this;
   }
 
+  /** Hides the device soft keyboard (Appium). */
+  async hideKeyboard(): Promise<this> {
+    await (browser as any).hideKeyboard();
+    return this.self;
+  }
+
   /* ==================== WAITING ==================== */
   async waitForDisplayed(name: string, timeout = 1000): Promise<this> {
     const selector = this.resolveSelector(name);

@@ -17,6 +17,7 @@ export const SIDEBAR_BUTTONS = {
 
 export const SIDEBAR_ITEMS_COUNT = {
   allItems: '0 items',
+  sevenItems: '7 items',
   favorites: '0 items',
 } as const;
 
