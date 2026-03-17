@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { Button } from '@tetherto/pearpass-lib-ui-kit'
 import { FaceId, Fingerprint } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { closeAllInstances, useUserData, useVaults } from 'pearpass-lib-vault'
+import { useVault, useVaults } from 'pearpass-lib-vault'
 import {
   clearBuffer,
   stringToBuffer
@@ -30,8 +30,8 @@ export const BiometricsScreen = () => {
   const route = useRoute()
   const { enableBiometrics, isBiometricsSupported, isBiometricsEnabled } =
     useBiometricsAuthentication()
-  const { logIn } = useUserData()
-  const { initVaults, resetState } = useVaults()
+  const { data: vaultsData } = useVaults()
+  const { refetch: refetchVault } = useVault()
   const password = route.params?.password
 
   const biometricsChecked = useRef(false)
@@ -54,16 +54,24 @@ export const BiometricsScreen = () => {
     : t`Unlock faster with biometrics`
   const buttonLabel = isIOS ? t`Enable Face ID` : t`Enable biometrics`
 
+  const enterApp = async () => {
+    const firstVault = vaultsData?.[0]
+    if (firstVault) {
+      await refetchVault(firstVault.id)
+      navigation.replace('MainTabNavigator')
+    } else {
+      navigation.replace('Welcome', {
+        state: NAVIGATION_ROUTES.SELECT_OR_LOAD
+      })
+    }
+  }
+
   const finishOnboarding = () => {
-    navigation.replace('Welcome', {
-      state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD
-    })
+    enterApp()
   }
 
   const handleEnableBiometrics = async () => {
-    console.log('[BiometricsScreen] password:', password ? 'present' : 'null')
     if (!password) {
-      console.log('[BiometricsScreen] No password, finishing')
       finishOnboarding()
       return
     }
@@ -71,15 +79,7 @@ export const BiometricsScreen = () => {
     const passwordBuffer = stringToBuffer(password)
 
     try {
-      console.log('[BiometricsScreen] Logging in...')
-      await logIn({ password: passwordBuffer })
-      console.log('[BiometricsScreen] Initializing vaults...')
-      await initVaults({ password: passwordBuffer })
-      console.log('[BiometricsScreen] Enabling biometrics...')
       const result = await enableBiometrics()
-      console.log('[BiometricsScreen] enableBiometrics result:', result)
-      await closeAllInstances()
-      resetState()
 
       if (result?.error) {
         logger.error('Failed to enable biometric authentication:', result.error)
@@ -91,11 +91,10 @@ export const BiometricsScreen = () => {
         })
       }
 
-      finishOnboarding()
+      await enterApp()
     } catch (error) {
-      console.log('[BiometricsScreen] Error:', error)
       logger.error('Error while enabling biometric authentication:', error)
-      finishOnboarding()
+      await enterApp()
     } finally {
       clearBuffer(passwordBuffer)
     }
