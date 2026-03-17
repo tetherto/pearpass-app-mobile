@@ -1,6 +1,10 @@
+import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import * as NavigationBar from 'expo-navigation-bar'
+import { StatusBar } from 'expo-status-bar'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   Dimensions,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,11 +17,6 @@ import { LogoTextWithLock } from '../../../svgs/LogoTextWithLock'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
-const TOP_GRADIENT_COLORS = [
-  { color: '#3A4A1A', offset: '0%' },
-  { color: '#15180E', offset: '100%', opacity: 0 }
-]
-
 export const OnboardingLayout = ({
   children,
   showLogo = true,
@@ -25,19 +24,31 @@ export const OnboardingLayout = ({
   avoidBottomInset = false,
   topGradient = false
 }) => {
+  const { theme } = useTheme()
+  const backgroundColor = theme.colors.colorSurfacePrimary
+
+  const topGradientColors = [
+    { color: '#3A4A1A', offset: '0%' },
+    { color: backgroundColor, offset: '100%', opacity: 0 }
+  ]
   const insets = useSafeAreaInsets()
+
+  if (Platform.OS === 'android') {
+    NavigationBar.setBackgroundColorAsync(backgroundColor)
+  }
 
   return (
     <View
       style={[
         styles.container,
         {
-          paddingTop: insets.top,
+          backgroundColor,
           paddingBottom: avoidBottomInset ? 0 : insets.bottom + 8
         }
       ]}
       testID="onboarding-v2-layout"
     >
+      <StatusBar style="light" translucent backgroundColor="transparent" />
       {topGradient && (
         <View style={styles.topGradientWrapper}>
           <Svg
@@ -47,7 +58,7 @@ export const OnboardingLayout = ({
           >
             <Defs>
               <RadialGradient id="topGrad" cx="50%" cy="0%" rx="70%" ry="60%">
-                {TOP_GRADIENT_COLORS.map((stop, i) => (
+                {topGradientColors.map((stop, i) => (
                   <Stop
                     key={i}
                     offset={stop.offset}
@@ -62,7 +73,12 @@ export const OnboardingLayout = ({
         </View>
       )}
 
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          { paddingTop: insets.top + (Platform.OS === 'android' ? 24 : 0) }
+        ]}
+      >
         {showLogo && (
           <View style={styles.logoContainer} testID="onboarding-v2-logo">
             <LogoTextWithLock width={120} />
@@ -85,9 +101,7 @@ export const OnboardingLayout = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    // TODO: add this color to the theme provider
-    backgroundColor: '#15180E'
+    flex: 1
   },
   topGradientWrapper: {
     position: 'absolute',
