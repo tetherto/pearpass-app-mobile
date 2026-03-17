@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
@@ -17,23 +17,24 @@ import {
 import { OnboardingLayout } from '../components/OnboardingLayout'
 import { RadialGradientBackground } from '../components/RadialGradientBackground'
 
-const GRADIENT_COLORS = [
-  { color: '#3A4A1A', offset: '0%' },
-  { color: '#15180E', offset: '100%', opacity: 0 }
-]
-
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 export const DataLocalScreen = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
+
+  const gradientColors = [
+    { color: '#3A4A1A', offset: '0%' },
+    { color: theme.colors.colorSurfacePrimary, offset: '100%', opacity: 0 }
+  ]
 
   return (
     <OnboardingLayout>
       <View style={styles.container}>
         <View style={styles.topSection}>
           <RadialGradientBackground
-            colors={GRADIENT_COLORS}
+            colors={gradientColors}
             style={styles.mediaContainer}
           >
             <Image

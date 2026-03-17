@@ -111,7 +111,7 @@ export const BiometricsScreen = () => {
         <View style={styles.topSection}>
           <View style={styles.riveContainer}>
             <Rive
-              resourceName={isIOS ? 'face-id' : 'fingerprint'}
+              resourceName={isIOS ? 'face_id' : 'fingerprint'}
               autoplay
               style={styles.riveAnimation}
               testID="onboarding-v2-biometrics-media"

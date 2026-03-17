@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button, PasswordField } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, PasswordField, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { TERMS_OF_USE } from 'pearpass-lib-constants'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
@@ -27,6 +27,7 @@ import { usePasswordCreation } from '../hooks/usePasswordCreation'
 export const CreatePasswordScreen = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
   const { isKeyboardVisible } = useKeyboardVisibility()
   const insets = useSafeAreaInsets()
   const [isScrollable, setIsScrollable] = useState(false)
@@ -140,6 +141,7 @@ export const CreatePasswordScreen = () => {
         <View
           style={[
             styles.bottomSection,
+            { backgroundColor: theme.colors.colorSurfacePrimary },
             isScrollable && styles.bottomSectionElevated
           ]}
           elevation={isScrollable ? 10 : 0}
@@ -215,9 +217,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 20,
     paddingTop: 16,
-    gap: 16,
-    // TODO: add this color to the theme provider
-    backgroundColor: '#15180E'
+    gap: 16
   },
   bottomSectionElevated: {
     borderTopWidth: 1,

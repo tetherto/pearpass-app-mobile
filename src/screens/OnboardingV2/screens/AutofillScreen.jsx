@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Button } from '@tetherto/pearpass-lib-ui-kit'
+import { OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   AppState,
@@ -14,7 +15,6 @@ import {
 } from 'react-native'
 import Rive from 'rive-react-native'
 
-import { OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   isAutofillEnabled,
   openAutofillSettings,

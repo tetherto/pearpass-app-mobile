@@ -20,7 +20,7 @@ export const SyncScreen = () => {
         <View style={styles.topSection}>
           <View style={styles.riveContainer}>
             <Rive
-              resourceName="sync-without-the-cloud"
+              resourceName="sync_without_the_cloud"
               autoplay
               style={styles.riveAnimation}
               testID="onboarding-v2-sync-media"
