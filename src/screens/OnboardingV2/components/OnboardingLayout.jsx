@@ -76,7 +76,7 @@ export const OnboardingLayout = ({
       <View
         style={[
           styles.header,
-          { paddingTop: insets.top + (Platform.OS === 'android' ? 24 : 0) }
+          { paddingTop: insets.top + (Platform.OS === 'android' ? 24 : 16) }
         ]}
       >
         {showLogo && (

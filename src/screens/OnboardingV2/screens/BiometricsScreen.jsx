@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useNavigation, useRoute } from '@react-navigation/native'
+import {
+  CommonActions,
+  useNavigation,
+  useRoute
+} from '@react-navigation/native'
 import { Button } from '@tetherto/pearpass-lib-ui-kit'
 import { FaceId, Fingerprint } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
@@ -58,11 +62,24 @@ export const BiometricsScreen = () => {
     const firstVault = vaultsData?.[0]
     if (firstVault) {
       await refetchVault(firstVault.id)
-      navigation.replace('MainTabNavigator')
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'MainTabNavigator' }]
+        })
+      )
     } else {
-      navigation.replace('Welcome', {
-        state: NAVIGATION_ROUTES.SELECT_OR_LOAD
-      })
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'Welcome',
+              params: { state: NAVIGATION_ROUTES.SELECT_OR_LOAD }
+            }
+          ]
+        })
+      )
     }
   }
 
