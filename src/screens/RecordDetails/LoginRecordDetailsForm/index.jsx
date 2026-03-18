@@ -15,6 +15,7 @@ import { AppWarning } from '../../../components/AppWarning'
 import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { InputFieldNote } from '../../../components/InputFieldNote'
+import { OtpCodeField } from '../../../components/OtpCodeField'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
@@ -134,6 +135,16 @@ Consider changing it to keep your account secure.`}
             }
             isDisabled
             editable={false}
+          />
+        </FormGroup>
+      )}
+
+      {!!initialRecord?.otpPublic && (
+        <FormGroup>
+          <OtpCodeField
+            key={initialRecord.id}
+            recordId={initialRecord.id}
+            otpPublic={initialRecord.otpPublic}
           />
         </FormGroup>
       )}

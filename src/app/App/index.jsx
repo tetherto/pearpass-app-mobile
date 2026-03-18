@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 
+import { OtpRefreshProvider } from 'pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
 import { Navigation } from '../Navigation'
@@ -34,7 +35,9 @@ export const App = () => {
 
   return (
     <>
-      <Navigation initialRouteName={initialRouteName} />
+      <OtpRefreshProvider>
+        <Navigation initialRouteName={initialRouteName} />
+      </OtpRefreshProvider>
 
       <Toast
         config={{

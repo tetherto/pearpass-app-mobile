@@ -1,0 +1,9 @@
+1.5.0
+
+- Added KeePass support
+- Improved passkey saving flow for login items with missing website/username fields
+- Fixed autofill field parsing (broken HTML attribute detection)
+- Fixed wrong error shown for incorrect master password
+- Avoided passkey duplicates and duplicate autofill records when adding passkeys
+- Added bypass of auto-lock during pairing
+- Updated iOS autofill libsodium linking and build/submission plumbing (EAS)
