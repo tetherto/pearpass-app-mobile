@@ -1,9 +1,9 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { Dimensions, Platform, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, Platform, StyleSheet, View } from 'react-native'
 import Rive from 'rive-react-native'
 
 import { OnboardingLayout } from '../components/OnboardingLayout'
@@ -27,13 +27,13 @@ export const SyncScreen = () => {
             />
           </View>
 
-          <Text style={styles.title} testID="onboarding-v2-sync-title">
+          <Title style={styles.title} data-testid="onboarding-v2-sync-title">
             {t`Sync without the cloud`}
-          </Text>
+          </Title>
 
           <Text
             style={styles.description}
-            testID="onboarding-v2-sync-description"
+            data-testid="onboarding-v2-sync-description"
           >
             {t`Your devices connect directly to each other using peer-to-peer technology.\n\nNo cloud. No copies. No middlemen.`}
           </Text>
@@ -83,18 +83,13 @@ const styles = StyleSheet.create({
   title: {
     fontFamily:
       Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    fontWeight: '400',
     color: colors.white.mode1,
     textAlign: 'center',
     marginTop: 48,
     marginBottom: 14
   },
   description: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: colors.white.mode1,
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 30

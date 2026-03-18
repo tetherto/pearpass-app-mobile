@@ -1,16 +1,9 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, useTheme, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import {
-  Dimensions,
-  Image,
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native'
+import { Dimensions, Image, Platform, StyleSheet, View } from 'react-native'
 
 // TODO: restore InitialVideo when the new video asset is available
 // import { InitialVideo } from '../../../containers/InitialVideo'
@@ -63,13 +56,16 @@ export const DataLocalScreen = () => {
           </View>
           */}
 
-          <Text style={styles.title} testID="onboarding-v2-data-local-title">
+          <Title
+            style={styles.title}
+            data-testid="onboarding-v2-data-local-title"
+          >
             {t`Your data stays on your devices`}
-          </Text>
+          </Title>
 
           <Text
             style={styles.description}
-            testID="onboarding-v2-data-local-description"
+            data-testid="onboarding-v2-data-local-description"
           >
             {t`Your items are stored locally, not on our servers.\nOnly you have access to them.`}
           </Text>
@@ -121,18 +117,13 @@ const styles = StyleSheet.create({
   title: {
     fontFamily:
       Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    fontWeight: '400',
     color: colors.white.mode1,
     textAlign: 'center',
     marginTop: 22,
     marginBottom: 14
   },
   description: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: colors.white.mode1,
     textAlign: 'center',
     lineHeight: 18,
     marginBottom: 30

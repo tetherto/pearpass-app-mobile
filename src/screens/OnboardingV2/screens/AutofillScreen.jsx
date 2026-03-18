@@ -2,17 +2,10 @@ import { useEffect, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Button } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import {
-  AppState,
-  Dimensions,
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native'
+import { AppState, Dimensions, Platform, StyleSheet, View } from 'react-native'
 import Rive from 'rive-react-native'
 
 import {
@@ -56,13 +49,6 @@ export const AutofillScreen = () => {
   }, [])
 
   const handleEnableAutofill = () => {
-    console.log('[AutofillScreen] handleEnableAutofill called')
-    console.log(
-      '[AutofillScreen] Platform:',
-      Platform.OS,
-      'Version:',
-      Platform.Version
-    )
     waitingForSettings.current = true
 
     const useSystemPrompt =
@@ -71,14 +57,8 @@ export const AutofillScreen = () => {
       ? requestToEnableAutofill
       : openAutofillSettings
 
-    console.log(
-      '[AutofillScreen] Using:',
-      useSystemPrompt ? 'requestToEnableAutofill' : 'openAutofillSettings'
-    )
-
     openSettings()
-      .then((result) => {
-        console.log('[AutofillScreen] Settings result:', result)
+      .then((_result) => {
         // If the system prompt resolved without leaving the app
         // (iOS 18+ in-app prompt, or already enabled), navigate directly
         if (!waitingForSettings.current) return
@@ -88,7 +68,6 @@ export const AutofillScreen = () => {
         }
       })
       .catch((error) => {
-        console.log('[AutofillScreen] Settings error:', error)
         logger.error('Failed to enable autofill:', error)
         waitingForSettings.current = false
       })
@@ -107,17 +86,20 @@ export const AutofillScreen = () => {
               resourceName="autofill"
               autoplay
               style={styles.riveAnimation}
-              testID="onboarding-v2-autofill-media"
+              data-testid="onboarding-v2-autofill-media"
             />
           </View>
 
-          <Text style={styles.title} testID="onboarding-v2-autofill-title">
+          <Title
+            style={styles.title}
+            data-testid="onboarding-v2-autofill-title"
+          >
             {t`Faster, safer sign-ins`}
-          </Text>
+          </Title>
 
           <Text
             style={styles.description}
-            testID="onboarding-v2-autofill-description"
+            data-testid="onboarding-v2-autofill-description"
           >
             {t`Allow autofill to sign in instantly on apps and websites. PearPass fills your credentials securely, so you don't need to remember, copy, or retype passwords.`}
           </Text>
@@ -167,19 +149,13 @@ const styles = StyleSheet.create({
   title: {
     fontFamily:
       Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    fontWeight: '400',
     color: colors.white.mode1,
     textAlign: 'center',
     marginBottom: 14
   },
   description: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#BDC3AC',
     textAlign: 'center',
-    lineHeight: 18,
     marginBottom: 30
   }
 })
