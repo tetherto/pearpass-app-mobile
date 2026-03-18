@@ -170,7 +170,7 @@ export const InputField = ({
 
         <View style={styles.inputContainer}>
           {isDisabled ? (
-            <ScrollView horizontal>
+            <ScrollView horizontal nestedScrollEnabled>
               <View style={styles.scrollableTextContainer}>
                 <Text
                   style={[
@@ -259,7 +259,7 @@ export const InputField = ({
     </View>
   )
 
-  if (isDisabled && onClick) {
+  if (isDisabled) {
     return (
       <View
         style={getWrapperStyle()}
