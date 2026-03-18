@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { FolderIcon } from 'pearpass-lib-ui-react-native-components'
-import { useRecords, useVault } from 'pearpass-lib-vault'
+import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
 
 import { Container, CurrentFolder, FolderName } from './styles'
 import { Categories } from '../../containers/Categories'

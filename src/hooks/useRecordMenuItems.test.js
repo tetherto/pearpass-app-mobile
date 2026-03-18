@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { renderHook } from '@testing-library/react-native'
-import { RECORD_TYPES } from 'pearpass-lib-vault'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
 import { useRecordMenuItems } from './useRecordMenuItems'
 import messages from '../locales/en/messages'
@@ -14,7 +14,7 @@ jest.mock('@lingui/react/macro', () => ({
     t: (text) => text
   })
 }))
-jest.mock('pearpass-lib-vault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
   RECORD_TYPES: {
     LOGIN: 'LOGIN',
     CREDIT_CARD: 'CREDIT_CARD',

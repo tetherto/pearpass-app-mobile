@@ -8,9 +8,9 @@ import {
   KebabMenuIcon,
   MoveToIcon,
   SearchIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useRecords } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useRecords } from '@tetherto/pearpass-lib-vault'
 import { TouchableOpacity } from 'react-native'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'

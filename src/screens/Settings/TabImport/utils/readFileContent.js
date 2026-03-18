@@ -1,6 +1,9 @@
+import {
+  MAX_FILE_SIZE_BYTES,
+  MAX_FILE_SIZE_MB
+} from '@tetherto/pearpass-lib-constants'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FileSystem from 'expo-file-system'
-import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from 'pearpass-lib-constants'
 
 const base64ToArrayBuffer = (base64) => {
   const binaryString = atob(base64)

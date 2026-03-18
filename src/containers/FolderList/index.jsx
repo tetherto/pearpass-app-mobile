@@ -2,15 +2,15 @@ import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { AUTHENTICATOR_ENABLED } from 'pearpass-lib-constants'
+import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
   FolderIcon,
   LockIcon,
   PlusIcon,
   StarIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useFolders, useRecordCountsByType } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
 
 import { FoldersContainer } from './styles'
 import { Folder } from '../../components/Folder'

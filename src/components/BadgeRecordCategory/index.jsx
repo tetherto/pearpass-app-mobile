@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { CategoryItem, CategoryText } from './styles'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'

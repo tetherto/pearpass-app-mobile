@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react'
 
 import { BottomSheetTextInput, BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
   ButtonPrimary,
   CommonFileIcon,
   DeleteIcon,
   FolderIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import {
   ActivityIndicator,
   Dimensions,

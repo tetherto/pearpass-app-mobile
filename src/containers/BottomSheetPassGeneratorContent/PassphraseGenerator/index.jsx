@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import Slider from '@react-native-community/slider'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View } from 'react-native'
 
 import { RuleSelector } from '../RuleSelector'

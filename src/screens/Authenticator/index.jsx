@@ -2,14 +2,17 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { PlusIcon, SaveIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import {
+  PlusIcon,
+  SaveIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   formatOtpCode,
   groupOtpRecords,
   isExpiring,
   useRecords
-} from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 

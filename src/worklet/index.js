@@ -1,5 +1,5 @@
+import { PearpassVaultClient } from '@tetherto/pearpass-lib-vault-core'
 import * as FileSystem from 'expo-file-system'
-import { PearpassVaultClient } from 'pearpass-lib-vault-core'
 import { AppState, Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
 import Suspendify from 'suspendify'

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { APP_STORE_URL, PLAY_STORE_URL } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { APP_STORE_URL, PLAY_STORE_URL } from '@tetherto/pearpass-lib-constants'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet, Platform, Linking } from 'react-native'
 
 import { isFdroid } from '../../../constants/distribution'

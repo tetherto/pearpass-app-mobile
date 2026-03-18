@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { AppWarning } from './index'
 import messages from '../../locales/en/messages'
@@ -9,7 +9,7 @@ import messages from '../../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
-jest.mock('pearpass-lib-ui-react-native-components', () => {
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => {
   const { Text } = require('react-native')
 
   return {

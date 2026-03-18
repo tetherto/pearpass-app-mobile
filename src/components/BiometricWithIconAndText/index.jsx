@@ -1,10 +1,10 @@
 import { useLingui } from '@lingui/react/macro'
-import * as LocalAuthentication from 'expo-local-authentication'
 import {
   FaceIdIcon,
   FingerprintIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import * as LocalAuthentication from 'expo-local-authentication'
 
 import { Wrapper, PressableText } from './styles'
 

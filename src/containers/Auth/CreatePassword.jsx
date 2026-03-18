@@ -2,16 +2,20 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { TERMS_OF_USE } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { closeAllInstances, useUserData, useVaults } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { TERMS_OF_USE } from '@tetherto/pearpass-lib-constants'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import {
+  closeAllInstances,
+  useUserData,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
   stringToBuffer
-} from 'pearpass-lib-vault/src/utils/buffer'
-import { checkPasswordStrength } from 'pearpass-utils-password-check'
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
+import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
 import {
   ActivityIndicator,
   KeyboardAvoidingView,

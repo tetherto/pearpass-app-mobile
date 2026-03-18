@@ -2,22 +2,22 @@ import { useEffect, useState } from 'react'
 
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
   BLIND_PEER_TYPE,
   BLIND_PEERS_LIMIT,
   BLIND_PEER_FORM_NAME,
   BLIND_PEERS_FORM_NAME
-} from 'pearpass-lib-constants'
+} from '@tetherto/pearpass-lib-constants'
 import {
   ButtonPrimary,
   ButtonSecondary,
   DeleteIcon,
   PlusIcon,
   SmallArrowIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
-import { useBlindMirrors } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
+import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
 import {
   Text,
   View,

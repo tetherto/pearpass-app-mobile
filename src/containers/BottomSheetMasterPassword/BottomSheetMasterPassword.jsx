@@ -1,17 +1,17 @@
 import { BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
   ButtonPrimary,
   ButtonSecondary
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
-import { useUserData, useVaults } from 'pearpass-lib-vault/src'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
+import { useUserData, useVaults } from '@tetherto/pearpass-lib-vault/src'
 import {
   clearBuffer,
   stringToBuffer
-} from 'pearpass-lib-vault/src/utils/buffer'
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
 import { Text, View, StyleSheet } from 'react-native'
 
 import { ButtonBiometricLogin } from '../../components/ButtonBiometricLogin'

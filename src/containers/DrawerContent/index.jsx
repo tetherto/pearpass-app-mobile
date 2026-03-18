@@ -1,9 +1,16 @@
 import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { ExitIcon, FullBodyIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { closeAllInstances, useVault, useVaults } from 'pearpass-lib-vault'
+import {
+  ExitIcon,
+  FullBodyIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import {
+  closeAllInstances,
+  useVault,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
 import { ActivityIndicator } from 'react-native'
 
 import {

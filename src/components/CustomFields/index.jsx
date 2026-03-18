@@ -1,4 +1,4 @@
-import { DeleteIcon } from 'pearpass-lib-ui-react-native-components'
+import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { ButtonLittle } from '../../libComponents'
 import { FormGroup } from '../FormGroup'

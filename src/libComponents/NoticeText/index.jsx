@@ -2,7 +2,7 @@ import {
   ErrorIcon,
   OkayIcon,
   YellowErrorIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { NoticeTextComponent, NoticeTextWrapper } from './styles'
 

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { useVault } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useVault } from '@tetherto/pearpass-lib-vault'
 
 import { InputPasswordPearPass } from '../../../libComponents'
 import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'

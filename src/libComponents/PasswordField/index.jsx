@@ -8,11 +8,11 @@ import {
   KeyIcon,
   OkayIcon,
   YellowErrorIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   checkPassphraseStrength,
   checkPasswordStrength
-} from 'pearpass-utils-password-check'
+} from '@tetherto/pearpass-utils-password-check'
 import { View } from 'react-native'
 
 import { ButtonLittle } from '../ButtonLittle'

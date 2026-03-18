@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { AUTO_LOCK_TIMEOUT_OPTIONS } from 'pearpass-lib-constants'
+import { AUTO_LOCK_TIMEOUT_OPTIONS } from '@tetherto/pearpass-lib-constants'
 import styled from 'styled-components/native'
 
 import { RadioSelect } from '../../components/RadioSelect'

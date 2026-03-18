@@ -1,12 +1,12 @@
-import { formatDate } from 'pear-apps-utils-date'
+import { formatDate } from '@tetherto/pear-apps-utils-date'
 import {
   BrushIcon,
   CheckIcon,
   DeleteIcon,
   LockCircleIcon,
   ShareIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator } from 'react-native'
 
 import {

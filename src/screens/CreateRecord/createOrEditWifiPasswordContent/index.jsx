@@ -1,9 +1,16 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { PasswordIcon, WifiIcon } from 'pearpass-lib-ui-react-native-components'
-import { RECORD_TYPES, useCreateRecord, useRecords } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import {
+  PasswordIcon,
+  WifiIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
+  RECORD_TYPES,
+  useCreateRecord,
+  useRecords
+} from '@tetherto/pearpass-lib-vault'
 import { Platform } from 'react-native'
 
 import { CreateCustomField } from '../../../components/CreateCustomField'

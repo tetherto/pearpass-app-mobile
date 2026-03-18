@@ -13,7 +13,7 @@ jest.mock('expo-file-system', () => ({
   EncodingType: { UTF8: 'utf8', Base64: 'base64' }
 }))
 
-jest.mock('pearpass-lib-constants', () => ({
+jest.mock('@tetherto/pearpass-lib-constants', () => ({
   MAX_FILE_SIZE_BYTES: 6 * 1024 * 1024, // 6 MB
   MAX_FILE_SIZE_MB: 6
 }))

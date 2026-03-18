@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 
-import { ErrorIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { ErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import {
   Platform,
   StyleSheet,

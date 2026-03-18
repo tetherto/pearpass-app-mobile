@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { HighlightString } from './index'
 

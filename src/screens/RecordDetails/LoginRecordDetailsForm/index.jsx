@@ -2,14 +2,14 @@ import { useCallback, useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useFocusEffect } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { isBefore, subtractDateUnits } from 'pear-apps-utils-date'
-import { generateUniqueId } from 'pear-apps-utils-generate-unique-id'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { isBefore, subtractDateUnits } from '@tetherto/pear-apps-utils-date'
+import { generateUniqueId } from '@tetherto/pear-apps-utils-generate-unique-id'
 import {
   KeyIcon,
   UserIcon,
   WebsiteIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { AppWarning } from '../../../components/AppWarning'
 import { CustomFields } from '../../../components/CustomFields'

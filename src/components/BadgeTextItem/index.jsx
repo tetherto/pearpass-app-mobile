@@ -1,4 +1,4 @@
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet } from 'react-native'
 
 /**

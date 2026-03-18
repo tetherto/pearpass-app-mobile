@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import { CommonFileIcon } from 'pearpass-lib-ui-react-native-components'
+import { CommonFileIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { InputField } from '../../libComponents'
 

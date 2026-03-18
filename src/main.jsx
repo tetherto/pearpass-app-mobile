@@ -6,9 +6,15 @@ import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { NavigationContainer } from '@react-navigation/native'
 import { ThemeProvider as UIKitProvider } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  colors,
+  ThemeProvider
+} from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import {
+  setPearpassVaultClient,
+  VaultProvider
+} from '@tetherto/pearpass-lib-vault'
 import { StatusBar } from 'expo-status-bar'
-import { colors, ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
-import { setPearpassVaultClient, VaultProvider } from 'pearpass-lib-vault'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { App } from './app/App'

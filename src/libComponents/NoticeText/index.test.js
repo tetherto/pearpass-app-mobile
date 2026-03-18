@@ -3,8 +3,8 @@ import {
   ErrorIcon,
   OkayIcon,
   YellowErrorIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { NoticeText } from './index'
 

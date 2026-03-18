@@ -1,5 +1,5 @@
 import { createDrawerNavigator } from '@react-navigation/drawer'
-import { AUTHENTICATOR_ENABLED } from 'pearpass-lib-constants'
+import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 
 import { DrawerContent } from '../../containers/DrawerContent'
 import { Authenticator } from '../../screens/Authenticator'

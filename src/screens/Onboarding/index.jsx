@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVideoPlayer, VideoView } from 'expo-video'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { Text, View, StyleSheet, Animated, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 

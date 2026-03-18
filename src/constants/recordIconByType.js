@@ -8,7 +8,7 @@ import {
   PasswordIcon,
   WifiIcon,
   PassPhraseIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 /**
  * @type {Record<string, import('react').ElementType>}

@@ -1,6 +1,6 @@
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { Text, StyleSheet } from 'react-native'
 
 /**

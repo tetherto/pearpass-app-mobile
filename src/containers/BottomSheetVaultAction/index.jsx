@@ -1,7 +1,7 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { PROTECTED_VAULT_ENABLED } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 import { VAULT_ACTION } from '../../constants/vaultActions'

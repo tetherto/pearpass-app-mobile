@@ -3,8 +3,8 @@ import {
   HomeIcon,
   PlusIcon,
   SettingsIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { BottomSheetRecordCreateContent } from '../../containers/BottomSheetRecordCreateContent'

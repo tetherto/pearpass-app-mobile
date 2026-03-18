@@ -1,8 +1,8 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { AUTHENTICATOR_ENABLED } from 'pearpass-lib-constants'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
   DeleteIcon,
   KeyIcon,
@@ -11,8 +11,12 @@ import {
   PlusIcon,
   UserIcon,
   WebsiteIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { RECORD_TYPES, useCreateRecord, useRecords } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
+  RECORD_TYPES,
+  useCreateRecord,
+  useRecords
+} from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
 import { CreateCustomField } from '../../../components/CreateCustomField'

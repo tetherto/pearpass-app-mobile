@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useUserData } from 'pearpass-lib-vault'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useUserData } from '@tetherto/pearpass-lib-vault'
 import { ActivityIndicator, View, Image } from 'react-native'
 
 import { NAVIGATION_ROUTES } from '../../constants/navigation'

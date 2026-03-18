@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { RECORD_TYPES } from 'pearpass-lib-vault'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
 /**
  * @param {{

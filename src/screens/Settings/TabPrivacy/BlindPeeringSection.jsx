@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { BLIND_PEERS_LEARN_MORE } from 'pearpass-lib-constants'
+import { BLIND_PEERS_LEARN_MORE } from '@tetherto/pearpass-lib-constants'
 import {
   EditIcon,
   RedirectIcon,
   TooltipIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
-import { useBlindMirrors } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
+import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
 import { View, Text, Pressable, Linking, StyleSheet } from 'react-native'
 import Toast from 'react-native-toast-message'
 

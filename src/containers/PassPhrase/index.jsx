@@ -5,14 +5,14 @@ import {
   PASSPHRASE_WORD_COUNTS,
   VALID_WORD_COUNTS,
   DEFAULT_SELECTED_TYPE
-} from 'pearpass-lib-constants'
+} from '@tetherto/pearpass-lib-constants'
 import {
   CopyIcon,
   PassPhraseIcon,
   PasteFromClipboardIcon,
   ErrorIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import Toast from 'react-native-toast-message'
 

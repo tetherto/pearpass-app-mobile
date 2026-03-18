@@ -1,4 +1,4 @@
-import { CopyIcon } from 'pearpass-lib-ui-react-native-components'
+import { CopyIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { TouchableOpacity } from 'react-native'
 import { useTheme } from 'styled-components/native'
 

@@ -1,9 +1,9 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { PROTECTED_VAULT_ENABLED } from 'pearpass-lib-constants'
-import { BackIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useVault } from 'pearpass-lib-vault'
+import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useVault } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 

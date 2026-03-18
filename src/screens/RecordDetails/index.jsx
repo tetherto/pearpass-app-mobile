@@ -6,10 +6,10 @@ import {
   FolderIcon,
   KebabMenuIcon,
   StarIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useRecordById, useRecords } from 'pearpass-lib-vault'
-import { RECORD_TYPES } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useRecordById, useRecords } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 import { TouchableOpacity } from 'react-native'
 
 import { RecordDetailsContent } from './RecordDetailsContentWrapper'

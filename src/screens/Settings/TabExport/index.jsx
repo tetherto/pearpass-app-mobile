@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { BackIcon } from 'pearpass-lib-ui-react-native-components'
+import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   authoriseCurrentProtectedVault,
   getCurrentProtectedVaultEncryption,
@@ -10,7 +10,7 @@ import {
   getVaultById,
   listRecords,
   useVault
-} from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-vault'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'

@@ -1,24 +1,24 @@
 import { Buffer } from 'buffer'
 
 import { render } from '@testing-library/react-native'
-import { generateAvatarInitials } from 'pear-apps-utils-avatar-initials'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { AvatarRecord } from './index'
 
-jest.mock('pear-apps-utils-avatar-initials', () => ({
+jest.mock('@tetherto/pear-apps-utils-avatar-initials', () => ({
   generateAvatarInitials: jest.fn(() => 'AB')
 }))
 
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   CheckIcon: (props) => <div testID="check-icon" {...props} />,
   StarIcon: (props) => <div testID="favorite-badge" {...props} />
 }))
 
-jest.mock('pearpass-lib-vault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
   getDefaultFavicon: jest.fn(),
   useFavicon: jest.fn(({ url }) => {
-    const { getDefaultFavicon } = require('pearpass-lib-vault')
+    const { getDefaultFavicon } = require('@tetherto/pearpass-lib-vault')
     const { extractDomainName } = require('../../utils/extractDomainName')
 
     if (!url) return { faviconSrc: null }
@@ -37,7 +37,7 @@ jest.mock('../../utils/extractDomainName', () => ({
   extractDomainName: jest.fn(() => 'example.com')
 }))
 
-const { getDefaultFavicon } = require('pearpass-lib-vault')
+const { getDefaultFavicon } = require('@tetherto/pearpass-lib-vault')
 
 const { extractDomainName } = require('../../utils/extractDomainName')
 

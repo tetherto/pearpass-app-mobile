@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
-import { KebabMenuIcon } from 'pearpass-lib-ui-react-native-components'
-import { formatOtpCode } from 'pearpass-lib-vault'
+import { KebabMenuIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { formatOtpCode } from '@tetherto/pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 
 import { styles } from './styles'

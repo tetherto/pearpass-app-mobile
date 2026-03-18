@@ -1,4 +1,4 @@
-import { useRecordCountsByType } from 'pearpass-lib-vault'
+import { useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
 
 import { Container } from './styles'
 import { BadgeRecordCategory } from '../../components/BadgeRecordCategory'

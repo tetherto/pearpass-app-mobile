@@ -1,11 +1,11 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { FolderIcon } from 'pearpass-lib-ui-react-native-components'
-import { XIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useCreateFolder, useFolders } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { XIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useCreateFolder, useFolders } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
 import {

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { AUTO_LOCK_ENABLED } from '@tetherto/pearpass-lib-constants'
 import * as SecureStore from 'expo-secure-store'
-import { AUTO_LOCK_ENABLED } from 'pearpass-lib-constants'
 
 import { Container, Description } from './styles'
 import { CardSingleSetting } from '../../../components/CardSingleSetting'

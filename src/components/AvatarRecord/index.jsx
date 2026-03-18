@@ -1,9 +1,12 @@
 import { Buffer } from 'buffer'
 
-import { generateAvatarInitials } from 'pear-apps-utils-avatar-initials'
-import { CheckIcon, StarIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useFavicon } from 'pearpass-lib-vault'
+import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
+import {
+  CheckIcon,
+  StarIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useFavicon } from '@tetherto/pearpass-lib-vault'
 
 import {
   AvatarImage,

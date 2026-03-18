@@ -1,7 +1,7 @@
 import {
   CheckIcon,
   KebabMenuIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import {
   MenuItemWrapper,

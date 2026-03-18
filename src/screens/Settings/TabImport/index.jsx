@@ -2,7 +2,7 @@ import { useCallback, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { MAX_IMPORT_RECORDS } from 'pearpass-lib-constants'
+import { MAX_IMPORT_RECORDS } from '@tetherto/pearpass-lib-constants'
 import {
   decryptKeepassKdbx,
   parse1PasswordData,
@@ -12,9 +12,12 @@ import {
   parseNordPassData,
   parsePearPassData,
   parseProtonPassData
-} from 'pearpass-lib-data-import'
-import { BackIcon } from 'pearpass-lib-ui-react-native-components'
-import { decryptExportData, useCreateRecord } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-data-import'
+import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
+  decryptExportData,
+  useCreateRecord
+} from '@tetherto/pearpass-lib-vault'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'

@@ -2,12 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { PROTECTED_VAULT_ENABLED } from 'pearpass-lib-constants'
-import { SmallArrowIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useCreateVault, useVault, useVaults } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { SmallArrowIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import {
+  useCreateVault,
+  useVault,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
 import {
   ActivityIndicator,
   Platform,

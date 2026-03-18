@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { LockIcon } from 'pearpass-lib-ui-react-native-components'
+import { LockIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   formatOtpCode,
   OTP_TYPE,
   useOtp,
   useTimerAnimation
-} from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-vault'
 import { Text, TouchableOpacity, View } from 'react-native'
 import Animated, {
   Easing,
@@ -16,7 +16,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 
-import type { OtpPublic } from 'pearpass-lib-vault/src/types'
+import type { OtpPublic } from '@tetherto/pearpass-lib-vault/src/types'
 
 import { styles } from './styles'
 import { getTimerColor, TIMER_ANIMATION_DURATION } from './utils'

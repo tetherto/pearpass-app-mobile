@@ -2,9 +2,12 @@ import { useMemo, useCallback, memo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import {
+  ImageIcon,
+  PlusIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { Camera } from 'expo-camera'
-import { ImageIcon, PlusIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
 import { Alert, Pressable, Linking } from 'react-native'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'

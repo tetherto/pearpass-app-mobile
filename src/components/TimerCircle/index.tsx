@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useTimerAnimation } from 'pearpass-lib-vault'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useTimerAnimation } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
 import Animated, {
   Easing,

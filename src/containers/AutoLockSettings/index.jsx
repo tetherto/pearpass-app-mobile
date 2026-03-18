@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { AUTO_LOCK_TIMEOUT_OPTIONS } from 'pearpass-lib-constants'
+import { AUTO_LOCK_TIMEOUT_OPTIONS } from '@tetherto/pearpass-lib-constants'
 import {
   ArrowDownIcon,
   TooltipIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { BottomSheetAutoLockContent } from './BottomSheetContent'

@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react/macro'
 import {
   generatePassphrase,
   generatePassword
-} from 'pearpass-utils-password-generator'
+} from '@tetherto/pearpass-utils-password-generator'
 
 import { PassphraseChecker } from './PassphraseChecker'
 import { PassphraseGenerator } from './PassphraseGenerator'

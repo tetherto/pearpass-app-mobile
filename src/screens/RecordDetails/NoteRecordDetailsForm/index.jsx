@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 
 import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'

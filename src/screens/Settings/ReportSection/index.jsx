@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator } from 'react-native'
 
 import { ReportProblemContainer } from './styles'

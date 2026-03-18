@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { useUserData } from 'pearpass-lib-vault'
+import { useUserData } from '@tetherto/pearpass-lib-vault'
 
 import { logger } from '../../../utils/logger'
 import * as SplashScreen from '../../../utils/SplashScreen'
