@@ -1,0 +1,5 @@
+export { DataLocalScreen as OnboardingV2DataLocal } from './screens/DataLocalScreen'
+export { SyncScreen as OnboardingV2Sync } from './screens/SyncScreen'
+export { CreatePasswordScreen as OnboardingV2CreatePassword } from './screens/CreatePasswordScreen'
+export { AutofillScreen as OnboardingV2Autofill } from './screens/AutofillScreen'
+export { BiometricsScreen as OnboardingV2Biometrics } from './screens/BiometricsScreen'
