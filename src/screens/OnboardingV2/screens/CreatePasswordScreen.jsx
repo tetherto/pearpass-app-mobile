@@ -2,7 +2,14 @@ import { useCallback, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button, PasswordField, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  Form,
+  PasswordField,
+  useTheme,
+  Text,
+  Title
+} from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { TERMS_OF_USE } from 'pearpass-lib-constants'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
@@ -11,9 +18,9 @@ import {
   KeyboardAvoidingView,
   Linking,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from 'react-native'
 import Animated, { LinearTransition } from 'react-native-reanimated'
@@ -88,28 +95,29 @@ export const CreatePasswordScreen = () => {
           }}
         >
           <View style={styles.topSection}>
-            <Text
+            <Title
               style={styles.title}
-              testID="onboarding-v2-create-password-title"
+              data-testid="onboarding-v2-create-password-title"
             >
               {t`Create Master password`}
-            </Text>
+            </Title>
 
             <Text
               style={styles.subtitle}
-              testID="onboarding-v2-create-password-subtitle"
+              data-testid="onboarding-v2-create-password-subtitle"
             >
               {t`This is the key to access PearPass. Already using PearPass?`}{' '}
-              <Text
-                style={styles.linkText}
-                onPress={handleTransferData}
-                testID="onboarding-v2-transfer-data-link"
-              >
-                {t`Transfer Data`}
-              </Text>
+              <Pressable onPress={handleTransferData} style={styles.inlineLink}>
+                <Text
+                  style={styles.linkText}
+                  data-testid="onboarding-v2-transfer-data-link"
+                >
+                  {t`Transfer Data`}
+                </Text>
+              </Pressable>
             </Text>
 
-            <View style={styles.inputContainer}>
+            <Form>
               <PasswordField
                 label={t`Password`}
                 placeholderText={t`Enter Master Password`}
@@ -117,7 +125,7 @@ export const CreatePasswordScreen = () => {
                 onChangeText={handlePasswordChange}
                 passwordIndicator={passwordIndicatorVariant}
                 infoBox={t`Strong passwords are usually at least 8 characters long, hard to guess, use a mix of letters, numbers, and symbols, and aren't based on personal information.`}
-                testID="onboarding-v2-password-input"
+                data-testid="onboarding-v2-password-input"
               />
 
               <Animated.View layout={LinearTransition.duration(200)}>
@@ -131,10 +139,10 @@ export const CreatePasswordScreen = () => {
                     passwordConfirmRegisterProps.error ? 'error' : 'default'
                   }
                   errorMessage={passwordConfirmRegisterProps.error}
-                  testID="onboarding-v2-password-confirm-input"
+                  data-testid="onboarding-v2-password-confirm-input"
                 />
               </Animated.View>
-            </View>
+            </Form>
           </View>
         </ScrollView>
 
@@ -146,15 +154,16 @@ export const CreatePasswordScreen = () => {
           ]}
           elevation={isScrollable ? 10 : 0}
         >
-          <Text style={styles.termsText} testID="onboarding-v2-terms-text">
+          <Text style={styles.termsText} data-testid="onboarding-v2-terms-text">
             {t`By clicking Continue, you confirm that you have read and agree to the`}{' '}
-            <Text
-              style={styles.termsLink}
-              onPress={handleTermsPress}
-              testID="onboarding-v2-terms-link"
-            >
-              {t`PearPass Application Terms of Use`}
-            </Text>
+            <Pressable onPress={handleTermsPress} style={styles.inlineLink}>
+              <Text
+                style={styles.termsLink}
+                data-testid="onboarding-v2-terms-link"
+              >
+                {t`PearPass Application Terms of Use`}
+              </Text>
+            </Pressable>
             .
           </Text>
 
@@ -190,28 +199,19 @@ const styles = StyleSheet.create({
   title: {
     fontFamily:
       Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    fontWeight: '400',
     color: colors.white.mode1,
     textAlign: 'center'
   },
   subtitle: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
     color: colors.white.mode1,
     textAlign: 'center'
   },
+  inlineLink: {
+    transform: [{ translateY: 4 }]
+  },
   linkText: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '700',
     color: colors.primary400.option1,
     textDecorationLine: 'underline'
-  },
-  inputContainer: {
-    width: '100%',
-    gap: 12
   },
   bottomSection: {
     paddingHorizontal: 16,
@@ -228,16 +228,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8
   },
   termsText: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#BDC3AC',
     textAlign: 'center'
   },
   termsLink: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
     color: colors.primary400.option1,
     textDecorationLine: 'underline'
   }

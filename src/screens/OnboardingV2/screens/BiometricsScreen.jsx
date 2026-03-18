@@ -6,7 +6,7 @@ import {
   useNavigation,
   useRoute
 } from '@react-navigation/native'
-import { Button } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { FaceId, Fingerprint } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import { useVault, useVaults } from 'pearpass-lib-vault'
@@ -14,7 +14,7 @@ import {
   clearBuffer,
   stringToBuffer
 } from 'pearpass-lib-vault/src/utils/buffer'
-import { Dimensions, Platform, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, Platform, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import Rive from 'rive-react-native'
 
@@ -134,15 +134,18 @@ export const BiometricsScreen = () => {
             />
           </View>
 
-          <Text style={styles.title} testID="onboarding-v2-biometrics-title">
+          <Title
+            style={styles.title}
+            data-testid="onboarding-v2-biometrics-title"
+          >
             {title}
-          </Text>
+          </Title>
 
           <Text
             style={styles.description}
-            testID="onboarding-v2-biometrics-description"
+            data-testid="onboarding-v2-biometrics-description"
           >
-            {t`Use your fingerprint or face to securely unlock PearPass and confirm actions. It’s faster than entering your Master Password and works only with your approval.`}
+            {t`Use your fingerprint or face to securely unlock PearPass and confirm actions. It's faster than entering your Master Password and works only with your approval.`}
           </Text>
         </View>
 
@@ -196,20 +199,14 @@ const styles = StyleSheet.create({
   title: {
     fontFamily:
       Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    fontWeight: '400',
     color: colors.white.mode1,
     textAlign: 'center',
     marginBottom: 14,
     marginTop: 16
   },
   description: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#BDC3AC',
     textAlign: 'center',
-    lineHeight: 18,
     marginBottom: 30
   }
 })
