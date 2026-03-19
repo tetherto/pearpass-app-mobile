@@ -126,7 +126,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "prettier": "^3.8.1",
     "react-test-renderer": "19.0.0",
-    "tether-dev-docs": "git+https://github.com/tetherto/tether-dev-docs.git",
+    "@tetherto/tether-dev-docs": "git+https://github.com/tetherto/tether-dev-docs.git",
     "typescript": "~5.8.3"
   },
   "overrides": {
