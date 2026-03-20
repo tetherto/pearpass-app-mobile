@@ -24,7 +24,8 @@ global.Buffer = global.Buffer || Buffer
  *  record: any,
  *  size: 'sm' | 'md' | 'lg',
  *  isSelected: boolean,
- *  websiteDomain?: string
+ *  websiteDomain?: string,
+ *  isFavorite?: boolean
  * }} param0
  * @returns
  */
@@ -32,7 +33,8 @@ export const AvatarRecord = ({
   record,
   size = 'sm',
   isSelected,
-  websiteDomain
+  websiteDomain,
+  isFavorite
 }) => {
   const { faviconSrc } = useFavicon({ url: websiteDomain })
 
@@ -57,7 +59,7 @@ export const AvatarRecord = ({
           {generateAvatarInitials(record.data?.title)}
         </AvatarInitials>
       )}
-      {record.isFavorite && (
+      {(isFavorite ?? record.isFavorite) && (
         <FavoriteBadge testID="favorite-badge">
           <StarIcon fill color={colors.primary400.mode1} />
         </FavoriteBadge>
