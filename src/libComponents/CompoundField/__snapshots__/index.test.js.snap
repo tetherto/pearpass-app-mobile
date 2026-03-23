@@ -43,7 +43,10 @@ exports[`CompoundField Component matches snapshot when disabled 1`] = `
     }
   }
 >
-  <Text>
+  <Text
+    isFirst={true}
+    isLast={true}
+  >
     Child Content
   </Text>
 </View>
@@ -92,7 +95,10 @@ exports[`CompoundField Component matches snapshot when enabled 1`] = `
     }
   }
 >
-  <Text>
+  <Text
+    isFirst={true}
+    isLast={true}
+  >
     Child Content
   </Text>
 </View>
