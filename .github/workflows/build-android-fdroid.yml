@@ -42,10 +42,16 @@ jobs:
       - name: Generate worklet bundles and translations
         run: npm run build
 
+      - name: Apply F-Droid prebuild patches
+        run: npm run fdroid:patches:prebuild
+
       - name: Expo prebuild (Android, fdroid)
         env:
           PEARPASS_DISTRIBUTION: fdroid
         run: npx expo prebuild --platform android --clean --no-install
+
+      - name: Apply F-Droid build patches
+        run: npm run fdroid:patches:build
 
       - name: Assemble F-Droid release APK
         env:
