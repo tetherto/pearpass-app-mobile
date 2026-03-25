@@ -25,6 +25,7 @@
     "fdroid:patches": "node scripts/fdroid/apply-patches.mjs all",
     "fdroid:patches:prebuild": "node scripts/fdroid/apply-patches.mjs prebuild",
     "fdroid:patches:build": "node scripts/fdroid/apply-patches.mjs build",
+    "update-submodules": "bash scripts/update-submodules.sh",
     "eas-build-pre-install": "node -v && npm -v && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
     "eas-build-post-install": "npm run build-plugins && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
   },
