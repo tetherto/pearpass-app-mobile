@@ -106,13 +106,7 @@
       "./plugins/withAppConfig",
       "./plugins/withRiveAssets",
       "./plugins/withNativeClipboard",
-      "./plugins/withCustomSplashScreen",
-      ["./plugins/expo-autofill-plugin", {
-        "ios": {
-          "appGroupIdentifier": "group.com.pears.pass"
-        },
-        "extensionBundlePath": "bundles/autofill.bundle"
-      }]
+      "./plugins/withCustomSplashScreen"
     ],
     "extra": {
       "appVersion": "1.6.0",
