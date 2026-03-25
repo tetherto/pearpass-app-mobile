@@ -22,6 +22,7 @@ Expected: generated `android/app/build.gradle` does not contain a `productFlavor
 ### F-Droid Android prebuild
 
 ```bash
+npm run fdroid:patches:prebuild
 PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --no-install
 ```
 
@@ -40,6 +41,10 @@ npm run bundle-bare
 ```
 
 ```bash
+npm run fdroid:patches:prebuild
+PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --no-install
+npm run fdroid:patches:build
+
 cd android
 ANDROID_HOME=$HOME/Library/Android/sdk \
   GRADLE_USER_HOME=/tmp/pearpass-gradle-home \
