@@ -73,7 +73,7 @@ export const EnterPassword = () => {
         password:
           typeof error === 'string'
             ? error
-            : t`Incorrect password. You have ${status?.remainingAttempts} attempts before the app locks for 5 minutes.`
+            : t`Incorrect password. You have ${status?.remainingAttempts} ${status?.remainingAttempts === 1 ? t`attempt` : t`attempts`} before the app will be temporarily locked.`
       })
       setIsLoading(false)
     } finally {
