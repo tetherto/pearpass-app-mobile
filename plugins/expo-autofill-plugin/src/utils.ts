@@ -45,22 +45,12 @@ export async function copyAndProcessSourceFiles(
         const escapeRegex = (s: string) => s.replace(/[\\.*+?^${}()|[\]]/g, '\\$&');
         const templateEscaped = escapeRegex(templatePackage);
 
-        // Replace package declarations
+        // Single global replacement to avoid double-substitution when packageName
+        // is a superset of templatePackage (e.g. com.pears.pass → com.pears.pass.nightly).
+        // Sequential replacements would re-match the already-replaced prefix.
         content = content.replace(
-          new RegExp(`^package ${templateEscaped}`, 'gm'),
-          `package ${packageName}`
-        );
-
-        // Replace imports
-        content = content.replace(
-          new RegExp(`import ${templateEscaped}`, 'g'),
-          `import ${packageName}`
-        );
-
-        // Replace fully qualified class references (e.g., com.pears.pass.autofill.utils.SecureBufferUtils)
-        content = content.replace(
-          new RegExp(`${templateEscaped}\\.`, 'g'),
-          `${packageName}.`
+          new RegExp(templateEscaped, 'g'),
+          packageName
         );
       }
 

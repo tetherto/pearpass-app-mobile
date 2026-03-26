@@ -98,6 +98,17 @@ android {
     return cfg;
   });
 
+  // Reference the autofill ProGuard file (written by withDangerousMod below)
+  config = withAppBuildGradle(config, (cfg) => {
+    if (!cfg.modResults.contents.includes('proguard-autofill.pro')) {
+      cfg.modResults.contents = cfg.modResults.contents.replace(
+        /proguardFiles\s+getDefaultProguardFile\([^)]+\)/,
+        `$&, "proguard-autofill.pro"`
+      );
+    }
+    return cfg;
+  });
+
   return withDangerousMod(config, ['android', async (cfg) => {
     const packageName = cfg.android?.package || 'com.pears.pass';
     const packagePath = packageName.replace(/\./g, '/');
@@ -195,6 +206,13 @@ android {
         await fs.promises.copyFile(bundleSrc, bundleDest);
       }
     }
+
+    // Write ProGuard keep rule using the actual package name
+    const proguardFile = path.join(androidDir, 'app/proguard-autofill.pro');
+    await fs.promises.writeFile(
+      proguardFile,
+      `-keep class ${packageName}.autofill.** { *; }\n`
+    );
 
     return cfg;
   }]);

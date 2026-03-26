@@ -81,7 +81,7 @@
             "minSdkVersion": 29,
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
-            "extraProguardRules": "-keep class com.swmansion.reanimated.** { *; }\n-keep class com.facebook.react.turbomodule.** { *; }\n-keep class to.pear.bare.** { *; }\n-keep class com.pears.pass.autofill.** { *; }",
+            "extraProguardRules": "-keep class com.swmansion.reanimated.** { *; }\n-keep class com.facebook.react.turbomodule.** { *; }\n-keep class to.pear.bare.** { *; }",
             "usesCleartextTraffic": true
           },
           "ios": {
@@ -106,7 +106,13 @@
       "./plugins/withAppConfig",
       "./plugins/withRiveAssets",
       "./plugins/withNativeClipboard",
-      "./plugins/withCustomSplashScreen"
+      "./plugins/withCustomSplashScreen",
+      ["./plugins/expo-autofill-plugin", {
+        "ios": {
+          "appGroupIdentifier": "group.com.pears.pass"
+        },
+        "extensionBundlePath": "bundles/autofill.bundle"
+      }]
     ],
     "extra": {
       "appVersion": "1.6.0",
