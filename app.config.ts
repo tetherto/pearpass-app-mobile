@@ -5,6 +5,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   const plugins = config.plugins ? [...config.plugins] : []
   plugins.push(['./plugins/withAndroidDistribution', { distribution }])
+  plugins.push([
+    './plugins/expo-autofill-plugin',
+    {
+      ios: {
+        appGroupIdentifier: 'group.com.pears.pass',
+      },
+      extensionBundlePath: 'bundles/autofill.bundle',
+    },
+  ])
 
   return {
     ...config,
