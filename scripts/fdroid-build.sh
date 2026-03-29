@@ -103,11 +103,42 @@ PY
 }
 
 ensure_java_home() {
-  if [ -z "${JAVA_HOME:-}" ] || [ ! -x "${JAVA_HOME}/bin/java" ]; then
-    JAVA_HOME="$(find /usr/lib/jvm -maxdepth 1 -type d -name 'java-21*' | head -n 1)"
+  if [ -n "${JAVA_HOME:-}" ] && [ -x "${JAVA_HOME}/bin/java" ]; then
+    export JAVA_HOME
+    return
   fi
+
+  if [ -x /usr/libexec/java_home ]; then
+    JAVA_HOME="$(
+      /usr/libexec/java_home -v 21 2>/dev/null \
+        || /usr/libexec/java_home 2>/dev/null \
+        || true
+    )"
+  fi
+
+  if { [ -z "${JAVA_HOME:-}" ] || [ ! -x "${JAVA_HOME}/bin/java" ]; } && [ -d /usr/lib/jvm ]; then
+    JAVA_HOME="$(
+      find /usr/lib/jvm -maxdepth 1 -type d \( -name 'java-21*' -o -name '*openjdk-21*' \) \
+        | head -n 1
+    )"
+  fi
+
   if [ -z "${JAVA_HOME:-}" ] || [ ! -x "${JAVA_HOME}/bin/java" ]; then
-    echo "Java 21 not found in /usr/lib/jvm" >&2
+    java_bin="$(command -v java || true)"
+    if [ -n "$java_bin" ]; then
+      JAVA_HOME="$(
+        python3 - "$java_bin" <<'PY'
+import os
+import sys
+
+print(os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[1]))))
+PY
+      )"
+    fi
+  fi
+
+  if [ -z "${JAVA_HOME:-}" ] || [ ! -x "${JAVA_HOME}/bin/java" ]; then
+    echo "Unable to determine JAVA_HOME automatically" >&2
     exit 1
   fi
   export JAVA_HOME
