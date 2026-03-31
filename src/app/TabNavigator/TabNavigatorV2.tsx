@@ -11,6 +11,7 @@ import {
   SettingsOutlined,
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { DrawerNavigator } from '../DrawerNavigator'
 import { SettingsNavigator } from '../SettingsNavigator'
@@ -20,6 +21,10 @@ const Tab = createBottomTabNavigator()
 
 export const TabNavigatorV2 = () => {
   const { theme } = useTheme()
+  const insets = useSafeAreaInsets()
+
+  const baseHeight = 66
+  const tabBarHeight = baseHeight + insets.bottom
 
   return (
     <Tab.Navigator
@@ -33,9 +38,10 @@ export const TabNavigatorV2 = () => {
           borderTopColor: theme.colors.colorBorderPrimary,
           elevation: 0,
           paddingTop: rawTokens.spacing12,
-          paddingBottom: rawTokens.spacing8,
+          paddingBottom: rawTokens.spacing8 + insets.bottom,
           paddingLeft: rawTokens.spacing16,
           paddingRight: rawTokens.spacing16,
+          height: tabBarHeight
         },
         tabBarItemStyle: {
           height: '100%',
