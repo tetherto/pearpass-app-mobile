@@ -9,6 +9,7 @@ import * as SecureStore from 'expo-secure-store'
 import { Keyboard, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
+import { useHapticsContext } from 'src/context/HapticsContext'
 
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { ListItem } from '../../../components/ListItem'
@@ -32,6 +33,7 @@ export const Security = () => {
   const { openModal } = useModal()
   const { expand, collapse } = useBottomSheet()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
+  const { isHapticsEnabled, setIsHapticsEnabled } = useHapticsContext()
   const {
     isBiometricsSupported,
     isBiometricsEnabled,
@@ -46,7 +48,8 @@ export const Security = () => {
     biometrics: false,
     copyToClipboard: true,
     passwordChangeReminder: true,
-    haptics: false
+    haptics: false,
+    isHapticsEnabled: false
   })
 
   const ruleOptions = useMemo(() => {
@@ -150,7 +153,7 @@ export const Security = () => {
         biometrics: isBiometricsEnabled,
         copyToClipboard: copyToClipboard !== 'false',
         passwordChangeReminder: isPasswordChangeReminderEnabled,
-        haptics: false
+        haptics: isHapticsEnabled
       })
     }
 
