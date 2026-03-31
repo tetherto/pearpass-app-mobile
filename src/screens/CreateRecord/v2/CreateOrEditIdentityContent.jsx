@@ -40,7 +40,7 @@ import {
   ScrollContainer,
   ScrollView,
   Wrapper
-} from '../ScrollViewFormWrapper/styles'
+} from './styles'
 
 export const CreateOrEditIdentityContent = ({
   initialRecord,

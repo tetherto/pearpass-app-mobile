@@ -26,7 +26,7 @@ import {
   ScrollContainer,
   ScrollView,
   Wrapper
-} from '../ScrollViewFormWrapper/styles'
+} from './styles'
 
 export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
   const { t } = useLingui()

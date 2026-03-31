@@ -2,27 +2,22 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import {
-  PasswordIcon,
-  WifiIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ApplicationIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
-import { Platform } from 'react-native'
 
-import { CreateCustomField } from '../../../components/CreateCustomField'
-import { CustomFields } from '../../../components/CustomFields'
-import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
-import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { BottomSheetPassGeneratorContent } from '../../../containers/BottomSheetPassGeneratorContent'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
-import { useLoadingContext } from '../../../context/LoadingContext'
-import { ButtonLittle, InputField, PasswordField } from '../../../libComponents'
-import { logger } from '../../../utils/logger'
+import { CreateCustomField } from '../../../../components/CreateCustomField'
+import { CustomFields } from '../../../../components/CustomFields'
+import { FormGroup } from '../../../../components/FormGroup'
+import { InputFieldNote } from '../../../../components/InputFieldNote'
+import { ToolbarCreateOrEditCategory } from '../../../../components/ToolbarCreateOrEditCategory'
+import { PassPhrase } from '../../../../containers/PassPhrase'
+import { useLoadingContext } from '../../../../context/LoadingContext'
+import { InputField } from '../../../../libComponents'
+import { logger } from '../../../../utils/logger'
 import {
   FormWrapper,
   Header,
@@ -32,26 +27,27 @@ import {
 } from '../ScrollViewFormWrapper/styles'
 
 /**
- *
- * @param {Object} [initialRecord] - Existing record data for editing
- * @param {Object} [initialRecord.data] - Record data containing title, password, note, customFields
- * @param {string} [initialRecord.data.title] - Wi-Fi network name
- * @param {string} [initialRecord.data.password] - Wi-Fi password
- * @param {string} [initialRecord.data.note] - Additional notes
- * @param {Array} [initialRecord.data.customFields] - Custom field objects
- * @param {boolean} [initialRecord.isFavorite] - Whether record is marked as favorite
- * @param {string} [initialRecord.folder] - Folder name where record is stored
- * @param {Object} [selectedFolder] - Pre-selected folder
- * @param {string} [selectedFolder.name] - Name of the selected folder
+ * @param {{
+ *   initialRecord?: {
+ *     data: {
+ *       title: string,
+ *       passPhrase: string,
+ *       note?: string,
+ *       customFields?: Array<{note: string}>
+ *     },
+ *     folder?: string
+ *   },
+ *   selectedFolder?: string
+ * }} props
  * @returns {JSX.Element}
  */
-export const CreateOrEditWifiPasswordContent = ({
+
+export const CreateOrEditPassphraseContent = ({
   initialRecord,
   selectedFolder
 }) => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const { expand } = useBottomSheet()
   const { setIsLoading, isLoading } = useLoadingContext()
 
   const { createRecord } = useCreateRecord({
@@ -67,8 +63,8 @@ export const CreateOrEditWifiPasswordContent = ({
   })
 
   const schema = Validator.object({
-    title: Validator.string().required(t`Name is required`),
-    password: Validator.string().required(t`Password is required`),
+    title: Validator.string().required(t`Title is required`),
+    passPhrase: Validator.string().required(t`Recovery phrase is required`),
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
@@ -81,7 +77,7 @@ export const CreateOrEditWifiPasswordContent = ({
   const { register, handleSubmit, registerArray, values, setValue } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
-      password: initialRecord?.data?.password ?? '',
+      passPhrase: initialRecord?.data?.passPhrase ?? '',
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder
@@ -93,14 +89,13 @@ export const CreateOrEditWifiPasswordContent = ({
     if (isLoading) {
       return
     }
-
     const data = {
-      type: RECORD_TYPES.WIFI_PASSWORD,
+      type: RECORD_TYPES.PASS_PHRASE,
       folder: values.folder,
       isFavorite: initialRecord?.isFavorite,
       data: {
         title: values.title,
-        password: values.password,
+        passPhrase: values.passPhrase,
         note: values.note,
         customFields: values.customFields
       }
@@ -150,51 +145,20 @@ export const CreateOrEditWifiPasswordContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
-                accessibilityLabel="Wi-Fi name field"
-                inputAccessibilityLabel="Wi-Fi name input field"
-                testID="wifi-name-input-field"
-                icon={WifiIcon}
-                label={t`Wi-Fi Name`}
-                placeholder={t`Insert Wi-Fi Name`}
+                accessibilityLabel="Application name field"
+                inputAccessibilityLabel="Application name input field"
+                testID="application-name-input-field"
+                label={t`Application`}
+                placeholder={t`Insert Application name`}
                 variant="outline"
+                icon={ApplicationIcon}
                 isLast
                 isFirst
                 {...register('title')}
               />
             </FormGroup>
             <FormGroup>
-              <PasswordField
-                accessibilityLabel="Wi-Fi password field"
-                inputAccessibilityLabel="Wi-Fi password input field"
-                testID="wifi-password-input-field"
-                icon={PasswordIcon}
-                label={t`Wi-Fi Password`}
-                placeholder={t`Insert Wi-Fi Password`}
-                variant="outline"
-                isLast
-                hasStrongness
-                shouldDisplayCustomPlaceholder={Platform.OS === 'android'}
-                {...register('password')}
-                additionalItems={
-                  <ButtonLittle
-                    startIcon={PasswordIcon}
-                    variant="secondary"
-                    borderRadius="md"
-                    onPress={() =>
-                      expand({
-                        children: (
-                          <BottomSheetPassGeneratorContent
-                            onPasswordInsert={(value) =>
-                              setValue('password', value)
-                            }
-                          />
-                        ),
-                        snapPoints: ['10%', '75%', '75%']
-                      })
-                    }
-                  />
-                }
-              />
+              <PassPhrase isCreateOrEdit {...register('passPhrase')} />
             </FormGroup>
 
             <FormGroup>

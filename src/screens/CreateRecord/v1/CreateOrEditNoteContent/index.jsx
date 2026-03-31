@@ -10,16 +10,16 @@ import {
 } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
-import { CreateCustomField } from '../../../components/CreateCustomField'
-import { CustomFields } from '../../../components/CustomFields'
-import { FormGroup } from '../../../components/FormGroup'
-import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { AttachmentField } from '../../../containers/AttachmentField'
-import { useLoadingContext } from '../../../context/LoadingContext'
-import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { ButtonLittle, InputField } from '../../../libComponents'
-import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
-import { logger } from '../../../utils/logger'
+import { CreateCustomField } from '../../../../components/CreateCustomField'
+import { CustomFields } from '../../../../components/CustomFields'
+import { FormGroup } from '../../../../components/FormGroup'
+import { ToolbarCreateOrEditCategory } from '../../../../components/ToolbarCreateOrEditCategory'
+import { AttachmentField } from '../../../../containers/AttachmentField'
+import { useLoadingContext } from '../../../../context/LoadingContext'
+import { useGetMultipleFiles } from '../../../../hooks/useGetMultipleFiles'
+import { ButtonLittle, InputField, TextArea } from '../../../../libComponents'
+import { convertBase64FilesToUint8 } from '../../../../utils/convertBase64FilesToUint8'
+import { logger } from '../../../../utils/logger'
 import {
   FormWrapper,
   Header,
@@ -28,10 +28,7 @@ import {
   Wrapper
 } from '../ScrollViewFormWrapper/styles'
 
-export const CreateOrEditCustomContent = ({
-  initialRecord,
-  selectedFolder
-}) => {
+export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { setIsLoading, isLoading } = useLoadingContext()
@@ -48,16 +45,9 @@ export const CreateOrEditCustomContent = ({
     }
   })
 
-  const onError = (error) => {
-    Toast.show({
-      type: 'baseToast',
-      text1: error.message,
-      position: 'bottom',
-      bottomOffset: 100
-    })
-  }
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
+    note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
         note: Validator.string().required(t`Comment is required`)
@@ -74,8 +64,9 @@ export const CreateOrEditCustomContent = ({
 
   const { register, handleSubmit, registerArray, values, setValue } = useForm({
     initialValues: {
-      title: initialRecord?.data?.title || '',
-      customFields: initialRecord?.data?.customFields || [],
+      title: initialRecord?.data?.title ?? '',
+      note: initialRecord?.data?.note ?? '',
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
     },
@@ -95,17 +86,27 @@ export const CreateOrEditCustomContent = ({
     removeItem
   } = registerArray('customFields')
 
+  const onError = (error) => {
+    Toast.show({
+      type: 'baseToast',
+      text1: error.message,
+      position: 'bottom',
+      bottomOffset: 100
+    })
+  }
+
   const onSubmit = async (values) => {
     if (isLoading) {
       return
     }
 
     const data = {
-      type: RECORD_TYPES.CUSTOM,
+      type: RECORD_TYPES.NOTE,
       folder: values.folder,
       isFavorite: initialRecord?.isFavorite,
       data: {
         title: values.title,
+        note: values.note,
         customFields: values.customFields,
         attachments: convertBase64FilesToUint8(values.attachments)
       }
@@ -127,10 +128,11 @@ export const CreateOrEditCustomContent = ({
       } else {
         await createRecord(data, onError)
       }
-    } catch (error) {
-      logger.error(error)
-    } finally {
+
       setIsLoading(false)
+    } catch (error) {
+      setIsLoading(false)
+      logger.error(error)
     }
   }
 
@@ -172,6 +174,15 @@ export const CreateOrEditCustomContent = ({
                 placeholder={t`No title`}
                 variant="outline"
                 {...register('title')}
+              />
+            </FormGroup>
+            <FormGroup>
+              <TextArea
+                accessibilityLabel="Add note field"
+                inputAccessibilityLabel="Add note input field"
+                testID="add-note"
+                {...register('note')}
+                placeholder={t`Write a comment...`}
               />
             </FormGroup>
 

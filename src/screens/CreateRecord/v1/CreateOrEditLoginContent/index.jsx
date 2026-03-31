@@ -19,26 +19,26 @@ import {
 } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
-import { CreateCustomField } from '../../../components/CreateCustomField'
-import { CustomFields } from '../../../components/CustomFields'
-import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
-import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { AttachmentField } from '../../../containers/AttachmentField'
-import { BottomSheetPassGeneratorContent } from '../../../containers/BottomSheetPassGeneratorContent'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
-import { useLoadingContext } from '../../../context/LoadingContext'
-import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
+import { CreateCustomField } from '../../../../components/CreateCustomField'
+import { CustomFields } from '../../../../components/CustomFields'
+import { FormGroup } from '../../../../components/FormGroup'
+import { InputFieldNote } from '../../../../components/InputFieldNote'
+import { ToolbarCreateOrEditCategory } from '../../../../components/ToolbarCreateOrEditCategory'
+import { AttachmentField } from '../../../../containers/AttachmentField'
+import { BottomSheetPassGeneratorContent } from '../../../../containers/BottomSheetPassGeneratorContent'
+import { useBottomSheet } from '../../../../context/BottomSheetContext'
+import { useLoadingContext } from '../../../../context/LoadingContext'
+import { useGetMultipleFiles } from '../../../../hooks/useGetMultipleFiles'
 import {
   ButtonLittle,
   CompoundField,
   InputField,
   PasswordField
-} from '../../../libComponents'
-import { addHttps } from '../../../utils/addHttps'
-import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
-import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
-import { logger } from '../../../utils/logger'
+} from '../../../../libComponents'
+import { addHttps } from '../../../../utils/addHttps'
+import { convertBase64FilesToUint8 } from '../../../../utils/convertBase64FilesToUint8'
+import { formatPasskeyDate } from '../../../../utils/formatPasskeyDate'
+import { logger } from '../../../../utils/logger'
 import {
   FormWrapper,
   Header,

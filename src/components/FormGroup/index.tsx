@@ -1,34 +1,31 @@
 import { Children, cloneElement, useCallback, useState } from 'react'
-
+import { ReactNode } from 'react'
 import {
   ArrowDownIcon,
   ArrowUpIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { View } from 'react-native'
-
 import { Title, TitleWrapper, Wrapper } from './styles'
 
-/**
- * @param {{
- *  children: ReactNode
- *  title?: string
- *  isCollapse: boolean
- *  onToggle?: (isOpen: boolean) => void
- *  isOpened?: boolean
- *
- * }} props
- */
+interface FormGroupProps {
+  children: ReactNode
+  title?: string
+  isCollapse?: boolean      // optional
+  onToggle?: (isOpen: boolean) => void
+  isOpened?: boolean
+}
+
 export const FormGroup = ({
   title,
-  isCollapse,
+  isCollapse = false,       // default value
   children,
   onToggle,
   isOpened = true
-}) => {
+}: FormGroupProps) => {
   const [isOpen, setIsOpen] = useState(isOpened)
-  const [focusedIndex, setFocusedIndex] = useState(null)
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
 
-  const handleFocusIndexSet = useCallback((index) => {
+  const handleFocusIndexSet = useCallback((index: number) => {
     setFocusedIndex(index)
   }, [])
 
@@ -50,7 +47,7 @@ export const FormGroup = ({
           {Children.toArray(children)
             .filter((child) => child !== null)
             .map((child, index, filteredArray) =>
-              cloneElement(child, {
+              cloneElement(child as React.ReactElement, {
                 index,
                 isFirst: index === 0,
                 isLast: index === filteredArray.length - 1,
