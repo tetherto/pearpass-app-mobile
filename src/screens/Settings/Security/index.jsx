@@ -9,7 +9,6 @@ import * as SecureStore from 'expo-secure-store'
 import { Keyboard, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
-import { useHapticsContext } from 'src/context/HapticsContext'
 
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { ListItem } from '../../../components/ListItem'
@@ -33,7 +32,6 @@ export const Security = () => {
   const { openModal } = useModal()
   const { expand, collapse } = useBottomSheet()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
-  const { isHapticsEnabled, setIsHapticsEnabled } = useHapticsContext()
   const {
     isBiometricsSupported,
     isBiometricsEnabled,
@@ -71,15 +69,6 @@ export const Security = () => {
         testIDOff: 'copy-to-clipboard-toggle-off',
         accessibilityLabelOn: t`Copy to clipboard enabled`,
         accessibilityLabelOff: t`Copy to clipboard disabled`
-      },
-      {
-        name: 'haptics',
-        label: t`Haptic feedback`,
-        description: t`Meaningful haptics for important actions`,
-        testIDOn: 'haptics-toggle-on',
-        testIDOff: 'haptics-toggle-off',
-        accessibilityLabelOn: t`Haptic feedback enabled`,
-        accessibilityLabelOff: t`Haptic feedback disabled`
       }
     ]
 
@@ -133,10 +122,6 @@ export const Security = () => {
       }
     }
 
-    if (newRules.haptics !== selectedRules.haptics) {
-      await setIsHapticsEnabled(newRules.haptics)
-    }
-
     setSelectedRules({ ...newRules })
   }
 
@@ -152,20 +137,12 @@ export const Security = () => {
       setSelectedRules({
         biometrics: isBiometricsEnabled,
         copyToClipboard: copyToClipboard !== 'false',
-        passwordChangeReminder: isPasswordChangeReminderEnabled,
-        haptics: isHapticsEnabled
+        passwordChangeReminder: isPasswordChangeReminderEnabled
       })
     }
 
     getInitialSettings()
-  }, [isBiometricsEnabled, isPasswordChangeReminderEnabled, isHapticsEnabled])
-
-  useEffect(
-    () => () => {
-      clearTimeout(timeoutRef.current)
-    },
-    []
-  )
+  }, [isBiometricsEnabled, isPasswordChangeReminderEnabled])
 
   useEffect(
     () => () => {
