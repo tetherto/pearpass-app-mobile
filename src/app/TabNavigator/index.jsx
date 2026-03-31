@@ -1,12 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   HomeIcon,
   PlusIcon,
   SettingsIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, View, TouchableOpacity } from 'react-native'
 
+import { TabNavigatorV2 } from './TabNavigatorV2'
 import { BottomSheetRecordCreateContent } from '../../containers/BottomSheetRecordCreateContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
@@ -15,7 +17,7 @@ import { SettingsNavigator } from '../SettingsNavigator'
 
 const Tab = createBottomTabNavigator()
 
-export const TabNavigator = () => {
+const TabNavigatorV1 = () => {
   const { expand } = useBottomSheet()
   const { hapticButtonPrimary } = useHapticFeedback()
 
@@ -110,6 +112,14 @@ export const TabNavigator = () => {
       />
     </Tab.Navigator>
   )
+}
+
+export const TabNavigator = () => {
+  if (DESIGN_VERSION === 2) {
+    return <TabNavigatorV2 />
+  }
+
+  return <TabNavigatorV1 />
 }
 
 const styles = StyleSheet.create({

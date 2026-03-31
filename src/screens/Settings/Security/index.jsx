@@ -2,7 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { AUTO_LOCK_ENABLED } from '@tetherto/pearpass-lib-constants'
+import {
+  AUTO_LOCK_ENABLED,
+  DESIGN_VERSION
+} from '@tetherto/pearpass-lib-constants'
 import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import * as SecureStore from 'expo-secure-store'
@@ -19,6 +22,8 @@ import { AutoLockSettings } from '../../../containers/AutoLockSettings'
 import { BottomSheetBiometricsLoginPrompt } from '../../../containers/BottomSheetBiometricsLoginPrompt'
 import { RuleSelector } from '../../../containers/BottomSheetPassGeneratorContent/RuleSelector'
 import { ModifyMasterVaultModalContent } from '../../../containers/Modal/ModifyMasterVaultModalContent'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
+import { ScreenLayout } from '../../../containers/ScreenLayout'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
 import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
@@ -204,17 +209,35 @@ export const Security = () => {
     }
   }
 
+  const Wrapper = DESIGN_VERSION === 2 ? ScreenLayout : SafeAreaView
+  const wrapperProps =
+    DESIGN_VERSION === 2
+      ? {
+          header: (
+            <BackScreenHeader
+              title={t`Security`}
+              onBack={() => navigation.goBack()}
+            />
+          )
+        }
+      : {
+          style: styles.container,
+          edges: ['top', 'left', 'right']
+        }
+
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <View style={styles.header}>
-        <ButtonLittle
-          startIcon={BackIcon}
-          variant="secondary"
-          borderRadius="md"
-          onPress={() => navigation.goBack()}
-        />
-        <Text style={styles.screenTitle}>{t`Security`}</Text>
-      </View>
+    <Wrapper {...wrapperProps}>
+      {DESIGN_VERSION === 1 && (
+        <View style={styles.header}>
+          <ButtonLittle
+            startIcon={BackIcon}
+            variant="secondary"
+            borderRadius="md"
+            onPress={() => navigation.goBack()}
+          />
+          <Text style={styles.screenTitle}>{t`Security`}</Text>
+        </View>
+      )}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <CardSingleSetting title={t`Master Password`}>
           <View style={styles.sectionContent}>
@@ -242,7 +265,7 @@ export const Security = () => {
           </View>
         </CardSingleSetting>
       </ScrollView>
-    </SafeAreaView>
+    </Wrapper>
   )
 }
 

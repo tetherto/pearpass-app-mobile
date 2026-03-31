@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   PlusIcon,
   SaveIcon
@@ -21,6 +22,7 @@ import { AvatarRecord } from '../../components/AvatarRecord'
 import { getTimerColor } from '../../components/OtpCodeField/utils'
 import { TimerCircle } from '../../components/TimerCircle'
 import { Header } from '../../containers/Header'
+import { ScreenLayout } from '../../containers/ScreenLayout'
 import { CopyButton } from '../../libComponents/CopyButton'
 import { AuthenticatorIllustration } from '../../svgs/AuthenticatorIllustration'
 
@@ -138,17 +140,37 @@ export const Authenticator = () => {
     )
   }
 
+  const Wrapper = DESIGN_VERSION === 2 ? ScreenLayout : SafeAreaView
+  const wrapperProps =
+    DESIGN_VERSION === 2
+      ? {
+          header: (
+            <Header
+              setSearchValue={setSearchValue}
+              searchValue={searchValue}
+              itemsFound={otpRecords.length}
+              setIsMultiSelectOn={() => {}}
+              isMultiSelectOn={false}
+              setSelectedRecords={() => {}}
+              selectedRecords={[]}
+            />
+          )
+        }
+      : { style: styles.container }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        setSearchValue={setSearchValue}
-        searchValue={searchValue}
-        itemsFound={otpRecords.length}
-        setIsMultiSelectOn={() => {}}
-        isMultiSelectOn={false}
-        setSelectedRecords={() => {}}
-        selectedRecords={[]}
-      />
+    <Wrapper {...wrapperProps}>
+      {DESIGN_VERSION === 1 && (
+        <Header
+          setSearchValue={setSearchValue}
+          searchValue={searchValue}
+          itemsFound={otpRecords.length}
+          setIsMultiSelectOn={() => {}}
+          isMultiSelectOn={false}
+          setSelectedRecords={() => {}}
+          selectedRecords={[]}
+        />
+      )}
 
       {otpRecords.length === 0 ? (
         <View style={styles.emptyStateContainer}>
@@ -191,6 +213,6 @@ export const Authenticator = () => {
           renderItem={renderItem}
         />
       )}
-    </SafeAreaView>
+    </Wrapper>
   )
 }
