@@ -18,7 +18,6 @@ global.Buffer = global.Buffer || Buffer
  *  record: any,
  *  size: 'sm' | 'md' | 'lg',
  *  isSelected: boolean,
- *  websiteDomain?: string,
  *  isFavorite?: boolean
  * }} param0
  * @returns
