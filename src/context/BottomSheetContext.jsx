@@ -8,7 +8,7 @@ import {
   useState
 } from 'react'
 
-import BottomSheet from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { BackDrop } from '../components/BottomSheetBackdrop'
@@ -83,7 +83,9 @@ export const BottomSheetProvider = ({
             borderColor: colors.primary100.mode1
           }}
         >
-          {options.children}
+          <BottomSheetView style={{ bottom: 0 }}>
+            {options.children}
+          </BottomSheetView>
         </BottomSheet>
       )}
     </BottomSheetContext.Provider>
