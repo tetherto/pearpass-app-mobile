@@ -6,34 +6,23 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { DATE_FORMAT } from '@tetherto/pearpass-lib-constants'
 import {
-  CalendarIcon,
-  DeleteIcon,
-  EmailIcon,
-  GenderIcon,
-  GroupIcon,
-  NationalityIcon,
-  PhoneIcon,
-  UserIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
+import { InputField, MultiSlotInput, UploadField } from '@tetherto/pearpass-lib-ui-kit'
 
-import { CreateCustomField } from '../../../components/CreateCustomField'
-import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { AttachmentField } from '../../../containers/AttachmentField'
 import { ImagesField } from '../../../containers/ImagesField'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { ButtonLittle, InputField } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
+import { handleChooseFile } from '../../../utils/handleChooseFile'
 import { logger } from '../../../utils/logger'
+import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
+import { adaptRegister } from './CreateOrEditLoginContent'
 import {
   FormWrapper,
   Header,
@@ -42,10 +31,53 @@ import {
   Wrapper
 } from './styles'
 
+interface IdentityRecord {
+  data?: {
+    title?: string
+    fullName?: string
+    email?: string
+    phoneNumber?: string
+    address?: string
+    zip?: string
+    city?: string
+    region?: string
+    country?: string
+    note?: string
+    customFields?: unknown[]
+    passportFullName?: string
+    passportNumber?: string
+    passportIssuingCountry?: string
+    passportDateOfIssue?: string
+    passportExpiryDate?: string
+    passportNationality?: string
+    passportDob?: string
+    passportGender?: string
+    passportPicture?: unknown[]
+    idCardNumber?: string
+    idCardDateOfIssue?: string
+    idCardExpiryDate?: string
+    idCardIssuingCountry?: string
+    idCardPicture?: unknown[]
+    drivingLicenseNumber?: string
+    drivingLicenseDateOfIssue?: string
+    drivingLicenseExpiryDate?: string
+    drivingLicenseIssuingCountry?: string
+    drivingLicensePicture?: unknown[]
+  }
+  folder?: string
+  isFavorite?: boolean
+  attachments?: unknown[]
+}
+
+interface Props {
+  initialRecord?: IdentityRecord
+  selectedFolder?: string
+}
+
 export const CreateOrEditIdentityContent = ({
   initialRecord,
   selectedFolder
-}) => {
+}: Props) => {
   const hasPassportFullName = !!initialRecord?.data?.passportFullName?.length
   const hasPassportNumber = !!initialRecord?.data?.passportNumber?.length
   const hasPassportIssuingCountry =
@@ -195,6 +227,7 @@ export const CreateOrEditIdentityContent = ({
       country: initialRecord?.data?.country ?? '',
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields || [],
+      comments: [],
       folder: selectedFolder ?? initialRecord?.folder,
       passportFullName: initialRecord?.data?.passportFullName ?? '',
       passportNumber: initialRecord?.data?.passportNumber ?? '',
@@ -320,6 +353,39 @@ export const CreateOrEditIdentityContent = ({
     }
   }
 
+  const MAX_ATTACHMENTS = 5
+
+  const handleUploadPress = () => {
+    const currentFiles = values.attachments as UploadedFile[]
+    if (currentFiles.length >= MAX_ATTACHMENTS) return
+
+    handleChooseFile(
+      ({ base64, name }: { base64: string; name: string }) => {
+        const newFile: UploadedFile = {
+          file: null as unknown as File,
+          name,
+          size: Math.round((base64.length * 3) / 4),
+          type: 'application/octet-stream',
+          // @ts-ignore — base64 is a native-only extension of UploadedFile used by convertBase64FilesToUint8
+          base64
+        }
+        setValue('attachments', [...currentFiles, newFile])
+      },
+      () => {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`File is too large`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
+      }
+    )
+  }
+
+  const handleFilesChange = (files: UploadedFile[], fieldName: string) => {
+    setValue(fieldName, files)
+  }
+
   const handleFileUpload = (file, fieldName) => {
     if (!file) {
       return
@@ -352,96 +418,63 @@ export const CreateOrEditIdentityContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
-                accessibilityLabel="Title field"
-                inputAccessibilityLabel="Title input field"
-                testID="title-input-field"
                 label={t`Title`}
-                placeholder={t`No title`}
-                variant="outline"
-                {...register('title')}
+                placeholderText={t`No title`}
+                testID="title-input-field"
+                {...adaptRegister(register('title'))}
               />
             </FormGroup>
             <FormGroup title={t`Personal information`} isCollapse>
               <InputField
-                accessibilityLabel="Full name field"
-                inputAccessibilityLabel="Full name input field"
-                testID="full-name-input-field"
-                icon={UserIcon}
                 label={t`Full name`}
-                placeholder={t`John Smith`}
-                variant="outline"
-                {...register('fullName')}
+                placeholderText={t`John Smith`}
+                testID="full-name-input-field"
+                {...adaptRegister(register('fullName'))}
               />
               <InputField
-                accessibilityLabel="Email field"
-                inputAccessibilityLabel="Email input field"
-                testID="email-input-field"
-                type="email-address"
-                icon={EmailIcon}
                 label={t`Email`}
-                placeholder={t`Insert email`}
-                variant="outline"
-                {...register('email')}
+                placeholderText={t`Insert email`}
+                testID="email-input-field"
+                {...adaptRegister(register('email'))}
               />
-
               <InputField
-                accessibilityLabel="Phone number field"
-                inputAccessibilityLabel="Phone number input field"
-                testID="phone-number-input-field"
-                type="numeric"
-                icon={PhoneIcon}
                 label={t`Phone number`}
-                placeholder={t`Insert phone number`}
-                variant="outline"
-                {...register('phoneNumber')}
+                placeholderText={t`Insert phone number`}
+                testID="phone-number-input-field"
+                {...adaptRegister(register('phoneNumber'))}
               />
             </FormGroup>
             <FormGroup title={t`Detail of address`} isCollapse>
               <InputField
-                accessibilityLabel="Address field"
-                inputAccessibilityLabel="Address input field"
                 testID="address-input-field"
                 label={t`Address`}
-                placeholder={t`Insert address`}
-                variant="outline"
-                {...register('address')}
+                placeholderText={t`Insert address`}
+                {...adaptRegister(register('address'))}
               />
               <InputField
-                accessibilityLabel="ZIP field"
-                inputAccessibilityLabel="ZIP input field"
                 testID="zip-input-field"
                 label={t`ZIP`}
-                placeholder={t`Insert ZIP`}
-                variant="outline"
-                {...register('zip')}
+                placeholderText={t`Insert ZIP`}
+                {...adaptRegister(register('zip'))}
               />
 
               <InputField
-                accessibilityLabel="City field"
-                inputAccessibilityLabel="City input field"
                 testID="city-input-field"
                 label={t`City`}
-                placeholder={t`Insert city`}
-                variant="outline"
-                {...register('city')}
+                placeholderText={t`Insert city`}
+                {...adaptRegister(register('city'))}
               />
               <InputField
-                accessibilityLabel="Region field"
-                inputAccessibilityLabel="Region input field"
                 testID="region-input-field"
                 label={t`Region`}
-                placeholder={t`Insert region`}
-                variant="outline"
-                {...register('region')}
+                placeholderText={t`Insert region`}
+                {...adaptRegister(register('region'))}
               />
               <InputField
-                accessibilityLabel="Country field"
-                inputAccessibilityLabel="Country input field"
                 testID="country-input-field"
                 label={t`Country`}
-                placeholder={t`Insert country`}
-                variant="outline"
-                {...register('country')}
+                placeholderText={t`Insert country`}
+                {...adaptRegister(register('country'))}
               />
             </FormGroup>
 
@@ -452,84 +485,52 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isPassportOpen}
             >
               <InputField
-                accessibilityLabel="Passport full name field"
-                inputAccessibilityLabel="Passport full name input field"
                 testID="passport-full-name-input-field"
                 label={t`Full name`}
-                placeholder={t`John Smith`}
-                variant="outline"
-                icon={UserIcon}
-                {...register('passportFullName')}
+                placeholderText={t`John Smith`}
+                {...adaptRegister(register('passportFullName'))}
               />
               <InputField
-                accessibilityLabel="Passport number field"
-                inputAccessibilityLabel="Passport number input field"
                 testID="passport-number-input-field"
                 label={t`Passport number`}
-                placeholder={t`Insert numbers`}
-                variant="outline"
-                icon={GroupIcon}
-                {...register('passportNumber')}
+                placeholderText={t`Insert numbers`}
+                {...adaptRegister(register('passportNumber'))}
               />
               <InputField
-                accessibilityLabel="Passport issuing country field"
-                inputAccessibilityLabel="Passport issuing country input field"
                 testID="passport-issuing-country-input-field"
                 label={t`Issuing country`}
-                placeholder={t`Insert country`}
-                variant="outline"
-                icon={NationalityIcon}
-                {...register('passportIssuingCountry')}
+                placeholderText={t`Insert country`}
+                {...adaptRegister(register('passportIssuingCountry'))}
               />
               <InputField
-                accessibilityLabel="Passport date of issue field"
-                inputAccessibilityLabel="Passport date of issue input field"
                 testID="passport-date-of-issue-input-field"
                 label={t`Date of issue`}
-                placeholder={DATE_FORMAT}
-                variant="outline"
-                icon={CalendarIcon}
-                {...register('passportDateOfIssue')}
+                placeholderText={DATE_FORMAT}
+                {...adaptRegister(register('passportDateOfIssue'))}
               />
               <InputField
-                accessibilityLabel="Passport expiry date field"
-                inputAccessibilityLabel="Passport expiry date input field"
                 testID="passport-expiry-date-input-field"
                 label={t`Expiry date`}
-                placeholder={DATE_FORMAT}
-                variant="outline"
-                icon={CalendarIcon}
-                {...register('passportExpiryDate')}
+                placeholderText={DATE_FORMAT}
+                {...adaptRegister(register('passportExpiryDate'))}
               />
               <InputField
-                accessibilityLabel="Passport nationality field"
-                inputAccessibilityLabel="Passport nationality input field"
                 testID="passport-nationality-input-field"
                 label={t`Nationality`}
-                placeholder={t`Insert your nationality`}
-                variant="outline"
-                icon={NationalityIcon}
-                {...register('passportNationality')}
+                placeholderText={t`Insert your nationality`}
+                {...adaptRegister(register('passportNationality'))}
               />
               <InputField
-                accessibilityLabel="Passport date of birth field"
-                inputAccessibilityLabel="Passport date of birth input field"
                 testID="passport-date-of-birth-input-field"
                 label={t`Date of birth`}
-                placeholder={DATE_FORMAT}
-                variant="outline"
-                icon={CalendarIcon}
-                {...register('passportDob')}
+                placeholderText={DATE_FORMAT}
+                {...adaptRegister(register('passportDob'))}
               />
               <InputField
-                accessibilityLabel="Passport gender field"
-                inputAccessibilityLabel="Passport gender input field"
                 testID="passport-gender-input-field"
                 label={t`Gender`}
-                placeholder={t`M/F`}
-                variant="outline"
-                icon={GenderIcon}
-                {...register('passportGender')}
+                placeholderText={t`M/F`}
+                {...adaptRegister(register('passportGender'))}
               />
             </FormGroup>
 
@@ -551,44 +552,28 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isIdCardOpen}
             >
               <InputField
-                accessibilityLabel="ID number field"
-                inputAccessibilityLabel="ID number input field"
                 testID="id-number-input-field"
                 label={t`ID number`}
-                placeholder={'123456789'}
-                variant="outline"
-                icon={GroupIcon}
-                {...register('idCardNumber')}
+                placeholderText="123456789"
+                {...adaptRegister(register('idCardNumber'))}
               />
               <InputField
-                accessibilityLabel="Identity card creation date field"
-                inputAccessibilityLabel="Identity card creation date input field"
                 testID="identity-card-creation-date-input-field"
                 label={t`Creation date`}
-                placeholder={DATE_FORMAT}
-                variant="outline"
-                icon={CalendarIcon}
-                {...register('idCardDateOfIssue')}
+                placeholderText={DATE_FORMAT}
+                {...adaptRegister(register('idCardDateOfIssue'))}
               />
               <InputField
-                accessibilityLabel="Identity card expiry date field"
-                inputAccessibilityLabel="Identity card expiry date input field"
                 testID="identity-card-expiry-date-input-field"
                 label={t`Expiry date`}
-                placeholder={DATE_FORMAT}
-                variant="outline"
-                icon={CalendarIcon}
-                {...register('idCardExpiryDate')}
+                placeholderText={DATE_FORMAT}
+                {...adaptRegister(register('idCardExpiryDate'))}
               />
               <InputField
-                accessibilityLabel="Identity card issuing country field"
-                inputAccessibilityLabel="Identity card issuing country input field"
                 testID="identity-card-issuing-country-input-field"
                 label={t`Issuing country`}
-                placeholder={t`Insert country`}
-                variant="outline"
-                icon={NationalityIcon}
-                {...register('idCardIssuingCountry')}
+                placeholderText={t`Insert country`}
+                {...adaptRegister(register('idCardIssuingCountry'))}
               />
             </FormGroup>
             {isIdCardOpen && (
@@ -609,44 +594,28 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isDrivingLicenseOpen}
             >
               <InputField
-                accessibilityLabel="Driving license ID number field"
-                inputAccessibilityLabel="Driving license ID number input field"
                 testID="driving-license-id-number-input-field"
                 label={t`ID number`}
-                placeholder={t`123456789`}
-                variant="outline"
-                icon={GroupIcon}
-                {...register('drivingLicenseNumber')}
+                placeholderText={t`123456789`}
+                {...adaptRegister(register('drivingLicenseNumber'))}
               />
               <InputField
-                accessibilityLabel="Driving license creation date field"
-                inputAccessibilityLabel="Driving license creation date input field"
                 testID="driving-license-creation-date-input-field"
                 label={t`Creation date`}
-                placeholder={DATE_FORMAT}
-                variant="outline"
-                icon={CalendarIcon}
-                {...register('drivingLicenseDateOfIssue')}
+                placeholderText={DATE_FORMAT}
+                {...adaptRegister(register('drivingLicenseDateOfIssue'))}
               />
               <InputField
-                accessibilityLabel="Driving license expiry date field"
-                inputAccessibilityLabel="Driving license expiry date input field"
                 testID="driving-license-expiry-date-input-field"
                 label={t`Expiry date`}
-                placeholder={DATE_FORMAT}
-                variant="outline"
-                icon={CalendarIcon}
-                {...register('drivingLicenseExpiryDate')}
+                placeholderText={DATE_FORMAT}
+                {...adaptRegister(register('drivingLicenseExpiryDate'))}
               />
               <InputField
-                accessibilityLabel="Driving license issuing country field"
-                inputAccessibilityLabel="Driving license issuing country input field"
                 testID="driving-license-issuing-country-input-field"
                 label={t`Issuing country`}
-                placeholder={t`Insert country`}
-                variant="outline"
-                icon={NationalityIcon}
-                {...register('drivingLicenseIssuingCountry')}
+                placeholderText={t`Insert country`}
+                {...adaptRegister(register('drivingLicenseIssuingCountry'))}
               />
             </FormGroup>
 
@@ -664,53 +633,27 @@ export const CreateOrEditIdentityContent = ({
             )}
 
             <FormGroup>
-              <AttachmentField
-                onUpload={(file) => handleFileUpload(file, 'attachments')}
-                isLast
-                label={'File'}
-              />
-              {values.attachments.map((attachment, index) => (
-                <AttachmentField
-                  key={attachment?.id || attachment.name}
-                  attachment={attachment}
-                  attachmentIndex={index}
-                  onDelete={(idx) => handleAttachmentDelete(idx, 'attachments')}
-                  isLast
-                  label={'File'}
-                  additionalItems={
-                    <ButtonLittle
-                      startIcon={DeleteIcon}
-                      variant="secondary"
-                      borderRadius="md"
-                      onPress={() =>
-                        handleAttachmentDelete(index, 'attachments')
-                      }
-                    />
-                  }
-                />
-              ))}
-            </FormGroup>
-
-            <FormGroup>
-              <InputFieldNote
-                accessibilityLabel="Note field"
-                inputAccessibilityLabel="Note input field"
-                testID="note-input-field"
-                {...register('note')}
+              <UploadField
+                files={values.attachments as UploadedFile[]}
+                onFilesChange={(files) => handleFilesChange(files, 'attachments')}
+                onPress={handleUploadPress}
+                uploadLinkText={t`Click to upload`}
+                uploadSuffixText={t`or drag and drop`}
+                maxFiles={MAX_ATTACHMENTS}
+                testID="attachments-upload-field"
               />
             </FormGroup>
 
-            <CustomFields
-              removeItem={removeItem}
-              customFields={list}
-              register={registerItem}
+            <MultiSlotInput
+              label={t`Custom comments`}
+              placeholderText={t`Add comment`}
+              addButtonLabel={t`Add another comment`}
+              values={values.comments as string[]}
+              onChange={(updated: string[]) => setValue('comments', updated)}
+              testID="custom-comments-multi-slot-input"
             />
 
-            <FormGroup>
-              <CreateCustomField
-                onCreateCustom={(type) => addItem({ type: type, name: type })}
-              />
-            </FormGroup>
+
           </FormWrapper>
         </ScrollView>
       </ScrollContainer>

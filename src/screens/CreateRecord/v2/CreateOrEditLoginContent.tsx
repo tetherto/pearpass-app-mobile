@@ -4,7 +4,6 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
-  CommonFileIcon,
   PasswordIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
@@ -20,7 +19,6 @@ import {
 import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
 import Toast from 'react-native-toast-message'
 
-import { FormGroup } from '../../../components/FormGroup'
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
 import { BottomSheetPassGeneratorContent } from '../../../containers/BottomSheetPassGeneratorContent'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
@@ -40,12 +38,12 @@ import {
   Wrapper
 } from './styles'
 
-export interface CreateOrEditLoginContentProps {
+interface Props {
   initialRecord?: any
   selectedFolder?: string
 }
 
-function adaptRegister(reg: {
+export function adaptRegister(reg: {
   value: string
   error?: string
   onChange: (val: any) => void
@@ -61,7 +59,7 @@ function adaptRegister(reg: {
 export const CreateOrEditLoginContent = ({
   initialRecord,
   selectedFolder
-}: CreateOrEditLoginContentProps) => {
+}: Props) => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { expand } = useBottomSheet()

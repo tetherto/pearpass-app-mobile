@@ -3,29 +3,26 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
-  CalendarIcon,
-  CreditCardIcon,
-  DeleteIcon,
-  NineDotsIcon,
-  UserIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
+import {
+  InputField,
+  MultiSlotInput,
+  PasswordField,
+  UploadField
+} from '@tetherto/pearpass-lib-ui-kit'
+import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
 import Toast from 'react-native-toast-message'
 
-import { CreateCustomField } from '../../../components/CreateCustomField'
-import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { AttachmentField } from '../../../containers/AttachmentField'
+import { adaptRegister } from './CreateOrEditLoginContent'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { ButtonLittle, InputField, PasswordField } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
+import { handleChooseFile } from '../../../utils/handleChooseFile'
 import { logger } from '../../../utils/logger'
 import {
   FormWrapper,
@@ -35,10 +32,28 @@ import {
   Wrapper
 } from './styles'
 
-export const CreateOrEditCreditCardContent = ({
-  initialRecord,
-  selectedFolder
-}) => {
+type CreditCardRecord = {
+  data?: {
+    title?: string
+    name?: string
+    number?: string
+    expireDate?: string
+    securityCode?: string
+    pinCode?: string
+    note?: string
+    customFields?: unknown[]
+  }
+  folder?: string
+  isFavorite?: boolean
+  attachments?: unknown[]
+}
+
+type Props = {
+  initialRecord?: CreditCardRecord
+  selectedFolder?: string
+}
+
+export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }: Props) => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { setIsLoading, isLoading } = useLoadingContext()
@@ -63,11 +78,7 @@ export const CreateOrEditCreditCardContent = ({
     securityCode: Validator.string().numeric(t`Should contain only numbers`),
     pinCode: Validator.string().numeric(t`Should contain only numbers`),
     note: Validator.string(),
-    customFields: Validator.array().items(
-      Validator.object({
-        note: Validator.string().required(t`Comment is required`)
-      })
-    ),
+    notes: Validator.array().items(Validator.string()),
     folder: Validator.string(),
     attachments: Validator.array().items(
       Validator.object({
@@ -86,7 +97,9 @@ export const CreateOrEditCreditCardContent = ({
       securityCode: initialRecord?.data?.securityCode ?? '',
       pinCode: initialRecord?.data?.pinCode ?? '',
       note: initialRecord?.data?.note ?? '',
-      customFields: initialRecord?.data?.customFields ?? [],
+      notes: initialRecord?.data?.customFields
+        ?.filter((f: any) => f.type === 'note')
+        ?.map((f: any) => f.note ?? '') ?? [''],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
     },
@@ -124,7 +137,9 @@ export const CreateOrEditCreditCardContent = ({
         securityCode: values.securityCode,
         pinCode: values.pinCode,
         note: values.note,
-        customFields: values.customFields,
+        customFields: (values.notes as string[])
+          .filter((n: string) => !!n?.trim().length)
+          .map((n: string) => ({ type: 'note', note: n })),
         attachments: convertBase64FilesToUint8(values.attachments)
       }
     }
@@ -153,12 +168,38 @@ export const CreateOrEditCreditCardContent = ({
     }
   }
 
-  const {
-    value: list,
-    addItem,
-    registerItem,
-    removeItem
-  } = registerArray('customFields')
+  const MAX_ATTACHMENTS = 5
+
+  const handleFilesChange = (files: UploadedFile[]) => {
+    setValue('attachments', files)
+  }
+
+  const handleUploadPress = () => {
+    const currentFiles = values.attachments as UploadedFile[]
+    if (currentFiles.length >= MAX_ATTACHMENTS) return
+
+    handleChooseFile(
+      ({ base64, name }: { base64: string; name: string }) => {
+        const newFile: UploadedFile = {
+          file: null as unknown as File,
+          name,
+          size: Math.round((base64.length * 3) / 4),
+          type: 'application/octet-stream',
+          // @ts-ignore
+          base64
+        }
+        setValue('attachments', [...currentFiles, newFile])
+      },
+      () => {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`File is too large`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
+      }
+    )
+  }
 
   const handleExpireDateChange = (inputValue) => {
     let value = inputValue.replace(/\D/g, '')
@@ -186,25 +227,11 @@ export const CreateOrEditCreditCardContent = ({
 
     setValue('number', value)
   }
-  const handleFileUpload = (file) => {
-    if (!file) {
-      return
-    }
-
-    setValue('attachments', [...values.attachments, file])
-  }
-
-  const handleAttachmentDelete = (index) => {
-    const updatedAttachments = values.attachments.filter(
-      (_, idx) => idx !== index
-    )
-    setValue('attachments', updatedAttachments)
-  }
-
   return (
     <Wrapper>
       <Header>
         <ToolbarCreateOrEditCategory
+          isLoading={isLoading}
           selectedFolder={values.folder}
           onFolderSelect={(folder) =>
             setValue('folder', folder.name === values.folder ? '' : folder.name)
@@ -218,119 +245,66 @@ export const CreateOrEditCreditCardContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
-                accessibilityLabel="Title field"
-                inputAccessibilityLabel="Title input field"
-                testID="title-field-input"
                 label={t`Title`}
-                placeholder={t`No title`}
-                variant="outline"
-                {...register('title')}
+                placeholderText={t`No title`}
+                testID="title-field-input"
+                {...adaptRegister(register('title'))}
               />
             </FormGroup>
             <FormGroup>
               <InputField
-                accessibilityLabel="Name on card field"
-                inputAccessibilityLabel="Name on card input field"
-                testID="name-on-card-input-field"
-                icon={UserIcon}
                 label={t`Name on card`}
-                placeholder={t`John Smith`}
-                variant="outline"
-                {...register('name')}
+                placeholderText={t`John Smith`}
+                testID="name-on-card-input-field"
+                {...adaptRegister(register('name'))}
               />
               <InputField
-                accessibilityLabel="Number on card field"
-                inputAccessibilityLabel="Number on card input field"
-                testID="number-on-card-input-field"
-                icon={CreditCardIcon}
-                type="numeric"
                 label={t`Number on card`}
-                placeholder={t`1234 1234 1234 1234 `}
-                variant="outline"
+                placeholderText={t`1234 1234 1234 1234`}
+                testID="number-on-card-input-field"
                 value={values.number}
-                onChange={handleCardNumberChange}
+                onChangeText={handleCardNumberChange}
               />
 
               <InputField
-                accessibilityLabel="Date of expire field"
-                inputAccessibilityLabel="Date of expire input field"
-                testID="date-of-expire-input-field"
-                icon={CalendarIcon}
                 label={t`Date of expire`}
-                type="numeric"
-                placeholder={t`MM YY`}
-                variant="outline"
+                placeholderText={t`MM YY`}
+                testID="date-of-expire-input-field"
                 value={values.expireDate}
-                onChange={handleExpireDateChange}
+                onChangeText={handleExpireDateChange}
               />
               <PasswordField
-                accessibilityLabel="Security code field"
-                inputAccessibilityLabel="Security doe input field"
                 testID="security-code-input-field"
-                type="numeric"
-                icon={CreditCardIcon}
                 label={t`Security code`}
-                placeholder={t`123`}
-                variant="outline"
-                {...register('securityCode')}
+                placeholderText={t`123`}
+                {...adaptRegister(register('securityCode'))}
               />
               <PasswordField
-                accessibilityLabel="Pin code field"
-                inputAccessibilityLabel="Pin code input field"
                 testID="pin-code-input-field"
-                type="numeric"
-                icon={NineDotsIcon}
                 label={t`Pin code`}
-                placeholder={t`1234`}
-                variant="outline"
-                {...register('pinCode')}
+                placeholderText={t`1234`}
+                {...adaptRegister(register('pinCode'))}
               />
             </FormGroup>
 
-            <FormGroup>
-              <AttachmentField
-                onUpload={handleFileUpload}
-                isLast
-                label={'File'}
-              />
-              {values.attachments.map((attachment, index) => (
-                <AttachmentField
-                  key={attachment?.id || attachment.name}
-                  attachment={attachment}
-                  isLast
-                  label={'File'}
-                  additionalItems={
-                    <ButtonLittle
-                      startIcon={DeleteIcon}
-                      variant="secondary"
-                      borderRadius="md"
-                      onPress={() => handleAttachmentDelete(index)}
-                    />
-                  }
-                />
-              ))}
-            </FormGroup>
-
-            <FormGroup>
-              <InputFieldNote
-                accessibilityLabel="Note field"
-                inputAccessibilityLabel="Note input field"
-                testID="note-input-field"
-                {...register('note')}
-              />
-            </FormGroup>
-
-            <CustomFields
-              customFields={list}
-              removeItem={removeItem}
-              register={registerItem}
+            <UploadField
+              files={values.attachments as UploadedFile[]}
+              onFilesChange={handleFilesChange}
+              onPress={handleUploadPress}
+              uploadLinkText={t`Click to upload`}
+              uploadSuffixText={t`or drag and drop`}
+              maxFiles={MAX_ATTACHMENTS}
+              testID="attachments-upload-field"
             />
 
-            <FormGroup>
-              <CreateCustomField
-                onCreateCustom={(type) => addItem({ type: type, name: type })}
-              />
-            </FormGroup>
+            <MultiSlotInput
+              label={t`Notes`}
+              placeholderText={t`Add note`}
+              addButtonLabel={t`Add another note`}
+              values={values.notes as string[]}
+              onChange={(updated: string[]) => setValue('notes', updated)}
+              testID="notes-multi-slot-input"
+            />
           </FormWrapper>
         </ScrollView>
       </ScrollContainer>

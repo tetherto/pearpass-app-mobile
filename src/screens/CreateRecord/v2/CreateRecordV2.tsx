@@ -19,8 +19,17 @@ const RecordFormContainer = styled.View`
   height: 100%;
   background-color: ${({ theme }) => theme.colors.grey500.mode1};
 `
+type CreateRecordV2Props = {
+  route: {
+    params: {
+      recordType: string
+      record?: any
+      selectedFolder?: string
+    }
+  }
+}
 
-export const CreateRecordV2 = ({ route }) => {
+export const CreateRecordV2 = ({ route }: CreateRecordV2Props) => {
   const { recordType, record: initialRecord, selectedFolder } = route.params
   const { state } = useSharedFilter()
 

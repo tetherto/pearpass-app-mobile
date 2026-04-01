@@ -1,5 +1,6 @@
 import { CreateRecordV1 } from './v1/CreateRecordV1'
 import { CreateRecordV2 } from './v2/CreateRecordV2'
+// import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 
 const APP_VERSION = 2
 

@@ -2,23 +2,26 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
+import {
+  InputField,
+  MultiSlotInput,
+  UploadField
+} from '@tetherto/pearpass-lib-ui-kit'
+import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
 import Toast from 'react-native-toast-message'
 
-import { CreateCustomField } from '../../../components/CreateCustomField'
-import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { AttachmentField } from '../../../containers/AttachmentField'
+import { adaptRegister } from './CreateOrEditLoginContent'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { ButtonLittle, InputField } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
+import { handleChooseFile } from '../../../utils/handleChooseFile'
 import { logger } from '../../../utils/logger'
 import {
   FormWrapper,
@@ -28,10 +31,25 @@ import {
   Wrapper
 } from './styles'
 
+type CustomContentRecord = {
+  data?: {
+    title?: string
+    customFields?: unknown[]
+  }
+  folder?: string
+  isFavorite?: boolean
+  attachments?: unknown[]
+}
+
+type Props = {
+  initialRecord?: CustomContentRecord
+  selectedFolder?: string
+}
+
 export const CreateOrEditCustomContent = ({
   initialRecord,
   selectedFolder
-}) => {
+}: Props) => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { setIsLoading, isLoading } = useLoadingContext()
@@ -56,13 +74,10 @@ export const CreateOrEditCustomContent = ({
       bottomOffset: 100
     })
   }
+
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
-    customFields: Validator.array().items(
-      Validator.object({
-        note: Validator.string().required(t`Comment is required`)
-      })
-    ),
+    customFields: Validator.array().items(Validator.string()),
     folder: Validator.string(),
     attachments: Validator.array().items(
       Validator.object({
@@ -72,10 +87,11 @@ export const CreateOrEditCustomContent = ({
     )
   })
 
-  const { register, handleSubmit, registerArray, values, setValue } = useForm({
+  const { register, handleSubmit, values, setValue } = useForm({
     initialValues: {
       title: initialRecord?.data?.title || '',
-      customFields: initialRecord?.data?.customFields || [],
+      customFields: initialRecord?.data?.customFields
+        ?.map((f: any) => f.note ?? '') ?? [''],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
     },
@@ -88,13 +104,6 @@ export const CreateOrEditCustomContent = ({
     initialRecord
   })
 
-  const {
-    value: list,
-    addItem,
-    registerItem,
-    removeItem
-  } = registerArray('customFields')
-
   const onSubmit = async (values) => {
     if (isLoading) {
       return
@@ -106,7 +115,9 @@ export const CreateOrEditCustomContent = ({
       isFavorite: initialRecord?.isFavorite,
       data: {
         title: values.title,
-        customFields: values.customFields,
+        customFields: (values.customFields as string[])
+          .filter((n: string) => !!n?.trim().length)
+          .map((n: string) => ({ type: 'note', note: n })),
         attachments: convertBase64FilesToUint8(values.attachments)
       }
     }
@@ -127,32 +138,51 @@ export const CreateOrEditCustomContent = ({
       } else {
         await createRecord(data, onError)
       }
+      setIsLoading(false)
     } catch (error) {
       logger.error(error)
-    } finally {
       setIsLoading(false)
     }
   }
 
-  const handleFileUpload = (file) => {
-    if (!file) {
-      return
-    }
+  const MAX_ATTACHMENTS = 5
 
-    setValue('attachments', [...values.attachments, file])
+  const handleFilesChange = (files: UploadedFile[]) => {
+    setValue('attachments', files)
   }
 
-  const handleAttachmentDelete = (index) => {
-    const updatedAttachments = values.attachments.filter(
-      (_, idx) => idx !== index
+  const handleUploadPress = () => {
+    const currentFiles = values.attachments as UploadedFile[]
+    if (currentFiles.length >= MAX_ATTACHMENTS) return
+
+    handleChooseFile(
+      ({ base64, name }: { base64: string; name: string }) => {
+        const newFile: UploadedFile = {
+          file: null as unknown as File,
+          name,
+          size: Math.round((base64.length * 3) / 4),
+          type: 'application/octet-stream',
+          // @ts-ignore
+          base64
+        }
+        setValue('attachments', [...currentFiles, newFile])
+      },
+      () => {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`File is too large`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
+      }
     )
-    setValue('attachments', updatedAttachments)
   }
 
   return (
     <Wrapper>
       <Header>
         <ToolbarCreateOrEditCategory
+          isLoading={isLoading}
           selectedFolder={values.folder}
           onFolderSelect={(folder) =>
             setValue('folder', folder.name === values.folder ? '' : folder.name)
@@ -165,51 +195,31 @@ export const CreateOrEditCustomContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
-                accessibilityLabel="Title field"
-                inputAccessibilityLabel="Title input field"
-                testID="title-input-field"
                 label={t`Title`}
-                placeholder={t`No title`}
-                variant="outline"
-                {...register('title')}
+                placeholderText={t`No title`}
+                testID="title-input-field"
+                {...adaptRegister(register('title'))}
               />
             </FormGroup>
 
-            <FormGroup>
-              <AttachmentField
-                onUpload={handleFileUpload}
-                isLast
-                label={'File'}
-              />
-              {values.attachments.map((attachment, index) => (
-                <AttachmentField
-                  key={attachment?.id || attachment.name}
-                  attachment={attachment}
-                  isLast
-                  label={'File'}
-                  additionalItems={
-                    <ButtonLittle
-                      startIcon={DeleteIcon}
-                      variant="secondary"
-                      borderRadius="md"
-                      onPress={() => handleAttachmentDelete(index)}
-                    />
-                  }
-                />
-              ))}
-            </FormGroup>
-
-            <CustomFields
-              removeItem={removeItem}
-              customFields={list}
-              register={registerItem}
+            <UploadField
+              files={values.attachments as UploadedFile[]}
+              onFilesChange={handleFilesChange}
+              onPress={handleUploadPress}
+              uploadLinkText={t`Click to upload`}
+              uploadSuffixText={t`or drag and drop`}
+              maxFiles={MAX_ATTACHMENTS}
+              testID="attachments-upload-field"
             />
 
-            <FormGroup>
-              <CreateCustomField
-                onCreateCustom={(type) => addItem({ type: type, name: type })}
-              />
-            </FormGroup>
+            <MultiSlotInput
+              label={t`Notes`}
+              placeholderText={t`Add note`}
+              addButtonLabel={t`Add another note`}
+              values={values.customFields as string[]}
+              onChange={(updated: string[]) => setValue('customFields', updated)}
+              testID="notes-multi-slot-input"
+            />
           </FormWrapper>
         </ScrollView>
       </ScrollContainer>
