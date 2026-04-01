@@ -6,14 +6,8 @@ import {
   StarIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { useFavicon } from '@tetherto/pearpass-lib-vault'
 
-import {
-  AvatarImage,
-  AvatarInitials,
-  FavoriteBadge,
-  ItemImageContainer
-} from './styles'
+import { AvatarInitials, FavoriteBadge, ItemImageContainer } from './styles'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'
 
 global.Buffer = global.Buffer || Buffer
@@ -24,7 +18,6 @@ global.Buffer = global.Buffer || Buffer
  *  record: any,
  *  size: 'sm' | 'md' | 'lg',
  *  isSelected: boolean,
- *  websiteDomain?: string,
  *  isFavorite?: boolean
  * }} param0
  * @returns
@@ -33,11 +26,8 @@ export const AvatarRecord = ({
   record,
   size = 'sm',
   isSelected,
-  websiteDomain,
   isFavorite
 }) => {
-  const { faviconSrc } = useFavicon({ url: websiteDomain })
-
   if (isSelected) {
     return (
       <ItemImageContainer isSelected={isSelected} size={size}>
@@ -48,17 +38,9 @@ export const AvatarRecord = ({
 
   return (
     <ItemImageContainer isSelected={isSelected} size={size}>
-      {faviconSrc ? (
-        <AvatarImage
-          testID="avatar-image"
-          source={{ uri: faviconSrc }}
-          size={size}
-        />
-      ) : (
-        <AvatarInitials size={size} color={RECORD_COLOR_BY_TYPE[record.type]}>
-          {generateAvatarInitials(record.data?.title)}
-        </AvatarInitials>
-      )}
+      <AvatarInitials size={size} color={RECORD_COLOR_BY_TYPE[record.type]}>
+        {generateAvatarInitials(record.data?.title)}
+      </AvatarInitials>
       {(isFavorite ?? record.isFavorite) && (
         <FavoriteBadge testID="favorite-badge">
           <StarIcon fill color={colors.primary400.mode1} />
