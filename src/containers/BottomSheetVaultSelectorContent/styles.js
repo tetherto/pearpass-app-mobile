@@ -1,6 +1,6 @@
 import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
-export const createStyles = (colors) => ({
+export const createStyles = () => ({
   dragHandleArea: {
     alignItems: 'center',
     paddingTop: rawTokens.spacing12,
@@ -24,22 +24,5 @@ export const createStyles = (colors) => ({
   headerTitle: {
     flex: 1,
     textAlign: 'center'
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: rawTokens.spacing8,
-    padding: rawTokens.spacing16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.colorBorderPrimary
-  },
-  itemActive: {
-    backgroundColor: colors.colorSurfaceHover
-  },
-  labelContainer: {
-    flex: 1,
-    gap: 2,
-    minHeight: 36,
-    justifyContent: 'center'
   }
 })
