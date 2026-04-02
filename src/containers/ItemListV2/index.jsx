@@ -8,7 +8,7 @@ import { Pressable, SectionList, View } from 'react-native'
 import { createStyles } from './styles'
 import { VaultListItem } from './VaultListItem'
 import { useBottomSheet } from '../../context/BottomSheetContext'
-import { BottomSheetRecordActionsContent } from '../BottomSheetRecordActionsContent'
+import { BottomSheetRecordActionsContentV2 } from '../BottomSheetRecordActionsContentV2'
 
 const CollapsibleSectionHeader = ({
   section,
@@ -81,10 +81,9 @@ export const ItemListV2 = ({
     (record) => {
       expand({
         children: (
-          <BottomSheetRecordActionsContent
+          <BottomSheetRecordActionsContentV2
             record={record}
             recordType={record.type}
-            excludeTypes={['move']}
             onSelectItem={() => {
               setIsMultiSelectOn?.(true)
               setSelectedRecords((prev) =>
@@ -93,7 +92,7 @@ export const ItemListV2 = ({
             }}
           />
         ),
-        snapPoints: ['10%', '50%', '50%']
+        snapPoints: ['10%', '60%', '60%']
       })
     },
     [expand, setIsMultiSelectOn, setSelectedRecords]

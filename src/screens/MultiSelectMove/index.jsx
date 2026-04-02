@@ -4,13 +4,14 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import {
   Button,
+  NavbarListItem,
   Text,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { FolderOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
 
 import { createStyles } from './styles'
 import { RecordItemRow } from '../../components/RecordItemRow'
@@ -94,21 +95,13 @@ export const MultiSelectMove = () => {
           </Text>
           <View style={styles.folderList}>
             {folderList.map((folder) => (
-              <Pressable
+              <NavbarListItem
                 key={folder.name}
-                style={[
-                  styles.folderItem,
-                  selectedFolder === folder.name && styles.folderItemSelected
-                ]}
-                onPress={() => setSelectedFolder(folder.name)}
-              >
-                <FolderOutlined
-                  width={16}
-                  height={16}
-                  color={theme.colors.colorTextPrimary}
-                />
-                <Text variant="label">{folder.name}</Text>
-              </Pressable>
+                icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
+                label={folder.name}
+                selected={selectedFolder === folder.name}
+                onClick={() => setSelectedFolder(folder.name)}
+              />
             ))}
           </View>
         </View>

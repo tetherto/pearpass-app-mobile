@@ -7,7 +7,7 @@ import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
 import { isV2 } from 'src/utils/designVersion'
 
 import { Container, CurrentFolder, FolderName } from './styles'
-import { BottomSheetSortContent } from '../../containers/BottomSheetSortContent'
+import { BottomSheetSortContentV2 } from '../../containers/BottomSheetSortContentV2'
 import { Categories } from '../../containers/Categories'
 import { ContentContainer } from '../../containers/ContentContainer'
 import { ContentHeader } from '../../containers/ContentHeader'
@@ -28,18 +28,14 @@ import { useJobQueueProcessor } from '../../jobQueue'
 import { groupRecordsByTimePeriod } from '../../utils/groupRecordsByTimePeriod'
 
 const SORT_BY_TYPE = {
-  Recent: {
-    key: 'updatedAt',
-    direction: 'desc'
-  },
-  'Newest to oldest': {
-    key: 'createdAt',
-    direction: 'desc'
-  },
-  'Oldest to newest': {
-    key: 'createdAt',
-    direction: 'asc'
-  }
+  Recent: { key: 'updatedAt', direction: 'desc' },
+  'Newest to oldest': { key: 'createdAt', direction: 'desc' },
+  'Oldest to newest': { key: 'createdAt', direction: 'asc' },
+  'Title A-Z': { key: 'data.title', direction: 'asc' },
+  'Last Used Newest': { key: 'updatedAt', direction: 'desc' },
+  'Last Used Oldest': { key: 'updatedAt', direction: 'asc' },
+  'Date Added Newest': { key: 'createdAt', direction: 'desc' },
+  'Date Added Oldest': { key: 'createdAt', direction: 'asc' }
 }
 
 export const Home = () => {
@@ -128,10 +124,12 @@ export const Home = () => {
             isMultiSelectOn={isMultiSelectOn}
             setIsMultiSelectOn={setIsMultiSelectOn}
             setSelectedRecords={setSelectedRecords}
+            recordType={recordType}
+            onCategoryChange={handleRecordType}
             onSortPress={() =>
               expand({
-                children: <BottomSheetSortContent />,
-                snapPoints: ['10%', '25%', '25%']
+                children: <BottomSheetSortContentV2 />,
+                snapPoints: ['10%', '50%', '50%']
               })
             }
           />

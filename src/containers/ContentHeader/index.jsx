@@ -1,4 +1,3 @@
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
@@ -18,7 +17,9 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
-import { FolderList } from '../FolderList'
+import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
+import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
+import { BottomSheetVaultSelectorContent } from '../BottomSheetVaultSelectorContent'
 
 const BREADCRUMB_HEIGHT = 57
 
@@ -26,14 +27,16 @@ export const ContentHeader = ({
   isMultiSelectOn,
   setIsMultiSelectOn,
   setSelectedRecords,
-  onSortPress
+  onSortPress,
+  recordType,
+  onCategoryChange
 }) => {
   const { t } = useLingui()
-  const navigation = useNavigation()
   const { theme } = useTheme()
-  const { expand } = useBottomSheet()
+  const { expand, collapse } = useBottomSheet()
+  const navigation = useNavigation()
   const { data: vaultData } = useVault()
-  const { state, setState } = useSharedFilter()
+  const { state } = useSharedFilter()
   const styles = createStyles(theme.colors)
 
   const bgColor = theme.colors.colorSurfacePrimary
@@ -45,26 +48,36 @@ export const ContentHeader = ({
       ? state.folder
       : t`All Folders`
 
-  const handleVaultPress = () => navigation.openDrawer()
+  const handleCreateVault = () => {
+    collapse()
+    navigation.navigate('Welcome', { state: 'credentials' })
+  }
+
+  const handleVaultPress = () => {
+    expand({
+      children: (
+        <BottomSheetVaultSelectorContent onCreateVault={handleCreateVault} />
+      ),
+      snapPoints: ['10%', '50%', '50%']
+    })
+  }
+
+  const handleCategoryPress = () => {
+    expand({
+      children: (
+        <BottomSheetCategorySelectorContent
+          recordType={recordType}
+          onSelect={onCategoryChange}
+        />
+      ),
+      snapPoints: ['10%', '70%', '70%']
+    })
+  }
 
   const handleFolderPress = () => {
     expand({
-      children: (
-        <BottomSheetScrollView style={{ padding: 20 }}>
-          <FolderList
-            isFilter
-            selectedFolder={state?.folder}
-            onFolderSelect={(folder) => {
-              setState((prev) => ({
-                ...prev,
-                folder: folder.id || folder.name,
-                isFavorite: folder.id === 'favorite'
-              }))
-            }}
-          />
-        </BottomSheetScrollView>
-      ),
-      snapPoints: ['10%', '50%', '50%']
+      children: <BottomSheetFolderSelectorContent />,
+      snapPoints: ['10%', '60%', '60%']
     })
   }
 
@@ -155,7 +168,11 @@ export const ContentHeader = ({
                   color={theme.colors.colorTextPrimary}
                 />
               </View>
-              {renderBreadcrumbPill(<Layers />, t`All Items`)}
+              {renderBreadcrumbPill(
+                <Layers />,
+                t`All Items`,
+                handleCategoryPress
+              )}
               <View style={styles.chevronSeparator}>
                 <KeyboardArrowRightFilled
                   width={14}
