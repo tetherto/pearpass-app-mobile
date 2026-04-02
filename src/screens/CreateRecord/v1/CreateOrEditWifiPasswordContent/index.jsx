@@ -21,7 +21,11 @@ import { ToolbarCreateOrEditCategory } from '../../../../components/ToolbarCreat
 import { BottomSheetPassGeneratorContent } from '../../../../containers/BottomSheetPassGeneratorContent'
 import { useBottomSheet } from '../../../../context/BottomSheetContext'
 import { useLoadingContext } from '../../../../context/LoadingContext'
-import { ButtonLittle, InputField, PasswordField } from '../../../../libComponents'
+import {
+  ButtonLittle,
+  InputField,
+  PasswordField
+} from '../../../../libComponents'
 import { logger } from '../../../../utils/logger'
 import {
   FormWrapper,

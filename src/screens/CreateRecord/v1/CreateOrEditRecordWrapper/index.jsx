@@ -1,4 +1,5 @@
 import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
+
 import { CreateOrEditCreditCardContent } from '../CreateOrEditCreditCardContent'
 import { CreateOrEditCustomContent } from '../CreateOrEditCustomContent'
 import { CreateOrEditIdentityContent } from '../CreateOrEditIdentityContent'

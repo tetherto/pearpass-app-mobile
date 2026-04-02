@@ -69,71 +69,71 @@ export const CreditCardRecordDetailsForm = ({
         hasExpireDate ||
         hasSecurityCode ||
         hasPinCode) && (
-          <FormGroup>
-            {hasName && (
-              <InputField
-                icon={UserIcon}
-                label={t`Name on card`}
-                placeholder={t`John Smith`}
-                isFirst
-                variant="outline"
-                isDisabled
-                {...register('name')}
-              />
-            )}
+        <FormGroup>
+          {hasName && (
+            <InputField
+              icon={UserIcon}
+              label={t`Name on card`}
+              placeholder={t`John Smith`}
+              isFirst
+              variant="outline"
+              isDisabled
+              {...register('name')}
+            />
+          )}
 
-            {hasNumber && (
-              <InputField
-                icon={CreditCardIcon}
-                label={t`Number on card`}
-                placeholder={t`1234 1234 1234 1234 `}
-                variant="outline"
-                isFirst={!hasName}
-                isDisabled
-                {...register('number')}
-              />
-            )}
+          {hasNumber && (
+            <InputField
+              icon={CreditCardIcon}
+              label={t`Number on card`}
+              placeholder={t`1234 1234 1234 1234 `}
+              variant="outline"
+              isFirst={!hasName}
+              isDisabled
+              {...register('number')}
+            />
+          )}
 
-            {hasExpireDate && (
-              <InputField
-                icon={CalendarIcon}
-                label={t`Date of expire`}
-                placeholder={t`MM YY`}
-                variant="outline"
-                isFirst={!hasName && !hasNumber}
-                isDisabled
-                {...register('expireDate')}
-              />
-            )}
+          {hasExpireDate && (
+            <InputField
+              icon={CalendarIcon}
+              label={t`Date of expire`}
+              placeholder={t`MM YY`}
+              variant="outline"
+              isFirst={!hasName && !hasNumber}
+              isDisabled
+              {...register('expireDate')}
+            />
+          )}
 
-            {hasSecurityCode && (
-              <PasswordField
-                icon={CreditCardIcon}
-                label={t`Security code`}
-                placeholder={t`12C3`}
-                variant="outline"
-                isFirst={!hasName && !hasNumber && !hasExpireDate}
-                isDisabled
-                {...register('securityCode')}
-              />
-            )}
+          {hasSecurityCode && (
+            <PasswordField
+              icon={CreditCardIcon}
+              label={t`Security code`}
+              placeholder={t`12C3`}
+              variant="outline"
+              isFirst={!hasName && !hasNumber && !hasExpireDate}
+              isDisabled
+              {...register('securityCode')}
+            />
+          )}
 
-            {hasPinCode && (
-              <PasswordField
-                icon={NineDotsIcon}
-                label={t`Pin code`}
-                placeholder={t`1234`}
-                isLast
-                variant="outline"
-                isFirst={
-                  !hasName && !hasNumber && !hasExpireDate && !hasSecurityCode
-                }
-                isDisabled
-                {...register('pinCode')}
-              />
-            )}
-          </FormGroup>
-        )}
+          {hasPinCode && (
+            <PasswordField
+              icon={NineDotsIcon}
+              label={t`Pin code`}
+              placeholder={t`1234`}
+              isLast
+              variant="outline"
+              isFirst={
+                !hasName && !hasNumber && !hasExpireDate && !hasSecurityCode
+              }
+              isDisabled
+              {...register('pinCode')}
+            />
+          )}
+        </FormGroup>
+      )}
 
       {hasAttachments && (
         <FormGroup>
