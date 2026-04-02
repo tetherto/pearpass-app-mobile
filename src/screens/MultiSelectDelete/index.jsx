@@ -17,10 +17,13 @@ export const MultiSelectDelete = () => {
   const { theme } = useTheme()
   const styles = createStyles(theme.colors)
 
-  const { selectedRecordIds, selectedRecordObjects } = params
+  const { selectedRecordIds, selectedRecordObjects, onComplete } = params
 
   const { deleteRecords } = useRecords({
-    onCompleted: () => navigation.goBack()
+    onCompleted: () => {
+      onComplete?.()
+      navigation.goBack()
+    }
   })
 
   return (

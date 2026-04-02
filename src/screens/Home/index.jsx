@@ -139,6 +139,7 @@ export const Home = () => {
             <MultiSelectBar
               selectedRecords={selectedRecords}
               setSelectedRecords={setSelectedRecords}
+              setIsMultiSelectOn={setIsMultiSelectOn}
               records={records}
             />
           )}

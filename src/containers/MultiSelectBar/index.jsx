@@ -14,6 +14,7 @@ import { createStyles } from './styles'
 export const MultiSelectBar = ({
   selectedRecords,
   setSelectedRecords,
+  setIsMultiSelectOn,
   records
 }) => {
   const { t } = useLingui()
@@ -30,7 +31,11 @@ export const MultiSelectBar = ({
   const handleMovePress = () => {
     navigation.navigate('MultiSelectMove', {
       selectedRecordIds: selectedRecords,
-      selectedRecordObjects: getSelectedRecordObjects()
+      selectedRecordObjects: getSelectedRecordObjects(),
+      onComplete: () => {
+        setSelectedRecords([])
+        setIsMultiSelectOn(false)
+      }
     })
   }
 
@@ -43,7 +48,11 @@ export const MultiSelectBar = ({
   const handleDeletePress = () => {
     navigation.navigate('MultiSelectDelete', {
       selectedRecordIds: selectedRecords,
-      selectedRecordObjects: getSelectedRecordObjects()
+      selectedRecordObjects: getSelectedRecordObjects(),
+      onComplete: () => {
+        setSelectedRecords([])
+        setIsMultiSelectOn(false)
+      }
     })
   }
 

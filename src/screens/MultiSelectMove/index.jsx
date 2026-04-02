@@ -21,11 +21,14 @@ export const MultiSelectMove = () => {
   const [selectedFolder, setSelectedFolder] = useState(null)
   const styles = createStyles(theme.colors)
 
-  const { selectedRecordIds, selectedRecordObjects } = params
+  const { selectedRecordIds, selectedRecordObjects, onComplete } = params
 
   const { data: folders } = useFolders()
   const { updateFolder } = useRecords({
-    onCompleted: () => navigation.goBack()
+    onCompleted: () => {
+      onComplete?.()
+      navigation.goBack()
+    }
   })
 
   const folderList = useMemo(
