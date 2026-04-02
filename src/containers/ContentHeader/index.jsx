@@ -1,4 +1,3 @@
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
@@ -18,7 +17,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
-import { FolderList } from '../FolderList'
+import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
 
 const BREADCRUMB_HEIGHT = 57
 
@@ -33,7 +32,7 @@ export const ContentHeader = ({
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
   const { data: vaultData } = useVault()
-  const { state, setState } = useSharedFilter()
+  const { state } = useSharedFilter()
   const styles = createStyles(theme.colors)
 
   const bgColor = theme.colors.colorSurfacePrimary
@@ -49,22 +48,8 @@ export const ContentHeader = ({
 
   const handleFolderPress = () => {
     expand({
-      children: (
-        <BottomSheetScrollView style={{ padding: 20 }}>
-          <FolderList
-            isFilter
-            selectedFolder={state?.folder}
-            onFolderSelect={(folder) => {
-              setState((prev) => ({
-                ...prev,
-                folder: folder.id || folder.name,
-                isFavorite: folder.id === 'favorite'
-              }))
-            }}
-          />
-        </BottomSheetScrollView>
-      ),
-      snapPoints: ['10%', '50%', '50%']
+      children: <BottomSheetFolderSelectorContent />,
+      snapPoints: ['10%', '60%', '60%']
     })
   }
 
