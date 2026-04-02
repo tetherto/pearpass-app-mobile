@@ -1,10 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import {
-  Button,
-  NavbarListItem,
-  Text,
-  useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+import { Button, ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
   Add,
   Close,
@@ -12,7 +7,7 @@ import {
   MoreVert
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -26,7 +21,7 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const { theme } = useTheme()
   const { collapse, expand } = useBottomSheet()
   const { openModal, closeModal } = useModal()
-  const styles = createStyles(theme.colors)
+  const styles = createStyles()
 
   const { data: vaultsData } = useVaults()
   const {
@@ -62,7 +57,20 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const handleVaultActionsPress = (vault) => {
     expand({
       children: (
-        <BottomSheetVaultAction vaultId={vault.id} vaultName={vault.name} />
+        <BottomSheetVaultAction
+          vaultId={vault.id}
+          vaultName={vault.name}
+          onDismiss={() =>
+            expand({
+              children: (
+                <BottomSheetVaultSelectorContent
+                  onCreateVault={onCreateVault}
+                />
+              ),
+              snapPoints: ['10%', '50%', '50%']
+            })
+          }
+        />
       ),
       snapPoints: ['10%', '20%', '20%']
     })
@@ -100,37 +108,32 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
       {vaultsData?.map((vault) => {
         const isActive = vault.id === activeVault?.id
         return (
-          <Pressable
+          <ListItem
             key={vault.id}
-            style={[styles.item, isActive && styles.itemActive]}
-            onPress={() => handleVaultPress(vault)}
-          >
-            <LockFilled
-              width={16}
-              height={16}
-              color={theme.colors.colorTextPrimary}
-            />
-            <View style={styles.labelContainer}>
-              <Text variant="label" numberOfLines={1}>
-                {vault.name}
-              </Text>
-            </View>
-            <Button
-              variant="tertiary"
-              size="small"
-              iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
-              onClick={() => handleVaultActionsPress(vault)}
-              aria-label={t`Vault actions`}
-            />
-          </Pressable>
+            icon={<LockFilled color={theme.colors.colorTextPrimary} />}
+            title={vault.name}
+            selected={isActive}
+            showDivider
+            iconSize={16}
+            rightElement={
+              <Button
+                variant="tertiary"
+                size="small"
+                iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
+                onClick={() => handleVaultActionsPress(vault)}
+                aria-label={t`Vault actions`}
+              />
+            }
+            onClick={() => handleVaultPress(vault)}
+          />
         )
       })}
 
-      <NavbarListItem
+      <ListItem
         icon={<Add color={theme.colors.colorTextPrimary} />}
-        label={t`Create New Vault`}
-        platform="mobile"
-        onClick={onCreateVault}
+        title={t`Create New Vault`}
+        iconSize={16}
+        onSelect={onCreateVault}
       />
     </ContentContainer>
   )

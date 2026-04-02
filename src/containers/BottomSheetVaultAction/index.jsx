@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
 import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
@@ -18,13 +20,25 @@ import { useHapticFeedback } from '../../hooks/useHapticFeedback'
  * @returns {JSX.Element} Bottom sheet with vault modification options
  *
  */
-export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
+export const BottomSheetVaultAction = ({ vaultId, vaultName, onDismiss }) => {
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
   const { openModal } = useModal()
   const { hapticButtonPrimary } = useHapticFeedback()
 
+  const actionTakenRef = useRef(false)
+
+  useEffect(
+    () => () => {
+      if (!actionTakenRef.current) {
+        onDismiss?.()
+      }
+    },
+    []
+  )
+
   const handleName = () => {
+    actionTakenRef.current = true
     hapticButtonPrimary()
     collapse()
     openModal(
@@ -37,6 +51,7 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
   }
 
   const handlePassword = () => {
+    actionTakenRef.current = true
     hapticButtonPrimary()
     collapse()
     openModal(
