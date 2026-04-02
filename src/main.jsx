@@ -15,6 +15,7 @@ import {
   VaultProvider
 } from '@tetherto/pearpass-lib-vault'
 import { StatusBar } from 'expo-status-bar'
+import { Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { App } from './app/App'
@@ -26,6 +27,7 @@ import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
 import { SharedFilterProvider } from './context/SharedFilterContext'
 import { messages } from './locales/en/messages'
+import { logger } from './utils/logger'
 import * as SplashScreen from './utils/SplashScreen'
 import { createPearpassVaultClient } from './worklet'
 
@@ -38,23 +40,83 @@ i18n.activate('en')
 
 export const Main = () => {
   const [isPearPassReady, setIsPearPassReady] = useState(false)
+  const [initError, setInitError] = useState(null)
 
   useEffect(() => {
     const init = async () => {
-      const vaultClient = await createPearpassVaultClient({
-        debugMode: process.env.NODE_ENV === 'development'
-      })
+      try {
+        const vaultClient = await createPearpassVaultClient({
+          debugMode: process.env.NODE_ENV === 'development'
+        })
 
-      setPearpassVaultClient(vaultClient)
-
-      setIsPearPassReady(true)
+        setPearpassVaultClient(vaultClient)
+        setIsPearPassReady(true)
+      } catch (error) {
+        logger.error('PearPass init failed:', error)
+        setInitError(error)
+        setIsPearPassReady(false)
+        SplashScreen.hideAsync()
+      }
     }
 
     init()
   }, [])
 
   if (!isPearPassReady) {
-    return null
+    return (
+      <UIKitProvider>
+        <StatusBar backgroundColor={colors.grey500.mode1} style="light" />
+        <GestureHandlerRootView
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: colors.grey500.mode1,
+            paddingHorizontal: 24
+          }}
+        >
+          {initError ? (
+            <>
+              <Text
+                style={{
+                  color: colors.white.mode1,
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  fontWeight: '700',
+                  marginBottom: 12,
+                  textAlign: 'center'
+                }}
+              >
+                PearPass failed to start
+              </Text>
+              <Text
+                style={{
+                  color: colors.white.mode1,
+                  fontFamily: 'Inter',
+                  fontSize: 12,
+                  fontWeight: '500',
+                  opacity: 0.8,
+                  textAlign: 'center'
+                }}
+              >
+                {String(initError?.message || initError)}
+              </Text>
+            </>
+          ) : (
+            <Text
+              style={{
+                color: colors.white.mode1,
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: '600'
+              }}
+            >
+              Initializing…
+            </Text>
+          )}
+        </GestureHandlerRootView>
+      </UIKitProvider>
+    )
   }
 
   return (

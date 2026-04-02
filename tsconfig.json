@@ -23,6 +23,10 @@
     "ios",
     "build",
     "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
     "e2e-mobile-tests"
   ],
   "extends": "expo/tsconfig.base"

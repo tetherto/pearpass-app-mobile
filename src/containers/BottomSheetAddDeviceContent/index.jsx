@@ -19,12 +19,28 @@ const TAB = {
   PAIR_ANOTHER: 'pairAnother'
 }
 
-const BottomSheetAddDeviceContentBase = () => {
+const BottomSheetAddDeviceContentBase = ({
+  initialTab = TAB.PAIR_THIS,
+  title,
+  pairThisDescription,
+  pairAnotherDescription,
+  showImportTab = true
+}) => {
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
 
-  const [activeTab, setActiveTab] = useState(TAB.PAIR_THIS)
+  const [activeTab, setActiveTab] = useState(initialTab)
   const [showScanner, setShowScanner] = useState(false)
+
+  const resolvedTitle = title || t`Add a device`
+
+  const resolvedPairThisDescription =
+    pairThisDescription ||
+    t`Scan this QR code or paste the vault key into the PearPass app on your other device to connect it to your account. This method keeps your account secure.`
+
+  const resolvedPairAnotherDescription =
+    pairAnotherDescription ||
+    t`Scan the QR code or paste the vault key from the PearPass app on your other device to connect it to your account. This method keeps your account secure.`
 
   const handleBack = () => {
     if (activeTab === TAB.PAIR_ANOTHER && showScanner) {
@@ -44,37 +60,39 @@ const BottomSheetAddDeviceContentBase = () => {
         >
           <ArrowLeftIcon size={24} color={colors.primary400.mode1} />
         </TouchableOpacity>
-        <Text style={styles.itemHeaderLabel}>{t`Add a device`}</Text>
+        <Text style={styles.itemHeaderLabel}>{resolvedTitle}</Text>
         <View style={styles.placeholder} />
       </View>
 
       <Text style={styles.description}>
         {activeTab === TAB.PAIR_THIS
-          ? t`Scan this QR code or paste the vault key into the PearPass app on your other device to connect it to your account. This method keeps your account secure.`
-          : t`Scan the QR code or paste the vault key from the PearPass app on your other device to connect it to your account. This method keeps your account secure.`}
+          ? resolvedPairThisDescription
+          : resolvedPairAnotherDescription}
       </Text>
 
       {activeTab === TAB.PAIR_THIS ? (
         <PairThisDeviceContent
           tabs={
-            <View style={styles.tabContainer}>
-              <TouchableOpacity
-                style={[styles.tab, styles.tabActive]}
-                activeOpacity={0.7}
-                onPress={() => setActiveTab(TAB.PAIR_THIS)}
-              >
-                <Text style={[styles.tabText, styles.tabTextActive]}>
-                  {t`Share this Vault`}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.tab}
-                activeOpacity={0.7}
-                onPress={() => setActiveTab(TAB.PAIR_ANOTHER)}
-              >
-                <Text style={styles.tabText}>{t`Import vault`}</Text>
-              </TouchableOpacity>
-            </View>
+            showImportTab ? (
+              <View style={styles.tabContainer}>
+                <TouchableOpacity
+                  style={[styles.tab, styles.tabActive]}
+                  activeOpacity={0.7}
+                  onPress={() => setActiveTab(TAB.PAIR_THIS)}
+                >
+                  <Text style={[styles.tabText, styles.tabTextActive]}>
+                    {t`Share this Vault`}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.tab}
+                  activeOpacity={0.7}
+                  onPress={() => setActiveTab(TAB.PAIR_ANOTHER)}
+                >
+                  <Text style={styles.tabText}>{t`Import vault`}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null
           }
         />
       ) : (
@@ -82,24 +100,26 @@ const BottomSheetAddDeviceContentBase = () => {
           showScanner={showScanner}
           setShowScanner={setShowScanner}
           tabs={
-            <View style={styles.tabContainer}>
-              <TouchableOpacity
-                style={styles.tab}
-                activeOpacity={0.7}
-                onPress={() => setActiveTab(TAB.PAIR_THIS)}
-              >
-                <Text style={styles.tabText}>{t`Share this Vault`}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.tab, styles.tabActive]}
-                activeOpacity={0.7}
-                onPress={() => setActiveTab(TAB.PAIR_ANOTHER)}
-              >
-                <Text style={[styles.tabText, styles.tabTextActive]}>
-                  {t`Import vault`}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            showImportTab ? (
+              <View style={styles.tabContainer}>
+                <TouchableOpacity
+                  style={styles.tab}
+                  activeOpacity={0.7}
+                  onPress={() => setActiveTab(TAB.PAIR_THIS)}
+                >
+                  <Text style={styles.tabText}>{t`Share this Vault`}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.tab, styles.tabActive]}
+                  activeOpacity={0.7}
+                  onPress={() => setActiveTab(TAB.PAIR_ANOTHER)}
+                >
+                  <Text style={[styles.tabText, styles.tabTextActive]}>
+                    {t`Import vault`}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : null
           }
         />
       )}

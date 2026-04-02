@@ -2,6 +2,9 @@
   "expo": {
     "name": "PearPass",
     "slug": "pearpass",
+    "platforms": ["ios", "android"],
+    "scheme": "pearpassappmobile",
+    "newArchEnabled": true,
     "icon": "./assets/images/appIcons/app-icon.png",
     "version": "1.6.0",
     "android": {
@@ -28,7 +31,6 @@
         "policy": "sdkVersion"
       },
       "usesNonExemptEncryption": false,
-      "scheme": "pearpassappmobile",
       "appleTeamId": "43QFHSJ5QR",
       "entitlements": {
         "com.apple.developer.authentication-services.autofill-credential-provider": true,
