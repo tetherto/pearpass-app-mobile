@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { Button, ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
@@ -11,6 +13,7 @@ import { View } from 'react-native'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { useGlobalLoading } from '../../context/LoadingContext'
 import { useModal } from '../../context/ModalContext'
 import { BottomSheetVaultAction } from '../BottomSheetVaultAction'
 import { ContentContainer } from '../ContentContainer'
@@ -22,6 +25,9 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const { collapse, expand } = useBottomSheet()
   const { openModal, closeModal } = useModal()
   const styles = createStyles()
+
+  const [isLoading, setIsLoading] = useState(false)
+  useGlobalLoading({ isLoading })
 
   const { data: vaultsData } = useVaults()
   const {
@@ -36,13 +42,18 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
       return
     }
 
+    setIsLoading(true)
     const isProtected = await isVaultProtected(vault.id)
+
     if (isProtected) {
+      setIsLoading(false)
       openModal(
         <VaultPasswordFormModalContent
           vault={vault}
           onSubmit={async (password) => {
+            setIsLoading(true)
             await refetchVault(vault.id, { password })
+            setIsLoading(false)
             closeModal()
             collapse()
           }}
@@ -50,6 +61,7 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
       )
     } else {
       await refetchVault(vault.id)
+      setIsLoading(false)
       collapse()
     }
   }
