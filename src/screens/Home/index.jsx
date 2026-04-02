@@ -123,6 +123,8 @@ export const Home = () => {
             isMultiSelectOn={isMultiSelectOn}
             setIsMultiSelectOn={setIsMultiSelectOn}
             setSelectedRecords={setSelectedRecords}
+            recordType={recordType}
+            onCategoryChange={handleRecordType}
             onSortPress={() =>
               expand({
                 children: <BottomSheetSortContentV2 />,

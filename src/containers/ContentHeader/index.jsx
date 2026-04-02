@@ -17,6 +17,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
+import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
 
 const BREADCRUMB_HEIGHT = 57
@@ -25,7 +26,9 @@ export const ContentHeader = ({
   isMultiSelectOn,
   setIsMultiSelectOn,
   setSelectedRecords,
-  onSortPress
+  onSortPress,
+  recordType,
+  onCategoryChange
 }) => {
   const { t } = useLingui()
   const navigation = useNavigation()
@@ -45,6 +48,18 @@ export const ContentHeader = ({
       : t`All Folders`
 
   const handleVaultPress = () => navigation.openDrawer()
+
+  const handleCategoryPress = () => {
+    expand({
+      children: (
+        <BottomSheetCategorySelectorContent
+          recordType={recordType}
+          onSelect={onCategoryChange}
+        />
+      ),
+      snapPoints: ['10%', '70%', '70%']
+    })
+  }
 
   const handleFolderPress = () => {
     expand({
@@ -140,7 +155,11 @@ export const ContentHeader = ({
                   color={theme.colors.colorTextPrimary}
                 />
               </View>
-              {renderBreadcrumbPill(<Layers />, t`All Items`)}
+              {renderBreadcrumbPill(
+                <Layers />,
+                t`All Items`,
+                handleCategoryPress
+              )}
               <View style={styles.chevronSeparator}>
                 <KeyboardArrowRightFilled
                   width={14}
