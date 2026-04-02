@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -97,27 +97,30 @@ export const VaultShareScreen = () => {
   const [expiryIndex, setExpiryIndex] = useState(0)
   const [countdownKey, setCountdownKey] = useState(0)
   const [svg, setSvg] = useState('')
+  const createInviteRef = useRef(createInvite)
+  const deleteInviteRef = useRef(deleteInvite)
 
-  const createVaultInvite = useCallback(async () => {
-    await createInvite()
-    setCountdownKey((current) => current + 1)
-  }, [createInvite])
+  useEffect(() => {
+    createInviteRef.current = createInvite
+    deleteInviteRef.current = deleteInvite
+  }, [createInvite, deleteInvite])
 
   useEffect(() => {
     const setup = async () => {
-      await createVaultInvite()
+      await createInviteRef.current?.()
+      setCountdownKey((current) => current + 1)
     }
 
     setup()
 
     return () => {
       const cleanup = async () => {
-        await deleteInvite()
+        await deleteInviteRef.current?.()
       }
 
       cleanup()
     }
-  }, [createVaultInvite, deleteInvite])
+  }, [])
 
   useEffect(() => {
     if (!data?.publicKey) {
@@ -137,9 +140,10 @@ export const VaultShareScreen = () => {
     await copyToClipboard(vaultLinkValue)
   }
 
-  const handleRefreshInvite = useCallback(async () => {
-    await createVaultInvite()
-  }, [createVaultInvite])
+  const handleRefreshInvite = async () => {
+    await createInviteRef.current?.()
+    setCountdownKey((current) => current + 1)
+  }
 
   return (
     <KeyboardAvoidingView

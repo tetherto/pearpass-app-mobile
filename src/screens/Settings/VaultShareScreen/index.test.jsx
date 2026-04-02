@@ -124,7 +124,7 @@ describe('VaultShareScreen', () => {
     expect(getByText('Share Personal Vault')).toBeTruthy()
     expect(getByText('Code expires in 0:24')).toBeTruthy()
 
-    await waitFor(() => expect(mockCreateInvite).toHaveBeenCalled())
+    await waitFor(() => expect(mockCreateInvite).toHaveBeenCalledTimes(1))
     await waitFor(() => expect(getByTestId('vault-share-qr-code')).toBeTruthy())
   })
 
