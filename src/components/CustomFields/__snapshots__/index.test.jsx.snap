@@ -161,7 +161,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
               }
             >
                
-              Note
+              Comment
                
             </Text>
             <View
@@ -182,7 +182,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                 onBlur={[Function]}
                 onChangeText={[Function]}
                 onFocus={[Function]}
-                placeholder="Add note"
+                placeholder="Add comment"
                 placeholderTextColor="#BABABA"
                 pointerEvents="auto"
                 secureTextEntry={false}
@@ -482,7 +482,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
               }
             >
                
-              Note
+              Comment
                
             </Text>
             <View
@@ -503,7 +503,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                 onBlur={[Function]}
                 onChangeText={[Function]}
                 onFocus={[Function]}
-                placeholder="Add note"
+                placeholder="Add comment"
                 placeholderTextColor="#BABABA"
                 pointerEvents="auto"
                 secureTextEntry={false}

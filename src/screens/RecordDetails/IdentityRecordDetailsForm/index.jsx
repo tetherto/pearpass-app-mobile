@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useFocusEffect } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { DATE_FORMAT } from 'pearpass-lib-constants'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { DATE_FORMAT } from '@tetherto/pearpass-lib-constants'
 import {
   EmailIcon,
   PhoneIcon,
@@ -12,7 +12,7 @@ import {
   CalendarIcon,
   GroupIcon,
   GenderIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'

@@ -1,5 +1,5 @@
-import { NoteIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { NoteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native'
 import { CopyButton } from 'src/libComponents'
 

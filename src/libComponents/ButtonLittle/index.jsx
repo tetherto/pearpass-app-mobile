@@ -1,4 +1,4 @@
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { Button, ButtonText } from './styles'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
@@ -23,16 +23,19 @@ export const ButtonLittle = ({
   onPress,
   testID,
   textTestID,
-  accessibilityLabel
+  accessibilityLabel,
+  disableHaptics = false
 }) => {
   const Icon = startIcon
   const { hapticButtonPrimary, hapticButtonSecondary } = useHapticFeedback()
 
   const handlePress = () => {
-    if (variant === 'primary') {
-      hapticButtonPrimary()
-    } else {
-      hapticButtonSecondary()
+    if (!disableHaptics) {
+      if (variant === 'primary') {
+        hapticButtonPrimary()
+      } else {
+        hapticButtonSecondary()
+      }
     }
     onPress?.()
   }

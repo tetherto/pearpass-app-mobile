@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import { checkPasswordStrength } from 'pearpass-utils-password-check'
+import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
 
 import { HighlightString, NoticeText } from '../../../libComponents'
 import { PasswordWrapper } from '../styles'

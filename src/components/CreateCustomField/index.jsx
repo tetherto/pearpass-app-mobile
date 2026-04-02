@@ -6,7 +6,7 @@ import {
   ArrowUpIcon,
   PlusIcon,
   CommonFileIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { ArrowIconWrapper, DropDown, Label, LabelText, Wrapper } from './styles'
 import { ButtonFilter } from '../../libComponents'
@@ -32,7 +32,7 @@ export const CreateCustomField = ({
     //   icon: ImageIcon
     // },
     {
-      name: t`Note`,
+      name: t`Comment`,
       type: 'note',
       icon: CommonFileIcon
     }

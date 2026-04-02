@@ -7,8 +7,8 @@ import {
   SecurityIcon,
   SyncingIcon,
   VaultIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import {
   ScrollView,
   StyleSheet,

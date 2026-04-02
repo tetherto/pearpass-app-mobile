@@ -3,7 +3,7 @@ import { Children, cloneElement, useCallback, useState } from 'react'
 import {
   ArrowDownIcon,
   ArrowUpIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 import { View } from 'react-native'
 
 import { Title, TitleWrapper, Wrapper } from './styles'

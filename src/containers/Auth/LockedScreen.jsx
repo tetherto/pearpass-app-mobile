@@ -2,10 +2,13 @@ import { useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useCountDown } from 'pear-apps-lib-ui-react-hooks'
-import { LockIcon, TimeIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useUserData } from 'pearpass-lib-vault'
+import { useCountDown } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import {
+  LockIcon,
+  TimeIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useUserData } from '@tetherto/pearpass-lib-vault'
 import { AppState, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 

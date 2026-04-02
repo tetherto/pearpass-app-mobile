@@ -18,11 +18,11 @@ jest.mock('react-native-toast-message', () => ({
   show: jest.fn()
 }))
 
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   PasteFromClipboardIcon: ({ color }) => `PasteFromClipboardIcon-${color}`
 }))
 
-jest.mock('pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
   colors: {
     black: {
       mode1: '#000000'

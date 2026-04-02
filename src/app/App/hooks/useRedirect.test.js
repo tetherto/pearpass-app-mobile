@@ -2,8 +2,8 @@ import { renderHook, waitFor } from '@testing-library/react-native'
 
 import { useRedirect } from './useRedirect'
 
+const { useUserData } = require('@tetherto/pearpass-lib-vault')
 const mockGetItemAsync = require('expo-secure-store').getItemAsync
-const { useUserData } = require('pearpass-lib-vault')
 
 const { logger } = require('../../../utils/logger')
 
@@ -11,7 +11,7 @@ const { logger } = require('../../../utils/logger')
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn()
 }))
-jest.mock('pearpass-lib-vault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
   useUserData: jest.fn()
 }))
 jest.mock('../../../utils/logger', () => ({

@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { OutsideLinkIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { OutsideLinkIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { AppState, Platform, Text, TouchableOpacity } from 'react-native'
 import Toast from 'react-native-toast-message'
 

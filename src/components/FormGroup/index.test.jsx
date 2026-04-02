@@ -1,10 +1,10 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text } from 'react-native'
 
 import { FormGroup } from './index'
 
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   ArrowDownIcon: () => 'ArrowDownIcon',
   ArrowUpIcon: () => 'ArrowUpIcon'
 }))

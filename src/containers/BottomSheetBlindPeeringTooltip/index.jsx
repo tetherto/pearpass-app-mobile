@@ -1,8 +1,8 @@
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { BLIND_PEERS_LEARN_MORE } from 'pearpass-lib-constants'
-import { RedirectIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { BLIND_PEERS_LEARN_MORE } from '@tetherto/pearpass-lib-constants'
+import { RedirectIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { Text, View, StyleSheet, Linking, Pressable } from 'react-native'
 import Toast from 'react-native-toast-message'
 

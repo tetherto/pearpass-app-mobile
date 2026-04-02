@@ -9,7 +9,7 @@ import {
 } from 'react'
 
 import BottomSheet from '@gorhom/bottom-sheet'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { BackDrop } from '../components/BottomSheetBackdrop'
 

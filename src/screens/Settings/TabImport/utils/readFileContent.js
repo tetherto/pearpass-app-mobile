@@ -1,6 +1,9 @@
+import {
+  MAX_FILE_SIZE_BYTES,
+  MAX_FILE_SIZE_MB
+} from '@tetherto/pearpass-lib-constants'
 import * as DocumentPicker from 'expo-document-picker'
 import * as FileSystem from 'expo-file-system'
-import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from 'pearpass-lib-constants'
 
 const base64ToArrayBuffer = (base64) => {
   const binaryString = atob(base64)
@@ -44,7 +47,10 @@ export const readFileContent = async (acceptedTypes) => {
       })
       return {
         fileContent: base64ToArrayBuffer(base64Content),
-        fileType
+        fileType,
+        filename,
+        size: file.size,
+        isEncrypted: true
       }
     }
 
@@ -52,9 +58,22 @@ export const readFileContent = async (acceptedTypes) => {
       encoding: FileSystem.EncodingType.UTF8
     })
 
+    let isEncrypted = false
+    if (fileType === 'json') {
+      try {
+        const parsed = JSON.parse(fileContent)
+        isEncrypted = parsed.encrypted === true
+      } catch {
+        isEncrypted = true
+      }
+    }
+
     return {
+      filename,
+      size: file.size,
       fileContent,
-      fileType
+      fileType,
+      isEncrypted
     }
   } else {
     throw new Error('File picking was canceled.')

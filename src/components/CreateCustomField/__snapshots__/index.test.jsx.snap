@@ -512,7 +512,7 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
         }
         variant="secondary"
       >
-        Note
+        Comment
       </Text>
     </View>
   </View>

@@ -28,3 +28,6 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+
+      - name: Run TypeScript typecheck
+        run: npm run typecheck

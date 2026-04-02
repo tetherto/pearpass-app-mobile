@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, waitFor } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { WifiPasswordQRCode } from './index'
 import messages from '../../locales/en/messages'
@@ -9,7 +9,7 @@ import messages from '../../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
-jest.mock('pear-apps-utils-qr', () => ({
+jest.mock('@tetherto/pear-apps-utils-qr', () => ({
   generateQRCodeSVG: jest.fn()
 }))
 
@@ -39,7 +39,7 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-const { generateQRCodeSVG } = require('pear-apps-utils-qr')
+const { generateQRCodeSVG } = require('@tetherto/pear-apps-utils-qr')
 
 const { logger } = require('../../utils/logger')
 

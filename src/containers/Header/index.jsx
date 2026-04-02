@@ -2,15 +2,16 @@ import { useCallback } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   BackIcon,
   DeleteIcon,
   KebabMenuIcon,
   MoveToIcon,
   SearchIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useRecords } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useRecords } from '@tetherto/pearpass-lib-vault'
 import { TouchableOpacity } from 'react-native'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -18,6 +19,7 @@ import { useModal } from '../../context/ModalContext'
 import { LogoLock } from '../../svgs/LogoLock'
 import { BottomSheetFolderListContent } from '../BottomSheetFolderListContent'
 import { BottomSheetToolbarActionsContent } from '../BottomSheetToolbarActionsContent'
+import { HeaderV2 } from './HeaderV2'
 import {
   InputContainer,
   KebabMenuButton,
@@ -30,7 +32,7 @@ import {
 import { ButtonLittle } from '../../libComponents'
 import { ConfirmModalContent } from '../Modal/ConfirmModalContent'
 
-export const Header = ({
+const HeaderV1 = ({
   setSearchValue,
   searchValue,
   itemsFound,
@@ -40,11 +42,8 @@ export const Header = ({
   isMultiSelectOn
 }) => {
   const navigation = useNavigation()
-
   const { openModal, closeModal } = useModal()
-
   const { t } = useLingui()
-
   const { expand, collapse } = useBottomSheet()
 
   const { deleteRecords, updateFolder } = useRecords({
@@ -155,4 +154,12 @@ export const Header = ({
       </KebabMenuButton>
     </SearchContainer>
   )
+}
+
+export const Header = (props) => {
+  if (DESIGN_VERSION === 2) {
+    return <HeaderV2 {...props} />
+  }
+
+  return <HeaderV1 {...props} />
 }

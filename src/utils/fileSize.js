@@ -1,4 +1,4 @@
-import { MAX_FILE_SIZE_MB } from 'pearpass-lib-constants'
+import { MAX_FILE_SIZE_MB } from '@tetherto/pearpass-lib-constants'
 /**
  * Calculates the file size in MB from base64 string
  * @param {string} base64 - The base64 string

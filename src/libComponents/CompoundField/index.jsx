@@ -1,3 +1,5 @@
+import { Children, cloneElement } from 'react'
+
 import { CompoundFieldComponent } from './styles'
 
 /**
@@ -9,6 +11,13 @@ import { CompoundFieldComponent } from './styles'
  */
 export const CompoundField = ({ children, isDisabled, testID }) => (
   <CompoundFieldComponent isDisabled={isDisabled} testID={testID}>
-    {children}
+    {Children.toArray(children)
+      .filter((child) => child !== null)
+      .map((child, index, arr) =>
+        cloneElement(child, {
+          isFirst: index === 0,
+          isLast: index === arr.length - 1
+        })
+      )}
   </CompoundFieldComponent>
 )

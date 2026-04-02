@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import { useCreateRecord, useRecords } from 'pearpass-lib-vault'
-import { pearpassVaultClient } from 'pearpass-lib-vault/src/instances'
-import { selectVault } from 'pearpass-lib-vault/src/selectors/selectVault'
+import { useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
+import { pearpassVaultClient } from '@tetherto/pearpass-lib-vault/src/instances'
+import { selectVault } from '@tetherto/pearpass-lib-vault/src/selectors/selectVault'
 import { AppState } from 'react-native'
 import { useSelector } from 'react-redux'
 

@@ -1,8 +1,7 @@
+import { PearpassVaultClient } from '@tetherto/pearpass-lib-vault-core'
 import * as FileSystem from 'expo-file-system'
-import { PearpassVaultClient } from 'pearpass-lib-vault-core'
-import { AppState, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
-import Suspendify from 'suspendify'
 
 import { getSharedDirectoryPath } from '../utils/AppGroupHelper.js'
 
@@ -55,25 +54,6 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
 
   await ensureDirectoryExist(jobStoragePath)
   await client.setJobStoragePath(jobStoragePath)
-
-  const suspender = new Suspendify({
-    async suspend() {
-      await client.beginBackground()
-    },
-    async resume() {
-      await client.endBackground()
-    }
-  })
-
-  AppState.addEventListener('change', (nextState) => {
-    if (nextState === 'active') {
-      suspender.resume()
-      return
-    }
-    if (nextState === 'background') {
-      suspender.suspend(0)
-    }
-  })
 
   return client
 }

@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { CommonFileIcon } from 'pearpass-lib-ui-react-native-components'
+import { CommonFileIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { Body, Header, Title } from './styles'
 import { FileSizeWarning } from '../../components/FileSizeWarning'

@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { CreateCustomField } from './index'
 import messages from '../../locales/en/messages'
@@ -35,7 +35,7 @@ describe('CreateCustomField', () => {
     )
 
     expect(getByText('Create Custom')).toBeTruthy()
-    expect(queryByText('Note')).toBeFalsy()
+    expect(queryByText('Comment')).toBeFalsy()
     expect(toJSON()).toMatchSnapshot()
   })
 
@@ -46,7 +46,7 @@ describe('CreateCustomField', () => {
 
     fireEvent.press(getByText('Create Custom').parent)
 
-    expect(getByText('Note')).toBeTruthy()
+    expect(getByText('Comment')).toBeTruthy()
   })
 
   it('calls onCreateCustom with correct type when option is selected', () => {
@@ -56,7 +56,7 @@ describe('CreateCustomField', () => {
 
     fireEvent.press(getByText('Create Custom').parent)
 
-    fireEvent.press(getByText('Note').parent)
+    fireEvent.press(getByText('Comment').parent)
 
     expect(mockOnCreateCustom).toHaveBeenCalledWith('note')
   })
@@ -68,11 +68,11 @@ describe('CreateCustomField', () => {
 
     fireEvent.press(getByText('Create Custom').parent)
 
-    expect(queryByText('Note')).toBeTruthy()
+    expect(queryByText('Comment')).toBeTruthy()
 
-    fireEvent.press(getByText('Note').parent)
+    fireEvent.press(getByText('Comment').parent)
 
-    expect(queryByText('Note')).toBeFalsy()
+    expect(queryByText('Comment')).toBeFalsy()
   })
 
   it('toggles dropdown state when label is clicked multiple times', () => {
@@ -80,13 +80,13 @@ describe('CreateCustomField', () => {
       <CreateCustomField onCreateCustom={mockOnCreateCustom} />
     )
 
-    expect(queryByText('Note')).toBeFalsy()
+    expect(queryByText('Comment')).toBeFalsy()
 
     fireEvent.press(getByText('Create Custom').parent)
-    expect(queryByText('Note')).toBeTruthy()
+    expect(queryByText('Comment')).toBeTruthy()
 
     fireEvent.press(getByText('Create Custom').parent)
-    expect(queryByText('Note')).toBeFalsy()
+    expect(queryByText('Comment')).toBeFalsy()
   })
 
   it('displays the correct icon based on dropdown state', () => {

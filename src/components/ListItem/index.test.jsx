@@ -2,7 +2,7 @@ import { render, fireEvent } from '@testing-library/react-native'
 
 import { ListItem } from './index'
 
-jest.mock('pear-apps-utils-date', () => ({
+jest.mock('@tetherto/pear-apps-utils-date', () => ({
   formatDate: jest.fn().mockReturnValue('01/01/2023')
 }))
 
@@ -36,7 +36,7 @@ jest.mock('./styles', () => {
   }
 })
 
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   BrushIcon: () => 'BrushIcon',
   CheckIcon: () => 'CheckIcon',
   DeleteIcon: () => 'DeleteIcon',
@@ -44,7 +44,7 @@ jest.mock('pearpass-lib-ui-react-native-components', () => ({
   ShareIcon: () => 'ShareIcon'
 }))
 
-jest.mock('pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
   colors: {
     primary400: { mode1: '#000000' },
     black: { mode1: '#000000' },

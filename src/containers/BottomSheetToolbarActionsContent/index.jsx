@@ -41,7 +41,12 @@ export const BottomSheetToolbarActionsContent = ({ setIsMultiSelectOn }) => {
       style={{ padding: 20 }}
       data={recordListActions}
       renderItem={({ item }) => (
-        <MenuActionItem key={item.name} item={item} onPress={item.click} />
+        <MenuActionItem
+          key={item.name}
+          item={item}
+          onPress={item.click}
+          disableHaptics
+        />
       )}
     />
   )

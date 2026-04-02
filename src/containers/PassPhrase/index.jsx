@@ -5,20 +5,21 @@ import {
   PASSPHRASE_WORD_COUNTS,
   VALID_WORD_COUNTS,
   DEFAULT_SELECTED_TYPE
-} from 'pearpass-lib-constants'
+} from '@tetherto/pearpass-lib-constants'
 import {
   CopyIcon,
   PassPhraseIcon,
   PasteFromClipboardIcon,
   ErrorIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { PassPhraseSettings } from './PassPhraseSettings'
 import { BadgeTextItem } from '../../components/BadgeTextItem'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { usePasteFromClipboard } from '../../hooks/usePasteFromClipboard'
 
 /**
@@ -36,6 +37,7 @@ export const PassPhrase = ({ isCreateOrEdit, onChange, value, error }) => {
   const [withRandomWord, setWithRandomWord] = useState(false)
   const [passphraseWords, setPassphraseWords] = useState([])
 
+  const { hapticButtonSecondary } = useHapticFeedback()
   const { copyToClipboard } = useCopyToClipboard()
   const { pasteFromClipboard } = usePasteFromClipboard()
 
@@ -109,11 +111,14 @@ export const PassPhrase = ({ isCreateOrEdit, onChange, value, error }) => {
 
       <TouchableOpacity
         style={styles.copyContainer}
-        onPress={
-          isCreateOrEdit
-            ? handlePasteFromClipboard
-            : () => copyToClipboard(value)
-        }
+        onPress={() => {
+          hapticButtonSecondary()
+          if (isCreateOrEdit) {
+            handlePasteFromClipboard()
+          } else {
+            copyToClipboard(value)
+          }
+        }}
       >
         {isCreateOrEdit ? (
           <>

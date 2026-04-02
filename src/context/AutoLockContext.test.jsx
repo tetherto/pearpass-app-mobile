@@ -1,9 +1,9 @@
 import { renderHook, act, waitFor } from '@testing-library/react-native'
-import { DEFAULT_AUTO_LOCK_TIMEOUT } from 'pearpass-lib-constants'
+import { DEFAULT_AUTO_LOCK_TIMEOUT } from '@tetherto/pearpass-lib-constants'
 
 import { AutoLockProvider, useAutoLockContext } from './AutoLockContext'
 
-jest.mock('pearpass-lib-constants', () => ({
+jest.mock('@tetherto/pearpass-lib-constants', () => ({
   DEFAULT_AUTO_LOCK_TIMEOUT: 15 * 60 * 1000
 }))
 

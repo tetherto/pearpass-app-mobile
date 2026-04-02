@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { BLIND_PEER_TYPE } from 'pearpass-lib-constants'
+import { BLIND_PEER_TYPE } from '@tetherto/pearpass-lib-constants'
 import {
   ButtonPrimary,
   ButtonSecondary
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
-import { useBlindMirrors } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
+import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
 import { Text, View, StyleSheet } from 'react-native'
 import Toast from 'react-native-toast-message'
 

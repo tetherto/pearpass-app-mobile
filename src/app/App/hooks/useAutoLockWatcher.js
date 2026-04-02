@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
-import { closeAllInstances, useUserData, useVaults } from 'pearpass-lib-vault'
-import { AppState } from 'react-native'
+import {
+  closeAllInstances,
+  useUserData,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
+import { AppState, Keyboard } from 'react-native'
 
 import { useRouteHelper } from './useRouteHelper'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
@@ -23,6 +27,7 @@ export const useAutoLockWatcher = () => {
   const lastActivityRef = useRef(Date.now())
   const lockInProgressRef = useRef(false)
   const appStateRef = useRef(AppState.currentState)
+  const keyboardVisibleRef = useRef(false)
   const { getCurrentRoute, isMasterPasswordScreen } = useRouteHelper()
   const { collapse } = useBottomSheet()
   const { closeModal } = useModal()
@@ -119,6 +124,11 @@ export const useAutoLockWatcher = () => {
         return
       }
 
+      if (keyboardVisibleRef.current) {
+        clearAutoLockTimer()
+        return
+      }
+
       clearAutoLockTimer()
 
       const lastActivity = overrideLastActivity ?? lastActivityRef.current
@@ -174,6 +184,31 @@ export const useAutoLockWatcher = () => {
     resetFromNow()
   }, [resetAutoLockTimer, isAutoLockActive, clearAutoLockTimer])
 
+  useEffect(() => {
+    if (!isAutoLockActive) return
+
+    const onShow = () => {
+      keyboardVisibleRef.current = true
+      clearAutoLockTimer()
+    }
+
+    const onHide = () => {
+      keyboardVisibleRef.current = false
+      const now = Date.now()
+      lastActivityRef.current = now
+      setLastActivityAt(now)
+      resetAutoLockTimer(now)
+    }
+
+    const showSub = Keyboard.addListener('keyboardDidShow', onShow)
+    const hideSub = Keyboard.addListener('keyboardDidHide', onHide)
+
+    return () => {
+      showSub.remove()
+      hideSub.remove()
+    }
+  }, [isAutoLockActive, clearAutoLockTimer, resetAutoLockTimer])
+
   /**
    * Background → foreground handling
    */
@@ -185,6 +220,8 @@ export const useAutoLockWatcher = () => {
       appStateRef.current = nextState
 
       if (nextState === 'active' && prev !== 'active') {
+        keyboardVisibleRef.current = false
+
         const stored = await getLastActivityAt()
         const lastActivity = stored ?? Date.now()
 

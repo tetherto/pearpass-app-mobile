@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 
 import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
@@ -43,7 +43,7 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
   return (
     <>
       {!!values?.note.length && (
-        <PressableNote label={t`Note`} text={values.note} />
+        <PressableNote label={t`Comment`} text={values.note} />
       )}
 
       {hasAttachments && (

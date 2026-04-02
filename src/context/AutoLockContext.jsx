@@ -8,11 +8,11 @@ import {
   useState
 } from 'react'
 
-import * as SecureStore from 'expo-secure-store'
 import {
   DEFAULT_AUTO_LOCK_TIMEOUT,
   AUTO_LOCK_ENABLED
-} from 'pearpass-lib-constants'
+} from '@tetherto/pearpass-lib-constants'
+import * as SecureStore from 'expo-secure-store'
 
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
 import { logger } from '../utils/logger'

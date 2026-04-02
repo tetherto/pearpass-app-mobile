@@ -1,5 +1,5 @@
+import { PearpassVaultClient } from '@tetherto/pearpass-lib-vault-core'
 import * as FileSystem from 'expo-file-system'
-import { PearpassVaultClient } from 'pearpass-lib-vault-core'
 import { Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
 
@@ -18,7 +18,7 @@ jest.mock('react-native-bare-kit', () => ({
   }))
 }))
 
-jest.mock('pearpass-lib-vault-core', () => ({
+jest.mock('@tetherto/pearpass-lib-vault-core', () => ({
   PearpassVaultClient: jest
     .fn()
     .mockImplementation(function PearpassVaultClient() {

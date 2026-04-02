@@ -9,7 +9,7 @@ import messages from '../../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
-jest.mock('pearpass-lib-constants', () => ({
+jest.mock('@tetherto/pearpass-lib-constants', () => ({
   MAX_FILE_SIZE_MB: 6
 }))
 

@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { ButtonSecondary } from './index'
 

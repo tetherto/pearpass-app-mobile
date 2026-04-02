@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { RECORD_TYPES, useRecords } from 'pearpass-lib-vault'
+import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { BottomSheetFolderListContent } from '../containers/BottomSheetFolderListContent'

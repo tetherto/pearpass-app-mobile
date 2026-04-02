@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { AUTO_LOCK_ENABLED } from '@tetherto/pearpass-lib-constants'
 import * as SecureStore from 'expo-secure-store'
-import { AUTO_LOCK_ENABLED } from 'pearpass-lib-constants'
 
 import { Container, Description } from './styles'
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
@@ -10,19 +10,17 @@ import { IOS_APP_GROUP_ID } from '../../../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../../../constants/secureStorageKeys'
 import { AutoLockSettings } from '../../../containers/AutoLockSettings'
 import { RuleSelector } from '../../../containers/BottomSheetPassGeneratorContent/RuleSelector'
-import { useHapticsContext } from '../../../context/HapticsContext'
 import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
 
 export const PrivacySection = () => {
   const { t } = useLingui()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
-  const { isHapticsEnabled, setIsHapticsEnabled } = useHapticsContext()
   const [selectedRules, setSelectedRules] = useState({
     biometrics: false,
     copyToClipboard: true,
     passwordChangeReminder: true,
-    haptics: true
+    haptics: false
   })
 
   const { isBiometricsSupported, isBiometricsEnabled, toggleBiometrics } =
@@ -47,15 +45,6 @@ export const PrivacySection = () => {
         testIDOff: 'copy-to-clipboard-toggle-off',
         accessibilityLabelOn: t`Copy to clipboard enabled`,
         accessibilityLabelOff: t`Copy to clipboard disabled`
-      },
-      {
-        name: 'haptics',
-        label: t`Haptic feedback`,
-        description: t`Enable vibration feedback when interacting with the app`,
-        testIDOn: 'haptics-toggle-on',
-        testIDOff: 'haptics-toggle-off',
-        accessibilityLabelOn: t`Haptic feedback enabled`,
-        accessibilityLabelOff: t`Haptic feedback disabled`
       }
     ]
 
@@ -109,10 +98,6 @@ export const PrivacySection = () => {
       }
     }
 
-    if (newRules.haptics !== selectedRules.haptics) {
-      await setIsHapticsEnabled(newRules.haptics)
-    }
-
     setSelectedRules({ ...newRules })
   }
 
@@ -129,12 +114,12 @@ export const PrivacySection = () => {
         biometrics: isBiometricsEnabled,
         copyToClipboard: copyToClipboard !== 'false',
         passwordChangeReminder: isPasswordChangeReminderEnabled,
-        haptics: isHapticsEnabled
+        haptics: false
       })
     }
 
     getInitialSettings()
-  }, [isBiometricsEnabled, isPasswordChangeReminderEnabled, isHapticsEnabled])
+  }, [isBiometricsEnabled, isPasswordChangeReminderEnabled])
 
   return (
     <CardSingleSetting title={t`Custom settings`}>

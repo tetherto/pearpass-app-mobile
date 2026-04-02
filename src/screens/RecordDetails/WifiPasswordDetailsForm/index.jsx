@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { PasswordIcon } from 'pearpass-lib-ui-react-native-components'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { PasswordIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'

@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { useUserData } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useUserData } from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
   stringToBuffer
-} from 'pearpass-lib-vault/src/utils/buffer'
-import { validatePasswordChange } from 'pearpass-utils-password-check'
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
+import { validatePasswordChange } from '@tetherto/pearpass-utils-password-check'
 
 import { InputLabel, InputWrapper } from './styles'
 import { useModal } from '../../../context/ModalContext'

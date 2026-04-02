@@ -49,6 +49,12 @@ async function sendSlackStats() {
       passedTests = 38;
       failedTests = 0;
       break;
+    case 'home':
+    case 'homeOnly':
+      totalTests = 0;
+      passedTests = 0;
+      failedTests = 0;
+      break;
   }
   
   const passedRate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;

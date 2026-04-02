@@ -1,4 +1,4 @@
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import styled from 'styled-components/native'
 
 export const InputWrapper = styled.TouchableOpacity`

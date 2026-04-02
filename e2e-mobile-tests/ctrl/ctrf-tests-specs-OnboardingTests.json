@@ -1,0 +1,142 @@
+{
+  "results": {
+    "tool": {
+      "name": "webdriverio"
+    },
+    "summary": {
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0,
+      "other": 0,
+      "start": 1770205461879,
+      "stop": 1770205716879
+    },
+    "tests": [
+      {
+        "name": "[PAS-203] User should see onboarding screens when opening the Mob app for the first time",
+        "status": "passed",
+        "duration": 8205,
+        "start": 1770205461,
+        "stop": 1770205470,
+        "rawStatus": "passed",
+        "type": "e2e",
+        "retries": 0,
+        "flaky": false,
+        "suite": "Onboarding Flow",
+        "filePath": "C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\tests\\specs\\OnboardingTests.ts",
+        "browser": ""
+      },
+      {
+        "name": "[PAS-926] User is moved to the next \"Onboarding\" screen by tapping on the \"Continue\" button",
+        "status": "passed",
+        "duration": 236544,
+        "start": 1770205470,
+        "stop": 1770205706,
+        "rawStatus": "passed",
+        "type": "e2e",
+        "retries": 0,
+        "flaky": false,
+        "suite": "Onboarding Flow",
+        "filePath": "C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\tests\\specs\\OnboardingTests.ts",
+        "browser": ""
+      },
+      {
+        "name": "[PAS-925] User can choose any onboarding screen by tapping on the screen picker",
+        "status": "passed",
+        "duration": 5411,
+        "start": 1770205706,
+        "stop": 1770205712,
+        "rawStatus": "passed",
+        "type": "e2e",
+        "retries": 0,
+        "flaky": false,
+        "suite": "Onboarding Flow",
+        "filePath": "C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\tests\\specs\\OnboardingTests.ts",
+        "browser": ""
+      },
+      {
+        "name": "[PAS-927] User skips \"Onboarding\" screens by tapping on \"Skip\" button",
+        "status": "passed",
+        "duration": 2471,
+        "start": 1770205712,
+        "stop": 1770205714,
+        "rawStatus": "passed",
+        "type": "e2e",
+        "retries": 0,
+        "flaky": false,
+        "suite": "Onboarding Flow",
+        "filePath": "C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\tests\\specs\\OnboardingTests.ts",
+        "browser": ""
+      },
+      {
+        "name": "[PAS-931] User is moved to the \"Sign-up\" screen after the \"Onboarding\" screens",
+        "status": "passed",
+        "duration": 1724,
+        "start": 1770205714,
+        "stop": 1770205716,
+        "rawStatus": "passed",
+        "type": "e2e",
+        "retries": 0,
+        "flaky": false,
+        "suite": "Onboarding Flow",
+        "filePath": "C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\tests\\specs\\OnboardingTests.ts",
+        "browser": ""
+      }
+    ],
+    "environment": {
+      "appName": "PearPass Mobile",
+      "appVersion": "1.0.0",
+      "osPlatform": "Android",
+      "extra": {
+        "platformName": "Android",
+        "automationName": "UiAutomator2",
+        "deviceName": "emulator-5554",
+        "platformVersion": "13",
+        "appPackage": "com.pears.pass",
+        "noReset": true,
+        "fullReset": false,
+        "autoGrantPermissions": true,
+        "newCommandTimeout": 300,
+        "dontStopAppOnReset": true,
+        "platform": "LINUX",
+        "webStorageEnabled": false,
+        "takesScreenshot": true,
+        "javascriptEnabled": true,
+        "databaseEnabled": false,
+        "networkConnectionEnabled": true,
+        "locationContextEnabled": false,
+        "warnings": {},
+        "desired": {
+          "platformName": "Android",
+          "automationName": "UiAutomator2",
+          "deviceName": "emulator-5554",
+          "platformVersion": "13",
+          "appPackage": "com.pears.pass",
+          "noReset": true,
+          "fullReset": false,
+          "autoGrantPermissions": true,
+          "newCommandTimeout": 300,
+          "dontStopAppOnReset": true
+        },
+        "deviceUDID": "emulator-5554",
+        "appActivity": "com.pears.pass/.MainActivity",
+        "pixelRatio": "2.625",
+        "statBarHeight": 136,
+        "viewportRect": {
+          "left": 0,
+          "top": 136,
+          "width": 1080,
+          "height": 2264
+        },
+        "deviceApiLevel": 33,
+        "deviceManufacturer": "Google",
+        "deviceModel": "sdk_gphone64_x86_64",
+        "deviceScreenSize": "1080x2400",
+        "deviceScreenDensity": 420,
+        "sessionId": "c73df9bd-82ae-4416-b6f0-32b940742216"
+      }
+    }
+  }
+}

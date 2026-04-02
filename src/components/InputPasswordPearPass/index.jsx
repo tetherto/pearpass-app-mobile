@@ -5,7 +5,7 @@ import {
   EyeClosedIcon,
   EyeIcon,
   LockCircleIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import {
   AdditionalItems,

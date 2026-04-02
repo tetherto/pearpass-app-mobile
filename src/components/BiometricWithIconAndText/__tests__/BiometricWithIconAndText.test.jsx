@@ -18,7 +18,7 @@ beforeAll(() => {
 })
 
 // Mock icon components to simple test components
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   FaceIdIcon: (props) => <mock-FaceIdIcon testID="face-icon" {...props} />,
   FingerprintIcon: (props) => (
     <mock-FingerprintIcon testID="fingerprint-icon" {...props} />
@@ -26,7 +26,7 @@ jest.mock('pearpass-lib-ui-react-native-components', () => ({
 }))
 
 // Mock theme provider colors usage to a simple object if needed
-jest.mock('pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
   colors: {
     primary400: { mode1: '#000' }
   }

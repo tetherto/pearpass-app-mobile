@@ -2,14 +2,14 @@ import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { CameraView } from 'expo-camera'
-import * as Clipboard from 'expo-clipboard'
 import {
   PasteFromClipboardIcon,
   QrCodeIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { usePair, useVault } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
+import { CameraView } from 'expo-camera'
+import * as Clipboard from 'expo-clipboard'
 import {
   ActivityIndicator,
   Platform,
@@ -21,6 +21,7 @@ import {
 } from 'react-native'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { useQRScanner } from '../../hooks/useQRScanner'
 import { ButtonPrimary, ButtonSecondary } from '../../libComponents'
 
@@ -33,6 +34,7 @@ export const PairAnotherDeviceContent = ({
   const navigation = useNavigation()
   const { collapse } = useBottomSheet()
 
+  const { hapticButtonSecondary } = useHapticFeedback()
   const [inviteCode, setInviteCode] = useState('')
   const [error, setError] = useState('')
 
@@ -56,6 +58,7 @@ export const PairAnotherDeviceContent = ({
   })
 
   const handleQRPress = async () => {
+    hapticButtonSecondary()
     if (!hasPermission) {
       await requestPermission()
     }
@@ -63,6 +66,7 @@ export const PairAnotherDeviceContent = ({
   }
 
   const handlePaste = async () => {
+    hapticButtonSecondary()
     const text = await Clipboard.getStringAsync()
     if (text) {
       setInviteCode(text)

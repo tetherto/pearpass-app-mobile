@@ -1,9 +1,16 @@
 import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { ExitIcon, FullBodyIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { closeAllInstances, useVault, useVaults } from 'pearpass-lib-vault'
+import {
+  ExitIcon,
+  FullBodyIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import {
+  closeAllInstances,
+  useVault,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
 import { ActivityIndicator } from 'react-native'
 
 import {
@@ -111,7 +118,11 @@ export const DrawerContent = ({ navigation }) => {
   }
 
   const handleFolderMenuOpen = (folderName) => {
-    if (folderName !== 'Favorites' && folderName !== 'All Folders') {
+    if (
+      folderName !== 'Favorites' &&
+      folderName !== 'All Folders' &&
+      folderName !== 'Authenticator'
+    ) {
       expand({
         children: <BottomSheetFolderMenuContent folderName={folderName} />,
         snapPoints: ['10%', '20%', '20%']
@@ -129,11 +140,22 @@ export const DrawerContent = ({ navigation }) => {
             selectedFolder={state?.folder}
             onLongPress={handleFolderMenuOpen}
             onFolderSelect={(folder) => {
+              if (folder?.id === 'authenticator') {
+                setState({
+                  folder: 'authenticator',
+                  isFavorite: false,
+                  sort: 'recent'
+                })
+                navigation.navigate('Authenticator')
+                navigation.closeDrawer()
+                return
+              }
               setState({
                 folder: folder?.id ?? folder.name,
                 isFavorite: folder?.id && folder?.id === 'favorite',
                 sort: 'recent'
               })
+              navigation.navigate('Home')
               navigation.closeDrawer()
             }}
           />

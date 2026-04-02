@@ -8,7 +8,7 @@ const {
   closeAllInstances,
   useUserData,
   useVaults
-} = require('pearpass-lib-vault')
+} = require('@tetherto/pearpass-lib-vault')
 
 const { useRouteHelper } = require('./useRouteHelper')
 const { useAutoLockContext } = require('../../../context/AutoLockContext')
@@ -23,7 +23,7 @@ const { clearAllFileCache } = require('../../../utils/filesCache')
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn()
 }))
-jest.mock('pearpass-lib-vault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
   useUserData: jest.fn(),
   useVaults: jest.fn(),
   closeAllInstances: jest.fn()

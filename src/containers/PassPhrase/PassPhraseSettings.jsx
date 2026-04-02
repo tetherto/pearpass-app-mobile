@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
-import { PASSPHRASE_TYPE_OPTIONS } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { PASSPHRASE_TYPE_OPTIONS } from '@tetherto/pearpass-lib-constants'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet } from 'react-native'
 
 import { AppSwitch } from '../../components/AppSwitch/AppSwitch'

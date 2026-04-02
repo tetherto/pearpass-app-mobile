@@ -1,13 +1,14 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { PROTECTED_VAULT_ENABLED } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 import { VAULT_ACTION } from '../../constants/vaultActions'
 import { ModifyVaultModalContent } from '../../containers/Modal/ModifyVaultModalContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useModal } from '../../context/ModalContext'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
 /**
  *
@@ -21,8 +22,10 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
   const { t } = useLingui()
   const { collapse } = useBottomSheet()
   const { openModal } = useModal()
+  const { hapticButtonPrimary } = useHapticFeedback()
 
   const handleName = () => {
+    hapticButtonPrimary()
     collapse()
     openModal(
       <ModifyVaultModalContent
@@ -34,6 +37,7 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
   }
 
   const handlePassword = () => {
+    hapticButtonPrimary()
     collapse()
     openModal(
       <ModifyVaultModalContent

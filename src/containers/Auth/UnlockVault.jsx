@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useVault, useVaults } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import {
   ActivityIndicator,
   KeyboardAvoidingView,

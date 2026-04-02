@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
-import { MAX_FILE_SIZE_MB } from 'pearpass-lib-constants'
-import { YellowErrorIcon } from 'pearpass-lib-ui-react-native-components'
+import { MAX_FILE_SIZE_MB } from '@tetherto/pearpass-lib-constants'
+import { YellowErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native'
 import { useTheme } from 'styled-components/native'

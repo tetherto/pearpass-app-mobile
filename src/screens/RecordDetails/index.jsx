@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
@@ -6,10 +8,10 @@ import {
   FolderIcon,
   KebabMenuIcon,
   StarIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useRecordById, useRecords } from 'pearpass-lib-vault'
-import { RECORD_TYPES } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useRecordById, useRecords } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 import { TouchableOpacity } from 'react-native'
 
 import { RecordDetailsContent } from './RecordDetailsContentWrapper'
@@ -29,6 +31,7 @@ import {
 import { AvatarRecord } from '../../components/AvatarRecord'
 import { BottomSheetRecordActionsContent } from '../../containers/BottomSheetRecordActionsContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { ButtonLittle } from '../../libComponents'
 
 export const RecordDetails = ({ route }) => {
@@ -42,9 +45,16 @@ export const RecordDetails = ({ route }) => {
 
   const { updateFavoriteState } = useRecords()
 
+  const { hapticButtonSecondary } = useHapticFeedback()
   const { t } = useLingui()
 
   const navigation = useNavigation()
+
+  const [isFavorite, setIsFavorite] = useState(record?.isFavorite ?? false)
+
+  useEffect(() => {
+    setIsFavorite(record?.isFavorite ?? false)
+  }, [record?.isFavorite])
 
   const websiteDomain =
     record?.type === RECORD_TYPES.LOGIN ? record?.data?.websites?.[0] : null
@@ -66,13 +76,16 @@ export const RecordDetails = ({ route }) => {
         <HeaderActions>
           <TouchableOpacity
             onPress={() => {
-              updateFavoriteState([record?.id], !record?.isFavorite)
+              hapticButtonSecondary()
+              const newFavoriteValue = !isFavorite
+              setIsFavorite(newFavoriteValue)
+              updateFavoriteState([record?.id], newFavoriteValue)
             }}
           >
             <StarIcon
               size="30"
               color={colors.primary400.mode1}
-              fill={record?.isFavorite}
+              fill={isFavorite}
             />
           </TouchableOpacity>
 
@@ -91,6 +104,7 @@ export const RecordDetails = ({ route }) => {
 
           <ButtonLittle
             startIcon={KebabMenuIcon}
+            disableHaptics
             onPress={() =>
               expand({
                 children: (
@@ -111,7 +125,12 @@ export const RecordDetails = ({ route }) => {
       </Header>
 
       <Record>
-        <AvatarRecord websiteDomain={websiteDomain} record={record} size="md" />
+        <AvatarRecord
+          websiteDomain={websiteDomain}
+          record={record}
+          size="md"
+          isFavorite={isFavorite}
+        />
         <RecordInfo>
           <Title numberOfLines={1} ellipsizeMode="tail">
             {record?.data?.title}

@@ -1,9 +1,13 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { ApplicationIcon } from 'pearpass-lib-ui-react-native-components'
-import { RECORD_TYPES, useCreateRecord, useRecords } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { ApplicationIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
+  RECORD_TYPES,
+  useCreateRecord,
+  useRecords
+} from '@tetherto/pearpass-lib-vault'
 
 import { CreateCustomField } from '../../../components/CreateCustomField'
 import { CustomFields } from '../../../components/CustomFields'
@@ -64,7 +68,7 @@ export const CreateOrEditPassphraseContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string()
@@ -141,6 +145,9 @@ export const CreateOrEditPassphraseContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Application name field"
+                inputAccessibilityLabel="Application name input field"
+                testID="application-name-input-field"
                 label={t`Application`}
                 placeholder={t`Insert Application name`}
                 variant="outline"
@@ -155,7 +162,14 @@ export const CreateOrEditPassphraseContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote
+                accessibilityLabel="Note field"
+                inputAccessibilityLabel="Note input field"
+                testID="note-input-field"
+                isFirst
+                isLast
+                {...register('note')}
+              />
             </FormGroup>
 
             <CustomFields

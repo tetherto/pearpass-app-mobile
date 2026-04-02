@@ -1,9 +1,13 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { DeleteIcon } from 'pearpass-lib-ui-react-native-components'
-import { RECORD_TYPES, useCreateRecord, useRecords } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
+  RECORD_TYPES,
+  useCreateRecord,
+  useRecords
+} from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
 import { CreateCustomField } from '../../../components/CreateCustomField'
@@ -46,7 +50,7 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string(),
@@ -163,6 +167,9 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Title field"
+                inputAccessibilityLabel="Title input field"
+                testID="title-input-field"
                 label={t`Title`}
                 placeholder={t`No title`}
                 variant="outline"
@@ -171,8 +178,11 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
             </FormGroup>
             <FormGroup>
               <TextArea
+                accessibilityLabel="Add note field"
+                inputAccessibilityLabel="Add note input field"
+                testID="add-note"
                 {...register('note')}
-                placeholder={t`Write a note...`}
+                placeholder={t`Write a comment...`}
               />
             </FormGroup>
 

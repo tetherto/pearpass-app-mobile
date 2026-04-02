@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { generateQRCodeSVG } from 'pear-apps-utils-qr'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 

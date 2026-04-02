@@ -5,8 +5,8 @@ import {
   PASSPHRASE_WORD_COUNTS,
   DEFAULT_SELECTED_TYPE,
   PASSPHRASE_TYPE_OPTIONS
-} from 'pearpass-lib-constants'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-constants'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import messages from '../../../locales/en/messages'
 import { PassPhraseSettings } from '../PassPhraseSettings'

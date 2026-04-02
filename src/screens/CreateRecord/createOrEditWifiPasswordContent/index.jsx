@@ -1,9 +1,16 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { PasswordIcon, WifiIcon } from 'pearpass-lib-ui-react-native-components'
-import { RECORD_TYPES, useCreateRecord, useRecords } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import {
+  PasswordIcon,
+  WifiIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
+  RECORD_TYPES,
+  useCreateRecord,
+  useRecords
+} from '@tetherto/pearpass-lib-vault'
 import { Platform } from 'react-native'
 
 import { CreateCustomField } from '../../../components/CreateCustomField'
@@ -65,7 +72,7 @@ export const CreateOrEditWifiPasswordContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Note is required`)
+        note: Validator.string().required(t`Comment is required`)
       })
     ),
     folder: Validator.string()
@@ -143,6 +150,9 @@ export const CreateOrEditWifiPasswordContent = ({
           <FormWrapper>
             <FormGroup>
               <InputField
+                accessibilityLabel="Wi-Fi name field"
+                inputAccessibilityLabel="Wi-Fi name input field"
+                testID="wifi-name-input-field"
                 icon={WifiIcon}
                 label={t`Wi-Fi Name`}
                 placeholder={t`Insert Wi-Fi Name`}
@@ -154,6 +164,9 @@ export const CreateOrEditWifiPasswordContent = ({
             </FormGroup>
             <FormGroup>
               <PasswordField
+                accessibilityLabel="Wi-Fi password field"
+                inputAccessibilityLabel="Wi-Fi password input field"
+                testID="wifi-password-input-field"
                 icon={PasswordIcon}
                 label={t`Wi-Fi Password`}
                 placeholder={t`Insert Wi-Fi Password`}
@@ -185,7 +198,14 @@ export const CreateOrEditWifiPasswordContent = ({
             </FormGroup>
 
             <FormGroup>
-              <InputFieldNote isFirst isLast {...register('note')} />
+              <InputFieldNote
+                accessibilityLabel="Note field"
+                inputAccessibilityLabel="Note input field"
+                testID="note-input-field"
+                isFirst
+                isLast
+                {...register('note')}
+              />
             </FormGroup>
 
             <CustomFields

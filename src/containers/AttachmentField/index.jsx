@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native'
 import {
   CommonFileIcon,
   PlusIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 import { TouchableOpacity } from 'react-native'
 
 import {

@@ -1,7 +1,7 @@
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { XIcon } from 'pearpass-lib-ui-react-native-components'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { XIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import {
   Actions,

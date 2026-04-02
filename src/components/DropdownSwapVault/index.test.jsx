@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { StyleSheet, View } from 'react-native'
 
 import { DropdownSwapVault } from '.'
@@ -16,7 +16,7 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-jest.mock('pearpass-lib-vault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
   useVault: () => ({
     refetch: jest.fn(),
     isVaultProtected: jest.fn().mockResolvedValue(false)

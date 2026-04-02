@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { renderHook } from '@testing-library/react-native'
-import { RECORD_TYPES } from 'pearpass-lib-vault'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
 import { useRecordActionItems } from './useRecordActionItems'
 import messages from '../locales/en/messages'
@@ -19,7 +19,7 @@ jest.mock('@react-navigation/native', () => ({
   })
 }))
 
-jest.mock('pearpass-lib-vault', () => {
+jest.mock('@tetherto/pearpass-lib-vault', () => {
   const deleteRecordsMock = jest.fn(() => Promise.resolve())
 
   return {

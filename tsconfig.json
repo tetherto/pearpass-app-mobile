@@ -1,7 +1,29 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
+    "customConditions": [
+      "react-native"
+    ],
+    "moduleResolution": "bundler",
+    "moduleSuffixes": [
+      ".ios",
+      ".android",
+      ".native",
+      ""
+    ]
   },
-  "exclude": ["node_modules", "android", "ios", "build", "dist"],
+  "exclude": [
+    "node_modules",
+    "android",
+    "ios",
+    "build",
+    "dist",
+    "e2e-mobile-tests"
+  ],
   "extends": "expo/tsconfig.base"
 }

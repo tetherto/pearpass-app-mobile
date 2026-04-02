@@ -58,10 +58,10 @@ const sidebarLocators = {
 ============================ */
   createNewFolderPageCloseButton: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]',
   createNewFolderPage: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup',
-  createNewFolderPageButton: '//android.view.ViewGroup[@content-desc="Create new folder"]',
+  createNewFolderPageButton: '~Create new folder',
   createNewFolderPageButtonText: '//android.widget.TextView[@text="Create new folder"]',
-  createNewFolderPageButtonIcon: '//android.view.ViewGroup[@content-desc="Create new folder"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
-  createNewFolderPageField: '~ Title ',
+  createNewFolderPageButtonIcon: '//android.view.ViewGroup[@content-desc="Create new folder"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  createNewFolderPageField: '~create-folder-title-input',
   createNewFolderPageFieldTitle: '//android.widget.TextView[@text=" Title "]',
   createNewFolderPageFieldInput: '//android.widget.EditText[@resource-id="create-folder-title-input-input"]',
   createNewFolderPageWarning: '//android.widget.TextView[@text=" Title is required "]',
@@ -72,8 +72,9 @@ const sidebarLocators = {
 /* ============================
         TEST FOLDER
 ============================ */
-  testFolder: '//android.widget.TextView[@text="Test Folder"]',
-  testFolderIcon: '//android.view.ViewGroup[@content-desc="Test Folder, 0 items"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
+  testFolder: '~TestFolder, 0 items',
+  testFolderIcon: '//android.view.ViewGroup[@content-desc="TestFolder, 0 items"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  testFolderText: '//android.widget.TextView[@text="TestFolder"]',
   testFolderCount: '(//android.widget.TextView[@text="0 items"])[3]',
   testFolderSelected: '//com.horcrux.svg.SvgView[@resource-id="sidebar-folder-undefined-active"]',
   testFolder1: '//android.widget.TextView[@text="Test Folder1"]',
@@ -107,7 +108,7 @@ const sidebarLocators = {
   chooseVaultDropdownSecondItem: '//android.widget.TextView[@text="Kazik"]',
   hideDropdownMenuIcon: '//android.view.ViewGroup[@content-desc="Kazik"]/com.horcrux.svg.SvgView[2]',
   chooseVaultButtonText1: '//android.widget.TextView[@text="Valeron"]', 
-  newVaultNameAtSidebar: '//android.view.ViewGroup[.//com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView/com.horcrux.svg.PathView]/android.widget.TextView',
+  newVaultNameAtSidebar: '//android.widget.TextView[@text="Ibrahim"]',
 }
 
 export default sidebarLocators

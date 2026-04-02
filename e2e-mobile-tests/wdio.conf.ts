@@ -73,6 +73,7 @@ function getVersion(p: string): string | undefined {
   return m ? m[1] : undefined;
 }
 
+/** Pushes test data files to emulator Download folder (Android local_emulator only). */
 function pushTestDataToEmulator(): void {
   const testDataDir = path.resolve(__dirname, 'tests', 'data', 'test-data');
   if (!fs.existsSync(testDataDir)) {
@@ -165,7 +166,8 @@ function parseCTRFStats() {
             else if (file.includes('SignUpTests')) suiteName = 'Sign Up Flow';
             else if (file.includes('SidebarTests')) suiteName = 'Sidebar Flow';
             else if (file.includes('SettingsTests')) suiteName = 'Settings Flow';
-            
+            else if (file.includes('HomeTests')) suiteName = 'Home Flow';
+
             if (!suiteStats[suiteName]) {
               suiteStats[suiteName] = { total: tests, passed, failed };
               totalTests += tests;
@@ -233,11 +235,20 @@ export const config: Options.Testrunner & {
     sidebarOnly: [
       './tests/specs/SidebarTests.ts',
     ],
+    home: [
+      './tests/specs/OnboardingTests.ts',
+      './tests/specs/SignUpTests.ts',
+      './tests/specs/HomeTests.ts',
+    ],
+    homeOnly: [
+      './tests/specs/HomeTests.ts',
+    ],
     all: [
       './tests/specs/OnboardingTests.ts',
       './tests/specs/SignUpTests.ts',
       './tests/specs/SidebarTests.ts',
       './tests/specs/SettingsTests.ts',
+      './tests/specs/HomeTests.ts',
     ],
   },
 
@@ -440,7 +451,7 @@ export const config: Options.Testrunner & {
     console.log(`Exit Code: ${exitCode}`);
     
     const stats = parseCTRFStats();
-    
+
     if (exitCode !== 0 && stats.total === 0) {
       stats.total = 0;
       stats.passed = 0;

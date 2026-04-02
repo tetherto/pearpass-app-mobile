@@ -11,7 +11,12 @@ export const BottomSheetSortContent = () => {
       style={{ padding: 20 }}
       data={recordSortActions}
       renderItem={({ item }) => (
-        <MenuActionItem key={item.name} item={item} onPress={item.click} />
+        <MenuActionItem
+          key={item.name}
+          item={item}
+          onPress={item.click}
+          disableHaptics
+        />
       )}
     />
   )
