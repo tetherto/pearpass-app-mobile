@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
+import { useNavigation } from '@react-navigation/native'
 import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
   Checklist,
@@ -32,7 +33,8 @@ export const ContentHeader = ({
 }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
-  const { expand } = useBottomSheet()
+  const { expand, collapse } = useBottomSheet()
+  const navigation = useNavigation()
   const { data: vaultData } = useVault()
   const { state } = useSharedFilter()
   const styles = createStyles(theme.colors)
@@ -46,9 +48,16 @@ export const ContentHeader = ({
       ? state.folder
       : t`All Folders`
 
+  const handleCreateVault = () => {
+    collapse()
+    navigation.navigate('Welcome', { state: 'credentials' })
+  }
+
   const handleVaultPress = () => {
     expand({
-      children: <BottomSheetVaultSelectorContent />,
+      children: (
+        <BottomSheetVaultSelectorContent onCreateVault={handleCreateVault} />
+      ),
       snapPoints: ['10%', '50%', '50%']
     })
   }

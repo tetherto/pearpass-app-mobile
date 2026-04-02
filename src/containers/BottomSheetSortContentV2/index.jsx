@@ -1,7 +1,12 @@
 import { useLingui } from '@lingui/react/macro'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Check, Close } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { Pressable, View } from 'react-native'
+import {
+  Button,
+  NavbarListItem,
+  Text,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { View } from 'react-native'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -42,25 +47,16 @@ export const BottomSheetSortContentV2 = () => {
           aria-label={t`Close`}
         />
       </View>
-      {sortOptions.map((option) => {
-        const isActive = activeSort === option.key
-        return (
-          <Pressable
-            key={option.key}
-            style={[styles.item, isActive && styles.itemActive]}
-            onPress={() => handleSelect(option.key)}
-          >
-            <Text variant="label">{option.label}</Text>
-            {isActive && (
-              <Check
-                width={16}
-                height={16}
-                color={theme.colors.colorTextPrimary}
-              />
-            )}
-          </Pressable>
-        )
-      })}
+      {sortOptions.map((option) => (
+        <NavbarListItem
+          key={option.key}
+          label={option.label}
+          selected={activeSort === option.key}
+          platform="mobile"
+          showDivider
+          onClick={() => handleSelect(option.key)}
+        />
+      ))}
     </ContentContainer>
   )
 }

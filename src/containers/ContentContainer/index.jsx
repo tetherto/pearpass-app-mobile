@@ -8,6 +8,7 @@ import { styles } from './styles'
 
 export const ContentContainer = ({
   children,
+  header,
   footer,
   scrollable = false,
   style,
@@ -29,6 +30,7 @@ export const ContentContainer = ({
         style
       ]}
     >
+      {header}
       {scrollable ? (
         <ScrollView
           style={styles.scrollView}

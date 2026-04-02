@@ -1,15 +1,19 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  NavbarListItem,
+  Text,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import {
   Add,
-  Check,
   Close,
   FolderOutlined,
   StarOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -51,83 +55,45 @@ export const BottomSheetFolderSelectorContent = () => {
         />
       </View>
 
-      <Pressable
-        style={[styles.item, state.folder === 'allFolder' && styles.itemActive]}
-        onPress={() => handleSelect('allFolder')}
-      >
-        <FolderOutlined
-          width={16}
-          height={16}
-          color={theme.colors.colorTextPrimary}
+      <NavbarListItem
+        icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
+        label={t`All Folders`}
+        count={recordCountsByType?.all}
+        selected={state.folder === 'allFolder'}
+        platform="mobile"
+        showDivider
+        onClick={() => handleSelect('allFolder')}
+      />
+
+      <NavbarListItem
+        icon={<StarOutlined color={theme.colors.colorTextPrimary} />}
+        label={t`Favorites`}
+        count={folders?.favorites?.records?.length}
+        selected={state.folder === 'favorite'}
+        platform="mobile"
+        showDivider
+        onClick={() => handleSelect('favorite', true)}
+      />
+
+      {customFolders.map((folder) => (
+        <NavbarListItem
+          key={folder.name}
+          icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
+          label={folder.name}
+          count={folder.records?.filter((r) => !!r.data).length ?? 0}
+          selected={state.folder === folder.name}
+          platform="mobile"
+          showDivider
+          onClick={() => handleSelect(folder.name)}
         />
-        <Text variant="label" style={styles.itemLabel}>
-          {t`All Folders`}
-        </Text>
-        <Text variant="label" style={styles.count}>
-          {recordCountsByType?.all ?? ''}
-        </Text>
-        {state.folder === 'allFolder' && (
-          <Check width={16} height={16} color={theme.colors.colorTextPrimary} />
-        )}
-      </Pressable>
+      ))}
 
-      <Pressable
-        style={[styles.item, state.folder === 'favorite' && styles.itemActive]}
-        onPress={() => handleSelect('favorite', true)}
-      >
-        <StarOutlined
-          width={16}
-          height={16}
-          color={theme.colors.colorTextPrimary}
-        />
-        <Text variant="label" style={styles.itemLabel}>
-          {t`Favorites`}
-        </Text>
-        <Text variant="label" style={styles.count}>
-          {folders?.favorites?.records?.length ?? ''}
-        </Text>
-        {state.folder === 'favorite' && (
-          <Check width={16} height={16} color={theme.colors.colorTextPrimary} />
-        )}
-      </Pressable>
-
-      {customFolders.map((folder) => {
-        const isActive = state.folder === folder.name
-        const count = folder.records?.filter((r) => !!r.data).length ?? 0
-        return (
-          <Pressable
-            key={folder.name}
-            style={[styles.item, isActive && styles.itemActive]}
-            onPress={() => handleSelect(folder.name)}
-          >
-            <FolderOutlined
-              width={16}
-              height={16}
-              color={theme.colors.colorTextPrimary}
-            />
-            <Text variant="label" style={styles.itemLabel}>
-              {folder.name}
-            </Text>
-            <Text variant="label" style={styles.count}>
-              {count}
-            </Text>
-            {isActive && (
-              <Check
-                width={16}
-                height={16}
-                color={theme.colors.colorTextPrimary}
-              />
-            )}
-          </Pressable>
-        )
-      })}
-
-      <Pressable style={styles.item} onPress={handleCreateFolder}>
-        <Add width={16} height={16} color={theme.colors.colorTextPrimary} />
-        <Text variant="label" style={styles.itemLabel}>
-          {t`Add New Folder`}
-        </Text>
-      </Pressable>
+      <NavbarListItem
+        icon={<Add color={theme.colors.colorTextPrimary} />}
+        label={t`Add New Folder`}
+        platform="mobile"
+        onClick={handleCreateFolder}
+      />
     </ContentContainer>
   )
 }

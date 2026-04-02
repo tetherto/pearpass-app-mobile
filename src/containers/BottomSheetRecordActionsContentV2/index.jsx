@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
   Check,
   ContentCopy,
@@ -9,9 +9,7 @@ import {
   StarOutlined,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { Pressable } from 'react-native'
 
-import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useRecordActionItems } from '../../hooks/useRecordActionItems'
 import { ContentContainer } from '../ContentContainer'
@@ -25,7 +23,6 @@ export const BottomSheetRecordActionsContentV2 = ({
   const { t } = useLingui()
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
-  const styles = createStyles(theme.colors)
 
   const { actions } = useRecordActionItems({ record, recordType, onDelete })
 
@@ -79,23 +76,23 @@ export const BottomSheetRecordActionsContentV2 = ({
   return (
     <ContentContainer scrollable contentStyle={{ padding: 0 }}>
       {actionItems.map(({ icon: Icon, label, onPress, isDestructive }) => (
-        <Pressable key={label} style={styles.item} onPress={onPress}>
-          <Icon
-            width={16}
-            height={16}
-            color={
-              isDestructive
-                ? theme.colors.colorTextDestructive
-                : theme.colors.colorTextPrimary
-            }
-          />
-          <Text
-            variant="label"
-            style={isDestructive ? styles.destructiveLabel : styles.itemLabel}
-          >
-            {label}
-          </Text>
-        </Pressable>
+        <NavbarListItem
+          key={label}
+          icon={
+            <Icon
+              color={
+                isDestructive
+                  ? theme.colors.colorSurfaceDestructiveElevated
+                  : theme.colors.colorTextPrimary
+              }
+            />
+          }
+          label={label}
+          variant={isDestructive ? 'destructive' : 'default'}
+          platform="mobile"
+          showDivider
+          onClick={onPress}
+        />
       ))}
     </ContentContainer>
   )

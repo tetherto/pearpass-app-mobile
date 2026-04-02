@@ -1,7 +1,12 @@
 import { useLingui } from '@lingui/react/macro'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Check,
+  Button,
+  NavbarListItem,
+  Text,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Add,
   Close,
   LockFilled,
   MoreVert
@@ -16,7 +21,7 @@ import { BottomSheetVaultAction } from '../BottomSheetVaultAction'
 import { ContentContainer } from '../ContentContainer'
 import { VaultPasswordFormModalContent } from '../Modal/VaultPasswordFormModalContent'
 
-export const BottomSheetVaultSelectorContent = () => {
+export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const { collapse, expand } = useBottomSheet()
@@ -63,18 +68,35 @@ export const BottomSheetVaultSelectorContent = () => {
     })
   }
 
-  return (
-    <ContentContainer scrollable contentStyle={{ padding: 0 }}>
-      <View style={styles.header}>
-        <Text variant="bodyEmphasized">{t`Vaults`}</Text>
-        <Button
-          variant="tertiary"
-          iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-          onClick={collapse}
-          aria-label={t`Close`}
-        />
-      </View>
+  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
+  return (
+    <ContentContainer
+      scrollable
+      contentStyle={{ padding: 0 }}
+      header={
+        <>
+          <View style={styles.dragHandleArea}>
+            <View
+              style={[styles.dragHandle, { backgroundColor: handleColor }]}
+            />
+          </View>
+          <View style={styles.header}>
+            <View style={styles.headerSpacer} />
+            <Text variant="bodyEmphasized" style={styles.headerTitle}>
+              {t`Vaults`}
+            </Text>
+            <Button
+              variant="tertiary"
+              size="medium"
+              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
+              onClick={collapse}
+              aria-label={t`Close`}
+            />
+          </View>
+        </>
+      }
+    >
       {vaultsData?.map((vault) => {
         const isActive = vault.id === activeVault?.id
         return (
@@ -88,31 +110,28 @@ export const BottomSheetVaultSelectorContent = () => {
               height={16}
               color={theme.colors.colorTextPrimary}
             />
-            <Text variant="label" style={styles.itemLabel}>
-              {vault.name}
-            </Text>
-            {isActive && (
-              <Check
-                width={16}
-                height={16}
-                color={theme.colors.colorTextPrimary}
-              />
-            )}
+            <View style={styles.labelContainer}>
+              <Text variant="label" numberOfLines={1}>
+                {vault.name}
+              </Text>
+            </View>
             <Button
               variant="tertiary"
-              iconBefore={
-                <MoreVert
-                  width={16}
-                  height={16}
-                  color={theme.colors.colorTextPrimary}
-                />
-              }
+              size="small"
+              iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
               onClick={() => handleVaultActionsPress(vault)}
               aria-label={t`Vault actions`}
             />
           </Pressable>
         )
       })}
+
+      <NavbarListItem
+        icon={<Add color={theme.colors.colorTextPrimary} />}
+        label={t`Create New Vault`}
+        platform="mobile"
+        onClick={onCreateVault}
+      />
     </ContentContainer>
   )
 }

@@ -1,8 +1,13 @@
 import { useLingui } from '@lingui/react/macro'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Check, Close } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  Button,
+  NavbarListItem,
+  Text,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -51,33 +56,17 @@ export const BottomSheetCategorySelectorContent = ({
         />
       </View>
 
-      {menuItems.map((item) => {
-        const isActive = recordType === item.type
-        const count = recordCountsByType?.[item.type]
-        return (
-          <Pressable
-            key={item.type}
-            style={[styles.item, isActive && styles.itemActive]}
-            onPress={() => handleSelect(item.type)}
-          >
-            <Text variant="label" style={styles.itemLabel}>
-              {item.name}
-            </Text>
-            {count !== undefined && (
-              <Text variant="label" style={styles.count}>
-                {count}
-              </Text>
-            )}
-            {isActive && (
-              <Check
-                width={16}
-                height={16}
-                color={theme.colors.colorTextPrimary}
-              />
-            )}
-          </Pressable>
-        )
-      })}
+      {menuItems.map((item) => (
+        <NavbarListItem
+          key={item.type}
+          label={item.name}
+          count={recordCountsByType?.[item.type]}
+          selected={recordType === item.type}
+          platform="mobile"
+          showDivider
+          onClick={() => handleSelect(item.type)}
+        />
+      ))}
     </ContentContainer>
   )
 }
