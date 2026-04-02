@@ -1,5 +1,4 @@
 import { useLingui } from '@lingui/react/macro'
-import { useNavigation } from '@react-navigation/native'
 import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
   Checklist,
@@ -19,6 +18,7 @@ import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
+import { BottomSheetVaultSelectorContent } from '../BottomSheetVaultSelectorContent'
 
 const BREADCRUMB_HEIGHT = 57
 
@@ -31,7 +31,6 @@ export const ContentHeader = ({
   onCategoryChange
 }) => {
   const { t } = useLingui()
-  const navigation = useNavigation()
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
   const { data: vaultData } = useVault()
@@ -47,7 +46,12 @@ export const ContentHeader = ({
       ? state.folder
       : t`All Folders`
 
-  const handleVaultPress = () => navigation.openDrawer()
+  const handleVaultPress = () => {
+    expand({
+      children: <BottomSheetVaultSelectorContent />,
+      snapPoints: ['10%', '50%', '50%']
+    })
+  }
 
   const handleCategoryPress = () => {
     expand({
