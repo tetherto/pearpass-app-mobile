@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
 
@@ -9,6 +10,7 @@ import { EmptyCollectionView } from '../../containers/EmptyCollectionView'
 import { EmptyResultsView } from '../../containers/EmptyResultsView'
 import { Header } from '../../containers/Header'
 import { ItemList } from '../../containers/ItemList'
+import { ScreenLayout } from '../../containers/ScreenLayout'
 import {
   INITIAL_STATE,
   useSharedFilter
@@ -85,17 +87,35 @@ export const Home = () => {
     }
   }, [selectedFolder, state.isFavorite])
 
+  const Wrapper = DESIGN_VERSION === 2 ? ScreenLayout : Container
+
   return (
-    <Container>
-      <Header
-        setIsMultiSelectOn={setIsMultiSelectOn}
-        isMultiSelectOn={isMultiSelectOn}
-        setSearchValue={handleSearch}
-        selectedRecords={selectedRecords}
-        setSelectedRecords={setSelectedRecords}
-        searchValue={searchValue}
-        itemsFound={records?.length}
-      />
+    <Wrapper
+      header={
+        DESIGN_VERSION === 2 ? (
+          <Header
+            setIsMultiSelectOn={setIsMultiSelectOn}
+            isMultiSelectOn={isMultiSelectOn}
+            setSearchValue={handleSearch}
+            selectedRecords={selectedRecords}
+            setSelectedRecords={setSelectedRecords}
+            searchValue={searchValue}
+            itemsFound={records?.length}
+          />
+        ) : undefined
+      }
+    >
+      {DESIGN_VERSION === 1 && (
+        <Header
+          setIsMultiSelectOn={setIsMultiSelectOn}
+          isMultiSelectOn={isMultiSelectOn}
+          setSearchValue={handleSearch}
+          selectedRecords={selectedRecords}
+          setSelectedRecords={setSelectedRecords}
+          searchValue={searchValue}
+          itemsFound={records?.length}
+        />
+      )}
 
       <Categories setRecordType={handleRecordType} recordType={recordType} />
 
@@ -121,6 +141,6 @@ export const Home = () => {
       )}
 
       {!records.length && !!searchValue.length && <EmptyResultsView />}
-    </Container>
+    </Wrapper>
   )
 }

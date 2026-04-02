@@ -3,37 +3,37 @@ const homeLocators = {
         HEADER
 ===================================================== */
   homeLogoLock: '//android.view.ViewGroup[@resource-id="logo-lock"]',
-  searchField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]',
-  searchFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-  searchFieldInput: '//android.widget.EditText[@text="Search..."]',
+  searchField: '~Search field',
+  searchFieldIcon: '~Search field icon',
+  searchFieldInput: '~Search field input',
   threeDotsButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/com.horcrux.svg.SvgView',
 /* =====================================================
         CATEGORIES (FILTERS)
 ===================================================== */
-  homeCategoryAllButton: '',
-  homeCategoryAllButtonIcon: '',
-  homeCategoryAllButtonText: '',
-  homeCategoryLoginsButton: '',
-  homeCategoryLoginsButtonIcon: '',
-  homeCategoryLoginsButtonText: '',
-  homeCategoryCreditCardsButton: '',
-  homeCategoryCreditCardsButtonIcon: '',
-  homeCategoryCreditCardsButtonText: '',
-  homeCategoryWifiButton: '',
-  homeCategoryWifiButtonIcon: '',
-  homeCategoryWifiButtonText: '',
-  homeCategoryRecoveryPhraseButton: '',
-  homeCategoryRecoveryPhraseButtonIcon: '',
-  homeCategoryRecoveryPhraseButtonText: '',
-  homeCategoryIdentitiesButton: '',
-  homeCategoryIdentitiesButtonIcon: '',
-  homeCategoryIdentitiesButtonText: '',
-  homeCategoryNotesButton: '',
-  homeCategoryNotesButtonIcon: '',
-  homeCategoryNotesButtonText: '',
-  homeCategoryCustomButton: '',
-  homeCategoryCustomButtonIcon: '',
-  homeCategoryCustomButtonText: '',
+  homeCategoryAllButton: '~All items category button',
+  homeCategoryAllButtonIcon: '~All items category icon',
+  homeCategoryAllButtonText: '~All items category count',
+  homeCategoryLoginsButton: '~Logins category button',
+  homeCategoryLoginsButtonIcon: '~Logins category icon',
+  homeCategoryLoginsButtonText: '~Logins category count',
+  homeCategoryCreditCardsButton: '~Credit cards category button',
+  homeCategoryCreditCardsButtonIcon: '~Credit cards category icon',
+  homeCategoryCreditCardsButtonText: '~Credit cards category count',
+  homeCategoryWifiButton: '~Wi-Fi category button',
+  homeCategoryWifiButtonIcon: '~Wi-Fi category icon',
+  homeCategoryWifiButtonText: '~Wi-Fi category count',
+  homeCategoryRecoveryPhraseButton: '~Recovery phrase category button',
+  homeCategoryRecoveryPhraseButtonIcon: '~Recovery phrase category icon',
+  homeCategoryRecoveryPhraseButtonText: '~Recovery phrase category count',
+  homeCategoryIdentitiesButton: '~Identities category button',
+  homeCategoryIdentitiesButtonIcon: '~Identities category icon',
+  homeCategoryIdentitiesButtonText: '~Identities category count',
+  homeCategoryNotesButton: '~Notes category button',
+  homeCategoryNotesButtonIcon: '~Notes category icon',
+  homeCategoryNotesButtonText: '~Notes category count',
+  homeCategoryCustomButton: '~Custom category button',
+  homeCategoryCustomButtonIcon: '~Custom category icon',
+  homeCategoryCustomButtonText: '~Custom category count',
 /* =====================================================
         CREATE ITEM BUTTONS AND TEXT
 ===================================================== */
@@ -51,7 +51,6 @@ const homeLocators = {
   createCreditCardButton: '~Create a credit card',
   createCreditCardButtonIcon: '//android.view.ViewGroup[@content-desc="Create a credit card"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
   createCreditCardButtonText: '//android.widget.TextView[@text="Create a credit card"]',
-
 
   createWifiPasswordButton: '~Create a Wi-Fi password',
   createWifiPasswordButtonIcon: '//android.view.ViewGroup[@content-desc="Create a Wi-Fi password"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
@@ -213,9 +212,107 @@ const homeLocators = {
   unencryptedFileCsvIncIcon: '//android.view.ViewGroup[@content-desc="IN, New reg"]/android.view.ViewGroup[1]',
   unencryptedFileCsvIncIconText: '//android.widget.TextView[@text="IN"]',
   unencryptedFileCsvIncText: '//android.widget.TextView[@text="Inc"]',
+/* =====================================================
+        CREATE ITEM POPUP
+===================================================== */
+  createItemPopup: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]',
+  loginsField: '~Logins, Save your username and password for any website or app.',
+  loginsFieldIcon: '//android.view.ViewGroup[@content-desc="Logins, Save your username and password for any website or app."]/android.view.ViewGroup',
+  loginsFieldIcon2: '//android.view.ViewGroup[@content-desc="Logins, Save your username and password for any website or app."]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  loginsFieldTitle: '//android.widget.TextView[@text="Logins"]',
+  loginsFieldText: '//android.widget.TextView[@text="Save your username and password for any website or app."]',
 
+  creditCardsField: '~Credit cards, Securely store card number, expiry date, and CVV.',
+  creditCardsFieldIcon: '//android.view.ViewGroup[@content-desc="Credit cards, Securely store card number, expiry date, and CVV."]/android.view.ViewGroup',
+  creditCardsFieldIcon2: '//android.view.ViewGroup[@content-desc="Credit cards, Securely store card number, expiry date, and CVV."]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  creditCardsFieldTitle: '//android.widget.TextView[@text="Credit cards"]',
+  creditCardsFieldText: '//android.widget.TextView[@text="Securely store card number, expiry date, and CVV."]',
 
+  wifiField: '~Wi-Fi, Keep your Wi-Fi name and password safe.',
+  wifiFieldIcon: '//android.view.ViewGroup[@content-desc="Wi-Fi, Keep your Wi-Fi name and password safe."]/android.view.ViewGroup',
+  wifiFieldIcon2: '//android.view.ViewGroup[@content-desc="Wi-Fi, Keep your Wi-Fi name and password safe."]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  wifiFieldTitle: '//android.widget.TextView[@text="Wi-Fi"]',
+  wifiFieldText: '//android.widget.TextView[@text="Keep your Wi-Fi name and password safe."]',
 
+  recoveryPhraseField: '~Recovery phrase, Securely store app recovery phrases.',
+  recoveryPhraseFieldIcon: '//android.view.ViewGroup[@content-desc="Recovery phrase, Securely store app recovery phrases."]/android.view.ViewGroup',
+  recoveryPhraseFieldIcon2: '//android.view.ViewGroup[@content-desc="Recovery phrase, Securely store app recovery phrases."]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  recoveryPhraseFieldTitle: '//android.widget.TextView[@text="Recovery phrase"]',
+  recoveryPhraseFieldText: '//android.widget.TextView[@text="Securely store app recovery phrases."]',
+
+  identitiesField: '~Identities, Keep personal info like ID numbers and addresses safe.',
+  identitiesFieldIcon: '//android.view.ViewGroup[@content-desc="Identities, Keep personal info like ID numbers and addresses safe."]/android.view.ViewGroup',
+  identitiesFieldIcon2: '//android.view.ViewGroup[@content-desc="Identities, Keep personal info like ID numbers and addresses safe."]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  identitiesFieldTitle: '//android.widget.TextView[@text="Identities"]',
+  identitiesFieldText: '//android.widget.TextView[@text="Keep personal info like ID numbers and addresses safe."]',
+
+  notesField: '~Notes, Encrypt and store private notes or sensitive text.',
+  notesFieldIcon: '//android.view.ViewGroup[@content-desc="Notes, Encrypt and store private notes or sensitive text."]/android.view.ViewGroup',
+  notesFieldIcon2: '//android.view.ViewGroup[@content-desc="Notes, Encrypt and store private notes or sensitive text."]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  notesFieldTitle: '//android.widget.TextView[@text="Notes"]',
+  notesFieldText: '//android.widget.TextView[@text="Encrypt and store private notes or sensitive text."]',
+
+  customField: '~Custom, Create your own entry with fully custom fields. ',
+  customFieldIcon: '//android.view.ViewGroup[@content-desc="Custom, Create your own entry with fully custom fields. "]/android.view.ViewGroup',
+  customFieldIcon2: '//android.view.ViewGroup[@content-desc="Custom, Create your own entry with fully custom fields. "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  customFieldTitle: '//android.widget.TextView[@text="Custom"]',
+  customFieldText: '//android.widget.TextView[@text="Create your own entry with fully custom fields. "]',
+
+  passwordField: '~Password, Create a safe password or passphrase',
+  passwordFieldIcon: '//android.view.ViewGroup[@content-desc="Password, Create a safe password or passphrase"]/android.view.ViewGroup',
+  passwordFieldIcon2: '//android.view.ViewGroup[@content-desc="Password, Create a safe password or passphrase"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  passwordFieldTitle: '//android.widget.TextView[@text="Password"]',
+  passwordFieldText: '//android.widget.TextView[@text="Create a safe password or passphrase"]',
+/* =====================================================
+        HOME PAGE - LOGIN CREATED ON HOME PAGE
+===================================================== */
+  loginCreatedOnHomePage: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup',
+  loginCreatedOnHomePageIcon: '//android.widget.ImageView[@resource-id="avatar-image"]',
+  loginCreatedOnHomePageText: '//android.widget.TextView[@text="Login to Google"]',
+  newLoginCreatedOnHomePageText: '//android.widget.TextView[@text="Login to Google New Title"]',
+  loginCreatedOnHomePageThreeDotsButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+/* =====================================================
+        HOME PAGE - CREDIT CARD CREATED ON HOME PAGE
+===================================================== */
+  creditCardCreatedOnHomePage: '~TC',
+  creditCardCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TC"]/android.view.ViewGroup[1]',
+  creditCardCreatedOnHomePageText: '//android.widget.TextView[@text="Test Credit Card"]',
+  creditCardCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TC"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+/* =====================================================
+        HOME PAGE - WIFI CREATED ON HOME PAGE
+===================================================== */
+  wifiCreatedOnHomePage: '~TW',
+  wifiCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TW"]/android.view.ViewGroup[1]',
+  wifiCreatedOnHomePageText: '//android.widget.TextView[@text="Test Wi-Fi Network"]',
+  wifiCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TW"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+/* =====================================================
+        HOME PAGE - RECOVERY PHRASE CREATED ON HOME PAGE
+===================================================== */
+  recoveryPhraseCreatedOnHomePage: '~TA',
+  recoveryPhraseCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TA"]/android.view.ViewGroup[1]',
+  recoveryPhraseCreatedOnHomePageText: '//android.widget.TextView[@text="Test Application"]',
+  recoveryPhraseCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TA"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+/* =====================================================
+        HOME PAGE - IDENTITY CREATED ON HOME PAGE
+===================================================== */
+  identityCreatedOnHomePage: '~TI',
+  identityCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TI"]/android.view.ViewGroup[1]',
+  identityCreatedOnHomePageText: '//android.widget.TextView[@text="Test Identity Title"]',
+  identityCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TI"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+/* =====================================================
+        HOME PAGE - NOTE CREATED ON HOME PAGE
+===================================================== */
+  noteCreatedOnHomePage: '~TN',
+  noteCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TN"]/android.view.ViewGroup[1]',
+  noteCreatedOnHomePageText: '//android.widget.TextView[@text="Test Note Title"]',
+  noteCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TN"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+/* =====================================================
+        HOME PAGE - CUSTOM ELEMENT CREATED ON HOME PAGE
+===================================================== */
+  customElementCreatedOnHomePage: '~CT',
+  customElementCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="CT"]/android.view.ViewGroup[1]',
+  customElementCreatedOnHomePageText: '//android.widget.TextView[@text="Custom title for test"]',
+  customElementCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="CT"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
 
 }
 export default homeLocators

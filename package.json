@@ -22,6 +22,9 @@
     "bundle-bare": "npm run bundle:android && npm run bundle:ios && npm run bundle:autofill",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile",
+    "fdroid:patches": "node scripts/fdroid/apply-patches.mjs all",
+    "fdroid:patches:prebuild": "node scripts/fdroid/apply-patches.mjs prebuild",
+    "fdroid:patches:build": "node scripts/fdroid/apply-patches.mjs build",
     "eas-build-pre-install": "node -v && npm -v && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
     "eas-build-post-install": "npm run build-plugins && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
   },
@@ -82,7 +85,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
-    "react-native-bare-kit": "0.9.2",
+    "react-native-bare-kit": "0.13.0",
     "react-native-config": "1.5.6",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-markdown-display": "7.0.2",
