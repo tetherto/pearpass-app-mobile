@@ -1,15 +1,30 @@
 import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
+import { StyleSheet } from 'react-native'
 
-export const createStyles = (colors) => ({
-  container: {
+export const styles = StyleSheet.create({
+  surface: {
     flex: 1,
-    backgroundColor: colors.colorSurfacePrimary,
-    borderTopLeftRadius: rawTokens.radius16,
-    borderTopRightRadius: rawTokens.radius16,
+    borderTopLeftRadius: rawTokens.spacing16,
+    borderTopRightRadius: rawTokens.spacing16,
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor: colors.colorBorderPrimary,
     overflow: 'hidden'
+  },
+  scrollView: {
+    flex: 1
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: rawTokens.spacing16
+  },
+  content: {
+    flex: 1,
+    padding: rawTokens.spacing16
+  },
+  footer: {
+    borderTopWidth: 1,
+    paddingTop: rawTokens.spacing16,
+    paddingHorizontal: rawTokens.spacing16
   }
 })

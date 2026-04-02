@@ -2,10 +2,15 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  Text,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { FolderOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
-import { Pressable, ScrollView, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 
 import { createStyles } from './styles'
 import { RecordItemRow } from '../../components/RecordItemRow'
@@ -54,46 +59,13 @@ export const MultiSelectMove = () => {
         backgroundColor: theme.colors.colorBackground
       }}
     >
-      <ContentContainer>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.section}>
-            <Text variant="caption" style={styles.sectionLabel}>
-              {t`Selected items`}
-            </Text>
-            {selectedRecordObjects.map((record) => (
-              <RecordItemRow
-                key={record.id}
-                record={record}
-                style={styles.recordItem}
-              />
-            ))}
-          </View>
-          <View style={styles.folderSection}>
-            <Text variant="caption" style={styles.sectionLabel}>
-              {t`Choose the destination folder of this items`}
-            </Text>
-            <View style={styles.folderList}>
-              {folderList.map((folder) => (
-                <Pressable
-                  key={folder.name}
-                  style={[
-                    styles.folderItem,
-                    selectedFolder === folder.name && styles.folderItemSelected
-                  ]}
-                  onPress={() => setSelectedFolder(folder.name)}
-                >
-                  <FolderOutlined
-                    width={16}
-                    height={16}
-                    color={theme.colors.colorTextPrimary}
-                  />
-                  <Text variant="label">{folder.name}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        </ScrollView>
-        <View style={styles.footer}>
+      <ContentContainer
+        scrollable
+        contentStyle={{
+          paddingVertical: rawTokens.spacing12,
+          gap: rawTokens.spacing24
+        }}
+        footer={
           <Button
             variant="primary"
             fullWidth
@@ -102,6 +74,43 @@ export const MultiSelectMove = () => {
           >
             {t`Move Items`}
           </Button>
+        }
+      >
+        <View style={styles.section}>
+          <Text variant="caption" style={styles.sectionLabel}>
+            {t`Selected items`}
+          </Text>
+          {selectedRecordObjects.map((record) => (
+            <RecordItemRow
+              key={record.id}
+              record={record}
+              style={styles.recordItem}
+            />
+          ))}
+        </View>
+        <View style={styles.folderSection}>
+          <Text variant="caption" style={styles.sectionLabel}>
+            {t`Choose the destination folder of this items`}
+          </Text>
+          <View style={styles.folderList}>
+            {folderList.map((folder) => (
+              <Pressable
+                key={folder.name}
+                style={[
+                  styles.folderItem,
+                  selectedFolder === folder.name && styles.folderItemSelected
+                ]}
+                onPress={() => setSelectedFolder(folder.name)}
+              >
+                <FolderOutlined
+                  width={16}
+                  height={16}
+                  color={theme.colors.colorTextPrimary}
+                />
+                <Text variant="label">{folder.name}</Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       </ContentContainer>
     </ScreenLayout>

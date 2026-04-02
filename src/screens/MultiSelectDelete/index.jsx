@@ -1,8 +1,13 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  Text,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { useRecords } from '@tetherto/pearpass-lib-vault'
-import { ScrollView, View } from 'react-native'
+import { View } from 'react-native'
 
 import { createStyles } from './styles'
 import { RecordItemRow } from '../../components/RecordItemRow'
@@ -39,25 +44,13 @@ export const MultiSelectDelete = () => {
         backgroundColor: theme.colors.colorBackground
       }}
     >
-      <ContentContainer>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.section}>
-            <Text variant="caption" style={styles.sectionLabel}>
-              {t`Selected items`}
-            </Text>
-            {selectedRecordObjects.map((record) => (
-              <RecordItemRow
-                key={record.id}
-                record={record}
-                style={styles.recordItem}
-              />
-            ))}
-          </View>
-          <Text variant="caption" style={styles.confirmText}>
-            {t`Are you sure to delete the selected items?`}
-          </Text>
-        </ScrollView>
-        <View style={styles.footer}>
+      <ContentContainer
+        scrollable
+        contentStyle={{
+          paddingVertical: rawTokens.spacing12,
+          gap: rawTokens.spacing24
+        }}
+        footer={
           <Button
             variant="destructive"
             fullWidth
@@ -65,7 +58,23 @@ export const MultiSelectDelete = () => {
           >
             {t`Delete Items`}
           </Button>
+        }
+      >
+        <View style={styles.section}>
+          <Text variant="caption" style={styles.sectionLabel}>
+            {t`Selected items`}
+          </Text>
+          {selectedRecordObjects.map((record) => (
+            <RecordItemRow
+              key={record.id}
+              record={record}
+              style={styles.recordItem}
+            />
+          ))}
         </View>
+        <Text variant="caption" style={styles.confirmText}>
+          {t`Are you sure to delete the selected items?`}
+        </Text>
       </ContentContainer>
     </ScreenLayout>
   )

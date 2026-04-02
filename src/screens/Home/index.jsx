@@ -122,7 +122,7 @@ export const Home = () => {
           backgroundColor: theme.colors.colorBackground
         }}
       >
-        <ContentContainer>
+        <ContentContainer contentStyle={{ padding: 0 }}>
           <ContentHeader
             isMultiSelectOn={isMultiSelectOn}
             setIsMultiSelectOn={setIsMultiSelectOn}
