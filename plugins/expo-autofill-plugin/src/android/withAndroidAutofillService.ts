@@ -75,7 +75,7 @@ preBuild.dependsOn copyAutofillBundle
         const sodiumDeps = `
     // Lazysodium for job queue encryption (crypto_secretbox / XSalsa20-Poly1305)
     implementation "com.goterl:lazysodium-android:5.1.0@aar"
-    implementation "net.java.dev.jna:jna:5.14.0@aar"`;
+    implementation "net.java.dev.jna:jna:5.16.0@aar"`;
         cfg.modResults.contents =
           cfg.modResults.contents.slice(0, insertIndex) +
           sodiumDeps +

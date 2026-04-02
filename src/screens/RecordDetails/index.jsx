@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
@@ -48,6 +50,12 @@ export const RecordDetails = ({ route }) => {
 
   const navigation = useNavigation()
 
+  const [isFavorite, setIsFavorite] = useState(record?.isFavorite ?? false)
+
+  useEffect(() => {
+    setIsFavorite(record?.isFavorite ?? false)
+  }, [record?.isFavorite])
+
   const websiteDomain =
     record?.type === RECORD_TYPES.LOGIN ? record?.data?.websites?.[0] : null
 
@@ -69,13 +77,15 @@ export const RecordDetails = ({ route }) => {
           <TouchableOpacity
             onPress={() => {
               hapticButtonSecondary()
-              updateFavoriteState([record?.id], !record?.isFavorite)
+              const newFavoriteValue = !isFavorite
+              setIsFavorite(newFavoriteValue)
+              updateFavoriteState([record?.id], newFavoriteValue)
             }}
           >
             <StarIcon
               size="30"
               color={colors.primary400.mode1}
-              fill={record?.isFavorite}
+              fill={isFavorite}
             />
           </TouchableOpacity>
 
@@ -115,7 +125,12 @@ export const RecordDetails = ({ route }) => {
       </Header>
 
       <Record>
-        <AvatarRecord websiteDomain={websiteDomain} record={record} size="md" />
+        <AvatarRecord
+          websiteDomain={websiteDomain}
+          record={record}
+          size="md"
+          isFavorite={isFavorite}
+        />
         <RecordInfo>
           <Title numberOfLines={1} ellipsizeMode="tail">
             {record?.data?.title}

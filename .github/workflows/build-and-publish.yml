@@ -196,7 +196,7 @@ jobs:
           if-no-files-found: error
 
       - name: Submit to Google play via EAS
-        if: github.ref == 'refs/heads/staging'
+        if: github.ref == 'refs/heads/dev'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EXPO_GOOGLE_SERVICE_ACCOUNT_KEY_PATH: "${{ env.GITHUB_WORKSPACE }}/google-service-account.json"
@@ -309,7 +309,7 @@ jobs:
           if-no-files-found: error
 
       - name: Submit to Apple App Store via EAS
-        if: github.ref == 'refs/heads/staging'
+        if: github.ref == 'refs/heads/dev'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           APPLE_APIKEY: ${{ secrets.APPLE_APIKEY }}

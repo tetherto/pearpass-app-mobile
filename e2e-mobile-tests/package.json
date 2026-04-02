@@ -15,6 +15,8 @@
     "test:sidebar": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio -- --suite sidebar && node slack-stats.js",
     "test:sidebar-only": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio -- --suite sidebarOnly && node slack-stats.js",
     "test:settings": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=false npm run wdio -- --suite settingsOnly && node slack-stats.js",
+    "test:home": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true npm run wdio -- --suite home && node slack-stats.js",
+    "test:home-only": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=false npm run wdio -- --suite homeOnly && node slack-stats.js",
     "test:all": "cross-env PLATFORM=Android RUN_TARGET=local_emulator ENABLE_QASE=false ENABLE_SLACK=true PUSH_TEST_DATA=true npm run wdio -- --suite all && node slack-stats.js"
   },
   "keywords": [],
