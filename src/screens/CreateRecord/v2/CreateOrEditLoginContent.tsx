@@ -45,14 +45,13 @@ interface Props {
 
 export function adaptRegister(reg: {
   value: string
+  name: string
   error?: string
   onChange: (val: any) => void
 }) {
   return {
     value: reg.value,
     onChangeText: (val: string) => reg.onChange(val),
-    variant: reg.error ? ('error' as const) : ('default' as const),
-    errorMessage: reg.error ?? undefined
   }
 }
 
