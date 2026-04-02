@@ -1,12 +1,17 @@
 /**
  * Groups records into time-period sections for SectionList.
  * Favorites are shown first as a separate section, then remaining
- * records are grouped by: Today, Yesterday, This Week, This Month, Older.
+ * records are bucketed by the sort key's date field. Section order
+ * follows the sort direction: descending = Today first, ascending = Older first.
  *
- * @param {Array} records - flat array of vault records
+ * @param {Array} records - flat array of vault records (already sorted)
+ * @param {{ key: string, direction: 'asc' | 'desc' }} [sort]
  * @returns {Array<{ title: string, key: string, isFavorites?: boolean, data: Array }>}
  */
-export const groupRecordsByTimePeriod = (records) => {
+export const groupRecordsByTimePeriod = (records, sort) => {
+  const dateField = sort?.key === 'createdAt' ? 'createdAt' : 'updatedAt'
+  const isAsc = sort?.direction === 'asc'
+
   const now = new Date()
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const yesterdayStart = new Date(todayStart)
@@ -34,7 +39,9 @@ export const groupRecordsByTimePeriod = (records) => {
   for (const record of records) {
     if (favoriteIds.has(record.id)) continue
 
-    const date = new Date(record.updatedAt || record.createdAt)
+    const date = new Date(
+      record[dateField] || record.updatedAt || record.createdAt
+    )
 
     if (date >= todayStart) {
       today.push(record)
@@ -49,6 +56,32 @@ export const groupRecordsByTimePeriod = (records) => {
     }
   }
 
+  const timeSections = []
+
+  if (today.length) {
+    timeSections.push({ title: 'Today', key: 'today', data: today })
+  }
+  if (yesterday.length) {
+    timeSections.push({ title: 'Yesterday', key: 'yesterday', data: yesterday })
+  }
+  if (thisWeek.length) {
+    timeSections.push({ title: 'This week', key: 'thisWeek', data: thisWeek })
+  }
+  if (thisMonth.length) {
+    timeSections.push({
+      title: 'This Month',
+      key: 'thisMonth',
+      data: thisMonth
+    })
+  }
+  if (older.length) {
+    timeSections.push({ title: 'Older', key: 'older', data: older })
+  }
+
+  if (isAsc) {
+    timeSections.reverse()
+  }
+
   const sections = []
 
   if (favorites.length) {
@@ -59,21 +92,6 @@ export const groupRecordsByTimePeriod = (records) => {
       data: favorites
     })
   }
-  if (today.length) {
-    sections.push({ title: 'Today', key: 'today', data: today })
-  }
-  if (yesterday.length) {
-    sections.push({ title: 'Yesterday', key: 'yesterday', data: yesterday })
-  }
-  if (thisWeek.length) {
-    sections.push({ title: 'This week', key: 'thisWeek', data: thisWeek })
-  }
-  if (thisMonth.length) {
-    sections.push({ title: 'This Month', key: 'thisMonth', data: thisMonth })
-  }
-  if (older.length) {
-    sections.push({ title: 'Older', key: 'older', data: older })
-  }
 
-  return sections
+  return sections.concat(timeSections)
 }

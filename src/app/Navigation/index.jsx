@@ -5,6 +5,8 @@ import { CreateRecord } from '../../screens/CreateRecord'
 import { ErrorScreen } from '../../screens/ErrorScreen'
 import { ImagePreview } from '../../screens/ImagePreview'
 import { Intro } from '../../screens/Intro'
+import { MultiSelectDelete } from '../../screens/MultiSelectDelete'
+import { MultiSelectMove } from '../../screens/MultiSelectMove'
 import { Onboarding } from '../../screens/Onboarding'
 import { RecordDetails } from '../../screens/RecordDetails'
 import { Welcome } from '../../screens/Welcome'
@@ -53,5 +55,7 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="ImagePreview" component={ImagePreview} />
     <Stack.Screen name="CreateRecord" component={CreateRecord} />
     <Stack.Screen name="CreateFolder" component={CreateFolder} />
+    <Stack.Screen name="MultiSelectDelete" component={MultiSelectDelete} />
+    <Stack.Screen name="MultiSelectMove" component={MultiSelectMove} />
   </Stack.Navigator>
 )
