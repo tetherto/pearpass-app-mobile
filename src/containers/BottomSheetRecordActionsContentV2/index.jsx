@@ -97,6 +97,7 @@ export const BottomSheetRecordActionsContentV2 = ({
         ({ icon: Icon, label, onPress, isDestructive }, index) => (
           <NavbarListItem
             key={label}
+            iconSize={16}
             icon={
               <Icon
                 color={

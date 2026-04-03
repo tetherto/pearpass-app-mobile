@@ -11,7 +11,7 @@ import {
 import {
   Add,
   Close,
-  FolderOutlined,
+  FolderOpen,
   StarOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
@@ -78,7 +78,7 @@ export const BottomSheetFolderSelectorContent = () => {
       }
     >
       <NavbarListItem
-        icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
+        icon={<FolderOpen color={theme.colors.colorTextPrimary} />}
         label={t`All Folders`}
         count={recordCountsByType?.all}
         selected={state.folder === 'allFolder'}
@@ -100,7 +100,7 @@ export const BottomSheetFolderSelectorContent = () => {
       {customFolders.map((folder, index) => (
         <NavbarListItem
           key={folder.name}
-          icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
+          icon={<FolderOpen color={theme.colors.colorTextPrimary} />}
           label={folder.name}
           count={folder.records?.filter((r) => !!r.data).length ?? 0}
           selected={state.folder === folder.name}

@@ -7,7 +7,7 @@ import {
   ErrorFilled,
   ExpandMore,
   KeyboardArrowRightFilled,
-  StarOutlined
+  StarFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFavicon } from '@tetherto/pearpass-lib-vault'
 import { Image, Pressable, SectionList, View } from 'react-native'
@@ -78,7 +78,7 @@ const CollapsibleSectionHeader = ({
     </View>
 
     {section.isFavorites && (
-      <StarOutlined width={18} height={18} color={iconColor} />
+      <StarFilled width={14} height={14} color={iconColor} />
     )}
 
     <Text variant="labelEmphasized" style={{ color: iconColor }}>

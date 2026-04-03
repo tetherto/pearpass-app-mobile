@@ -9,7 +9,7 @@ import {
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { FolderOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { FolderOpen } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
 
@@ -97,7 +97,7 @@ export const MultiSelectMove = () => {
             {folderList.map((folder) => (
               <NavbarListItem
                 key={folder.name}
-                icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
+                icon={<FolderOpen color={theme.colors.colorTextPrimary} />}
                 label={folder.name}
                 selected={selectedFolder === folder.name}
                 onClick={() => setSelectedFolder(folder.name)}
