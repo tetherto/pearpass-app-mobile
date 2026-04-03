@@ -7,8 +7,8 @@ import { FormGroup } from '../../../components/FormGroup'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { CopyButton } from '../../../libComponents/CopyButton'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-
-export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }: { initialRecord?: any, selectedFolder?: string }) => {
   const initialValues = useMemo(
     () => ({
       customFields: initialRecord?.data?.customFields || [],
@@ -32,7 +32,7 @@ export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const hasCustomFields = !!(values?.customFields as any[])?.length
+  const hasCustomFields = !!(values?.customFields as unknown[])?.length
   const hasAttachments = !!values?.attachments?.length
 
   return (
@@ -52,7 +52,7 @@ export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
 
       {hasAttachments && (
         <FormGroup>
-          {(values.attachments as any[]).map((attachment) => (
+          {(values.attachments as { id?: string; name?: string }[]).map((attachment) => (
             <AttachmentField
               key={attachment?.id || attachment.name}
               attachment={attachment}

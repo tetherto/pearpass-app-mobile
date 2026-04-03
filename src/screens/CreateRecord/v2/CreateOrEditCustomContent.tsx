@@ -91,7 +91,7 @@ export const CreateOrEditCustomContent = ({
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
     },
-    validate: (values: any) => schema.validate(values)
+    validate: (values: Record<string, unknown>) => schema.validate(values)
   })
 
   useGetMultipleFiles({
@@ -103,11 +103,11 @@ export const CreateOrEditCustomContent = ({
   const {
     value: customFieldsList,
     addItem: addCustomField,
-    registerItem: registerCustomFieldItem,
     removeItem: removeCustomField
   } = registerArray('customFields')
 
-  const onSubmit = async (values: any) => {
+  type FormValues = { title: string; folder: string; customFields: unknown[]; attachments: { base64: string; id?: string | number; name: string }[] }
+  const onSubmit = async (values: FormValues) => {
     if (isLoading) return
 
     const data = {
@@ -131,13 +131,13 @@ export const CreateOrEditCustomContent = ({
       }
 
       setIsLoading(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(error)
       setIsLoading(false)
     }
   }
 
-  const handleFileUpload = (file: any) => {
+  const handleFileUpload = (file: { base64: string; id?: string | number; name: string } | null) => {
     if (!file) return
     setValue('attachments', [...values.attachments, file])
   }
@@ -152,7 +152,7 @@ export const CreateOrEditCustomContent = ({
         <ToolbarCreateOrEditCategory
           isLoading={isLoading}
           selectedFolder={values.folder}
-          onFolderSelect={(folder: any) =>
+          onFolderSelect={(folder: { name: string }) =>
             setValue('folder', folder.name === values.folder ? '' : folder.name)
           }
           onSave={handleSubmit(onSubmit)}
@@ -180,7 +180,7 @@ export const CreateOrEditCustomContent = ({
                 addButtonTestID="add-file-button"
                 addButtonAccessibilityLabel={t`Add file button`}
               />
-              {values.attachments.map((attachment: any, index: number) => (
+              {values.attachments.map((attachment: { id?: string; name?: string }, index: number) => (
                 <AttachmentField
                   key={attachment?.id || attachment.name}
                   attachment={attachment}
@@ -212,7 +212,7 @@ export const CreateOrEditCustomContent = ({
                 setValue(`customFields[${index}].note`, val)
               }}
               onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
               testID="custom-fields-multi-slot-input"
             />
           </FormWrapper>

@@ -23,7 +23,7 @@ import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { CopyButton } from '../../../libComponents/CopyButton'
 
 const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: any) => void
+  name: string; value: string; error?: string; onChange: (e: unknown) => void
 }) => ({
   name: registerResult.name,
   value: registerResult.value,
@@ -32,6 +32,10 @@ const toDisabledRegister = (registerResult: {
 export const IdentityRecordDetailsForm = ({
   initialRecord,
   selectedFolder
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialRecord?: any
+  selectedFolder?: string
 }) => {
   const { t } = useLingui()
   const [isPassportOpen, setIsPassportOpen] = useState(true)
@@ -485,7 +489,7 @@ export const IdentityRecordDetailsForm = ({
 
       {hasAttachments && (
         <FormGroup>
-          {(values.attachments as any[]).map((attachment) => (
+          {(values.attachments as { id?: string; name?: string }[]).map((attachment) => (
             <AttachmentField
               key={attachment?.id || attachment.name}
               attachment={attachment}

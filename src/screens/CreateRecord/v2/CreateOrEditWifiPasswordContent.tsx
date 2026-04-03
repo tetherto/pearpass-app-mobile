@@ -74,7 +74,7 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
     validate: (values) => schema.validate(values)
   })
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: Record<string, unknown>) => {
     if (isLoading) return
 
     const data = {
@@ -108,7 +108,6 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
   const {
     value: customFieldsList,
     addItem: addCustomField,
-    registerItem: registerCustomFieldItem,
     removeItem: removeCustomField
   } = registerArray('customFields')
 
@@ -118,7 +117,7 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
         <ToolbarCreateOrEditCategory
           isLoading={isLoading}
           selectedFolder={values.folder}
-          onFolderSelect={(folder: any) =>
+          onFolderSelect={(folder: { name: string }) =>
             setValue('folder', folder.name === values.folder ? '' : folder.name)
           }
           onSave={handleSubmit(onSubmit)}
@@ -180,7 +179,7 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
                 setValue(`customFields[${index}].note`, val)
               }}
               onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
               testID="custom-fields-multi-slot-input"
             />
           </FormWrapper>

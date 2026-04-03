@@ -32,7 +32,7 @@ type NoteRecord = {
   }
   folder?: string
   isFavorite?: boolean
-  attachments?: any[]
+  attachments?: unknown[]
 }
 
 type Props = {
@@ -94,7 +94,6 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
   const {
     value: customFieldsList,
     addItem: addCustomField,
-    registerItem: registerCustomFieldItem,
     removeItem: removeCustomField
   } = registerArray('customFields')
 
@@ -188,7 +187,7 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
                 label={t`Note`}
                 placeholder={t`Write a comment...`}
                 testID="add-note"
-                {...adaptRegister(register('note'))}
+                {...register('note')}
               />
             </FormGroup>
 
@@ -226,7 +225,7 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
                 setValue(`customFields[${index}].note`, val)
               }}
               onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
               testID="notes-multi-slot-input"
             />
           </FormWrapper>

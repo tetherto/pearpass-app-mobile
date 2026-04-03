@@ -244,7 +244,6 @@ export const CreateOrEditIdentityContent = ({
   const {
     value: customFieldsList,
     addItem: addCustomField,
-    registerItem: registerCustomFieldItem,
     removeItem: removeCustomField
   } = registerArray('customFields')
 
@@ -611,7 +610,7 @@ export const CreateOrEditIdentityContent = ({
                 setValue(`customFields[${index}].note`, val)
               }}
               onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
               testID="custom-fields-multi-slot-input"
             />
           </FormWrapper>

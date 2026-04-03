@@ -23,7 +23,7 @@ type CreateRecordV2Props = {
   route: {
     params: {
       recordType: string
-      record?: any
+      record?: unknown
       selectedFolder?: string
     }
   }

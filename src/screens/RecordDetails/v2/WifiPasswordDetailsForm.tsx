@@ -14,12 +14,13 @@ import { FormGroup } from '../../../components/FormGroup'
 import { WifiPasswordQRCode } from '../../../components/WifiPasswordQRCode'
 
 interface WifiPasswordDetailsFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialRecord?: any
-  selectedFolder?: any
+  selectedFolder?: string
 }
 
 const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: any) => void
+  name: string; value: string; error?: string; onChange: (e: unknown) => void
 }) => ({
   name: registerResult.name,
   value: registerResult.value,
@@ -49,7 +50,7 @@ export const WifiPasswordDetailsForm = ({ initialRecord, selectedFolder }: WifiP
 
   const hasPassword = !!values?.password?.length
   const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as any[])?.length
+  const hasCustomFields = !!(values?.customFields as unknown[])?.length
 
   return (
     <>

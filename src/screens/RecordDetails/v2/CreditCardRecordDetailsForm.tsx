@@ -21,7 +21,7 @@ import { FormGroup } from '../../../components/FormGroup'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 
 const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: any) => void
+  name: string; value: string; error?: string; onChange: (e: unknown) => void
 }) => ({
   name: registerResult.name,
   value: registerResult.value,
@@ -30,6 +30,10 @@ const toDisabledRegister = (registerResult: {
 export const CreditCardRecordDetailsForm = ({
   initialRecord,
   selectedFolder
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialRecord?: any
+  selectedFolder?: string
 }) => {
   const { t } = useLingui()
 
@@ -68,7 +72,7 @@ export const CreditCardRecordDetailsForm = ({
   const hasSecurityCode = !!values?.securityCode?.length
   const hasPinCode = !!values?.pinCode?.length
   const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as any[])?.length
+  const hasCustomFields = !!(values?.customFields as unknown[])?.length
   const hasAttachments = !!values?.attachments?.length
 
   return (
@@ -134,7 +138,7 @@ export const CreditCardRecordDetailsForm = ({
 
       {hasAttachments && (
         <FormGroup>
-          {(values.attachments as any[]).map((attachment) => (
+          {(values.attachments as { id?: string; name?: string }[]).map((attachment) => (
             <AttachmentField
               key={attachment?.id || attachment.name}
               attachment={attachment}

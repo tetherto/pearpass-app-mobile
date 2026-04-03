@@ -10,7 +10,8 @@ import { PressableNote } from '../../../components/PressableNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 
-export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }: { initialRecord?: any, selectedFolder?: string }) => {
   const { t } = useLingui()
 
   const initialValues = useMemo(
@@ -38,7 +39,7 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
   }, [initialValues, setValues])
 
   const hasAttachments = !!values?.attachments?.length
-  const hasCustomFields = !!(values?.customFields as any[])?.length
+  const hasCustomFields = !!(values?.customFields as unknown[])?.length
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
@@ -10,12 +10,13 @@ import { FormGroup } from '../../../components/FormGroup'
 import { PassPhrase } from '../../../containers/PassPhrase'
 
 interface PassPhraseRecordDetailsFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialRecord?: any
-  selectedFolder?: any
+  selectedFolder?: string
 }
 
 const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: any) => void
+  name: string; value: string; error?: string; onChange: (e: unknown) => void
 }) => ({
   name: registerResult.name,
   value: registerResult.value,
@@ -35,7 +36,7 @@ export const PassPhraseRecordDetailsForm = ({ initialRecord, selectedFolder }: P
     [initialRecord, selectedFolder]
   )
 
-  const { register, registerArray, setValues, values } = useForm({
+  const { register, setValues, values } = useForm({
     initialValues: initialValues
   })
 
@@ -45,7 +46,7 @@ export const PassPhraseRecordDetailsForm = ({ initialRecord, selectedFolder }: P
 
   const hasPassPhrase = !!values?.passPhrase?.length
   const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as any[])?.length
+  const hasCustomFields = !!(values?.customFields as unknown[])?.length
 
   return (
     <>

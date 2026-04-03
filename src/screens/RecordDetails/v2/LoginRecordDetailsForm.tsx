@@ -14,8 +14,7 @@ import { CopyButton } from '../../../libComponents/CopyButton'
 import {
   InputField,
   PasswordField,
-  MultiSlotInput,
-  UploadField
+  MultiSlotInput
 } from '@tetherto/pearpass-lib-ui-kit'
 import { AttachmentField } from '../../../containers/AttachmentField'
 
@@ -27,12 +26,13 @@ import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeRemin
 import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 
 interface LoginRecordDetailsFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialRecord?: any
-  selectedFolder?: any
+  selectedFolder?: string
 }
 
 const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: any) => void
+  name: string; value: string; error?: string; onChange: (e: unknown) => void
 }) => ({
   name: registerResult.name,
   value: registerResult.value,
@@ -59,7 +59,7 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }: LoginR
     [initialRecord, selectedFolder]
   )
 
-  const { register, registerArray, setValues, values, setValue } = useForm({
+  const { register, setValues, values, setValue } = useForm({
     initialValues: initialValues
   })
 
@@ -84,7 +84,7 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }: LoginR
   const hasPasskey = !!values?.credential
   const hasWebsites = !!(values?.websites as string[])?.length
   const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as any[])?.length
+  const hasCustomFields = !!(values?.customFields as unknown[])?.length
   const hasAttachments = !!values?.attachments?.length
 
   const isPasswordSixMonthsOld = () => {
@@ -170,7 +170,7 @@ Consider changing it to keep your account secure.`}
 
       {hasAttachments && (
         <FormGroup>
-          {(values.attachments as any[]).map((attachment) => (
+          {(values.attachments as { id?: string; name?: string }[]).map((attachment) => (
             <AttachmentField
               key={attachment?.id || attachment.name}
               attachment={attachment}

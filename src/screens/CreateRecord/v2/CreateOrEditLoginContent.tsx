@@ -19,10 +19,8 @@ import {
 import {
   InputField,
   MultiSlotInput,
-  UploadField,
   PasswordField
 } from '@tetherto/pearpass-lib-ui-kit'
-import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
 import Toast from 'react-native-toast-message'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { FormGroup } from '../../../components/FormGroup'
@@ -37,7 +35,6 @@ import { ButtonLittle } from '../../../libComponents'
 import { addHttps } from '../../../utils/addHttps'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
-import { handleChooseFile } from '../../../utils/handleChooseFile'
 import { logger } from '../../../utils/logger'
 import {
   FormWrapper,
@@ -47,8 +44,27 @@ import {
   Wrapper
 } from './styles'
 
+type LoginRecord = {
+  data?: {
+    title?: string
+    username?: string
+    password?: string
+    otpInput?: string
+    otp?: { secret?: string }
+    note?: string
+    websites?: string[]
+    customFields?: unknown[]
+    credential?: { id?: string }
+    passkeyCreatedAt?: string
+    passwordUpdatedAt?: string
+  }
+  folder?: string
+  isFavorite?: boolean
+  attachments?: unknown[]
+}
+
 interface Props {
-  initialRecord?: any
+  initialRecord?: LoginRecord
   selectedFolder?: string
 }
 
@@ -128,7 +144,7 @@ export const CreateOrEditLoginContent = ({
       credential: initialRecord?.data?.credential?.id ?? '',
       passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
     },
-    validate: (values: any) => schema.validate(values)
+    validate: (values: Record<string, unknown>) => schema.validate(values)
   })
 
   
@@ -149,7 +165,18 @@ export const CreateOrEditLoginContent = ({
     })
   }
 
-  const onSubmit = async (values: any) => {
+  type FormValues = {
+    title: string
+    username: string
+    password: string
+    otpSecret: string
+    note: string
+    websites: { website?: string }[]
+    customFields: unknown[]
+    folder: string
+    attachments: { base64: string; id?: string | number; name: string }[]
+  }
+  const onSubmit = async (values: FormValues) => {
     if (isLoading) return
 
     const otpInput = values.otpSecret?.trim() || undefined
@@ -191,7 +218,7 @@ export const CreateOrEditLoginContent = ({
       }
 
       setIsLoading(false)
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(error)
       setIsLoading(false)
     }
@@ -200,14 +227,11 @@ export const CreateOrEditLoginContent = ({
   const {
     value: websitesList,
     addItem,
-    registerItem,
     removeItem
   } = registerArray('websites')
 
   const {
-    value: customFieldsList,
     addItem: addCustomField,
-    registerItem: registerCustomFieldItem,
     removeItem: removeCustomField
   } = registerArray('customFields')
 
@@ -232,7 +256,7 @@ export const CreateOrEditLoginContent = ({
         <ToolbarCreateOrEditCategory
           isLoading={isLoading}
           selectedFolder={values.folder}
-          onFolderSelect={(folder: any) =>
+          onFolderSelect={(folder: { name: string }) =>
             setValue(
               'folder',
               folder.name === values.folder ? '' : folder.name
@@ -325,7 +349,7 @@ export const CreateOrEditLoginContent = ({
                 setValue(`websites[${index}].website`, val)
               }}
               onRemove={(index: number) => removeItem(index)}
-              errorMessage={(errors as any)?.websites?.find(Boolean)?.error?.website}
+              errorMessage={(errors as Record<string, {error?: {website?: string}}[]>)?.websites?.find(Boolean)?.error?.website}
               testID="website-multi-slot-input"
             />
 
@@ -380,7 +404,7 @@ export const CreateOrEditLoginContent = ({
                 setValue(`customFields[${index}].note`, val)
               }}
               onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
               testID="custom-fields-multi-slot-input"
             />
 
