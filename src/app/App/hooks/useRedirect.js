@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import { useUserData } from '@tetherto/pearpass-lib-vault'
 
 import { logger } from '../../../utils/logger'
@@ -27,7 +28,7 @@ export const useRedirect = () => {
         const userData = await refetchUserData()
 
         if (!userData?.hasPasswordSet) {
-          setInitialRouteName('Intro')
+          setInitialRouteName(DESIGN_VERSION === 2 ? 'OnboardingV2' : 'Intro')
           return
         }
 
