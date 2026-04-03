@@ -6,7 +6,7 @@ import { View, Text, StyleSheet } from 'react-native'
  * @param {{
  *  warning: string,
  *  containerStyles: object,
- *  textStyles: object,
+ *  textStyles?: object,
  *  testID?: string
  *  textTestID?: string
  * }} props
