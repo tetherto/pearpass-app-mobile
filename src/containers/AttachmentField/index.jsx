@@ -75,8 +75,8 @@ const truncateFileName = (fileName, maxLength = 20) => {
  * @param {boolean} [props.isFirst] - Whether this field is the first in a list.
  * @param {boolean} [props.isLast] - Whether this field is the last in a list.
  * @param {function} [props.onUpload] - Callback function triggered when a file is uploaded.
- * @param {number} [props.attachmentIndex] - Index of the attachment in a list.
  * @param {function} [props.onDelete] - Callback function triggered when an attachment is deleted.
+ * @param {function} [props.onRename] - Callback function triggered when an attachment is renamed.
  * @param {string} [props.testID] - Test ID for the field wrapper.
  * @param {string} [props.accessibilityLabel] - Accessibility label for the field wrapper.
  * @param {string} [props.inputTestID] - Test ID for the input area.
@@ -92,8 +92,8 @@ export const AttachmentField = ({
   isFirst,
   isLast,
   onUpload,
-  attachmentIndex,
   onDelete,
+  onRename,
   testID,
   accessibilityLabel,
   inputTestID,
@@ -132,7 +132,8 @@ export const AttachmentField = ({
       navigation.navigate('ImagePreview', {
         imageUri: uri,
         imageName: attachment.name,
-        onDelete: onDelete ? () => onDelete(attachmentIndex) : undefined
+        onDelete: onDelete ? () => onDelete() : undefined,
+        onRename: onRename ? (newName) => onRename(newName) : undefined
       })
     } else {
       try {

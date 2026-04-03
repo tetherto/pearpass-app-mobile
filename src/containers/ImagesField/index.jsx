@@ -31,8 +31,15 @@ import { useAutoLockContext } from '../../context/AutoLockContext'
  * @param {Array<Object>} [props.pictures=[]]
  * @param {function} [props.onAdd]
  * @param {function} [props.onRemove]
+ * @param {function} [props.onRename]
  */
-const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
+const ImagesFieldComponent = ({
+  title,
+  pictures = [],
+  onAdd,
+  onRemove,
+  onRename
+}) => {
   const { expand } = useBottomSheet()
   const navigation = useNavigation()
   const { t } = useLingui()
@@ -57,10 +64,11 @@ const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
       navigation.navigate('ImagePreview', {
         imageUri: uri,
         imageName: name,
-        onDelete: onRemove ? () => onRemove(index) : undefined
+        onDelete: onRemove ? () => onRemove(index) : undefined,
+        onRename: onRename ? (newName) => onRename(index, newName) : undefined
       })
     },
-    [navigation, onRemove]
+    [navigation, onRemove, onRename]
   )
 
   const handleAddClick = useCallback(async () => {

@@ -151,6 +151,13 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
     setValue('attachments', updatedAttachments)
   }
 
+  const handleAttachmentRename = (index, newName) => {
+    const updatedAttachments = values.attachments.map((attachment, idx) =>
+      idx === index ? { ...attachment, name: newName } : attachment
+    )
+    setValue('attachments', updatedAttachments)
+  }
+
   return (
     <Wrapper>
       <Header>
@@ -198,6 +205,8 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }) => {
                   attachment={attachment}
                   isLast
                   label={'File'}
+                  onDelete={() => handleAttachmentDelete(index)}
+                  onRename={(newName) => handleAttachmentRename(index, newName)}
                   additionalItems={
                     <ButtonLittle
                       startIcon={DeleteIcon}
