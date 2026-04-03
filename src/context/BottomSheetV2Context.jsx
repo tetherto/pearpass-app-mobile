@@ -21,12 +21,11 @@ const BottomSheetV2Context = createContext()
 
 export const BottomSheetV2Provider = ({ children }) => {
   const ref = useRef(null)
+  const contentViewRef = useRef(null)
   const { theme } = useTheme()
   const { height: screenHeight } = useWindowDimensions()
   const [content, setContent] = useState(null)
   const [snapPoints, setSnapPoints] = useState([1])
-  const pendingOpen = useRef(false)
-  const pendingSnap = useRef(null)
   const isExpanding = useRef(false)
   const backdropAnim = useRef(new Animated.Value(0)).current
 
@@ -42,35 +41,28 @@ export const BottomSheetV2Provider = ({ children }) => {
 
   const expand = useCallback(({ children: sheetContent }) => {
     isExpanding.current = true
-    pendingOpen.current = true
     setContent(sheetContent)
   }, [])
 
-  const handleContentLayout = useCallback(
-    (e) => {
-      const height = e.nativeEvent.layout.height
-      if (height <= 0 || !pendingOpen.current) return
-      pendingOpen.current = false
-      const capped = Math.min(height, screenHeight * 0.75)
-      pendingSnap.current = capped
-      setSnapPoints([capped])
-    },
-    [screenHeight]
-  )
-
   useEffect(() => {
-    if (pendingSnap.current !== null) {
-      pendingSnap.current = null
-      Animated.timing(backdropAnim, {
-        toValue: 1,
-        duration: BACKDROP_DURATION,
-        useNativeDriver: true
-      }).start()
-      requestAnimationFrame(() => {
-        ref.current?.snapToIndex(0)
+    if (!content) return
+    const raf = requestAnimationFrame(() => {
+      contentViewRef.current?.measure((_x, _y, _width, height) => {
+        if (!isExpanding.current || height <= 0) return
+        const capped = Math.min(height, screenHeight * 0.75)
+        setSnapPoints([capped])
+        Animated.timing(backdropAnim, {
+          toValue: 1,
+          duration: BACKDROP_DURATION,
+          useNativeDriver: true
+        }).start()
+        requestAnimationFrame(() => {
+          ref.current?.snapToIndex(0)
+        })
       })
-    }
-  }, [snapPoints, backdropAnim])
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [content, screenHeight, backdropAnim])
 
   const ctx = useMemo(() => ({ expand, collapse }), [expand, collapse])
 
@@ -91,8 +83,6 @@ export const BottomSheetV2Provider = ({ children }) => {
           backdropComponent={renderBackdrop}
           onClose={() => {
             if (isExpanding.current) return
-            pendingOpen.current = false
-            pendingSnap.current = null
             backdropAnim.setValue(0)
             setContent(null)
             setSnapPoints([1])
@@ -108,7 +98,7 @@ export const BottomSheetV2Provider = ({ children }) => {
           }}
         >
           <BottomSheetView>
-            <View onLayout={handleContentLayout}>{content}</View>
+            <View ref={contentViewRef}>{content}</View>
           </BottomSheetView>
         </BottomSheet>
       </BottomSheetContext.Provider>
