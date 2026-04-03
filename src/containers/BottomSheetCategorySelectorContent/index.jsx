@@ -78,14 +78,14 @@ export const BottomSheetCategorySelectorContent = ({
         </>
       }
     >
-      {menuItems.map((item) => (
+      {menuItems.map((item, index) => (
         <NavbarListItem
           key={item.type}
           label={item.name}
           count={recordCountsByType?.[item.type]}
           selected={recordType === item.type}
           platform="mobile"
-          showDivider
+          showDivider={index < menuItems.length - 1}
           onClick={() => handleSelect(item.type)}
         />
       ))}

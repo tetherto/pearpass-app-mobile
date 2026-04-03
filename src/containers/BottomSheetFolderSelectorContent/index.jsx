@@ -97,7 +97,7 @@ export const BottomSheetFolderSelectorContent = () => {
         onClick={() => handleSelect('favorite', true)}
       />
 
-      {customFolders.map((folder) => (
+      {customFolders.map((folder, index) => (
         <NavbarListItem
           key={folder.name}
           icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
@@ -105,7 +105,7 @@ export const BottomSheetFolderSelectorContent = () => {
           count={folder.records?.filter((r) => !!r.data).length ?? 0}
           selected={state.folder === folder.name}
           platform="mobile"
-          showDivider
+          showDivider={index < customFolders.length - 1}
           onClick={() => handleSelect(folder.name)}
         />
       ))}
@@ -114,6 +114,7 @@ export const BottomSheetFolderSelectorContent = () => {
         icon={<Add color={theme.colors.colorTextPrimary} />}
         label={t`Add New Folder`}
         platform="mobile"
+        showDivider={false}
         onClick={handleCreateFolder}
       />
     </ContentContainer>

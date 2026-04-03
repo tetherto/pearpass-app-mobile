@@ -93,25 +93,27 @@ export const BottomSheetRecordActionsContentV2 = ({
         </View>
       }
     >
-      {actionItems.map(({ icon: Icon, label, onPress, isDestructive }) => (
-        <NavbarListItem
-          key={label}
-          icon={
-            <Icon
-              color={
-                isDestructive
-                  ? theme.colors.colorSurfaceDestructiveElevated
-                  : theme.colors.colorTextPrimary
-              }
-            />
-          }
-          label={label}
-          variant={isDestructive ? 'destructive' : 'default'}
-          platform="mobile"
-          showDivider
-          onClick={onPress}
-        />
-      ))}
+      {actionItems.map(
+        ({ icon: Icon, label, onPress, isDestructive }, index) => (
+          <NavbarListItem
+            key={label}
+            icon={
+              <Icon
+                color={
+                  isDestructive
+                    ? theme.colors.colorSurfaceDestructiveElevated
+                    : theme.colors.colorTextPrimary
+                }
+              />
+            }
+            label={label}
+            variant={isDestructive ? 'destructive' : 'default'}
+            platform="mobile"
+            showDivider={index < actionItems.length - 1}
+            onClick={onPress}
+          />
+        )
+      )}
     </ContentContainer>
   )
 }

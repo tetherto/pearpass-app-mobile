@@ -26,6 +26,10 @@ export const createStyles = (colors) => ({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  recordItem: {
+    borderRadius: rawTokens.radius8,
+    overflow: 'hidden'
+  },
   divider: {
     height: 1,
     backgroundColor: colors.colorBorderPrimary,
