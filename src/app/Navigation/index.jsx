@@ -5,6 +5,7 @@ import { CreateRecord } from '../../screens/CreateRecord'
 import { ErrorScreen } from '../../screens/ErrorScreen'
 import { ImagePreview } from '../../screens/ImagePreview'
 import { ImagePreviewV2 } from '../../screens/ImagePreview/ImagePreviewV2'
+import { ImportVault } from '../../screens/ImportVault'
 import { Intro } from '../../screens/Intro'
 import { Onboarding } from '../../screens/Onboarding'
 import {
@@ -83,5 +84,6 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="CreateRecord" component={CreateRecord} />
     <Stack.Screen name="CreateFolder" component={CreateFolder} />
     <Stack.Screen name="MasterPassword" component={MasterPassword} />
+    <Stack.Screen name="ImportVault" component={ImportVault} />
   </Stack.Navigator>
 )

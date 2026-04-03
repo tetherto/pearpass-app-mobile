@@ -1,9 +1,12 @@
 import { useLingui } from '@lingui/react/macro'
-import { useTheme, rawTokens, Button, SearchField } from '@tetherto/pearpass-lib-ui-kit'
+import { useNavigation } from '@react-navigation/native'
 import {
-  Add,
-  ImportOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+  useTheme,
+  rawTokens,
+  Button,
+  SearchField
+} from '@tetherto/pearpass-lib-ui-kit'
+import { Add, ImportOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View, StyleSheet } from 'react-native'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -14,6 +17,7 @@ export const HeaderV2 = ({ setSearchValue, searchValue }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
+  const navigation = useNavigation()
 
   const handleAdd = () => {
     expand({
@@ -40,7 +44,10 @@ export const HeaderV2 = ({ setSearchValue, searchValue }) => {
             variant="tertiary"
             size="medium"
             aria-label="Import"
-            iconBefore={<ImportOutlined color={theme.colors.colorTextPrimary} />}
+            iconBefore={
+              <ImportOutlined color={theme.colors.colorTextPrimary} />
+            }
+            onClick={() => navigation.navigate('ImportVault')}
           />
 
           <Button
