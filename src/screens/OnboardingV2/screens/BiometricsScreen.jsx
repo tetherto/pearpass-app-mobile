@@ -8,12 +8,12 @@ import {
 } from '@react-navigation/native'
 import { Button, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { FaceId, Fingerprint } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useVault, useVaults } from 'pearpass-lib-vault'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
   stringToBuffer
-} from 'pearpass-lib-vault/src/utils/buffer'
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
 import { Dimensions, Platform, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import Rive from 'rive-react-native'

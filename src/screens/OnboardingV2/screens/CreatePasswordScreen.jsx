@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { TERMS_OF_USE } from '@tetherto/pearpass-lib-constants'
 import {
   Button,
   Form,
@@ -11,8 +12,7 @@ import {
   Title
 } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { TERMS_OF_USE } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   Keyboard,
   KeyboardAvoidingView,
