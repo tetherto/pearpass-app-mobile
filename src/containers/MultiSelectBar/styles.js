@@ -4,8 +4,8 @@ export const createStyles = (colors) => ({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.colorBorderPrimary
+    borderBottomWidth: 1,
+    borderBottomColor: colors.colorBorderPrimary
   },
   leftSection: {
     flex: 1,
