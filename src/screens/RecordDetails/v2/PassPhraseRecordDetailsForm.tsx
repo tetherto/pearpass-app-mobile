@@ -8,10 +8,10 @@ import { CopyButton } from '../../../libComponents/CopyButton'
 
 import { FormGroup } from '../../../components/FormGroup'
 import { PassPhrase } from '../../../containers/PassPhrase'
+import { PassPhraseRecord } from './types'
 
 interface PassPhraseRecordDetailsFormProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialRecord?: any
+  initialRecord?: PassPhraseRecord
   selectedFolder?: string
 }
 

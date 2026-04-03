@@ -24,10 +24,10 @@ import { OtpCodeField } from '../../../components/OtpCodeField'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
 import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
+import { LoginRecord } from './types'
 
 interface LoginRecordDetailsFormProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialRecord?: any
+  initialRecord?: LoginRecord
   selectedFolder?: string
 }
 

@@ -9,9 +9,9 @@ import { FormGroup } from '../../../components/FormGroup'
 import { PressableNote } from '../../../components/PressableNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
+import { NoteRecord } from './types'
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }: { initialRecord?: any, selectedFolder?: string }) => {
+export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }: { initialRecord?: NoteRecord, selectedFolder?: string }) => {
   const { t } = useLingui()
 
   const initialValues = useMemo(

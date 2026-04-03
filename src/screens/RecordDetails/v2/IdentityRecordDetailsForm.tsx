@@ -21,6 +21,7 @@ import { AttachmentField } from '../../../containers/AttachmentField'
 import { ImagesField } from '../../../containers/ImagesField'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { CopyButton } from '../../../libComponents/CopyButton'
+import { IdentityRecord } from './types'
 
 const toDisabledRegister = (registerResult: {
   name: string; value: string; error?: string; onChange: (e: unknown) => void
@@ -33,8 +34,7 @@ export const IdentityRecordDetailsForm = ({
   initialRecord,
   selectedFolder
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialRecord?: any
+  initialRecord?: IdentityRecord
   selectedFolder?: string
 }) => {
   const { t } = useLingui()

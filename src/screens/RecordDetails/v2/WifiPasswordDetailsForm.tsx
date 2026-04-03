@@ -9,13 +9,12 @@ import {
 import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
 import { CopyButton } from '../../../libComponents/CopyButton'
 import { PasswordField } from '../../../libComponents'
-
 import { FormGroup } from '../../../components/FormGroup'
 import { WifiPasswordQRCode } from '../../../components/WifiPasswordQRCode'
+import { WifiPasswordRecord } from './types'
 
 interface WifiPasswordDetailsFormProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialRecord?: any
+  initialRecord?: WifiPasswordRecord
   selectedFolder?: string
 }
 

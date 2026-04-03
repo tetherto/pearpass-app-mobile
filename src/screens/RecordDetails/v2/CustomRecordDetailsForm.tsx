@@ -7,8 +7,9 @@ import { FormGroup } from '../../../components/FormGroup'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { CopyButton } from '../../../libComponents/CopyButton'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }: { initialRecord?: any, selectedFolder?: string }) => {
+import { CustomRecord } from './types'
+
+export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }: { initialRecord?: CustomRecord, selectedFolder?: string }) => {
   const initialValues = useMemo(
     () => ({
       customFields: initialRecord?.data?.customFields || [],

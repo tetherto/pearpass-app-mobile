@@ -19,6 +19,7 @@ import { CopyButton } from '../../../libComponents/CopyButton'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { FormGroup } from '../../../components/FormGroup'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
+import { CreditCardRecord } from './types'
 
 const toDisabledRegister = (registerResult: {
   name: string; value: string; error?: string; onChange: (e: unknown) => void
@@ -31,8 +32,7 @@ export const CreditCardRecordDetailsForm = ({
   initialRecord,
   selectedFolder
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialRecord?: any
+  initialRecord?: CreditCardRecord
   selectedFolder?: string
 }) => {
   const { t } = useLingui()
