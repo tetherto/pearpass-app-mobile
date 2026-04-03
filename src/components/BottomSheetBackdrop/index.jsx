@@ -1,8 +1,7 @@
 import styled from 'styled-components/native'
 
 export const BackDrop = styled.TouchableOpacity`
-  background-color: black;
-  opacity: 0.3;
+  background-color: rgba(0, 0, 0, 0.3);
   position: absolute;
   top: 0;
   bottom: 0;
