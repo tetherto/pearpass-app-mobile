@@ -1,16 +1,17 @@
-import { useContext } from 'react'
+import { useCallback, useContext } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Check,
-  ContentCopy,
+  CheckBox,
+  CopyAll,
   DriveFileMoveOutlined,
   EditOutlined,
   Share,
   StarOutlined,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { useCreateRecord } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
@@ -33,6 +34,7 @@ export const BottomSheetRecordActionsContentV2 = ({
   const bottom = insets?.bottom ?? 0
 
   const { actions } = useRecordActionItems({ record, recordType, onDelete })
+  const { createRecord } = useCreateRecord()
 
   const editAction = actions.find((a) => a.type === 'edit')
   const favoriteAction = actions.find((a) => a.type === 'favorite')
@@ -43,6 +45,16 @@ export const BottomSheetRecordActionsContentV2 = ({
     collapse()
     onSelectItem?.()
   }
+
+  const handleDuplicate = useCallback(async () => {
+    await createRecord({
+      type: record.type,
+      folder: record.folder,
+      isFavorite: record.isFavorite,
+      data: { ...record.data }
+    })
+    collapse()
+  }, [record, createRecord, collapse])
 
   const actionItems = [
     {
@@ -56,7 +68,7 @@ export const BottomSheetRecordActionsContentV2 = ({
       onPress: favoriteAction?.click
     },
     ...(onSelectItem
-      ? [{ icon: Check, label: t`Select Item`, onPress: handleSelectItem }]
+      ? [{ icon: CheckBox, label: t`Select Item`, onPress: handleSelectItem }]
       : []),
     {
       icon: Share,
@@ -69,9 +81,9 @@ export const BottomSheetRecordActionsContentV2 = ({
       onPress: moveAction?.click
     },
     {
-      icon: ContentCopy,
+      icon: CopyAll,
       label: t`Duplicate`,
-      onPress: () => {}
+      onPress: handleDuplicate
     },
     {
       icon: TrashOutlined,
@@ -97,6 +109,7 @@ export const BottomSheetRecordActionsContentV2 = ({
         ({ icon: Icon, label, onPress, isDestructive }, index) => (
           <NavbarListItem
             key={label}
+            iconSize={16}
             icon={
               <Icon
                 color={

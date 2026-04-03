@@ -78,17 +78,25 @@ export const BottomSheetCategorySelectorContent = ({
         </>
       }
     >
-      {menuItems.map((item, index) => (
-        <NavbarListItem
-          key={item.type}
-          label={item.name}
-          count={recordCountsByType?.[item.type]}
-          selected={recordType === item.type}
-          platform="mobile"
-          showDivider={index < menuItems.length - 1}
-          onClick={() => handleSelect(item.type)}
-        />
-      ))}
+      {menuItems.map((item, index) => {
+        const Icon = item.icon
+
+        return (
+          <NavbarListItem
+            key={item.type}
+            label={item.name}
+            count={recordCountsByType?.[item.type]}
+            selected={recordType === item.type}
+            platform="mobile"
+            showDivider={index < menuItems.length - 1}
+            onClick={() => handleSelect(item.type)}
+            icon={
+              Icon ? <Icon color={theme.colors.colorTextPrimary} /> : undefined
+            }
+            iconSize={16}
+          />
+        )
+      })}
     </ContentContainer>
   )
 }
