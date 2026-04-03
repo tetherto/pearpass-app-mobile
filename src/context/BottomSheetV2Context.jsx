@@ -27,6 +27,7 @@ export const BottomSheetV2Provider = ({ children }) => {
   const [content, setContent] = useState(null)
   const [snapPoints, setSnapPoints] = useState([1])
   const isExpanding = useRef(false)
+  const pendingSnap = useRef(false)
   const backdropAnim = useRef(new Animated.Value(0)).current
 
   const collapse = useCallback(() => {
@@ -50,19 +51,23 @@ export const BottomSheetV2Provider = ({ children }) => {
       contentViewRef.current?.measure((_x, _y, _width, height) => {
         if (!isExpanding.current || height <= 0) return
         const capped = Math.min(height, screenHeight * 0.75)
+        pendingSnap.current = true
         setSnapPoints([capped])
         Animated.timing(backdropAnim, {
           toValue: 1,
           duration: BACKDROP_DURATION,
           useNativeDriver: true
         }).start()
-        requestAnimationFrame(() => {
-          ref.current?.snapToIndex(0)
-        })
       })
     })
     return () => cancelAnimationFrame(raf)
   }, [content, screenHeight, backdropAnim])
+
+  useEffect(() => {
+    if (!pendingSnap.current || !isExpanding.current) return
+    pendingSnap.current = false
+    ref.current?.snapToIndex(0)
+  }, [snapPoints])
 
   const ctx = useMemo(() => ({ expand, collapse }), [expand, collapse])
 
