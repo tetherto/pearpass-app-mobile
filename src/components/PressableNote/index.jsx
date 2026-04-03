@@ -1,7 +1,8 @@
 import { NoteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native'
-import { CopyButton } from 'src/libComponents'
+
+import { CopyButton } from '../../libComponents'
 
 /**
  * @param {Object} props - Component props

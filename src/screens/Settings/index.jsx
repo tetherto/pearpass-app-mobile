@@ -9,6 +9,7 @@ import {
   VaultIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
+import { useVault } from '@tetherto/pearpass-lib-vault'
 import {
   ScrollView,
   StyleSheet,
@@ -28,6 +29,16 @@ const MenuItem = ({ label, icon: Icon, onPress }) => (
 export const Settings = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { data: vault } = useVault()
+  const isDev = process.env.NODE_ENV === 'development'
+
+  const navigateRoot = (screen, params) => {
+    let nav = navigation
+    while (nav?.getParent?.()) {
+      nav = nav.getParent()
+    }
+    nav.navigate(screen, params)
+  }
 
   const menuItems = [
     { label: t`Security`, screen: 'Security', icon: SecurityIcon },
@@ -37,6 +48,17 @@ export const Settings = () => {
     { label: t`Appearance`, screen: 'Appearance', icon: AppearanceIcon },
     { label: t`About`, screen: 'About', icon: AboutIcon }
   ]
+
+  if (isDev) {
+    menuItems.unshift({
+      label: t`Vault Wizard (V2)`,
+      screen: '__vault_wizard_v2__'
+    })
+    menuItems.unshift({
+      label: t`Vault Settings (V2)`,
+      screen: '__vault_settings_v2__'
+    })
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -50,7 +72,22 @@ export const Settings = () => {
               key={item.screen}
               label={item.label}
               icon={item.icon}
-              onPress={() => navigation.navigate(item.screen)}
+              onPress={() => {
+                if (item.screen === '__vault_wizard_v2__') {
+                  navigateRoot('Welcome', { state: 'credentials' })
+                  return
+                }
+
+                if (item.screen === '__vault_settings_v2__') {
+                  navigation.navigate('VaultSettingsScreen', {
+                    vaultId: vault?.id,
+                    vaultName: vault?.name
+                  })
+                  return
+                }
+
+                navigation.navigate(item.screen)
+              }}
             />
           ))}
         </View>
