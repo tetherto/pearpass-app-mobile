@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import {
   Button,
@@ -7,6 +9,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit'
 import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -19,6 +22,8 @@ export const BottomSheetSortContentV2 = () => {
   const { collapse } = useBottomSheet()
   const { state, setState } = useSharedFilter()
   const styles = createStyles(theme.colors)
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottom = insets?.bottom ?? 0
 
   const sortOptions = [
     { key: 'Title A-Z', label: t`Title (A-Z)` },
@@ -37,7 +42,7 @@ export const BottomSheetSortContentV2 = () => {
   }
 
   return (
-    <ContentContainer contentStyle={{ padding: 0 }}>
+    <ContentContainer contentStyle={{ padding: 0, paddingBottom: bottom }}>
       <View style={styles.header}>
         <Text variant="bodyEmphasized">{t`Order Items`}</Text>
         <Button

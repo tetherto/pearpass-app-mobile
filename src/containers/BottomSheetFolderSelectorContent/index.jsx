@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
@@ -14,6 +16,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -27,6 +30,8 @@ export const BottomSheetFolderSelectorContent = () => {
   const { collapse } = useBottomSheet()
   const { state, setState } = useSharedFilter()
   const styles = createStyles(theme.colors)
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottom = insets?.bottom ?? 0
 
   const { data: folders } = useFolders()
   const { data: recordCountsByType } = useRecordCountsByType({})
@@ -44,7 +49,10 @@ export const BottomSheetFolderSelectorContent = () => {
   }
 
   return (
-    <ContentContainer scrollable contentStyle={{ padding: 0 }}>
+    <ContentContainer
+      scrollable
+      contentStyle={{ padding: 0, paddingBottom: bottom }}
+    >
       <View style={styles.header}>
         <Text variant="bodyEmphasized">{t`Folders`}</Text>
         <Button

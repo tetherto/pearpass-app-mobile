@@ -138,8 +138,7 @@ export const ItemListV2 = ({
               )
             }}
           />
-        ),
-        snapPoints: ['10%', '60%', '60%']
+        )
       })
     },
     [expand, setIsMultiSelectOn, setSelectedRecords]

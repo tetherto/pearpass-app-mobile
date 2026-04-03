@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import {
   Button,
@@ -8,6 +10,7 @@ import {
 import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -24,6 +27,8 @@ export const BottomSheetCategorySelectorContent = ({
   const { collapse } = useBottomSheet()
   const { state } = useSharedFilter()
   const styles = createStyles(theme.colors)
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottom = insets?.bottom ?? 0
 
   const menuItems = useRecordMenuItems({ exclude: ['password'] })
 
@@ -45,7 +50,10 @@ export const BottomSheetCategorySelectorContent = ({
   }
 
   return (
-    <ContentContainer scrollable contentStyle={{ padding: 0 }}>
+    <ContentContainer
+      scrollable
+      contentStyle={{ padding: 0, paddingBottom: bottom }}
+    >
       <View style={styles.header}>
         <Text variant="bodyEmphasized">{t`Categories`}</Text>
         <Button

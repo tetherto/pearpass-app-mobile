@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
@@ -9,6 +11,7 @@ import {
   StarOutlined,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useRecordActionItems } from '../../hooks/useRecordActionItems'
@@ -23,6 +26,8 @@ export const BottomSheetRecordActionsContentV2 = ({
   const { t } = useLingui()
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottom = insets?.bottom ?? 0
 
   const { actions } = useRecordActionItems({ record, recordType, onDelete })
 
@@ -74,7 +79,10 @@ export const BottomSheetRecordActionsContentV2 = ({
   ]
 
   return (
-    <ContentContainer scrollable contentStyle={{ padding: 0 }}>
+    <ContentContainer
+      scrollable
+      contentStyle={{ padding: 0, paddingBottom: bottom }}
+    >
       {actionItems.map(({ icon: Icon, label, onPress, isDestructive }) => (
         <NavbarListItem
           key={label}
