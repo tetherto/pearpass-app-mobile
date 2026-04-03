@@ -4,9 +4,11 @@ import { CreateFolder } from '../../screens/CreateFolder'
 import { CreateRecord } from '../../screens/CreateRecord'
 import { ErrorScreen } from '../../screens/ErrorScreen'
 import { ImagePreview } from '../../screens/ImagePreview'
+import { ImportVault } from '../../screens/ImportVault'
 import { Intro } from '../../screens/Intro'
 import { Onboarding } from '../../screens/Onboarding'
 import { RecordDetails } from '../../screens/RecordDetails'
+import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
 import { TabNavigator } from '../TabNavigator'
 
@@ -53,5 +55,7 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="ImagePreview" component={ImagePreview} />
     <Stack.Screen name="CreateRecord" component={CreateRecord} />
     <Stack.Screen name="CreateFolder" component={CreateFolder} />
+    <Stack.Screen name="ImportVault" component={ImportVault} />
+    <Stack.Screen name="ShareVault" component={ShareVault} />
   </Stack.Navigator>
 )
