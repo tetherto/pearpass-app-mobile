@@ -2,35 +2,35 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState
 } from 'react'
 
-import BottomSheet from '@gorhom/bottom-sheet'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 
 import { BackDrop } from '../components/BottomSheetBackdrop'
 
-const BottomSheetContext = createContext()
+export const BottomSheetContext = createContext()
 
 export const BottomSheetProvider = ({
   children,
   enableContentPanningGesture = true
 }) => {
   const bottomSheetRef = useRef(null)
+  const { theme } = useTheme()
 
   const [options, setOptions] = useState(null)
   const snapPoints = useMemo(() => options?.snapPoints || [0], [options])
 
-  useEffect(() => {
-    if (!options) {
-      bottomSheetRef?.current?.collapse()
-    }
-  }, [options])
+  const collapseBottomSheet = useCallback(() => {
+    bottomSheetRef.current?.close()
+  }, [])
 
-  const collapseBottomSheet = useCallback(() => setOptions(null), [])
+  const handleClose = useCallback(() => {
+    setOptions(null)
+  }, [])
 
   const handleSheetchanges = useCallback(
     (index) => {
@@ -57,7 +57,7 @@ export const BottomSheetProvider = ({
         visible={!!options}
       />
     ),
-    [options, bottomSheetRef]
+    [options, collapseBottomSheet]
   )
 
   return (
@@ -75,15 +75,20 @@ export const BottomSheetProvider = ({
           handleComponent={null}
           backdropComponent={renderBackdrop}
           onChange={handleSheetchanges}
+          onClose={handleClose}
           backgroundStyle={{
-            backgroundColor: colors.grey500.mode1,
+            backgroundColor: theme.colors.colorSurfacePrimary,
+            borderTopLeftRadius: rawTokens.spacing16,
+            borderTopRightRadius: rawTokens.spacing16,
             overflow: 'hidden',
             borderWidth: 1,
-            padding: 20,
-            borderColor: colors.primary100.mode1
+            borderBottomWidth: 0,
+            borderColor: theme.colors.colorSurfaceDisabled
           }}
         >
-          {options.children}
+          <BottomSheetView style={{ bottom: 0 }}>
+            {options.children}
+          </BottomSheetView>
         </BottomSheet>
       )}
     </BottomSheetContext.Provider>
