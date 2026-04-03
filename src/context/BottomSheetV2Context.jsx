@@ -21,10 +21,10 @@ const BottomSheetV2Context = createContext()
 
 export const BottomSheetV2Provider = ({ children }) => {
   const ref = useRef(null)
-  const contentViewRef = useRef(null)
   const { theme } = useTheme()
   const { height: screenHeight } = useWindowDimensions()
   const [content, setContent] = useState(null)
+  const [expandCount, setExpandCount] = useState(0)
   const [snapPoints, setSnapPoints] = useState([1])
   const isExpanding = useRef(false)
   const pendingSnap = useRef(false)
@@ -44,26 +44,26 @@ export const BottomSheetV2Provider = ({ children }) => {
 
   const expand = useCallback(({ children: sheetContent }) => {
     isExpanding.current = true
+    setExpandCount((c) => c + 1)
     setContent(sheetContent)
   }, [])
 
-  useEffect(() => {
-    if (!content) return
-    const raf = requestAnimationFrame(() => {
-      contentViewRef.current?.measure((_x, _y, _width, height) => {
-        if (!isExpanding.current || height <= 0) return
-        const capped = Math.min(height, screenHeight * 0.75)
-        pendingSnap.current = true
-        setSnapPoints([capped])
-        Animated.timing(backdropAnim, {
-          toValue: 1,
-          duration: BACKDROP_DURATION,
-          useNativeDriver: true
-        }).start()
-      })
-    })
-    return () => cancelAnimationFrame(raf)
-  }, [content, screenHeight, backdropAnim])
+  const handleContentLayout = useCallback(
+    (e) => {
+      if (!isExpanding.current) return
+      const { height } = e.nativeEvent.layout
+      if (height <= 0) return
+      const capped = Math.min(height, screenHeight * 0.75)
+      pendingSnap.current = true
+      setSnapPoints([capped])
+      Animated.timing(backdropAnim, {
+        toValue: 1,
+        duration: BACKDROP_DURATION,
+        useNativeDriver: true
+      }).start()
+    },
+    [screenHeight, backdropAnim]
+  )
 
   useEffect(() => {
     if (!pendingSnap.current || !isExpanding.current) return
@@ -117,7 +117,9 @@ export const BottomSheetV2Provider = ({ children }) => {
           }}
         >
           <BottomSheetView>
-            <View ref={contentViewRef}>{content}</View>
+            <View key={expandCount} onLayout={handleContentLayout}>
+              {content}
+            </View>
           </BottomSheetView>
         </BottomSheet>
       </BottomSheetContext.Provider>
