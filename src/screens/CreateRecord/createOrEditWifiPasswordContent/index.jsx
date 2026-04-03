@@ -167,6 +167,10 @@ export const CreateOrEditWifiPasswordContent = ({
                 accessibilityLabel="Wi-Fi password field"
                 inputAccessibilityLabel="Wi-Fi password input field"
                 testID="wifi-password-input-field"
+                showToggleTestID="show-wifi-password-button"
+                hideToggleTestID="hide-wifi-password-button"
+                showToggleAccessibilityLabel="Show wifi password button"
+                hideToggleAccessibilityLabel="Hide wifi password button"
                 icon={PasswordIcon}
                 label={t`Wi-Fi Password`}
                 placeholder={t`Insert Wi-Fi Password`}
@@ -180,6 +184,8 @@ export const CreateOrEditWifiPasswordContent = ({
                     startIcon={PasswordIcon}
                     variant="secondary"
                     borderRadius="md"
+                    testID="generate-password-button"
+                    accessibilityLabel="Generate password button"
                     onPress={() =>
                       expand({
                         children: (
@@ -219,6 +225,8 @@ export const CreateOrEditWifiPasswordContent = ({
                 onCreateCustom={(type) =>
                   addCustomField({ type: type, name: type })
                 }
+                testID="create-custom-field"
+                accessibilityLabel="Create custom field"
               />
             </FormGroup>
           </FormWrapper>
