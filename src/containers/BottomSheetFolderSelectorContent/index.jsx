@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
@@ -14,6 +16,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -26,7 +29,9 @@ export const BottomSheetFolderSelectorContent = () => {
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
   const { state, setState } = useSharedFilter()
-  const styles = createStyles(theme.colors)
+  const styles = createStyles()
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottom = insets?.bottom ?? 0
 
   const { data: folders } = useFolders()
   const { data: recordCountsByType } = useRecordCountsByType({})
@@ -43,18 +48,35 @@ export const BottomSheetFolderSelectorContent = () => {
     navigation.navigate('CreateFolder')
   }
 
-  return (
-    <ContentContainer scrollable contentStyle={{ padding: 0 }}>
-      <View style={styles.header}>
-        <Text variant="bodyEmphasized">{t`Folders`}</Text>
-        <Button
-          variant="tertiary"
-          iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-          onClick={collapse}
-          aria-label={t`Close`}
-        />
-      </View>
+  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
+  return (
+    <ContentContainer
+      scrollable
+      contentStyle={{ padding: 0, paddingBottom: bottom }}
+      header={
+        <>
+          <View style={styles.dragHandleArea}>
+            <View
+              style={[styles.dragHandle, { backgroundColor: handleColor }]}
+            />
+          </View>
+          <View style={styles.header}>
+            <View style={styles.headerSpacer} />
+            <Text variant="bodyEmphasized" style={styles.headerTitle}>
+              {t`Folders`}
+            </Text>
+            <Button
+              variant="tertiary"
+              size="medium"
+              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
+              onClick={collapse}
+              aria-label={t`Close`}
+            />
+          </View>
+        </>
+      }
+    >
       <NavbarListItem
         icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
         label={t`All Folders`}
@@ -75,7 +97,7 @@ export const BottomSheetFolderSelectorContent = () => {
         onClick={() => handleSelect('favorite', true)}
       />
 
-      {customFolders.map((folder) => (
+      {customFolders.map((folder, index) => (
         <NavbarListItem
           key={folder.name}
           icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
@@ -83,7 +105,7 @@ export const BottomSheetFolderSelectorContent = () => {
           count={folder.records?.filter((r) => !!r.data).length ?? 0}
           selected={state.folder === folder.name}
           platform="mobile"
-          showDivider
+          showDivider={index < customFolders.length - 1}
           onClick={() => handleSelect(folder.name)}
         />
       ))}
@@ -92,6 +114,7 @@ export const BottomSheetFolderSelectorContent = () => {
         icon={<Add color={theme.colors.colorTextPrimary} />}
         label={t`Add New Folder`}
         platform="mobile"
+        showDivider={false}
         onClick={handleCreateFolder}
       />
     </ContentContainer>

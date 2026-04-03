@@ -57,8 +57,7 @@ export const ContentHeader = ({
     expand({
       children: (
         <BottomSheetVaultSelectorContent onCreateVault={handleCreateVault} />
-      ),
-      snapPoints: ['10%', '50%', '50%']
+      )
     })
   }
 
@@ -69,15 +68,13 @@ export const ContentHeader = ({
           recordType={recordType}
           onSelect={onCategoryChange}
         />
-      ),
-      snapPoints: ['10%', '70%', '70%']
+      )
     })
   }
 
   const handleFolderPress = () => {
     expand({
-      children: <BottomSheetFolderSelectorContent />,
-      snapPoints: ['10%', '60%', '60%']
+      children: <BottomSheetFolderSelectorContent />
     })
   }
 

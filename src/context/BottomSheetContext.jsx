@@ -12,7 +12,7 @@ import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 
 import { BackDrop } from '../components/BottomSheetBackdrop'
 
-const BottomSheetContext = createContext()
+export const BottomSheetContext = createContext()
 
 export const BottomSheetProvider = ({
   children,

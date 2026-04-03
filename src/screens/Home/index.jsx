@@ -128,8 +128,7 @@ export const Home = () => {
             onCategoryChange={handleRecordType}
             onSortPress={() =>
               expand({
-                children: <BottomSheetSortContentV2 />,
-                snapPoints: ['10%', '50%', '50%']
+                children: <BottomSheetSortContentV2 />
               })
             }
           />

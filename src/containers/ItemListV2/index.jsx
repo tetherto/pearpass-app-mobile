@@ -138,8 +138,7 @@ export const ItemListV2 = ({
               )
             }}
           />
-        ),
-        snapPoints: ['10%', '60%', '60%']
+        )
       })
     },
     [expand, setIsMultiSelectOn, setSelectedRecords]
@@ -173,32 +172,38 @@ export const ItemListV2 = ({
           />
         )}
         renderItem={({ item: record }) => (
-          <ListItem
-            icon={<RecordItemIcon record={record} />}
-            iconSize={32}
-            title={record.data?.title ?? ''}
-            subtitle={getRecordSubtitle(record) || undefined}
-            selectionMode={isMultiSelectOn ? 'multi' : 'none'}
-            isSelected={isRecordSelected(record.id)}
-            onClick={() => handleRecordPress(record.id)}
-            onLongPress={() => handleLongPress(record)}
-            rightElement={
-              !isMultiSelectOn ? (
-                <View
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
-                >
-                  {record.hasSecurityAlert && (
-                    <ErrorFilled width={20} height={20} />
-                  )}
-                  <KeyboardArrowRightFilled
-                    width={18}
-                    height={18}
-                    color={theme.colors.colorTextSecondary}
-                  />
-                </View>
-              ) : undefined
-            }
-          />
+          <View style={styles.recordItem}>
+            <ListItem
+              icon={<RecordItemIcon record={record} />}
+              iconSize={32}
+              title={record.data?.title ?? ''}
+              subtitle={getRecordSubtitle(record) || undefined}
+              selectionMode={isMultiSelectOn ? 'multi' : 'none'}
+              isSelected={isRecordSelected(record.id)}
+              onClick={() => handleRecordPress(record.id)}
+              onLongPress={() => handleLongPress(record)}
+              rightElement={
+                !isMultiSelectOn ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    {record.hasSecurityAlert && (
+                      <ErrorFilled width={20} height={20} />
+                    )}
+                    <KeyboardArrowRightFilled
+                      width={18}
+                      height={18}
+                      color={theme.colors.colorTextSecondary}
+                    />
+                  </View>
+                ) : undefined
+              }
+            />
+          </View>
         )}
         renderSectionFooter={({ section }) => {
           const idx = visibleSections.findIndex((s) => s.key === section.key)

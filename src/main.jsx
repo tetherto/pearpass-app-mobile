@@ -17,11 +17,13 @@ import {
 } from '@tetherto/pearpass-lib-vault'
 import { StatusBar } from 'expo-status-bar'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { App } from './app/App'
 import { AutoLockTouchCapture } from './components/AutoLockHandler'
 import { AutoLockProvider } from './context/AutoLockContext'
 import { BottomSheetProvider } from './context/BottomSheetContext'
+import { BottomSheetV2Provider } from './context/BottomSheetV2Context'
 import { HapticsProvider } from './context/HapticsContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
@@ -71,21 +73,25 @@ export const Main = () => {
             <LoadingProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
                 <BottomSheetWrapper>
-                  <VaultProvider>
-                    <SharedFilterProvider>
-                      <NavigationContainer>
-                        <AutoLockProvider>
-                          <AutoLockTouchCapture>
-                            <ModalProvider>
-                              <BottomSheetProvider>
-                                <App />
-                              </BottomSheetProvider>
-                            </ModalProvider>
-                          </AutoLockTouchCapture>
-                        </AutoLockProvider>
-                      </NavigationContainer>
-                    </SharedFilterProvider>
-                  </VaultProvider>
+                  <SafeAreaProvider>
+                    <VaultProvider>
+                      <SharedFilterProvider>
+                        <NavigationContainer>
+                          <AutoLockProvider>
+                            <AutoLockTouchCapture>
+                              <ModalProvider>
+                                <BottomSheetProvider>
+                                  <BottomSheetV2Provider>
+                                    <App />
+                                  </BottomSheetV2Provider>
+                                </BottomSheetProvider>
+                              </ModalProvider>
+                            </AutoLockTouchCapture>
+                          </AutoLockProvider>
+                        </NavigationContainer>
+                      </SharedFilterProvider>
+                    </VaultProvider>
+                  </SafeAreaProvider>
                 </BottomSheetWrapper>
               </GestureHandlerRootView>
             </LoadingProvider>

@@ -1,3 +1,5 @@
+import { useContext } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
@@ -9,7 +11,10 @@ import {
   StarOutlined,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
+import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useRecordActionItems } from '../../hooks/useRecordActionItems'
 import { ContentContainer } from '../ContentContainer'
@@ -23,6 +28,9 @@ export const BottomSheetRecordActionsContentV2 = ({
   const { t } = useLingui()
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
+  const styles = createStyles()
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottom = insets?.bottom ?? 0
 
   const { actions } = useRecordActionItems({ record, recordType, onDelete })
 
@@ -73,27 +81,39 @@ export const BottomSheetRecordActionsContentV2 = ({
     }
   ]
 
+  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
+
   return (
-    <ContentContainer scrollable contentStyle={{ padding: 0 }}>
-      {actionItems.map(({ icon: Icon, label, onPress, isDestructive }) => (
-        <NavbarListItem
-          key={label}
-          icon={
-            <Icon
-              color={
-                isDestructive
-                  ? theme.colors.colorSurfaceDestructiveElevated
-                  : theme.colors.colorTextPrimary
-              }
-            />
-          }
-          label={label}
-          variant={isDestructive ? 'destructive' : 'default'}
-          platform="mobile"
-          showDivider
-          onClick={onPress}
-        />
-      ))}
+    <ContentContainer
+      scrollable
+      contentStyle={{ padding: 0, paddingBottom: bottom }}
+      header={
+        <View style={styles.dragHandleArea}>
+          <View style={[styles.dragHandle, { backgroundColor: handleColor }]} />
+        </View>
+      }
+    >
+      {actionItems.map(
+        ({ icon: Icon, label, onPress, isDestructive }, index) => (
+          <NavbarListItem
+            key={label}
+            icon={
+              <Icon
+                color={
+                  isDestructive
+                    ? theme.colors.colorSurfaceDestructiveElevated
+                    : theme.colors.colorTextPrimary
+                }
+              />
+            }
+            label={label}
+            variant={isDestructive ? 'destructive' : 'default'}
+            platform="mobile"
+            showDivider={index < actionItems.length - 1}
+            onClick={onPress}
+          />
+        )
+      )}
     </ContentContainer>
   )
 }

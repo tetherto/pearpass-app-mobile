@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { Button, ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
@@ -10,6 +10,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -23,6 +24,8 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const { collapse, expand } = useBottomSheet()
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottom = insets?.bottom ?? 0
   const { openModal, closeModal } = useModal()
   const styles = createStyles()
 
@@ -78,13 +81,11 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
                 <BottomSheetVaultSelectorContent
                   onCreateVault={onCreateVault}
                 />
-              ),
-              snapPoints: ['10%', '50%', '50%']
+              )
             })
           }
         />
-      ),
-      snapPoints: ['10%', '20%', '20%']
+      )
     })
   }
 
@@ -93,7 +94,7 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   return (
     <ContentContainer
       scrollable
-      contentStyle={{ padding: 0 }}
+      contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={
         <>
           <View style={styles.dragHandleArea}>
@@ -145,7 +146,7 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
         icon={<Add color={theme.colors.colorTextPrimary} />}
         title={t`Create New Vault`}
         iconSize={16}
-        onSelect={onCreateVault}
+        onClick={onCreateVault}
       />
     </ContentContainer>
   )
