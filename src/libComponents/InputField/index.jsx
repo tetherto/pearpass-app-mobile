@@ -35,10 +35,10 @@ import { HighlightString } from '../HighlightString'
  *  onClick?: () => void,
  *  onInputLayout?: (event: any) => void,
  *  type?: 'numeric' | 'default',
- *  isSecure: boolean,
- *  isColored: boolean,
+ *  isSecure?: boolean,
+ *  isColored?: boolean,
  *  variant?: 'default' | 'outline',
- *  isTransparent: boolean,
+ *  isTransparent?: boolean,
  *  belowInputContent?: React.ReactNode,
  *  shouldDisplayCustomPlaceholder?: boolean
  *  testID?: string
