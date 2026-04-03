@@ -67,6 +67,14 @@ export const BottomSheetV2Provider = ({ children }) => {
     if (!isExpanding.current) return
     pendingOpen.current = true
     ref.current?.snapToIndex(0)
+
+    const retryTimer = setTimeout(() => {
+      if (pendingOpen.current && isExpanding.current) {
+        ref.current?.snapToIndex(0)
+      }
+    }, 300)
+
+    return () => clearTimeout(retryTimer)
   }, [snapPoints])
 
   const handleSheetChange = useCallback((index) => {
