@@ -3,8 +3,8 @@ import { useContext } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Check,
-  ContentCopy,
+  CheckBox,
+  CopyAll,
   DriveFileMoveOutlined,
   EditOutlined,
   Share,
@@ -56,7 +56,7 @@ export const BottomSheetRecordActionsContentV2 = ({
       onPress: favoriteAction?.click
     },
     ...(onSelectItem
-      ? [{ icon: Check, label: t`Select Item`, onPress: handleSelectItem }]
+      ? [{ icon: CheckBox, label: t`Select Item`, onPress: handleSelectItem }]
       : []),
     {
       icon: Share,
@@ -69,7 +69,7 @@ export const BottomSheetRecordActionsContentV2 = ({
       onPress: moveAction?.click
     },
     {
-      icon: ContentCopy,
+      icon: CopyAll,
       label: t`Duplicate`,
       onPress: () => {}
     },
