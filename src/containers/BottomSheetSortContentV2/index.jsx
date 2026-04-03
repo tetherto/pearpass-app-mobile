@@ -88,7 +88,7 @@ export const BottomSheetSortContentV2 = () => {
         </>
       }
     >
-      {sortOptions.map(({ key, label, icon: Icon }) => (
+      {sortOptions.map(({ key, label, icon: Icon }, index) => (
         <NavbarListItem
           key={key}
           icon={<Icon color={theme.colors.colorTextPrimary} />}
@@ -96,7 +96,7 @@ export const BottomSheetSortContentV2 = () => {
           label={label}
           selected={activeSort === key}
           platform="mobile"
-          showDivider
+          showDivider={index < sortOptions.length - 1}
           onClick={() => handleSelect(key)}
         />
       ))}
