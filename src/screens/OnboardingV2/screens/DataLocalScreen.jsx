@@ -1,14 +1,18 @@
+import { useEffect } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, useTheme, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { Dimensions, Image, Platform, StyleSheet, View } from 'react-native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useVideoPlayer, VideoView } from 'expo-video'
+import { Dimensions, Platform, StyleSheet, View } from 'react-native'
 
-// TODO: restore InitialVideo when the new video asset is available
-// import { InitialVideo } from '../../../containers/InitialVideo'
 import { OnboardingLayout } from '../components/OnboardingLayout'
 import { RadialGradientBackground } from '../components/RadialGradientBackground'
+
+const loopVideoSource = require('../../../../assets/videos/onboarding_lock_loop.mp4')
+const startVideoSource = require('../../../../assets/videos/onboarding_lock_start.mp4')
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -16,11 +20,39 @@ export const DataLocalScreen = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
-
   const gradientColors = [
     { color: '#3A4A1A', offset: '0%' },
     { color: theme.colors.colorSurfacePrimary, offset: '100%', opacity: 0 }
   ]
+
+  const player = useVideoPlayer(startVideoSource, (player) => {
+    player.loop = false
+    player.play()
+  })
+
+  useEffect(() => {
+    if (!player) return
+
+    let switchingToLoop = false
+
+    const endSub = player.addListener('playToEnd', async () => {
+      switchingToLoop = true
+      player.loop = true
+      await player.replaceAsync(loopVideoSource)
+    })
+
+    const statusSub = player.addListener('statusChange', ({ status }) => {
+      if (switchingToLoop && status === 'readyToPlay') {
+        switchingToLoop = false
+        player.play()
+      }
+    })
+
+    return () => {
+      endSub.remove()
+      statusSub.remove()
+    }
+  }, [player])
 
   return (
     <OnboardingLayout>
@@ -30,31 +62,15 @@ export const DataLocalScreen = () => {
             colors={gradientColors}
             style={styles.mediaContainer}
           >
-            <Image
-              source={require('../../../../assets/images/lock.png')}
-              style={styles.lockImage}
-              resizeMode="contain"
+            <VideoView
+              style={styles.video}
+              player={player}
+              allowsFullscreen={false}
+              allowsPictureInPicture={false}
+              nativeControls={false}
               testID="onboarding-v2-data-local-media"
             />
           </RadialGradientBackground>
-
-          {/* TODO: restore video when the new asset is available
-          <View
-            style={styles.mediaContainer}
-            testID="onboarding-v2-data-local-media"
-          >
-            <InitialVideo
-              onStart={() => buttonFadeAnim.setValue(0)}
-              onEnded={() => {
-                Animated.timing(buttonFadeAnim, {
-                  toValue: 1,
-                  duration: 500,
-                  useNativeDriver: true
-                }).start()
-              }}
-            />
-          </View>
-          */}
 
           <Title
             style={styles.title}
@@ -96,18 +112,18 @@ const styles = StyleSheet.create({
   topSection: {
     alignItems: 'center',
     paddingHorizontal: 31,
-    paddingTop: 64
+    paddingTop: 0
   },
   mediaContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: SCREEN_WIDTH / 1.4,
-    height: SCREEN_WIDTH / 1.4,
-    marginTop: 64
+    width: SCREEN_WIDTH,
+    height: SCREEN_WIDTH
   },
-  lockImage: {
-    width: SCREEN_WIDTH / 1.4,
-    height: SCREEN_WIDTH / 1.4
+  video: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_WIDTH,
+    aspectRatio: 1
   },
   buttonContainer: {
     paddingHorizontal: 16,

@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
   useCreateVault,
   useUserData,
   useVault,
   useVaults
-} from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
   stringToBuffer
-} from 'pearpass-lib-vault/src/utils/buffer'
-import { checkPasswordStrength } from 'pearpass-utils-password-check'
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
+import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
 import { Platform } from 'react-native'
 
 import { logger } from '../../../utils/logger'

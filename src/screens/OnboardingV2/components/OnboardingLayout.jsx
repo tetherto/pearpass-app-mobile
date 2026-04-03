@@ -1,7 +1,7 @@
 import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import * as NavigationBar from 'expo-navigation-bar'
 import { StatusBar } from 'expo-status-bar'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
 import {
   Dimensions,
   Platform,
