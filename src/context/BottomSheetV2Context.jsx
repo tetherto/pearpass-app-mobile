@@ -10,10 +10,12 @@ import {
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { View, useWindowDimensions } from 'react-native'
+import { Animated, View, useWindowDimensions } from 'react-native'
 
 import { BottomSheetContext } from './BottomSheetContext'
 import { BackDrop } from '../components/BottomSheetBackdrop'
+
+const BACKDROP_DURATION = 200
 
 const BottomSheetV2Context = createContext()
 
@@ -22,14 +24,19 @@ export const BottomSheetV2Provider = ({ children }) => {
   const { theme } = useTheme()
   const { height: screenHeight } = useWindowDimensions()
   const [content, setContent] = useState(null)
-  const [isOpen, setIsOpen] = useState(false)
   const [snapPoints, setSnapPoints] = useState([1])
   const pendingOpen = useRef(false)
   const pendingSnap = useRef(null)
+  const backdropAnim = useRef(new Animated.Value(0)).current
 
   const collapse = useCallback(() => {
+    Animated.timing(backdropAnim, {
+      toValue: 0,
+      duration: BACKDROP_DURATION,
+      useNativeDriver: true
+    }).start()
     ref.current?.close()
-  }, [])
+  }, [backdropAnim])
 
   const expand = useCallback(({ children: sheetContent }) => {
     pendingOpen.current = true
@@ -51,18 +58,22 @@ export const BottomSheetV2Provider = ({ children }) => {
   useEffect(() => {
     if (pendingSnap.current !== null) {
       pendingSnap.current = null
-      setIsOpen(true)
+      Animated.timing(backdropAnim, {
+        toValue: 1,
+        duration: BACKDROP_DURATION,
+        useNativeDriver: true
+      }).start()
       requestAnimationFrame(() => {
         ref.current?.snapToIndex(0)
       })
     }
-  }, [snapPoints])
+  }, [snapPoints, backdropAnim])
 
   const ctx = useMemo(() => ({ expand, collapse }), [expand, collapse])
 
   const renderBackdrop = useCallback(
-    () => <BackDrop activeOpacity={1} onPress={collapse} visible={isOpen} />,
-    [isOpen, collapse]
+    () => <BackDrop animatedOpacity={backdropAnim} onPress={collapse} />,
+    [backdropAnim, collapse]
   )
 
   return (
@@ -78,7 +89,7 @@ export const BottomSheetV2Provider = ({ children }) => {
           onClose={() => {
             pendingOpen.current = false
             pendingSnap.current = null
-            setIsOpen(false)
+            backdropAnim.setValue(0)
             setContent(null)
             setSnapPoints([1])
           }}

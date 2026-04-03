@@ -146,7 +146,7 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
         icon={<Add color={theme.colors.colorTextPrimary} />}
         title={t`Create New Vault`}
         iconSize={16}
-        onSelect={onCreateVault}
+        onClick={onCreateVault}
       />
     </ContentContainer>
   )
