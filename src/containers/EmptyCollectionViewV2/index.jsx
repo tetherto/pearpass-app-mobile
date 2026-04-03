@@ -33,6 +33,7 @@ export const EmptyCollectionViewV2 = () => {
           variant="secondary"
           fullWidth
           iconBefore={<ImportOutlined color={theme.colors.colorTextPrimary} />}
+          onClick={() => navigation.navigate('Settings', { screen: 'Vaults' })}
         >
           {t`Import items`}
         </Button>
