@@ -26,7 +26,7 @@ export const BottomSheetCategorySelectorContent = ({
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
   const { state } = useSharedFilter()
-  const styles = createStyles(theme.colors)
+  const styles = createStyles()
   const insets = useContext(SafeAreaInsetsContext)
   const bottom = insets?.bottom ?? 0
 
@@ -49,21 +49,35 @@ export const BottomSheetCategorySelectorContent = ({
     collapse()
   }
 
+  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
+
   return (
     <ContentContainer
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
+      header={
+        <>
+          <View style={styles.dragHandleArea}>
+            <View
+              style={[styles.dragHandle, { backgroundColor: handleColor }]}
+            />
+          </View>
+          <View style={styles.header}>
+            <View style={styles.headerSpacer} />
+            <Text variant="bodyEmphasized" style={styles.headerTitle}>
+              {t`Categories`}
+            </Text>
+            <Button
+              variant="tertiary"
+              size="medium"
+              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
+              onClick={collapse}
+              aria-label={t`Close`}
+            />
+          </View>
+        </>
+      }
     >
-      <View style={styles.header}>
-        <Text variant="bodyEmphasized">{t`Categories`}</Text>
-        <Button
-          variant="tertiary"
-          iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-          onClick={collapse}
-          aria-label={t`Close`}
-        />
-      </View>
-
       {menuItems.map((item) => (
         <NavbarListItem
           key={item.type}

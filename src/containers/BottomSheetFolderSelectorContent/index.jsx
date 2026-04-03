@@ -29,7 +29,7 @@ export const BottomSheetFolderSelectorContent = () => {
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
   const { state, setState } = useSharedFilter()
-  const styles = createStyles(theme.colors)
+  const styles = createStyles()
   const insets = useContext(SafeAreaInsetsContext)
   const bottom = insets?.bottom ?? 0
 
@@ -48,21 +48,35 @@ export const BottomSheetFolderSelectorContent = () => {
     navigation.navigate('CreateFolder')
   }
 
+  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
+
   return (
     <ContentContainer
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
+      header={
+        <>
+          <View style={styles.dragHandleArea}>
+            <View
+              style={[styles.dragHandle, { backgroundColor: handleColor }]}
+            />
+          </View>
+          <View style={styles.header}>
+            <View style={styles.headerSpacer} />
+            <Text variant="bodyEmphasized" style={styles.headerTitle}>
+              {t`Folders`}
+            </Text>
+            <Button
+              variant="tertiary"
+              size="medium"
+              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
+              onClick={collapse}
+              aria-label={t`Close`}
+            />
+          </View>
+        </>
+      }
     >
-      <View style={styles.header}>
-        <Text variant="bodyEmphasized">{t`Folders`}</Text>
-        <Button
-          variant="tertiary"
-          iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-          onClick={collapse}
-          aria-label={t`Close`}
-        />
-      </View>
-
       <NavbarListItem
         icon={<FolderOutlined color={theme.colors.colorTextPrimary} />}
         label={t`All Folders`}
