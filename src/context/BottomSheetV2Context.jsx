@@ -27,9 +27,11 @@ export const BottomSheetV2Provider = ({ children }) => {
   const [snapPoints, setSnapPoints] = useState([1])
   const pendingOpen = useRef(false)
   const pendingSnap = useRef(null)
+  const isExpanding = useRef(false)
   const backdropAnim = useRef(new Animated.Value(0)).current
 
   const collapse = useCallback(() => {
+    isExpanding.current = false
     Animated.timing(backdropAnim, {
       toValue: 0,
       duration: BACKDROP_DURATION,
@@ -39,6 +41,7 @@ export const BottomSheetV2Provider = ({ children }) => {
   }, [backdropAnim])
 
   const expand = useCallback(({ children: sheetContent }) => {
+    isExpanding.current = true
     pendingOpen.current = true
     setContent(sheetContent)
   }, [])
@@ -87,6 +90,7 @@ export const BottomSheetV2Provider = ({ children }) => {
           handleComponent={null}
           backdropComponent={renderBackdrop}
           onClose={() => {
+            if (isExpanding.current) return
             pendingOpen.current = false
             pendingSnap.current = null
             backdropAnim.setValue(0)
