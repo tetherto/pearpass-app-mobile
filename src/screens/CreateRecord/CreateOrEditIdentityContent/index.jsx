@@ -541,6 +541,10 @@ export const CreateOrEditIdentityContent = ({
                 }
                 title={t`Passport picture`}
                 pictures={values.passportPicture}
+                testID="passport-picture-field"
+                accessibilityLabel="Passport picture field"
+                addButtonTestID="add-passport-picture-button"
+                addButtonAccessibilityLabel="Add passport picture button"
               />
             )}
 
@@ -599,6 +603,10 @@ export const CreateOrEditIdentityContent = ({
                 }
                 title={t`ID card picture`}
                 pictures={values.idCardPicture}
+                testID="id-card-picture-field"
+                accessibilityLabel="Id card picture field"
+                addButtonTestID="add-id-card-picture-button"
+                addButtonAccessibilityLabel="Add id card picture button"
               />
             )}
 
@@ -660,6 +668,10 @@ export const CreateOrEditIdentityContent = ({
                 }
                 title={t`Driving license picture`}
                 pictures={values.drivingLicensePicture}
+                testID="driving-license-picture-field"
+                accessibilityLabel="Driving license picture field"
+                addButtonTestID="add-driving-license-picture-button"
+                addButtonAccessibilityLabel="Add driving license picture button"
               />
             )}
 
@@ -668,6 +680,12 @@ export const CreateOrEditIdentityContent = ({
                 onUpload={(file) => handleFileUpload(file, 'attachments')}
                 isLast
                 label={'File'}
+                testID="add-file-field"
+                accessibilityLabel="Add file field"
+                textTestID="add-file-text"
+                textAccessibilityLabel="Add file text"
+                addButtonTestID="add-file-button"
+                addButtonAccessibilityLabel="Add file button"
               />
               {values.attachments.map((attachment, index) => (
                 <AttachmentField
@@ -677,11 +695,17 @@ export const CreateOrEditIdentityContent = ({
                   onDelete={(idx) => handleAttachmentDelete(idx, 'attachments')}
                   isLast
                   label={'File'}
+                  testID="new-added-file-field"
+                  accessibilityLabel="New added file field"
+                  textTestID="new-added-file-text"
+                  textAccessibilityLabel="New added file text"
                   additionalItems={
                     <ButtonLittle
                       startIcon={DeleteIcon}
                       variant="secondary"
                       borderRadius="md"
+                      testID="delete-file-button"
+                      accessibilityLabel="Delete file button"
                       onPress={() =>
                         handleAttachmentDelete(index, 'attachments')
                       }
@@ -709,6 +733,8 @@ export const CreateOrEditIdentityContent = ({
             <FormGroup>
               <CreateCustomField
                 onCreateCustom={(type) => addItem({ type: type, name: type })}
+                testID="create-custom-field"
+                accessibilityLabel="Create custom field"
               />
             </FormGroup>
           </FormWrapper>

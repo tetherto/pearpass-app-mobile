@@ -83,6 +83,8 @@ const truncateFileName = (fileName, maxLength = 20) => {
  * @param {string} [props.inputAccessibilityLabel] - Accessibility label for the input area.
  * @param {string} [props.addButtonTestID] - Test ID for the add button.
  * @param {string} [props.addButtonAccessibilityLabel] - Accessibility label for the add button.
+ * @param {string} [props.textTestID] - Test ID for the attachment name text.
+ * @param {string} [props.textAccessibilityLabel] - Accessibility label for the attachment name text.
  * @returns {JSX.Element} The rendered AttachmentField component.
  */
 export const AttachmentField = ({
@@ -99,7 +101,9 @@ export const AttachmentField = ({
   inputTestID,
   inputAccessibilityLabel,
   addButtonTestID,
-  addButtonAccessibilityLabel
+  addButtonAccessibilityLabel,
+  textTestID,
+  textAccessibilityLabel
 }) => {
   const { expand, collapse } = useBottomSheet()
   const navigation = useNavigation()
@@ -163,7 +167,11 @@ export const AttachmentField = ({
           accessibilityLabel={inputAccessibilityLabel}
         >
           <TouchableOpacity onPress={handleAttachmentPress}>
-            <AttachmentName isPlaceHolder={!attachment}>
+            <AttachmentName
+              isPlaceHolder={!attachment}
+              testID={textTestID}
+              accessibilityLabel={textAccessibilityLabel}
+            >
               {!attachment ? 'Add file' : truncateFileName(attachment?.name)}
             </AttachmentName>
           </TouchableOpacity>

@@ -267,6 +267,10 @@ export const CreateOrEditCreditCardContent = ({
                 accessibilityLabel="Security code field"
                 inputAccessibilityLabel="Security doe input field"
                 testID="security-code-input-field"
+                showToggleTestID="show-security-code-button"
+                hideToggleTestID="hide-security-code-button"
+                showToggleAccessibilityLabel="Show security code button"
+                hideToggleAccessibilityLabel="Hide security code button"
                 type="numeric"
                 icon={CreditCardIcon}
                 label={t`Security code`}
@@ -278,6 +282,10 @@ export const CreateOrEditCreditCardContent = ({
                 accessibilityLabel="Pin code field"
                 inputAccessibilityLabel="Pin code input field"
                 testID="pin-code-input-field"
+                showToggleTestID="show-pin-code-button"
+                hideToggleTestID="hide-pin-code-button"
+                showToggleAccessibilityLabel="Show pin code button"
+                hideToggleAccessibilityLabel="Hide pin code button"
                 type="numeric"
                 icon={NineDotsIcon}
                 label={t`Pin code`}
@@ -292,6 +300,10 @@ export const CreateOrEditCreditCardContent = ({
                 onUpload={handleFileUpload}
                 isLast
                 label={'File'}
+                addButtonTestID="add-file-button"
+                addButtonAccessibilityLabel="Add file button"
+                textTestID="add-file-text"
+                textAccessibilityLabel="Add file text"
               />
               {values.attachments.map((attachment, index) => (
                 <AttachmentField
@@ -329,6 +341,8 @@ export const CreateOrEditCreditCardContent = ({
             <FormGroup>
               <CreateCustomField
                 onCreateCustom={(type) => addItem({ type: type, name: type })}
+                testID="create-custom-field"
+                accessibilityLabel="Create custom field"
               />
             </FormGroup>
           </FormWrapper>
