@@ -27,7 +27,6 @@ export const BottomSheetV2Provider = ({ children }) => {
   const [expandCount, setExpandCount] = useState(0)
   const [snapPoints, setSnapPoints] = useState([1])
   const isExpanding = useRef(false)
-  const pendingSnap = useRef(false)
   const pendingOpen = useRef(false)
   const backdropAnim = useRef(new Animated.Value(0)).current
 
@@ -54,7 +53,6 @@ export const BottomSheetV2Provider = ({ children }) => {
       const { height } = e.nativeEvent.layout
       if (height <= 0) return
       const capped = Math.min(height, screenHeight * 0.75)
-      pendingSnap.current = true
       setSnapPoints([capped])
       Animated.timing(backdropAnim, {
         toValue: 1,
@@ -66,8 +64,7 @@ export const BottomSheetV2Provider = ({ children }) => {
   )
 
   useEffect(() => {
-    if (!pendingSnap.current || !isExpanding.current) return
-    pendingSnap.current = false
+    if (!isExpanding.current) return
     pendingOpen.current = true
     ref.current?.snapToIndex(0)
   }, [snapPoints])
