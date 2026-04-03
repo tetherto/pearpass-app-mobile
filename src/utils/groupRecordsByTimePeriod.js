@@ -9,6 +9,24 @@
  * @returns {Array<{ title: string, key: string, isFavorites?: boolean, data: Array }>}
  */
 export const groupRecordsByTimePeriod = (records, sort) => {
+  if (sort?.key === 'data.title') {
+    const favorites = records.filter((r) => r.isFavorite)
+    const rest = records.filter((r) => !r.isFavorite)
+    const sections = []
+    if (favorites.length) {
+      sections.push({
+        title: 'Favorites',
+        key: 'favorites',
+        isFavorites: true,
+        data: favorites
+      })
+    }
+    if (rest.length) {
+      sections.push({ title: 'All Items', key: 'all', data: rest })
+    }
+    return sections
+  }
+
   const dateField = sort?.key === 'createdAt' ? 'createdAt' : 'updatedAt'
   const isAsc = sort?.direction === 'asc'
 

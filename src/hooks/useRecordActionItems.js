@@ -190,7 +190,7 @@ export const useRecordActionItems = ({
       {
         name: record?.isFavorite
           ? t`Remove from Favorites`
-          : t`Mark as favorite`,
+          : t`Add to Favorites`,
         type: 'favorite',
         click: handleFavoriteToggle
       },

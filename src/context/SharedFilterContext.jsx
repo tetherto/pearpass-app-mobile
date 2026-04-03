@@ -5,7 +5,7 @@ const SharedFilterContext = createContext()
 export const INITIAL_STATE = {
   folder: 'allFolder',
   isFavorite: false,
-  sort: 'Recent'
+  sort: 'Date Added Newest'
 }
 
 /**

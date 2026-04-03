@@ -27,14 +27,11 @@ export const BottomSheetSortContentV2 = () => {
 
   const sortOptions = [
     { key: 'Title A-Z', label: t`Title (A-Z)` },
-    { key: 'Last Used Newest', label: t`Last Used (Newest)` },
-    { key: 'Last Used Oldest', label: t`Last Used (Oldest)` },
-    { key: 'Date Added Newest', label: t`Date Added (Newest)` },
-    { key: 'Date Added Oldest', label: t`Date Added (Oldest)` }
+    { key: 'Date Added Newest', label: t`Date Added (Newest first)` },
+    { key: 'Date Added Oldest', label: t`Date Added (Oldest first)` }
   ]
 
-  // 'Recent' is the legacy key — treat it as equivalent to 'Last Used Newest'
-  const activeSort = state.sort === 'Recent' ? 'Last Used Newest' : state.sort
+  const activeSort = state.sort
 
   const handleSelect = (key) => {
     setState((prev) => ({ ...prev, sort: key }))

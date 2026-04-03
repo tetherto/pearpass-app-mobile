@@ -27,12 +27,7 @@ import { useJobQueueProcessor } from '../../jobQueue'
 import { groupRecordsByTimePeriod } from '../../utils/groupRecordsByTimePeriod'
 
 const SORT_BY_TYPE = {
-  Recent: { key: 'updatedAt', direction: 'desc' },
-  'Newest to oldest': { key: 'createdAt', direction: 'desc' },
-  'Oldest to newest': { key: 'createdAt', direction: 'asc' },
   'Title A-Z': { key: 'data.title', direction: 'asc' },
-  'Last Used Newest': { key: 'updatedAt', direction: 'desc' },
-  'Last Used Oldest': { key: 'updatedAt', direction: 'asc' },
   'Date Added Newest': { key: 'createdAt', direction: 'desc' },
   'Date Added Oldest': { key: 'createdAt', direction: 'asc' }
 }
