@@ -2,26 +2,23 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
-import {
-  InputField,
-  MultiSlotInput,
-  UploadField
-} from '@tetherto/pearpass-lib-ui-kit'
-import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
+import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
 import Toast from 'react-native-toast-message'
 
+import { AttachmentField } from '../../../containers/AttachmentField'
 import { FormGroup } from '../../../components/FormGroup'
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
 import { adaptRegister } from './CreateOrEditLoginContent'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
+import { ButtonLittle } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
-import { handleChooseFile } from '../../../utils/handleChooseFile'
 import { logger } from '../../../utils/logger'
 import {
   FormWrapper,
@@ -55,18 +52,14 @@ export const CreateOrEditCustomContent = ({
   const { setIsLoading, isLoading } = useLoadingContext()
 
   const { createRecord } = useCreateRecord({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
   const { updateRecords } = useRecords({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
-  const onError = (error) => {
+  const onError = (error: Error) => {
     Toast.show({
       type: 'baseToast',
       text1: error.message,
@@ -77,7 +70,11 @@ export const CreateOrEditCustomContent = ({
 
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
-    customFields: Validator.array().items(Validator.string()),
+    customFields: Validator.array().items(
+      Validator.object({
+        note: Validator.string().required(t`Comment is required`)
+      })
+    ),
     folder: Validator.string(),
     attachments: Validator.array().items(
       Validator.object({
@@ -87,15 +84,14 @@ export const CreateOrEditCustomContent = ({
     )
   })
 
-  const { register, handleSubmit, values, setValue } = useForm({
+  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title || '',
-      customFields: initialRecord?.data?.customFields
-        ?.map((f: any) => f.note ?? '') ?? [''],
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
     },
-    validate: (values) => schema.validate(values)
+    validate: (values: any) => schema.validate(values)
   })
 
   useGetMultipleFiles({
@@ -104,10 +100,15 @@ export const CreateOrEditCustomContent = ({
     initialRecord
   })
 
-  const onSubmit = async (values) => {
-    if (isLoading) {
-      return
-    }
+  const {
+    value: customFieldsList,
+    addItem: addCustomField,
+    registerItem: registerCustomFieldItem,
+    removeItem: removeCustomField
+  } = registerArray('customFields')
+
+  const onSubmit = async (values: any) => {
+    if (isLoading) return
 
     const data = {
       type: RECORD_TYPES.CUSTOM,
@@ -115,9 +116,7 @@ export const CreateOrEditCustomContent = ({
       isFavorite: initialRecord?.isFavorite,
       data: {
         title: values.title,
-        customFields: (values.customFields as string[])
-          .filter((n: string) => !!n?.trim().length)
-          .map((n: string) => ({ type: 'note', note: n })),
+        customFields: values.customFields,
         attachments: convertBase64FilesToUint8(values.attachments)
       }
     }
@@ -126,56 +125,25 @@ export const CreateOrEditCustomContent = ({
       setIsLoading(true)
 
       if (initialRecord) {
-        await updateRecords(
-          [
-            {
-              ...initialRecord,
-              ...data
-            }
-          ],
-          onError
-        )
+        await updateRecords([{ ...initialRecord, ...data }], onError)
       } else {
         await createRecord(data, onError)
       }
+
       setIsLoading(false)
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error)
       setIsLoading(false)
     }
   }
 
-  const MAX_ATTACHMENTS = 5
-
-  const handleFilesChange = (files: UploadedFile[]) => {
-    setValue('attachments', files)
+  const handleFileUpload = (file: any) => {
+    if (!file) return
+    setValue('attachments', [...values.attachments, file])
   }
 
-  const handleUploadPress = () => {
-    const currentFiles = values.attachments as UploadedFile[]
-    if (currentFiles.length >= MAX_ATTACHMENTS) return
-
-    handleChooseFile(
-      ({ base64, name }: { base64: string; name: string }) => {
-        const newFile: UploadedFile = {
-          file: null as unknown as File,
-          name,
-          size: Math.round((base64.length * 3) / 4),
-          type: 'application/octet-stream',
-          // @ts-ignore
-          base64
-        }
-        setValue('attachments', [...currentFiles, newFile])
-      },
-      () => {
-        Toast.show({
-          type: 'baseToast',
-          text1: t`File is too large`,
-          position: 'bottom',
-          bottomOffset: 100
-        })
-      }
-    )
+  const handleAttachmentDelete = (index: number) => {
+    setValue('attachments', values.attachments.filter((_, idx) => idx !== index))
   }
 
   return (
@@ -184,7 +152,7 @@ export const CreateOrEditCustomContent = ({
         <ToolbarCreateOrEditCategory
           isLoading={isLoading}
           selectedFolder={values.folder}
-          onFolderSelect={(folder) =>
+          onFolderSelect={(folder: any) =>
             setValue('folder', folder.name === values.folder ? '' : folder.name)
           }
           onSave={handleSubmit(onSubmit)}
@@ -193,32 +161,59 @@ export const CreateOrEditCustomContent = ({
       <ScrollContainer>
         <ScrollView>
           <FormWrapper>
-            <FormGroup>
-              <InputField
-                label={t`Title`}
-                placeholderText={t`No title`}
-                testID="title-input-field"
-                {...adaptRegister(register('title'))}
-              />
-            </FormGroup>
-
-            <UploadField
-              files={values.attachments as UploadedFile[]}
-              onFilesChange={handleFilesChange}
-              onPress={handleUploadPress}
-              uploadLinkText={t`Click to upload`}
-              uploadSuffixText={t`or drag and drop`}
-              maxFiles={MAX_ATTACHMENTS}
-              testID="attachments-upload-field"
+            <InputField
+              label={t`Title`}
+              placeholder={t`No title`}
+              testID="title-input-field"
+              {...adaptRegister(register('title'))}
             />
 
+            <FormGroup>
+              <AttachmentField
+                onUpload={handleFileUpload}
+                isLast
+                label={'File'}
+                testID="file-field"
+                accessibilityLabel={t`File field`}
+                inputTestID="file-input-field"
+                inputAccessibilityLabel={t`File input field`}
+                addButtonTestID="add-file-button"
+                addButtonAccessibilityLabel={t`Add file button`}
+              />
+              {values.attachments.map((attachment: any, index: number) => (
+                <AttachmentField
+                  key={attachment?.id || attachment.name}
+                  attachment={attachment}
+                  isLast
+                  label={'File'}
+                  testID="file-field"
+                  accessibilityLabel={t`File field`}
+                  inputTestID="file-input-field"
+                  inputAccessibilityLabel={t`File input field`}
+                  additionalItems={
+                    <ButtonLittle
+                      startIcon={DeleteIcon}
+                      variant="secondary"
+                      borderRadius="md"
+                      onPress={() => handleAttachmentDelete(index)}
+                    />
+                  }
+                />
+              ))}
+            </FormGroup>
+
             <MultiSlotInput
-              label={t`Notes`}
-              placeholderText={t`Add note`}
-              addButtonLabel={t`Add another note`}
-              values={values.customFields as string[]}
-              onChange={(updated: string[]) => setValue('customFields', updated)}
-              testID="notes-multi-slot-input"
+              label={t`Custom fields`}
+              placeholder={t`Add comment`}
+              addButtonLabel={t`Add another comment`}
+              values={(customFieldsList as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+              onAdd={() => addCustomField({ type: 'note', note: '' })}
+              onChangeItem={(index: number, val: string) => {
+                setValue(`customFields[${index}].note`, val)
+              }}
+              onRemove={(index: number) => removeCustomField(index)}
+              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              testID="custom-fields-multi-slot-input"
             />
           </FormWrapper>
         </ScrollView>

@@ -3,6 +3,13 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
+  CalendarIcon,
+  CreditCardIcon,
+  NineDotsIcon,
+  UserIcon,
+  DeleteIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
@@ -11,18 +18,18 @@ import {
   InputField,
   MultiSlotInput,
   PasswordField,
-  UploadField
 } from '@tetherto/pearpass-lib-ui-kit'
-import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
 import Toast from 'react-native-toast-message'
 
+import { ButtonLittle } from 'src/libComponents'
+import { AttachmentField } from '../../../containers/AttachmentField'
 import { FormGroup } from '../../../components/FormGroup'
+
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
 import { adaptRegister } from './CreateOrEditLoginContent'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
-import { handleChooseFile } from '../../../utils/handleChooseFile'
 import { logger } from '../../../utils/logger'
 import {
   FormWrapper,
@@ -78,7 +85,11 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     securityCode: Validator.string().numeric(t`Should contain only numbers`),
     pinCode: Validator.string().numeric(t`Should contain only numbers`),
     note: Validator.string(),
-    notes: Validator.array().items(Validator.string()),
+    customFields: Validator.array().items(
+      Validator.object({
+        note: Validator.string().required(t`Comment is required`)
+      })
+    ),
     folder: Validator.string(),
     attachments: Validator.array().items(
       Validator.object({
@@ -88,7 +99,7 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     )
   })
 
-  const { values, register, handleSubmit, registerArray, setValue } = useForm({
+  const { values, register, handleSubmit, setValue, registerArray, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       name: initialRecord?.data?.name ?? '',
@@ -97,9 +108,7 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
       securityCode: initialRecord?.data?.securityCode ?? '',
       pinCode: initialRecord?.data?.pinCode ?? '',
       note: initialRecord?.data?.note ?? '',
-      notes: initialRecord?.data?.customFields
-        ?.filter((f: any) => f.type === 'note')
-        ?.map((f: any) => f.note ?? '') ?? [''],
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
     },
@@ -120,10 +129,9 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
       bottomOffset: 100
     })
   }
+
   const onSubmit = async (values) => {
-    if (isLoading) {
-      return
-    }
+    if (isLoading) return
 
     const data = {
       type: RECORD_TYPES.CREDIT_CARD,
@@ -137,9 +145,7 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
         securityCode: values.securityCode,
         pinCode: values.pinCode,
         note: values.note,
-        customFields: (values.notes as string[])
-          .filter((n: string) => !!n?.trim().length)
-          .map((n: string) => ({ type: 'note', note: n })),
+        customFields: values.customFields,
         attachments: convertBase64FilesToUint8(values.attachments)
       }
     }
@@ -148,15 +154,7 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
       setIsLoading(true)
 
       if (initialRecord) {
-        await updateRecords(
-          [
-            {
-              ...initialRecord,
-              ...data
-            }
-          ],
-          onError
-        )
+        await updateRecords([{ ...initialRecord, ...data }], onError)
       } else {
         await createRecord(data, onError)
       }
@@ -168,65 +166,42 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     }
   }
 
-  const MAX_ATTACHMENTS = 5
-
-  const handleFilesChange = (files: UploadedFile[]) => {
-    setValue('attachments', files)
-  }
-
-  const handleUploadPress = () => {
-    const currentFiles = values.attachments as UploadedFile[]
-    if (currentFiles.length >= MAX_ATTACHMENTS) return
-
-    handleChooseFile(
-      ({ base64, name }: { base64: string; name: string }) => {
-        const newFile: UploadedFile = {
-          file: null as unknown as File,
-          name,
-          size: Math.round((base64.length * 3) / 4),
-          type: 'application/octet-stream',
-          // @ts-ignore
-          base64
-        }
-        setValue('attachments', [...currentFiles, newFile])
-      },
-      () => {
-        Toast.show({
-          type: 'baseToast',
-          text1: t`File is too large`,
-          position: 'bottom',
-          bottomOffset: 100
-        })
-      }
-    )
-  }
+  const {
+    value: customFieldsList,
+    addItem: addCustomField,
+    removeItem: removeCustomField
+  } = registerArray('customFields')
 
   const handleExpireDateChange = (inputValue) => {
     let value = inputValue.replace(/\D/g, '')
-
-    if (value.length > 4) {
-      value = value.slice(0, 4)
-    }
-
-    if (value.length > 2) {
-      value = `${value.slice(0, 2)} ${value.slice(2)}`
-    }
-
+    if (value.length > 4) value = value.slice(0, 4)
+    if (value.length > 2) value = `${value.slice(0, 2)} ${value.slice(2)}`
     setValue('expireDate', value)
   }
+
   const handleCardNumberChange = (inputValue) => {
     let value = inputValue.replace(/\D/g, '')
-
-    if (value.length > 16) {
-      value = value.slice(0, 16)
-    }
-
-    if (value.length > 0) {
-      value = value.match(/.{1,4}/g).join(' ')
-    }
-
+    if (value.length > 16) value = value.slice(0, 16)
+    if (value.length > 0) value = value.match(/.{1,4}/g).join(' ')
     setValue('number', value)
   }
+
+
+  const handleFileUpload = (file) => {
+    if (!file) {
+      return
+    }
+
+    setValue('attachments', [...values.attachments, file])
+  }
+
+  const handleAttachmentDelete = (index) => {
+    const updatedAttachments = values.attachments.filter(
+      (_, idx) => idx !== index
+    )
+    setValue('attachments', updatedAttachments)
+  }
+
   return (
     <Wrapper>
       <Header>
@@ -246,64 +221,105 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
             <FormGroup>
               <InputField
                 label={t`Title`}
-                placeholderText={t`No title`}
+                placeholder={t`No title`}
                 testID="title-field-input"
                 {...adaptRegister(register('title'))}
               />
             </FormGroup>
+
             <FormGroup>
               <InputField
                 label={t`Name on card`}
-                placeholderText={t`John Smith`}
+                placeholder={t`John Smith`}
+                leftSlot={<UserIcon />}
                 testID="name-on-card-input-field"
                 {...adaptRegister(register('name'))}
               />
               <InputField
                 label={t`Number on card`}
-                placeholderText={t`1234 1234 1234 1234`}
+                placeholder={t`1234 1234 1234 1234`}
+                leftSlot={<CreditCardIcon />}
                 testID="number-on-card-input-field"
                 value={values.number}
-                onChangeText={handleCardNumberChange}
+                onChange={handleCardNumberChange}
               />
-
               <InputField
                 label={t`Date of expire`}
-                placeholderText={t`MM YY`}
+                placeholder={t`MM YY`}
+                leftSlot={<CalendarIcon />}
                 testID="date-of-expire-input-field"
                 value={values.expireDate}
-                onChangeText={handleExpireDateChange}
+                onChange={handleExpireDateChange}
               />
               <PasswordField
-                testID="security-code-input-field"
                 label={t`Security code`}
-                placeholderText={t`123`}
+                placeholder={t`123`}
+                leftSlot={<CreditCardIcon />}
+                testID="security-code-input-field"
                 {...adaptRegister(register('securityCode'))}
               />
               <PasswordField
-                testID="pin-code-input-field"
                 label={t`Pin code`}
-                placeholderText={t`1234`}
+                placeholder={t`1234`}
+                leftSlot={<NineDotsIcon />}
+                testID="pin-code-input-field"
                 {...adaptRegister(register('pinCode'))}
               />
             </FormGroup>
 
-            <UploadField
-              files={values.attachments as UploadedFile[]}
-              onFilesChange={handleFilesChange}
-              onPress={handleUploadPress}
-              uploadLinkText={t`Click to upload`}
-              uploadSuffixText={t`or drag and drop`}
-              maxFiles={MAX_ATTACHMENTS}
-              testID="attachments-upload-field"
+            <FormGroup>
+              <AttachmentField
+                onUpload={handleFileUpload}
+                isLast
+                label={'File'}
+                testID="file-field"
+                accessibilityLabel={t`File field`}
+                inputTestID="file-input-field"
+                inputAccessibilityLabel={t`File input field`}
+                addButtonTestID="add-file-button"
+                addButtonAccessibilityLabel={t`Add file button`}
+              />
+              {values.attachments.map((attachment, index) => (
+                <AttachmentField
+                  key={attachment?.id || attachment.name}
+                  attachment={attachment}
+                  isLast
+                  label={'File'}
+                  testID="file-field"
+                  accessibilityLabel={t`File field`}
+                  inputTestID="file-input-field"
+                  inputAccessibilityLabel={t`File input field`}
+                  additionalItems={
+                    <ButtonLittle
+                      startIcon={DeleteIcon}
+                      variant="secondary"
+                      borderRadius="md"
+                      onPress={() => handleAttachmentDelete(index)}
+                    />
+                  }
+                />
+              ))}
+            </FormGroup>
+
+            <InputField
+              label={t`Comment`}
+              placeholder={t`Add comment`}
+              testID="note-input-field"
+              {...adaptRegister(register('note'))}
             />
 
             <MultiSlotInput
-              label={t`Notes`}
-              placeholderText={t`Add note`}
-              addButtonLabel={t`Add another note`}
-              values={values.notes as string[]}
-              onChange={(updated: string[]) => setValue('notes', updated)}
-              testID="notes-multi-slot-input"
+              label={t`Custom fields`}
+              placeholder={t`Add comment`}
+              addButtonLabel={t`Add another comment`}
+              values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+              onAdd={() => addCustomField({ type: 'note', note: '' })}
+              onChangeItem={(index: number, val: string) => {
+                setValue(`customFields[${index}].note`, val)
+              }}
+              onRemove={(index: number) => removeCustomField(index)}
+              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              testID="custom-fields-multi-slot-input"
             />
           </FormWrapper>
         </ScrollView>

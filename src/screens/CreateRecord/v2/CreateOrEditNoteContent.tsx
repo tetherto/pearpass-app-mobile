@@ -2,16 +2,17 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { InputField, MultiSlotInput, TextArea, UploadField } from '@tetherto/pearpass-lib-ui-kit'
-import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
+import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { InputField, MultiSlotInput, TextArea } from '@tetherto/pearpass-lib-ui-kit'
 import { RECORD_TYPES, useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
-import { handleChooseFile } from '../../../utils/handleChooseFile'
 
+import { AttachmentField } from '../../../containers/AttachmentField'
 import { FormGroup } from '../../../components/FormGroup'
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
+import { ButtonLittle } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
 import { adaptRegister } from './CreateOrEditLoginContent'
@@ -31,15 +32,13 @@ type NoteRecord = {
   }
   folder?: string
   isFavorite?: boolean
-  attachments?: UploadedFile[]
+  attachments?: any[]
 }
 
 type Props = {
   initialRecord?: NoteRecord
   selectedFolder?: string
 }
-
-const MAX_ATTACHMENTS = 5
 
 export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props) => {
   const { t } = useLingui()
@@ -61,20 +60,25 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
     note: Validator.string(),
-    notes: Validator.array().items(Validator.string()),
+    customFields: Validator.array().items(
+      Validator.object({
+        note: Validator.string().required(t`Comment is required`)
+      })
+    ),
     folder: Validator.string(),
-    attachments: Validator.array().items(Validator.object({
-      name: Validator.string().required()
-    }))
+    attachments: Validator.array().items(
+      Validator.object({
+        id: Validator.string(),
+        name: Validator.string().required()
+      })
+    )
   })
 
-  const { register, handleSubmit, values, setValue } = useForm({
+  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       note: initialRecord?.data?.note ?? '',
-      notes: initialRecord?.data?.customFields
-        ?.filter((f: any) => f.type === 'note')
-        ?.map((f: any) => f.note ?? '') ?? [''],
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? []
     },
@@ -87,6 +91,12 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
     initialRecord
   })
 
+  const {
+    value: customFieldsList,
+    addItem: addCustomField,
+    registerItem: registerCustomFieldItem,
+    removeItem: removeCustomField
+  } = registerArray('customFields')
 
   const onError = (error) => {
     Toast.show({
@@ -109,9 +119,7 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
       data: {
         title: values.title,
         note: values.note,
-        customFields: (values.notes as string[])
-          .filter((n: string) => !!n?.trim().length)
-          .map((n: string) => ({ type: 'note', note: n })),
+        customFields: values.customFields,
         attachments: convertBase64FilesToUint8(values.attachments)
       }
     }
@@ -140,35 +148,17 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
     }
   }
 
-  const handleFilesChange = (files: UploadedFile[]) => {
-    setValue('attachments', files)
+  const handleFileUpload = (file) => {
+    if (!file) {
+      return
+    }
+
+    setValue('attachments', [...values.attachments, file])
   }
 
-  const handleUploadPress = () => {
-    const currentFiles = values.attachments as UploadedFile[]
-    if (currentFiles.length >= MAX_ATTACHMENTS) return
-
-    handleChooseFile(
-      ({ base64, name }: { base64: string; name: string }) => {
-        const newFile: UploadedFile = {
-          file: null as unknown as File,
-          name,
-          size: Math.round((base64.length * 3) / 4),
-          type: 'application/octet-stream',
-          // @ts-ignore
-          base64
-        }
-        setValue('attachments', [...currentFiles, newFile])
-      },
-      () => {
-        Toast.show({
-          type: 'baseToast',
-          text1: t`File is too large`,
-          position: 'bottom',
-          bottomOffset: 100
-        })
-      }
-    )
+  const handleAttachmentDelete = (index) => {
+    const updatedAttachments = values.attachments.filter((_, idx) => idx !== index)
+    setValue('attachments', updatedAttachments)
   }
 
   return (
@@ -203,23 +193,40 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
             </FormGroup>
 
             <FormGroup>
-              <UploadField
-                files={values.attachments as UploadedFile[]}
-                onFilesChange={handleFilesChange}
-                onPress={handleUploadPress}
-                uploadLinkText={t`Click to upload`}
-                uploadSuffixText={t`or drag and drop`}
-                maxFiles={MAX_ATTACHMENTS}
-                testID="attachments-upload-field"
+              <AttachmentField
+                onUpload={handleFileUpload}
+                isLast
+                label={'File'}
               />
+              {values.attachments.map((attachment, index) => (
+                <AttachmentField
+                  key={attachment?.id || attachment.name}
+                  attachment={attachment}
+                  isLast
+                  label={'File'}
+                  additionalItems={
+                    <ButtonLittle
+                      startIcon={DeleteIcon}
+                      variant="secondary"
+                      borderRadius="md"
+                      onPress={() => handleAttachmentDelete(index)}
+                    />
+                  }
+                />
+              ))}
             </FormGroup>
 
             <MultiSlotInput
               label={t`Notes`}
-              placeholderText={t`Add note`}
+              placeholder={t`Add note`}
               addButtonLabel={t`Add another note`}
-              values={values.notes as string[]}
-              onChange={(updated: string[]) => setValue('notes', updated)}
+              values={(customFieldsList as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+              onAdd={() => addCustomField({ type: 'note', note: '' })}
+              onChangeItem={(index: number, val: string) => {
+                setValue(`customFields[${index}].note`, val)
+              }}
+              onRemove={(index: number) => removeCustomField(index)}
+              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
               testID="notes-multi-slot-input"
             />
           </FormWrapper>

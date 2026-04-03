@@ -5,16 +5,27 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
   CalendarIcon,
   CreditCardIcon,
+  CommonFileIcon,
   NineDotsIcon,
   UserIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
+  InputField,
+  PasswordField,
+  MultiSlotInput
+} from '@tetherto/pearpass-lib-ui-kit'
+import { CopyButton } from '../../../libComponents/CopyButton'
 
-import { CustomFields } from '../../../components/CustomFields'
-import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
+import { FormGroup } from '../../../components/FormGroup'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { InputField, PasswordField } from '../../../libComponents'
+
+const toDisabledRegister = (registerResult: {
+  name: string; value: string; error?: string; onChange: (e: any) => void
+}) => ({
+  name: registerResult.name,
+  value: registerResult.value,
+})
 
 export const CreditCardRecordDetailsForm = ({
   initialRecord,
@@ -37,11 +48,9 @@ export const CreditCardRecordDetailsForm = ({
     [initialRecord, selectedFolder]
   )
 
-  const { register, registerArray, setValues, values, setValue } = useForm({
+  const { register, setValues, values, setValue } = useForm({
     initialValues: initialValues
   })
-
-  const { value: list, registerItem } = registerArray('customFields')
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -50,7 +59,7 @@ export const CreditCardRecordDetailsForm = ({
   })
 
   useEffect(() => {
-    setValues(initialValues)
+    setValues({ ...initialValues, attachments: values.attachments })
   }, [initialValues, setValues])
 
   const hasName = !!values?.name?.length
@@ -59,85 +68,73 @@ export const CreditCardRecordDetailsForm = ({
   const hasSecurityCode = !!values?.securityCode?.length
   const hasPinCode = !!values?.pinCode?.length
   const hasNote = !!values?.note?.length
-  const hasCustomFields = !!list?.length
+  const hasCustomFields = !!(values?.customFields as any[])?.length
   const hasAttachments = !!values?.attachments?.length
 
   return (
     <>
-      {(hasName ||
-        hasNumber ||
-        hasExpireDate ||
-        hasSecurityCode ||
-        hasPinCode) && (
-          <FormGroup>
-            {hasName && (
-              <InputField
-                icon={UserIcon}
-                label={t`Name on card`}
-                placeholder={t`John Smith`}
-                isFirst
-                variant="outline"
-                isDisabled
-                {...register('name')}
-              />
-            )}
+      {(hasName || hasNumber || hasExpireDate || hasSecurityCode || hasPinCode) && (
+        <FormGroup>
+          {hasName && (
+            <InputField
+              leftSlot={<UserIcon />}
+              rightSlot={<CopyButton value={values.name} />}
+              label={t`Name on card`}
+              placeholder={t`John Smith`}
+              disabled
+              {...toDisabledRegister(register('name'))}
+            />
+          )}
 
-            {hasNumber && (
-              <InputField
-                icon={CreditCardIcon}
-                label={t`Number on card`}
-                placeholder={t`1234 1234 1234 1234 `}
-                variant="outline"
-                isFirst={!hasName}
-                isDisabled
-                {...register('number')}
-              />
-            )}
+          {hasNumber && (
+            <InputField
+              leftSlot={<CreditCardIcon />}
+              rightSlot={<CopyButton value={values.number} />}
+              label={t`Number on card`}
+              placeholder={t`1234 1234 1234 1234`}
+              disabled
+              {...toDisabledRegister(register('number'))}
+            />
+          )}
 
-            {hasExpireDate && (
-              <InputField
-                icon={CalendarIcon}
-                label={t`Date of expire`}
-                placeholder={t`MM YY`}
-                variant="outline"
-                isFirst={!hasName && !hasNumber}
-                isDisabled
-                {...register('expireDate')}
-              />
-            )}
+          {hasExpireDate && (
+            <InputField
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.expireDate} />}
+              label={t`Date of expire`}
+              placeholder={t`MM YY`}
+              disabled
+              {...toDisabledRegister(register('expireDate'))}
+            />
+          )}
 
-            {hasSecurityCode && (
-              <PasswordField
-                icon={CreditCardIcon}
-                label={t`Security code`}
-                placeholder={t`12C3`}
-                variant="outline"
-                isFirst={!hasName && !hasNumber && !hasExpireDate}
-                isDisabled
-                {...register('securityCode')}
-              />
-            )}
+          {hasSecurityCode && (
+            <PasswordField
+              leftSlot={<CreditCardIcon />}
+              rightSlot={<CopyButton value={values.securityCode} />}
+              label={t`Security code`}
+              placeholder={t`12C3`}
+              disabled
+              {...toDisabledRegister(register('securityCode'))}
+            />
+          )}
 
-            {hasPinCode && (
-              <PasswordField
-                icon={NineDotsIcon}
-                label={t`Pin code`}
-                placeholder={t`1234`}
-                isLast
-                variant="outline"
-                isFirst={
-                  !hasName && !hasNumber && !hasExpireDate && !hasSecurityCode
-                }
-                isDisabled
-                {...register('pinCode')}
-              />
-            )}
-          </FormGroup>
-        )}
+          {hasPinCode && (
+            <PasswordField
+              leftSlot={<NineDotsIcon />}
+              rightSlot={<CopyButton value={values.pinCode} />}
+              label={t`Pin code`}
+              placeholder={t`1234`}
+              disabled
+              {...toDisabledRegister(register('pinCode'))}
+            />
+          )}
+        </FormGroup>
+      )}
 
       {hasAttachments && (
         <FormGroup>
-          {values.attachments.map((attachment) => (
+          {(values.attachments as any[]).map((attachment) => (
             <AttachmentField
               key={attachment?.id || attachment.name}
               attachment={attachment}
@@ -148,16 +145,26 @@ export const CreditCardRecordDetailsForm = ({
       )}
 
       {hasNote && (
-        <FormGroup>
-          <InputFieldNote isDisabled isFirst isLast {...register('note')} />
-        </FormGroup>
+        <InputField
+          label={t`Note`}
+          placeholder={t`Add note`}
+          leftSlot={<CommonFileIcon />}
+          rightSlot={<CopyButton value={values.note} />}
+          disabled
+          {...toDisabledRegister(register('note'))}
+        />
       )}
 
       {hasCustomFields && (
-        <CustomFields
-          areInputsDisabled
-          customFields={list}
-          register={registerItem}
+        <MultiSlotInput
+          label={t`Custom fields`}
+          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+          onAdd={() => {}}
+          onChangeItem={() => {}}
+          onRemove={() => {}}
+          testID="custom-fields-multi-slot-input"
+          disabled
+          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
         />
       )}
     </>

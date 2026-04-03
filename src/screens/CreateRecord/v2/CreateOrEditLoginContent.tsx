@@ -4,7 +4,12 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
-  PasswordIcon
+  KeyIcon,
+  LockIcon,
+  PasswordIcon,
+  UserIcon,
+  DeleteIcon,
+  WebsiteIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   RECORD_TYPES,
@@ -14,10 +19,14 @@ import {
 import {
   InputField,
   MultiSlotInput,
-  UploadField
+  UploadField,
+  PasswordField
 } from '@tetherto/pearpass-lib-ui-kit'
 import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
 import Toast from 'react-native-toast-message'
+import { AttachmentField } from '../../../containers/AttachmentField'
+import { FormGroup } from '../../../components/FormGroup'
+
 
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
 import { BottomSheetPassGeneratorContent } from '../../../containers/BottomSheetPassGeneratorContent'
@@ -43,15 +52,18 @@ interface Props {
   selectedFolder?: string
 }
 
+// todo: do we even need it? if it is al lthe same?
 export function adaptRegister(reg: {
   value: string
   name: string
   error?: string
-  onChange: (val: any) => void
+  onChange: (e: React.ChangeEvent<HTMLInputElement> | string) => void
 }) {
   return {
     value: reg.value,
-    onChangeText: (val: string) => reg.onChange(val),
+    error: reg.error,
+    name: reg.name,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => reg.onChange(e),
   }
 }
 
@@ -79,9 +91,15 @@ export const CreateOrEditLoginContent = ({
     otpSecret: Validator.string(),
     note: Validator.string(),
     websites: Validator.array().items(
-      Validator.string().website('Wrong format of website')
+      Validator.object({
+        website: Validator.string().website('Wrong format of website')
+      })
     ),
-    comments: Validator.array().items(Validator.string()),
+    customFields: Validator.array().items(
+      Validator.object({
+        note: Validator.string().required(t`Comment is required`)
+      })
+    ),
     folder: Validator.string(),
     attachments: Validator.array().items(
       Validator.object({
@@ -91,7 +109,7 @@ export const CreateOrEditLoginContent = ({
     )
   })
 
-  const { register, handleSubmit, values, setValue } = useForm({
+  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       username: initialRecord?.data?.username ?? '',
@@ -102,11 +120,9 @@ export const CreateOrEditLoginContent = ({
         '',
       note: initialRecord?.data?.note ?? '',
       websites: initialRecord?.data?.websites?.length
-        ? initialRecord.data.websites
-        : [''],
-      comments: initialRecord?.data?.customFields
-        ?.filter((f: any) => f.type === 'note')
-        ?.map((f: any) => f.note ?? '') ?? [''],
+        ? initialRecord.data.websites.map((website) => ({ website }))
+        : [{ name: 'website' }],
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? [],
       credential: initialRecord?.data?.credential?.id ?? '',
@@ -114,6 +130,9 @@ export const CreateOrEditLoginContent = ({
     },
     validate: (values: any) => schema.validate(values)
   })
+
+  
+
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -146,18 +165,14 @@ export const CreateOrEditLoginContent = ({
         password: values.password,
         note: values.note,
         otpInput,
-        websites: (values.websites as string[])
-          .map((website: string) => {
-            if (!!website?.trim().length) {
-              return addHttps(website)
+        websites: (values.websites as Array<{ website: string }>)
+          .map((item) => {
+            if (!!item?.website?.trim().length) {
+              return addHttps(item.website)
             }
           })
-          .filter(
-            (website: string | undefined) => !!website?.trim().length
-          ),
-        customFields: (values.comments as string[])
-          .filter((c: string) => !!c?.trim().length)
-          .map((c: string) => ({ type: 'note', note: c })),
+          .filter((website) => !!website?.trim().length),
+        customFields: values.customFields,
         attachments: convertBase64FilesToUint8(values.attachments),
         passwordUpdatedAt: initialRecord?.data?.passwordUpdatedAt
       }
@@ -182,37 +197,33 @@ export const CreateOrEditLoginContent = ({
     }
   }
 
-  const handleFilesChange = (files: UploadedFile[]) => {
-    setValue('attachments', files)
+  const {
+    value: websitesList,
+    addItem,
+    registerItem,
+    removeItem
+  } = registerArray('websites')
+
+  const {
+    value: customFieldsList,
+    addItem: addCustomField,
+    registerItem: registerCustomFieldItem,
+    removeItem: removeCustomField
+  } = registerArray('customFields')
+
+  const handleFileUpload = (file) => {
+    if (!file) {
+      return
+    }
+
+    setValue('attachments', [...values.attachments, file])
   }
 
-  const MAX_ATTACHMENTS = 5
-
-  const handleUploadPress = () => {
-    const currentFiles = values.attachments as UploadedFile[]
-    if (currentFiles.length >= MAX_ATTACHMENTS) return
-
-    handleChooseFile(
-      ({ base64, name }: { base64: string; name: string }) => {
-        const newFile: UploadedFile = {
-          file: null as unknown as File, // not available on native
-          name,
-          size: Math.round((base64.length * 3) / 4), // approximate byte size from base64
-          type: 'application/octet-stream',
-          // @ts-ignore — base64 is a native-only extension of UploadedFile used by convertBase64FilesToUint8
-          base64
-        }
-        setValue('attachments', [...currentFiles, newFile])
-      },
-      () => {
-        Toast.show({
-          type: 'baseToast',
-          text1: t`File is too large`,
-          position: 'bottom',
-          bottomOffset: 100
-        })
-      }
+  const handleAttachmentDelete = (index) => {
+    const updatedAttachments = values.attachments.filter(
+      (_, idx) => idx !== index
     )
+    setValue('attachments', updatedAttachments)
   }
 
   return (
@@ -237,22 +248,23 @@ export const CreateOrEditLoginContent = ({
 
             <InputField
               label={t`Title`}
-              placeholderText={t`No title`}
+              placeholder={t`No title`}
               testID="title-field"
               {...adaptRegister(register('title'))}
             />
 
             <InputField
               label={t`Email or username`}
-              placeholderText={t`Email or username`}
+              placeholder={t`Email or username`}
+              leftSlot={<UserIcon />}
               testID="email-username-field"
               {...adaptRegister(register('username'))}
             />
 
-            <InputField
+            <PasswordField
               label={t`Password`}
-              placeholderText={t`Insert password`}
-              inputType="password"
+              placeholder={t`Insert password`}
+              leftSlot={<KeyIcon />}
               testID="password-field"
               rightSlot={
                 <ButtonLittle
@@ -281,8 +293,9 @@ export const CreateOrEditLoginContent = ({
             {AUTHENTICATOR_ENABLED && (
               <InputField
                 label={t`Authenticator Secret Key`}
-                placeholderText={t`Enter Secret Key or otpauth:// URI`}
+                placeholder={t`Enter Secret Key or otpauth:// URI`}
                 inputType="password"
+                leftSlot={<LockIcon />}
                 testID="otp-secret-field"
                 {...adaptRegister(register('otpSecret'))}
               />
@@ -291,52 +304,84 @@ export const CreateOrEditLoginContent = ({
             {!!values?.credential && (
               <InputField
                 label={t`Passkey`}
-                placeholderText={t`Passkey`}
+                placeholder={t`Passkey`}
+                leftSlot={<KeyIcon />}
                 value={
                   formatPasskeyDate(values.passkeyCreatedAt) ||
                   t`Passkey Stored`
                 }
-                onChangeText={() => { }}
+                onChange={() => { }}
               />
             )}
 
             <MultiSlotInput
               label={t`Website`}
-              placeholderText="https://"
+              placeholder="https://"
+              leftSlot={<WebsiteIcon />}
               addButtonLabel={t`Add another website`}
-              values={values.websites as string[]}
-              onChange={(updated: string[]) => setValue('websites', updated)}
+              values={(websitesList as Array<{ website?: string }>).map((w) => w?.website ?? '')}
+              onAdd={() => addItem({ name: 'website' })}
+              onChangeItem={(index: number, val: string) => {
+                setValue(`websites[${index}].website`, val)
+              }}
+              onRemove={(index: number) => removeItem(index)}
+              errorMessage={(errors as any)?.websites?.find(Boolean)?.error?.website}
               testID="website-multi-slot-input"
             />
 
-            <UploadField
-              files={values.attachments as UploadedFile[]}
-              onFilesChange={handleFilesChange}
-              onPress={handleUploadPress}
-              uploadLinkText={t`Click to upload`}
-              uploadSuffixText={t`or drag and drop`}
-              maxFiles={MAX_ATTACHMENTS}
-              testID="attachments-upload-field"
-            />
+            <FormGroup>
+              <AttachmentField
+                onUpload={handleFileUpload}
+                isLast
+                label={'File'}
+                testID="file-field"
+                accessibilityLabel={t`File field`}
+                inputTestID="file-input-field"
+                inputAccessibilityLabel={t`File input field`}
+                addButtonTestID="add-file-button"
+                addButtonAccessibilityLabel={t`Add file button`}
+              />
+              {values.attachments.map((attachment, index) => (
+                <AttachmentField
+                  key={attachment?.id || attachment.name}
+                  attachment={attachment}
+                  isLast
+                  label={'File'}
+                  testID="file-field"
+                  accessibilityLabel={t`File field`}
+                  inputTestID="file-input-field"
+                  inputAccessibilityLabel={t`File input field`}
+                  additionalItems={
+                    <ButtonLittle
+                      startIcon={DeleteIcon}
+                      variant="secondary"
+                      borderRadius="md"
+                      onPress={() => handleAttachmentDelete(index)}
+                    />
+                  }
+                />
+              ))}
+            </FormGroup>
 
-            {/* TODO: "notes" field was removed — unclear why it existed alongside the comments field. 
-            Confirm during review whether to keep or remove it. */}
-
-            {/* <InputField
+            <InputField
               label={t`Comment`}
-              placeholderText={t`Add comment`}
-              icon={CommonFileIcon}
+              placeholder={t`Add comment`}
               testID="add-note-field"
               {...adaptRegister(register('note'))}
-            /> */}
+            />
 
             <MultiSlotInput
-              label={t`Custom comments`}
-              placeholderText={t`Add comment`}
+              label={t`Custom fields`}
+              placeholder={t`Add comment`}
               addButtonLabel={t`Add another comment`}
-              values={values.comments as string[]}
-              onChange={(updated: string[]) => setValue('comments', updated)}
-              testID="custom-comments-multi-slot-input"
+              values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+              onAdd={() => addCustomField({ type: 'note', note: '' })}
+              onChangeItem={(index: number, val: string) => {
+                setValue(`customFields[${index}].note`, val)
+              }}
+              onRemove={(index: number) => removeCustomField(index)}
+              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              testID="custom-fields-multi-slot-input"
             />
 
           </FormWrapper>

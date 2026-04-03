@@ -11,16 +11,23 @@ import {
   NationalityIcon,
   CalendarIcon,
   GroupIcon,
-  GenderIcon
+  GenderIcon,
+  CommonFileIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
 
-import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
 import { ImagesField } from '../../../containers/ImagesField'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { InputField } from '../../../libComponents'
+import { CopyButton } from '../../../libComponents/CopyButton'
+
+const toDisabledRegister = (registerResult: {
+  name: string; value: string; error?: string; onChange: (e: any) => void
+}) => ({
+  name: registerResult.name,
+  value: registerResult.value,
+})
 
 export const IdentityRecordDetailsForm = ({
   initialRecord,
@@ -30,6 +37,7 @@ export const IdentityRecordDetailsForm = ({
   const [isPassportOpen, setIsPassportOpen] = useState(true)
   const [isIdCardOpen, setIsIdCardOpen] = useState(true)
   const [isDrivingOpen, setIsDrivingOpen] = useState(true)
+
   const initialValues = useMemo(
     () => ({
       fullName: initialRecord?.data?.fullName ?? '',
@@ -58,12 +66,9 @@ export const IdentityRecordDetailsForm = ({
       idCardIssuingCountry: initialRecord?.data?.idCardIssuingCountry ?? '',
       idCardPicture: initialRecord?.data?.idCardPicture ?? [],
       drivingLicenseNumber: initialRecord?.data?.drivingLicenseNumber ?? '',
-      drivingLicenseDateOfIssue:
-        initialRecord?.data?.drivingLicenseDateOfIssue ?? '',
-      drivingLicenseExpiryDate:
-        initialRecord?.data?.drivingLicenseExpiryDate ?? '',
-      drivingLicenseIssuingCountry:
-        initialRecord?.data?.drivingLicenseIssuingCountry ?? '',
+      drivingLicenseDateOfIssue: initialRecord?.data?.drivingLicenseDateOfIssue ?? '',
+      drivingLicenseExpiryDate: initialRecord?.data?.drivingLicenseExpiryDate ?? '',
+      drivingLicenseIssuingCountry: initialRecord?.data?.drivingLicenseIssuingCountry ?? '',
       drivingLicensePicture: initialRecord?.data?.drivingLicensePicture ?? [],
       attachments: initialRecord?.data.attachments ?? []
     }),
@@ -74,7 +79,7 @@ export const IdentityRecordDetailsForm = ({
     initialValues: initialValues
   })
 
-  const { value: list, registerItem } = registerArray('customFields')
+  const { value: list } = registerArray('customFields')
 
   const { refetch } = useGetMultipleFiles({
     fieldNames: [
@@ -95,7 +100,6 @@ export const IdentityRecordDetailsForm = ({
   )
 
   useEffect(() => {
-    // Preserve image fields that already have base64 data to prevent flickering/disappearing
     const imageFields = [
       'attachments',
       'passportPicture',
@@ -104,7 +108,6 @@ export const IdentityRecordDetailsForm = ({
     ]
     const preservedValues = { ...initialValues }
 
-    // Keep existing image fields if they have base64 data
     imageFields.forEach((fieldName) => {
       const currentValue = values[fieldName]
       if (
@@ -113,12 +116,10 @@ export const IdentityRecordDetailsForm = ({
         currentValue.length > 0 &&
         currentValue.some((item) => item.base64)
       ) {
-        // Only preserve if the attachment IDs match (same attachments, just reloading)
         const initialValue = initialValues[fieldName]
         const currentIds = currentValue.map((item) => item.id).sort()
         const initialIds = (initialValue || []).map((item) => item.id).sort()
 
-        // If IDs match, preserve the current values (they have base64 data)
         if (JSON.stringify(currentIds) === JSON.stringify(initialIds)) {
           preservedValues[fieldName] = currentValue
         }
@@ -153,11 +154,9 @@ export const IdentityRecordDetailsForm = ({
   const hasIdCardIssuingCountry = !!values?.idCardIssuingCountry?.length
   const hasIdCardPicture = !!values.idCardPicture?.length
   const hasDrivingLicenseNumber = !!values?.drivingLicenseNumber?.length
-  const hasDrivingLicenseDateOfIssue =
-    !!values?.drivingLicenseDateOfIssue?.length
+  const hasDrivingLicenseDateOfIssue = !!values?.drivingLicenseDateOfIssue?.length
   const hasDrivingLicenseExpiryDate = !!values?.drivingLicenseExpiryDate?.length
-  const hasDrivingLicenseIssuingCountry =
-    !!values?.drivingLicenseIssuingCountry?.length
+  const hasDrivingLicenseIssuingCountry = !!values?.drivingLicenseIssuingCountry?.length
   const hasDrivingLicensePicture = !!values.drivingLicensePicture?.length
   const hasAttachments = !!values?.attachments?.length
 
@@ -192,34 +191,32 @@ export const IdentityRecordDetailsForm = ({
         <FormGroup title={t`Personal information`} isCollapse>
           {hasFullName && (
             <InputField
-              icon={UserIcon}
               label={t`Full name`}
               placeholder={t`John Smith`}
-              variant="outline"
-              isDisabled
-              {...register('fullName')}
+              leftSlot={<UserIcon />}
+              rightSlot={<CopyButton value={values.fullName} />}
+              disabled
+              {...toDisabledRegister(register('fullName'))}
             />
           )}
-
           {hasEmail && (
             <InputField
-              icon={EmailIcon}
               label={t`Email`}
               placeholder={t`Insert email`}
-              variant="outline"
-              isDisabled
-              {...register('email')}
+              leftSlot={<EmailIcon />}
+              rightSlot={<CopyButton value={values.email} />}
+              disabled
+              {...toDisabledRegister(register('email'))}
             />
           )}
-
           {hasPhoneNumber && (
             <InputField
-              icon={PhoneIcon}
               label={t`Phone number`}
               placeholder={t`Insert phone number`}
-              variant="outline"
-              isDisabled
-              {...register('phoneNumber')}
+              leftSlot={<PhoneIcon />}
+              rightSlot={<CopyButton value={values.phoneNumber} />}
+              disabled
+              {...toDisabledRegister(register('phoneNumber'))}
             />
           )}
         </FormGroup>
@@ -231,49 +228,45 @@ export const IdentityRecordDetailsForm = ({
             <InputField
               label={t`Address`}
               placeholder={t`Insert address`}
-              variant="outline"
-              isDisabled
-              {...register('address')}
+              rightSlot={<CopyButton value={values.address} />}
+              disabled
+              {...toDisabledRegister(register('address'))}
             />
           )}
-
           {hasZip && (
             <InputField
               label={t`ZIP`}
               placeholder={t`Insert ZIP`}
-              variant="outline"
-              isDisabled
-              {...register('zip')}
+              rightSlot={<CopyButton value={values.zip} />}
+              disabled
+              {...toDisabledRegister(register('zip'))}
             />
           )}
-
           {hasCity && (
             <InputField
               label={t`City`}
               placeholder={t`Insert city`}
-              variant="outline"
-              isDisabled
-              {...register('city')}
+              rightSlot={<CopyButton value={values.city} />}
+              disabled
+              {...toDisabledRegister(register('city'))}
             />
           )}
-
           {hasRegion && (
             <InputField
               label={t`Region`}
               placeholder={t`Insert region`}
-              variant="outline"
-              isDisabled
-              {...register('region')}
+              rightSlot={<CopyButton value={values.region} />}
+              disabled
+              {...toDisabledRegister(register('region'))}
             />
           )}
-
           {hasCountry && (
             <InputField
               label={t`Country`}
               placeholder={t`Insert country`}
-              variant="outline"
-              isDisabled
-              {...register('country')}
+              rightSlot={<CopyButton value={values.country} />}
+              disabled
+              {...toDisabledRegister(register('country'))}
             />
           )}
         </FormGroup>
@@ -290,80 +283,80 @@ export const IdentityRecordDetailsForm = ({
             <InputField
               label={t`Full name`}
               placeholder={t`John Smith`}
-              variant="outline"
-              icon={UserIcon}
-              isDisabled
-              {...register('passportFullName')}
+              leftSlot={<UserIcon />}
+              rightSlot={<CopyButton value={values.passportFullName} />}
+              disabled
+              {...toDisabledRegister(register('passportFullName'))}
             />
           )}
           {hasPassportNumber && (
             <InputField
               label={t`Passport number`}
               placeholder={t`Insert numbers`}
-              variant="outline"
-              icon={GroupIcon}
-              isDisabled
-              {...register('passportNumber')}
+              leftSlot={<GroupIcon />}
+              rightSlot={<CopyButton value={values.passportNumber} />}
+              disabled
+              {...toDisabledRegister(register('passportNumber'))}
             />
           )}
           {hasPassportIssuingCountry && (
             <InputField
               label={t`Issuing country`}
               placeholder={t`Insert country`}
-              variant="outline"
-              icon={NationalityIcon}
-              isDisabled
-              {...register('passportIssuingCountry')}
+              leftSlot={<NationalityIcon />}
+              rightSlot={<CopyButton value={values.passportIssuingCountry} />}
+              disabled
+              {...toDisabledRegister(register('passportIssuingCountry'))}
             />
           )}
           {hasPassportDateOfIssue && (
             <InputField
               label={t`Date of issue`}
               placeholder={DATE_FORMAT}
-              variant="outline"
-              icon={CalendarIcon}
-              isDisabled
-              {...register('passportDateOfIssue')}
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.passportDateOfIssue} />}
+              disabled
+              {...toDisabledRegister(register('passportDateOfIssue'))}
             />
           )}
           {hasPassportExpiryDate && (
             <InputField
               label={t`Expiry date`}
               placeholder={DATE_FORMAT}
-              variant="outline"
-              icon={CalendarIcon}
-              isDisabled
-              {...register('passportExpiryDate')}
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.passportExpiryDate} />}
+              disabled
+              {...toDisabledRegister(register('passportExpiryDate'))}
             />
           )}
           {hasPassportNationality && (
             <InputField
               label={t`Nationality`}
               placeholder={t`Insert your nationality`}
-              variant="outline"
-              icon={NationalityIcon}
-              isDisabled
-              {...register('passportNationality')}
+              leftSlot={<NationalityIcon />}
+              rightSlot={<CopyButton value={values.passportNationality} />}
+              disabled
+              {...toDisabledRegister(register('passportNationality'))}
             />
           )}
           {hasPassportDob && (
             <InputField
               label={t`Date of birth`}
               placeholder={DATE_FORMAT}
-              variant="outline"
-              icon={CalendarIcon}
-              isDisabled
-              {...register('passportDob')}
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.passportDob} />}
+              disabled
+              {...toDisabledRegister(register('passportDob'))}
             />
           )}
           {hasPassportGender && (
             <InputField
               label={t`Gender`}
               placeholder={t`M/F`}
-              variant="outline"
-              icon={GenderIcon}
-              isDisabled
-              {...register('passportGender')}
+              leftSlot={<GenderIcon />}
+              rightSlot={<CopyButton value={values.passportGender} />}
+              disabled
+              {...toDisabledRegister(register('passportGender'))}
             />
           )}
         </FormGroup>
@@ -387,40 +380,40 @@ export const IdentityRecordDetailsForm = ({
             <InputField
               label={t`ID number`}
               placeholder={'123456789'}
-              variant="outline"
-              icon={GroupIcon}
-              isDisabled
-              {...register('idCardNumber')}
+              leftSlot={<GroupIcon />}
+              rightSlot={<CopyButton value={values.idCardNumber} />}
+              disabled
+              {...toDisabledRegister(register('idCardNumber'))}
             />
           )}
           {hasIdCardDateOfIssue && (
             <InputField
               label={t`Creation date`}
               placeholder={DATE_FORMAT}
-              variant="outline"
-              icon={CalendarIcon}
-              isDisabled
-              {...register('idCardDateOfIssue')}
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.idCardDateOfIssue} />}
+              disabled
+              {...toDisabledRegister(register('idCardDateOfIssue'))}
             />
           )}
           {hasIdCardExpiryDate && (
             <InputField
               label={t`Expiry date`}
               placeholder={DATE_FORMAT}
-              variant="outline"
-              icon={CalendarIcon}
-              isDisabled
-              {...register('idCardExpiryDate')}
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.idCardExpiryDate} />}
+              disabled
+              {...toDisabledRegister(register('idCardExpiryDate'))}
             />
           )}
           {hasIdCardIssuingCountry && (
             <InputField
               label={t`Issuing country`}
               placeholder={t`Insert country`}
-              variant="outline"
-              icon={NationalityIcon}
-              isDisabled
-              {...register('idCardIssuingCountry')}
+              leftSlot={<NationalityIcon />}
+              rightSlot={<CopyButton value={values.idCardIssuingCountry} />}
+              disabled
+              {...toDisabledRegister(register('idCardIssuingCountry'))}
             />
           )}
         </FormGroup>
@@ -444,40 +437,40 @@ export const IdentityRecordDetailsForm = ({
             <InputField
               label={t`ID number`}
               placeholder={t`123456789`}
-              variant="outline"
-              icon={GroupIcon}
-              isDisabled
-              {...register('drivingLicenseNumber')}
+              leftSlot={<GroupIcon />}
+              rightSlot={<CopyButton value={values.drivingLicenseNumber} />}
+              disabled
+              {...toDisabledRegister(register('drivingLicenseNumber'))}
             />
           )}
           {hasDrivingLicenseDateOfIssue && (
             <InputField
               label={t`Creation date`}
               placeholder={DATE_FORMAT}
-              variant="outline"
-              icon={CalendarIcon}
-              isDisabled
-              {...register('drivingLicenseDateOfIssue')}
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.drivingLicenseDateOfIssue} />}
+              disabled
+              {...toDisabledRegister(register('drivingLicenseDateOfIssue'))}
             />
           )}
           {hasDrivingLicenseExpiryDate && (
             <InputField
               label={t`Expiry date`}
               placeholder={DATE_FORMAT}
-              variant="outline"
-              icon={CalendarIcon}
-              isDisabled
-              {...register('drivingLicenseExpiryDate')}
+              leftSlot={<CalendarIcon />}
+              rightSlot={<CopyButton value={values.drivingLicenseExpiryDate} />}
+              disabled
+              {...toDisabledRegister(register('drivingLicenseExpiryDate'))}
             />
           )}
           {hasDrivingLicenseIssuingCountry && (
             <InputField
               label={t`Issuing country`}
               placeholder={t`Insert country`}
-              variant="outline"
-              icon={NationalityIcon}
-              isDisabled
-              {...register('drivingLicenseIssuingCountry')}
+              leftSlot={<NationalityIcon />}
+              rightSlot={<CopyButton value={values.drivingLicenseIssuingCountry} />}
+              disabled
+              {...toDisabledRegister(register('drivingLicenseIssuingCountry'))}
             />
           )}
         </FormGroup>
@@ -492,7 +485,7 @@ export const IdentityRecordDetailsForm = ({
 
       {hasAttachments && (
         <FormGroup>
-          {values.attachments.map((attachment) => (
+          {(values.attachments as any[]).map((attachment) => (
             <AttachmentField
               key={attachment?.id || attachment.name}
               attachment={attachment}
@@ -503,16 +496,27 @@ export const IdentityRecordDetailsForm = ({
       )}
 
       {hasNote && (
-        <FormGroup>
-          <InputFieldNote isDisabled {...register('note')} />
-        </FormGroup>
+        <InputField
+          label={t`Comment`}
+          placeholder={t`Add comment`}
+          leftSlot={<CommonFileIcon />}
+          rightSlot={<CopyButton value={values.note} />}
+          disabled
+          {...toDisabledRegister(register('note'))}
+        />
       )}
 
       {hasCustomFields && (
-        <CustomFields
-          areInputsDisabled
-          customFields={list}
-          register={registerItem}
+        <MultiSlotInput
+          label={t`Custom fields`}
+          placeholder={t`Add comment`}
+          values={(list as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+          onAdd={() => {}}
+          onChangeItem={() => {}}
+          onRemove={() => {}}
+          testID="custom-fields-multi-slot-input"
+          disabled
+          rightSlot={(index) => <CopyButton value={(list as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
         />
       )}
     </>

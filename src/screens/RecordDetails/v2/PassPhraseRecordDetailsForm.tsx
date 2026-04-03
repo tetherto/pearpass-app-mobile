@@ -1,38 +1,35 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
+import { useLingui } from '@lingui/react/macro'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { CommonFileIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
+import { CopyButton } from '../../../libComponents/CopyButton'
 
-import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
 import { PassPhrase } from '../../../containers/PassPhrase'
 
-/**
- * @param {{
- *   initialRecord?: {
- *     data: {
- *       title: string,
- *       passPhrase: string,
- *       note?: string,
- *       customFields?: Array<{note: string}>
- *     },
- *     folder?: string
- *   },
- *   selectedFolder?: string
- * }} props
- * @returns {JSX.Element}
- */
+interface PassPhraseRecordDetailsFormProps {
+  initialRecord?: any
+  selectedFolder?: any
+}
 
-export const PassPhraseRecordDetailsForm = ({
-  initialRecord,
-  selectedFolder
-}) => {
+const toDisabledRegister = (registerResult: {
+  name: string; value: string; error?: string; onChange: (e: any) => void
+}) => ({
+  name: registerResult.name,
+  value: registerResult.value,
+})
+
+export const PassPhraseRecordDetailsForm = ({ initialRecord, selectedFolder }: PassPhraseRecordDetailsFormProps) => {
+  const { t } = useLingui()
+
   const initialValues = useMemo(
     () => ({
       title: initialRecord?.data?.title ?? '',
       passPhrase: initialRecord?.data?.passPhrase ?? '',
       note: initialRecord?.data?.note ?? '',
-      customFields: initialRecord?.data.customFields ?? [],
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder
     }),
     [initialRecord, selectedFolder]
@@ -42,16 +39,13 @@ export const PassPhraseRecordDetailsForm = ({
     initialValues: initialValues
   })
 
-  const { value: customFieldsList, registerItem: registerCustomFieldItem } =
-    registerArray('customFields')
-
   useEffect(() => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
   const hasPassPhrase = !!values?.passPhrase?.length
   const hasNote = !!values?.note?.length
-  const hasCustomFields = !!customFieldsList?.length
+  const hasCustomFields = !!(values?.customFields as any[])?.length
 
   return (
     <>
@@ -62,16 +56,27 @@ export const PassPhraseRecordDetailsForm = ({
       )}
 
       {hasNote && (
-        <FormGroup>
-          <InputFieldNote isDisabled {...register('note')} />
-        </FormGroup>
+        <InputField
+          label={t`Comment`}
+          placeholder={t`Add comment`}
+          leftSlot={<CommonFileIcon />}
+          rightSlot={<CopyButton value={values.note} />}
+          disabled
+          {...toDisabledRegister(register('note'))}
+        />
       )}
 
       {hasCustomFields && (
-        <CustomFields
-          areInputsDisabled
-          customFields={customFieldsList}
-          register={registerCustomFieldItem}
+        <MultiSlotInput
+          label={t`Custom fields`}
+          placeholder={t`Add comment`}
+          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+          onAdd={() => {}}
+          onChangeItem={() => {}}
+          onRemove={() => {}}
+          testID="custom-fields-multi-slot-input"
+          disabled
+          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
         />
       )}
     </>

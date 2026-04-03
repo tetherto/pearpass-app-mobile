@@ -2,7 +2,7 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { PasswordIcon, WifiIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { PasswordIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { RECORD_TYPES, useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
 import { InputField, MultiSlotInput, PasswordField } from '@tetherto/pearpass-lib-ui-kit'
 
@@ -25,7 +25,8 @@ type WifiRecord = {
   data?: {
     title?: string
     password?: string
-    customFields?: unknown[]
+    note?: string
+    customFields?: Array<{ type: string; note: string }>
   }
   folder?: string
   isFavorite?: boolean
@@ -53,17 +54,21 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
   const schema = Validator.object({
     title: Validator.string().required(t`Name is required`),
     password: Validator.string().required(t`Password is required`),
-    notes: Validator.array().items(Validator.string()),
+    note: Validator.string(),
+    customFields: Validator.array().items(
+      Validator.object({
+        note: Validator.string().required(t`Comment is required`)
+      })
+    ),
     folder: Validator.string()
   })
 
-  const { register, handleSubmit, values, setValue } = useForm({
+  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       password: initialRecord?.data?.password ?? '',
-      notes: initialRecord?.data?.customFields
-        ?.filter((f: any) => f.type === 'note')
-        ?.map((f: any) => f.note ?? '') ?? [''],
+      note: initialRecord?.data?.note ?? '',
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder
     },
     validate: (values) => schema.validate(values)
@@ -79,9 +84,8 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
       data: {
         title: values.title,
         password: values.password,
-        customFields: (values.notes as string[])
-          .filter((n: string) => !!n?.trim().length)
-          .map((n: string) => ({ type: 'note', note: n }))
+        note: values.note,
+        customFields: values.customFields
       }
     }
 
@@ -101,6 +105,13 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
     }
   }
 
+  const {
+    value: customFieldsList,
+    addItem: addCustomField,
+    registerItem: registerCustomFieldItem,
+    removeItem: removeCustomField
+  } = registerArray('customFields')
+
   return (
     <Wrapper>
       <Header>
@@ -119,46 +130,58 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
           <FormWrapper>
             <InputField
               label={t`Wi-Fi Name`}
-              placeholderText={t`Insert Wi-Fi Name`}
+              placeholder={t`Insert Wi-Fi Name`}
               testID="wifi-name-input-field"
               {...adaptRegister(register('title'))}
             />
 
             <PasswordField
               label={t`Wi-Fi Password`}
-              placeholderText={t`Insert Wi-Fi Password`}
+              placeholder={t`Insert Wi-Fi Password`}
               testID="wifi-password-input-field"
-              // rightSlot={
-              //   <ButtonLittle
-              //     startIcon={PasswordIcon}
-              //     variant="secondary"
-              //     borderRadius="md"
-              //     testID="password-generator-button"
-              //     accessibilityLabel={t`Password generator button`}
-              //     onPress={() =>
-              //       expand({
-              //         children: (
-              //           <BottomSheetPassGeneratorContent
-              //             onPasswordInsert={(value: string) =>
-              //               setValue('password', value)
-              //             }
-              //           />
-              //         ),
-              //         snapPoints: ['10%', '75%', '75%']
-              //       })
-              //     }
-              //   />
-              // }
+              rightSlot={
+                <ButtonLittle
+                  startIcon={PasswordIcon}
+                  variant="secondary"
+                  borderRadius="md"
+                  testID="password-generator-button"
+                  accessibilityLabel={t`Password generator button`}
+                  onPress={() =>
+                    expand({
+                      children: (
+                        <BottomSheetPassGeneratorContent
+                          onPasswordInsert={(value: string) =>
+                            setValue('password', value)
+                          }
+                        />
+                      ),
+                      snapPoints: ['10%', '75%', '75%']
+                    })
+                  }
+                />
+              }
               {...adaptRegister(register('password'))}
             />
 
+            <InputField
+              label={t`Comment`}
+              placeholder={t`Add comment`}
+              testID="add-note-field"
+              {...adaptRegister(register('note'))}
+            />
+
             <MultiSlotInput
-              label={t`Notes`}
-              placeholderText={t`Add note`}
-              addButtonLabel={t`Add another note`}
-              values={values.notes as string[]}
-              onChange={(updated: string[]) => setValue('notes', updated)}
-              testID="notes-multi-slot-input"
+              label={t`Custom fields`}
+              placeholder={t`Add comment`}
+              addButtonLabel={t`Add another comment`}
+              values={(customFieldsList as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+              onAdd={() => addCustomField({ type: 'note', note: '' })}
+              onChangeItem={(index: number, val: string) => {
+                setValue(`customFields[${index}].note`, val)
+              }}
+              onRemove={(index: number) => removeCustomField(index)}
+              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              testID="custom-fields-multi-slot-input"
             />
           </FormWrapper>
         </ScrollView>

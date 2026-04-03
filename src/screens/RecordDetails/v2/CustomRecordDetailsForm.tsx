@@ -1,10 +1,11 @@
 import { useEffect, useMemo } from 'react'
 
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
 
-import { CustomFields } from '../../../components/CustomFields'
 import { FormGroup } from '../../../components/FormGroup'
 import { AttachmentField } from '../../../containers/AttachmentField'
+import { CopyButton } from '../../../libComponents/CopyButton'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 
 export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
@@ -17,11 +18,9 @@ export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     [initialRecord, selectedFolder]
   )
 
-  const { registerArray, setValues, values, setValue } = useForm({
+  const { setValues, values, setValue } = useForm({
     initialValues: initialValues
   })
-
-  const { value: list, registerItem } = registerArray('customFields')
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -33,19 +32,27 @@ export const CustomRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
+  const hasCustomFields = !!(values?.customFields as any[])?.length
+  const hasAttachments = !!values?.attachments?.length
+
   return (
     <>
-      {!!list?.length && (
-        <CustomFields
-          areInputsDisabled
-          customFields={list}
-          register={registerItem}
+      {hasCustomFields && (
+        <MultiSlotInput
+          label="Custom fields"
+          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+          onAdd={() => {}}
+          onChangeItem={() => {}}
+          onRemove={() => {}}
+          testID="custom-fields-multi-slot-input"
+          disabled
+          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
         />
       )}
 
-      {!!values?.attachments?.length && (
+      {hasAttachments && (
         <FormGroup>
-          {values.attachments.map((attachment) => (
+          {(values.attachments as any[]).map((attachment) => (
             <AttachmentField
               key={attachment?.id || attachment.name}
               attachment={attachment}

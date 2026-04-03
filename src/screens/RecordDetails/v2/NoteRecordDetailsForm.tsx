@@ -3,7 +3,8 @@ import { useEffect, useMemo } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 
-import { CustomFields } from '../../../components/CustomFields'
+import { MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
+import { CopyButton } from '../../../libComponents/CopyButton'
 import { FormGroup } from '../../../components/FormGroup'
 import { PressableNote } from '../../../components/PressableNote'
 import { AttachmentField } from '../../../containers/AttachmentField'
@@ -22,11 +23,9 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
     [initialRecord, selectedFolder]
   )
 
-  const { registerArray, setValues, values, setValue } = useForm({
+  const { setValues, values, setValue } = useForm({
     initialValues: initialValues
   })
-
-  const { value: list, registerItem } = registerArray('customFields')
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -39,11 +38,12 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
   }, [initialValues, setValues])
 
   const hasAttachments = !!values?.attachments?.length
+  const hasCustomFields = !!(values?.customFields as any[])?.length
 
   return (
     <>
       {!!values?.note.length && (
-        <PressableNote label={t`Comment`} text={values.note} />
+        <PressableNote label={t`Comment`} text={values.note} onPress={() => "todo: what should this component do?"} />
       )}
 
       {hasAttachments && (
@@ -58,11 +58,16 @@ export const NoteRecordDetailsForm = ({ initialRecord, selectedFolder }) => {
         </FormGroup>
       )}
 
-      {!!list?.length && (
-        <CustomFields
-          areInputsDisabled
-          customFields={list}
-          register={registerItem}
+      {hasCustomFields && (
+        <MultiSlotInput
+          label={t`Custom fields`}
+          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+          onAdd={() => { }}
+          onChangeItem={() => { }}
+          onRemove={() => { }}
+          testID="custom-fields-multi-slot-input"
+          disabled
+          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
         />
       )}
     </>

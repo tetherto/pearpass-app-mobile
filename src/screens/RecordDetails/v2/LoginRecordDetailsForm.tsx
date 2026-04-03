@@ -5,19 +5,22 @@ import { useFocusEffect } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { isBefore, subtractDateUnits } from '@tetherto/pear-apps-utils-date'
 import {
+  CommonFileIcon,
   KeyIcon,
   UserIcon,
   WebsiteIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { 
-  InputField, 
-  PasswordField, 
-  MultiSlotInput, 
-  UploadField } from '@tetherto/pearpass-lib-ui-kit'
+import { CopyButton } from '../../../libComponents/CopyButton'
+import {
+  InputField,
+  PasswordField,
+  MultiSlotInput,
+  UploadField
+} from '@tetherto/pearpass-lib-ui-kit'
+import { AttachmentField } from '../../../containers/AttachmentField'
 
 import { AppWarning } from '../../../components/AppWarning'
 import { FormGroup } from '../../../components/FormGroup'
-import { InputFieldNote } from '../../../components/InputFieldNote'
 import { OtpCodeField } from '../../../components/OtpCodeField'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
@@ -29,7 +32,8 @@ interface LoginRecordDetailsFormProps {
 }
 
 const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: any) => void }) => ({
+  name: string; value: string; error?: string; onChange: (e: any) => void
+}) => ({
   name: registerResult.name,
   value: registerResult.value,
 })
@@ -58,8 +62,6 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }: LoginR
   const { register, registerArray, setValues, values, setValue } = useForm({
     initialValues: initialValues
   })
-
-
 
   const { refetch } = useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -109,6 +111,7 @@ Consider changing it to keep your account secure.`}
               testID="username-field"
               disabled
               leftSlot={<UserIcon />}
+              rightSlot={<CopyButton value={values.username} />}
               label={t`Email or username`}
               placeholder={t`Email or username`}
               {...toDisabledRegister(register('username'))}
@@ -118,6 +121,7 @@ Consider changing it to keep your account secure.`}
           {hasPassword && (
             <PasswordField
               leftSlot={<KeyIcon />}
+              rightSlot={<CopyButton value={values.password} />}
               label={t`Password`}
               placeholder={t`Insert password`}
               disabled
@@ -139,7 +143,7 @@ Consider changing it to keep your account secure.`}
         </FormGroup>
       )}
 
-      {/* TODO: implement: under the hood it is using OLD inputfield */}
+      {/* TODO: implement. seperate task*/}
       {!!initialRecord?.otpPublic && (
         <FormGroup>
           <OtpCodeField
@@ -151,43 +155,55 @@ Consider changing it to keep your account secure.`}
       )}
 
       {hasWebsites && (
-          <MultiSlotInput
-            label={t`Website`}
-            values={values.websites as string[]}
-            onChange={() => {}}
-            testID="website-multi-slot-input"
-            disabled
-            leftSlot={<WebsiteIcon />}
-          />
+        <MultiSlotInput
+          label={t`Website`}
+          values={values.websites as string[]}
+          onAdd={() => {}}
+          onChangeItem={() => {}}
+          onRemove={() => {}}
+          testID="website-multi-slot-input"
+          disabled
+          leftSlot={<WebsiteIcon />}
+          rightSlot={(index) => <CopyButton value={(values.websites as string[])[index]} />}
+        />
       )}
 
-      {/* TODO implement */}
-
-      {/* {hasAttachments && (
-        <UploadField
-          files={values.attachments}
-          onFilesChange={() => {}}
-          maxFiles={values.attachments.length}
-
-        />
-      )} */}
-
-      {/* TODO: implement */}
-
-      {/* {hasNote && (
+      {hasAttachments && (
         <FormGroup>
-          <InputFieldNote disabled {...toDisabledRegister(register('note'))} />
+          {(values.attachments as any[]).map((attachment) => (
+            <AttachmentField
+              key={attachment?.id || attachment.name}
+              attachment={attachment}
+              label={'File'}
+            />
+          ))}
         </FormGroup>
       )}
 
+      {hasNote && (
+        <InputField
+          label={t`Comment`}
+          placeholder={t`Add comment`}
+          leftSlot={<CommonFileIcon />}
+          rightSlot={<CopyButton value={values.note} />}
+          disabled
+          {...toDisabledRegister(register('note'))}
+        />
+      )}
+
       {hasCustomFields && (
-          <MultiSlotInput
-            label={t`Custom fields`}
-            values={values.customFields as any[]}
-            onChange={() => {}}
-            testID="custom-fields-multi-slot-input"
-          />
-      )} */}
+        <MultiSlotInput
+          label={t`Custom fields`}
+          placeholder={t`Add comment`}
+          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+          onAdd={() => {}}
+          onChangeItem={() => {}}
+          onRemove={() => {}}
+          testID="custom-fields-multi-slot-input"
+          disabled
+          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
+        />
+      )}
     </>
   )
 }

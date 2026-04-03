@@ -6,22 +6,32 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { DATE_FORMAT } from '@tetherto/pearpass-lib-constants'
 import {
+  CalendarIcon,
+  DeleteIcon,
+  EmailIcon,
+  GenderIcon,
+  GroupIcon,
+  NationalityIcon,
+  PhoneIcon,
+  UserIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
-import { InputField, MultiSlotInput, UploadField } from '@tetherto/pearpass-lib-ui-kit'
+import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
 
 import { FormGroup } from '../../../components/FormGroup'
 import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
+import { AttachmentField } from '../../../containers/AttachmentField'
 import { ImagesField } from '../../../containers/ImagesField'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
+import { ButtonLittle } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
-import { handleChooseFile } from '../../../utils/handleChooseFile'
 import { logger } from '../../../utils/logger'
-import type { UploadedFile } from '@tetherto/pearpass-lib-ui-kit'
 import { adaptRegister } from './CreateOrEditLoginContent'
 import {
   FormWrapper,
@@ -80,33 +90,23 @@ export const CreateOrEditIdentityContent = ({
 }: Props) => {
   const hasPassportFullName = !!initialRecord?.data?.passportFullName?.length
   const hasPassportNumber = !!initialRecord?.data?.passportNumber?.length
-  const hasPassportIssuingCountry =
-    !!initialRecord?.data?.passportIssuingCountry?.length
-  const hasPassportDateOfIssue =
-    !!initialRecord?.data?.passportDateOfIssue?.length
-  const hasPassportExpiryDate =
-    !!initialRecord?.data?.passportExpiryDate?.length
-  const hasPassportNationality =
-    !!initialRecord?.data?.passportNationality?.length
+  const hasPassportIssuingCountry = !!initialRecord?.data?.passportIssuingCountry?.length
+  const hasPassportDateOfIssue = !!initialRecord?.data?.passportDateOfIssue?.length
+  const hasPassportExpiryDate = !!initialRecord?.data?.passportExpiryDate?.length
+  const hasPassportNationality = !!initialRecord?.data?.passportNationality?.length
   const hasPassportDob = !!initialRecord?.data?.passportDob?.length
   const hasPassportGender = !!initialRecord?.data?.passportGender?.length
-  const hasPassportPicture = !!initialRecord?.data.passportPicture?.length
+  const hasPassportPicture = !!initialRecord?.data?.passportPicture?.length
   const hasIdCardNumber = !!initialRecord?.data?.idCardNumber?.length
   const hasIdCardDateOfIssue = !!initialRecord?.data?.idCardDateOfIssue?.length
   const hasIdCardExpiryDate = !!initialRecord?.data?.idCardExpiryDate?.length
-  const hasIdCardIssuingCountry =
-    !!initialRecord?.data?.idCardIssuingCountry?.length
-  const hasIdCardPicture = !!initialRecord?.data.idCardPicture?.length
-  const hasDrivingLicenseNumber =
-    !!initialRecord?.data?.drivingLicenseNumber?.length
-  const hasDrivingLicenseDateOfIssue =
-    !!initialRecord?.data?.drivingLicenseDateOfIssue?.length
-  const hasDrivingLicenseExpiryDate =
-    !!initialRecord?.data?.drivingLicenseExpiryDate?.length
-  const hasDrivingLicenseIssuingCountry =
-    !!initialRecord?.data?.drivingLicenseIssuingCountry?.length
-  const hasDrivingLicensePicture =
-    !!initialRecord?.data.drivingLicensePicture?.length
+  const hasIdCardIssuingCountry = !!initialRecord?.data?.idCardIssuingCountry?.length
+  const hasIdCardPicture = !!initialRecord?.data?.idCardPicture?.length
+  const hasDrivingLicenseNumber = !!initialRecord?.data?.drivingLicenseNumber?.length
+  const hasDrivingLicenseDateOfIssue = !!initialRecord?.data?.drivingLicenseDateOfIssue?.length
+  const hasDrivingLicenseExpiryDate = !!initialRecord?.data?.drivingLicenseExpiryDate?.length
+  const hasDrivingLicenseIssuingCountry = !!initialRecord?.data?.drivingLicenseIssuingCountry?.length
+  const hasDrivingLicensePicture = !!initialRecord?.data?.drivingLicensePicture?.length
 
   const hasPassport =
     hasPassportFullName ||
@@ -135,24 +135,18 @@ export const CreateOrEditIdentityContent = ({
 
   const [isPassportOpen, setIsPassportOpen] = useState(hasPassport)
   const [isIdCardOpen, setIsIdCardOpen] = useState(hasIdCard)
-  const [isDrivingLicenseOpen, setIsDrivingLicenseOpen] =
-    useState(hasDrivingLicense)
+  const [isDrivingLicenseOpen, setIsDrivingLicenseOpen] = useState(hasDrivingLicense)
 
   const { t } = useLingui()
   const navigation = useNavigation()
-
   const { setIsLoading, isLoading } = useLoadingContext()
 
   const { createRecord } = useCreateRecord({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
   const { updateRecords } = useRecords({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
   const schema = Validator.object({
@@ -181,40 +175,28 @@ export const CreateOrEditIdentityContent = ({
     passportDob: Validator.string(),
     passportGender: Validator.string(),
     passportPicture: Validator.array().items(
-      Validator.object({
-        id: Validator.string(),
-        name: Validator.string().required()
-      })
+      Validator.object({ id: Validator.string(), name: Validator.string().required() })
     ),
     idCardNumber: Validator.string(),
     idCardDateOfIssue: Validator.string(),
     idCardExpiryDate: Validator.string(),
     idCardIssuingCountry: Validator.string(),
     idCardPicture: Validator.array().items(
-      Validator.object({
-        id: Validator.string(),
-        name: Validator.string().required()
-      })
+      Validator.object({ id: Validator.string(), name: Validator.string().required() })
     ),
     drivingLicenseNumber: Validator.string(),
     drivingLicenseDateOfIssue: Validator.string(),
     drivingLicenseExpiryDate: Validator.string(),
     drivingLicenseIssuingCountry: Validator.string(),
     drivingLicensePicture: Validator.array().items(
-      Validator.object({
-        id: Validator.string(),
-        name: Validator.string().required()
-      })
+      Validator.object({ id: Validator.string(), name: Validator.string().required() })
     ),
     attachments: Validator.array().items(
-      Validator.object({
-        id: Validator.string(),
-        name: Validator.string().required()
-      })
+      Validator.object({ id: Validator.string(), name: Validator.string().required() })
     )
   })
 
-  const { register, handleSubmit, registerArray, values, setValue } = useForm({
+  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       fullName: initialRecord?.data?.fullName ?? '',
@@ -227,7 +209,6 @@ export const CreateOrEditIdentityContent = ({
       country: initialRecord?.data?.country ?? '',
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields || [],
-      comments: [],
       folder: selectedFolder ?? initialRecord?.folder,
       passportFullName: initialRecord?.data?.passportFullName ?? '',
       passportNumber: initialRecord?.data?.passportNumber ?? '',
@@ -244,34 +225,27 @@ export const CreateOrEditIdentityContent = ({
       idCardIssuingCountry: initialRecord?.data?.idCardIssuingCountry ?? '',
       idCardPicture: initialRecord?.data?.idCardPicture || [],
       drivingLicenseNumber: initialRecord?.data?.drivingLicenseNumber ?? '',
-      drivingLicenseDateOfIssue:
-        initialRecord?.data?.drivingLicenseDateOfIssue ?? '',
-      drivingLicenseExpiryDate:
-        initialRecord?.data?.drivingLicenseExpiryDate ?? '',
-      drivingLicenseIssuingCountry:
-        initialRecord?.data?.drivingLicenseIssuingCountry ?? '',
+      drivingLicenseDateOfIssue: initialRecord?.data?.drivingLicenseDateOfIssue ?? '',
+      drivingLicenseExpiryDate: initialRecord?.data?.drivingLicenseExpiryDate ?? '',
+      drivingLicenseIssuingCountry: initialRecord?.data?.drivingLicenseIssuingCountry ?? '',
       drivingLicensePicture: initialRecord?.data?.drivingLicensePicture || [],
       attachments: initialRecord?.attachments ?? []
     },
     validate: (values) => schema.validate(values)
   })
+
   useGetMultipleFiles({
-    fieldNames: [
-      'attachments',
-      'passportPicture',
-      'idCardPicture',
-      'drivingLicensePicture'
-    ],
+    fieldNames: ['attachments', 'passportPicture', 'idCardPicture', 'drivingLicensePicture'],
     updateValues: setValue,
     initialRecord,
     currentValues: values
   })
 
   const {
-    value: list,
-    addItem,
-    registerItem,
-    removeItem
+    value: customFieldsList,
+    addItem: addCustomField,
+    registerItem: registerCustomFieldItem,
+    removeItem: removeCustomField
   } = registerArray('customFields')
 
   const onError = (error) => {
@@ -282,10 +256,9 @@ export const CreateOrEditIdentityContent = ({
       bottomOffset: 100
     })
   }
+
   const onSubmit = async (values) => {
-    if (isLoading) {
-      return
-    }
+    if (isLoading) return
 
     const data = {
       type: RECORD_TYPES.IDENTITY,
@@ -321,9 +294,7 @@ export const CreateOrEditIdentityContent = ({
         drivingLicenseDateOfIssue: values.drivingLicenseDateOfIssue,
         drivingLicenseExpiryDate: values.drivingLicenseExpiryDate,
         drivingLicenseIssuingCountry: values.drivingLicenseIssuingCountry,
-        drivingLicensePicture: convertBase64FilesToUint8(
-          values.drivingLicensePicture
-        ),
+        drivingLicensePicture: convertBase64FilesToUint8(values.drivingLicensePicture),
         attachments: convertBase64FilesToUint8(values.attachments)
       }
     }
@@ -332,15 +303,7 @@ export const CreateOrEditIdentityContent = ({
       setIsLoading(true)
 
       if (initialRecord) {
-        await updateRecords(
-          [
-            {
-              ...initialRecord,
-              ...data
-            }
-          ],
-          onError
-        )
+        await updateRecords([{ ...initialRecord, ...data }], onError)
       } else {
         await createRecord(data, onError)
       }
@@ -348,57 +311,17 @@ export const CreateOrEditIdentityContent = ({
       setIsLoading(false)
     } catch (error) {
       logger.error('Error creating or updating identity record:', error)
-
       setIsLoading(false)
     }
   }
 
-  const MAX_ATTACHMENTS = 5
-
-  const handleUploadPress = () => {
-    const currentFiles = values.attachments as UploadedFile[]
-    if (currentFiles.length >= MAX_ATTACHMENTS) return
-
-    handleChooseFile(
-      ({ base64, name }: { base64: string; name: string }) => {
-        const newFile: UploadedFile = {
-          file: null as unknown as File,
-          name,
-          size: Math.round((base64.length * 3) / 4),
-          type: 'application/octet-stream',
-          // @ts-ignore — base64 is a native-only extension of UploadedFile used by convertBase64FilesToUint8
-          base64
-        }
-        setValue('attachments', [...currentFiles, newFile])
-      },
-      () => {
-        Toast.show({
-          type: 'baseToast',
-          text1: t`File is too large`,
-          position: 'bottom',
-          bottomOffset: 100
-        })
-      }
-    )
-  }
-
-  const handleFilesChange = (files: UploadedFile[], fieldName: string) => {
-    setValue(fieldName, files)
-  }
-
   const handleFileUpload = (file, fieldName) => {
-    if (!file) {
-      return
-    }
-
+    if (!file) return
     setValue(fieldName, [...values[fieldName], file])
   }
 
   const handleAttachmentDelete = (index, fieldName) => {
-    const updatedAttachments = values[fieldName].filter(
-      (_, idx) => idx !== index
-    )
-    setValue(fieldName, updatedAttachments)
+    setValue(fieldName, values[fieldName].filter((_, idx) => idx !== index))
   }
 
   return (
@@ -419,61 +342,65 @@ export const CreateOrEditIdentityContent = ({
             <FormGroup>
               <InputField
                 label={t`Title`}
-                placeholderText={t`No title`}
+                placeholder={t`No title`}
                 testID="title-input-field"
                 {...adaptRegister(register('title'))}
               />
             </FormGroup>
+
             <FormGroup title={t`Personal information`} isCollapse>
               <InputField
                 label={t`Full name`}
-                placeholderText={t`John Smith`}
+                placeholder={t`John Smith`}
+                leftSlot={<UserIcon />}
                 testID="full-name-input-field"
                 {...adaptRegister(register('fullName'))}
               />
               <InputField
                 label={t`Email`}
-                placeholderText={t`Insert email`}
+                placeholder={t`Insert email`}
+                leftSlot={<EmailIcon />}
                 testID="email-input-field"
                 {...adaptRegister(register('email'))}
               />
               <InputField
                 label={t`Phone number`}
-                placeholderText={t`Insert phone number`}
+                placeholder={t`Insert phone number`}
+                leftSlot={<PhoneIcon />}
                 testID="phone-number-input-field"
                 {...adaptRegister(register('phoneNumber'))}
               />
             </FormGroup>
+
             <FormGroup title={t`Detail of address`} isCollapse>
               <InputField
-                testID="address-input-field"
                 label={t`Address`}
-                placeholderText={t`Insert address`}
+                placeholder={t`Insert address`}
+                testID="address-input-field"
                 {...adaptRegister(register('address'))}
               />
               <InputField
-                testID="zip-input-field"
                 label={t`ZIP`}
-                placeholderText={t`Insert ZIP`}
+                placeholder={t`Insert ZIP`}
+                testID="zip-input-field"
                 {...adaptRegister(register('zip'))}
               />
-
               <InputField
-                testID="city-input-field"
                 label={t`City`}
-                placeholderText={t`Insert city`}
+                placeholder={t`Insert city`}
+                testID="city-input-field"
                 {...adaptRegister(register('city'))}
               />
               <InputField
-                testID="region-input-field"
                 label={t`Region`}
-                placeholderText={t`Insert region`}
+                placeholder={t`Insert region`}
+                testID="region-input-field"
                 {...adaptRegister(register('region'))}
               />
               <InputField
-                testID="country-input-field"
                 label={t`Country`}
-                placeholderText={t`Insert country`}
+                placeholder={t`Insert country`}
+                testID="country-input-field"
                 {...adaptRegister(register('country'))}
               />
             </FormGroup>
@@ -485,51 +412,59 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isPassportOpen}
             >
               <InputField
-                testID="passport-full-name-input-field"
                 label={t`Full name`}
-                placeholderText={t`John Smith`}
+                placeholder={t`John Smith`}
+                leftSlot={<UserIcon />}
+                testID="passport-full-name-input-field"
                 {...adaptRegister(register('passportFullName'))}
               />
               <InputField
-                testID="passport-number-input-field"
                 label={t`Passport number`}
-                placeholderText={t`Insert numbers`}
+                placeholder={t`Insert numbers`}
+                leftSlot={<GroupIcon />}
+                testID="passport-number-input-field"
                 {...adaptRegister(register('passportNumber'))}
               />
               <InputField
-                testID="passport-issuing-country-input-field"
                 label={t`Issuing country`}
-                placeholderText={t`Insert country`}
+                placeholder={t`Insert country`}
+                leftSlot={<NationalityIcon />}
+                testID="passport-issuing-country-input-field"
                 {...adaptRegister(register('passportIssuingCountry'))}
               />
               <InputField
-                testID="passport-date-of-issue-input-field"
                 label={t`Date of issue`}
-                placeholderText={DATE_FORMAT}
+                placeholder={DATE_FORMAT}
+                leftSlot={<CalendarIcon />}
+                testID="passport-date-of-issue-input-field"
                 {...adaptRegister(register('passportDateOfIssue'))}
               />
               <InputField
-                testID="passport-expiry-date-input-field"
                 label={t`Expiry date`}
-                placeholderText={DATE_FORMAT}
+                placeholder={DATE_FORMAT}
+                leftSlot={<CalendarIcon />}
+                testID="passport-expiry-date-input-field"
                 {...adaptRegister(register('passportExpiryDate'))}
               />
               <InputField
-                testID="passport-nationality-input-field"
                 label={t`Nationality`}
-                placeholderText={t`Insert your nationality`}
+                placeholder={t`Insert your nationality`}
+                leftSlot={<NationalityIcon />}
+                testID="passport-nationality-input-field"
                 {...adaptRegister(register('passportNationality'))}
               />
               <InputField
-                testID="passport-date-of-birth-input-field"
                 label={t`Date of birth`}
-                placeholderText={DATE_FORMAT}
+                placeholder={DATE_FORMAT}
+                leftSlot={<CalendarIcon />}
+                testID="passport-date-of-birth-input-field"
                 {...adaptRegister(register('passportDob'))}
               />
               <InputField
-                testID="passport-gender-input-field"
                 label={t`Gender`}
-                placeholderText={t`M/F`}
+                placeholder={t`M/F`}
+                leftSlot={<GenderIcon />}
+                testID="passport-gender-input-field"
                 {...adaptRegister(register('passportGender'))}
               />
             </FormGroup>
@@ -537,9 +472,7 @@ export const CreateOrEditIdentityContent = ({
             {isPassportOpen && (
               <ImagesField
                 onAdd={(file) => handleFileUpload(file, 'passportPicture')}
-                onRemove={(index) =>
-                  handleAttachmentDelete(index, 'passportPicture')
-                }
+                onRemove={(index) => handleAttachmentDelete(index, 'passportPicture')}
                 title={t`Passport picture`}
                 pictures={values.passportPicture}
               />
@@ -552,36 +485,39 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isIdCardOpen}
             >
               <InputField
-                testID="id-number-input-field"
                 label={t`ID number`}
-                placeholderText="123456789"
+                placeholder="123456789"
+                leftSlot={<GroupIcon />}
+                testID="id-number-input-field"
                 {...adaptRegister(register('idCardNumber'))}
               />
               <InputField
-                testID="identity-card-creation-date-input-field"
                 label={t`Creation date`}
-                placeholderText={DATE_FORMAT}
+                placeholder={DATE_FORMAT}
+                leftSlot={<CalendarIcon />}
+                testID="identity-card-creation-date-input-field"
                 {...adaptRegister(register('idCardDateOfIssue'))}
               />
               <InputField
-                testID="identity-card-expiry-date-input-field"
                 label={t`Expiry date`}
-                placeholderText={DATE_FORMAT}
+                placeholder={DATE_FORMAT}
+                leftSlot={<CalendarIcon />}
+                testID="identity-card-expiry-date-input-field"
                 {...adaptRegister(register('idCardExpiryDate'))}
               />
               <InputField
-                testID="identity-card-issuing-country-input-field"
                 label={t`Issuing country`}
-                placeholderText={t`Insert country`}
+                placeholder={t`Insert country`}
+                leftSlot={<NationalityIcon />}
+                testID="identity-card-issuing-country-input-field"
                 {...adaptRegister(register('idCardIssuingCountry'))}
               />
             </FormGroup>
+
             {isIdCardOpen && (
               <ImagesField
                 onAdd={(file) => handleFileUpload(file, 'idCardPicture')}
-                onRemove={(index) =>
-                  handleAttachmentDelete(index, 'idCardPicture')
-                }
+                onRemove={(index) => handleAttachmentDelete(index, 'idCardPicture')}
                 title={t`ID card picture`}
                 pictures={values.idCardPicture}
               />
@@ -594,66 +530,90 @@ export const CreateOrEditIdentityContent = ({
               isOpened={isDrivingLicenseOpen}
             >
               <InputField
-                testID="driving-license-id-number-input-field"
                 label={t`ID number`}
-                placeholderText={t`123456789`}
+                placeholder={t`123456789`}
+                leftSlot={<GroupIcon />}
+                testID="driving-license-id-number-input-field"
                 {...adaptRegister(register('drivingLicenseNumber'))}
               />
               <InputField
-                testID="driving-license-creation-date-input-field"
                 label={t`Creation date`}
-                placeholderText={DATE_FORMAT}
+                placeholder={DATE_FORMAT}
+                leftSlot={<CalendarIcon />}
+                testID="driving-license-creation-date-input-field"
                 {...adaptRegister(register('drivingLicenseDateOfIssue'))}
               />
               <InputField
-                testID="driving-license-expiry-date-input-field"
                 label={t`Expiry date`}
-                placeholderText={DATE_FORMAT}
+                placeholder={DATE_FORMAT}
+                leftSlot={<CalendarIcon />}
+                testID="driving-license-expiry-date-input-field"
                 {...adaptRegister(register('drivingLicenseExpiryDate'))}
               />
               <InputField
-                testID="driving-license-issuing-country-input-field"
                 label={t`Issuing country`}
-                placeholderText={t`Insert country`}
+                placeholder={t`Insert country`}
+                leftSlot={<NationalityIcon />}
+                testID="driving-license-issuing-country-input-field"
                 {...adaptRegister(register('drivingLicenseIssuingCountry'))}
               />
             </FormGroup>
 
             {isDrivingLicenseOpen && (
               <ImagesField
-                onAdd={(file) =>
-                  handleFileUpload(file, 'drivingLicensePicture')
-                }
-                onRemove={(index) =>
-                  handleAttachmentDelete(index, 'drivingLicensePicture')
-                }
+                onAdd={(file) => handleFileUpload(file, 'drivingLicensePicture')}
+                onRemove={(index) => handleAttachmentDelete(index, 'drivingLicensePicture')}
                 title={t`Driving license picture`}
                 pictures={values.drivingLicensePicture}
               />
             )}
 
+            <InputField
+              label={t`Comment`}
+              placeholder={t`Add comment`}
+              testID="note-input-field"
+              {...adaptRegister(register('note'))}
+            />
+
             <FormGroup>
-              <UploadField
-                files={values.attachments as UploadedFile[]}
-                onFilesChange={(files) => handleFilesChange(files, 'attachments')}
-                onPress={handleUploadPress}
-                uploadLinkText={t`Click to upload`}
-                uploadSuffixText={t`or drag and drop`}
-                maxFiles={MAX_ATTACHMENTS}
-                testID="attachments-upload-field"
+              <AttachmentField
+                onUpload={(file) => handleFileUpload(file, 'attachments')}
+                isLast
+                label={'File'}
               />
+              {values.attachments.map((attachment, index) => (
+                <AttachmentField
+                  key={attachment?.id || attachment.name}
+                  attachment={attachment}
+                  attachmentIndex={index}
+                  onDelete={(idx) => handleAttachmentDelete(idx, 'attachments')}
+                  isLast
+                  label={'File'}
+                  additionalItems={
+                    <ButtonLittle
+                      startIcon={DeleteIcon}
+                      variant="secondary"
+                      borderRadius="md"
+                      onPress={() => handleAttachmentDelete(index, 'attachments')}
+                    />
+                  }
+                />
+              ))}
             </FormGroup>
 
             <MultiSlotInput
-              label={t`Custom comments`}
-              placeholderText={t`Add comment`}
+              label={t`Custom fields`}
+              placeholder={t`Add comment`}
               addButtonLabel={t`Add another comment`}
-              values={values.comments as string[]}
-              onChange={(updated: string[]) => setValue('comments', updated)}
-              testID="custom-comments-multi-slot-input"
+              values={(customFieldsList as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
+              onAdd={() => addCustomField({ type: 'note', note: '' })}
+              onChangeItem={(index: number, val: string) => {
+                setValue(`customFields[${index}].note`, val)
+              }}
+              onRemove={(index: number) => removeCustomField(index)}
+              errorMessage={(errors as any)?.customFields?.find(Boolean)?.error?.note}
+              testID="custom-fields-multi-slot-input"
             />
-
-
           </FormWrapper>
         </ScrollView>
       </ScrollContainer>
