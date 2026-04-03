@@ -28,6 +28,8 @@ import { groupRecordsByTimePeriod } from '../../utils/groupRecordsByTimePeriod'
 
 const SORT_BY_TYPE = {
   'Title A-Z': { key: 'data.title', direction: 'asc' },
+  'Last Updated Newest': { key: 'updatedAt', direction: 'desc' },
+  'Last Updated Oldest': { key: 'updatedAt', direction: 'asc' },
   'Date Added Newest': { key: 'createdAt', direction: 'desc' },
   'Date Added Oldest': { key: 'createdAt', direction: 'asc' }
 }

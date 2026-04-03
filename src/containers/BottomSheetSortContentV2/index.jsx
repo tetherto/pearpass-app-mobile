@@ -27,6 +27,8 @@ export const BottomSheetSortContentV2 = () => {
 
   const sortOptions = [
     { key: 'Title A-Z', label: t`Title (A-Z)` },
+    { key: 'Last Updated Newest', label: t`Last Updated (Newest first)` },
+    { key: 'Last Updated Oldest', label: t`Last Updated (Oldest first)` },
     { key: 'Date Added Newest', label: t`Date Added (Newest first)` },
     { key: 'Date Added Oldest', label: t`Date Added (Oldest first)` }
   ]
