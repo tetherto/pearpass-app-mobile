@@ -85,7 +85,10 @@ export const OnboardingLayout = ({
         )}
         {rightAction && (
           <TouchableOpacity
-            style={styles.rightAction}
+            style={[
+              styles.rightAction,
+              { top: insets.top + (Platform.OS === 'android' ? 16 : 8) }
+            ]}
             onPress={rightAction.onPress}
             testID="onboarding-v2-right-action"
           >
@@ -131,8 +134,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontSize: 14,
     fontWeight: '400',
-    color: colors.white.mode1,
-    top: 26
+    color: colors.white.mode1
   },
   content: {
     flex: 1,
