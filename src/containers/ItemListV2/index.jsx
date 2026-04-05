@@ -9,9 +9,9 @@ import {
   StarFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { Pressable, SectionList, View } from 'react-native'
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { createStyles } from './styles'
+import { FadeGradient } from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { getRecordSubtitle } from '../../utils/getRecordSubtitle'
@@ -177,25 +177,10 @@ export const ItemListV2 = ({
           return <View style={styles.divider} />
         }}
       />
-      <View style={styles.fadeGradient} pointerEvents="none">
-        <Svg width="100%" height={70}>
-          <Defs>
-            <LinearGradient id="fade-bottom" x1="0" y1="0" x2="0" y2="1">
-              <Stop
-                offset="0"
-                stopColor={theme.colors.colorSurfacePrimary}
-                stopOpacity="0"
-              />
-              <Stop
-                offset="1"
-                stopColor={theme.colors.colorSurfacePrimary}
-                stopOpacity="1"
-              />
-            </LinearGradient>
-          </Defs>
-          <Rect x="0" y="0" width="100%" height={70} fill="url(#fade-bottom)" />
-        </Svg>
-      </View>
+      <FadeGradient
+        color={theme.colors.colorSurfacePrimary}
+        style={styles.fadeGradient}
+      />
     </View>
   )
 }
