@@ -5,11 +5,8 @@ import { useNavigation } from '@react-navigation/native'
 import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
-import { BottomSheetFolderListContent } from '../containers/BottomSheetFolderListContent'
 import { BottomSheetSortContent } from '../containers/BottomSheetSortContent'
-import { ConfirmModalContent } from '../containers/Modal/ConfirmModalContent'
 import { useBottomSheet } from '../context/BottomSheetContext'
-import { useModal } from '../context/ModalContext'
 import { useSharedFilter } from '../context/SharedFilterContext'
 
 /**
@@ -40,46 +37,24 @@ export const useRecordActionItems = ({
 } = {}) => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const { openModal, closeModal } = useModal()
   const { collapse, expand } = useBottomSheet()
   const { copyToClipboard } = useCopyToClipboard()
-  const { deleteRecords, updateFavoriteState, updateFolder } = useRecords({
-    onCompleted: () => {
-      closeModal()
-      collapse?.()
-      onDelete?.()
-    }
-  })
+  const { updateFavoriteState } = useRecords()
   const { setState } = useSharedFilter()
-
-  const handleDeleteConfirm = useCallback(async () => {
-    await deleteRecords([record?.id])
-  }, [record])
 
   const handleDelete = useCallback(() => {
     collapse?.()
-    openModal(
-      <ConfirmModalContent
-        title="Delete item"
-        text="Are you sure that you want to delete this item?"
-        secondaryAction={closeModal}
-        primaryAction={handleDeleteConfirm}
-      />
-    )
-  }, [ConfirmModalContent, handleDeleteConfirm])
+    navigation.navigate('MultiSelectDelete', {
+      selectedRecordIds: [record?.id],
+      selectedRecordObjects: [record],
+      onComplete: onDelete
+    })
+  }, [record, onDelete])
 
   const handleFavoriteToggle = useCallback(() => {
     updateFavoriteState([record?.id], !record?.isFavorite)
-
     collapse?.()
   }, [record])
-
-  const handleFolderMoveSelect = useCallback(
-    async (folder) => {
-      await updateFolder([record?.id], folder.name)
-    },
-    [record]
-  )
 
   const handleEdit = useCallback(() => {
     navigation.navigate('CreateRecord', {
@@ -87,20 +62,17 @@ export const useRecordActionItems = ({
       recordType: record.type,
       selectedFolder: record.folder
     })
-
     collapse?.()
   }, [record])
 
   const handleMoveClick = useCallback(() => {
     collapse?.()
-
-    expand({
-      children: (
-        <BottomSheetFolderListContent onFolderSelect={handleFolderMoveSelect} />
-      ),
-      snapPoints: ['10%', '25%', '25%']
+    navigation.navigate('MultiSelectMove', {
+      selectedRecordIds: [record?.id],
+      selectedRecordObjects: [record],
+      onComplete: onDelete
     })
-  }, [])
+  }, [record, onDelete])
 
   const handleCopy = useCallback((value) => {
     if (!value?.length) {

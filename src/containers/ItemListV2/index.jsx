@@ -11,6 +11,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFavicon } from '@tetherto/pearpass-lib-vault'
 import { Image, Pressable, SectionList, View } from 'react-native'
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { createStyles } from './styles'
 import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'
@@ -180,6 +181,7 @@ export const ItemListV2 = ({
               subtitle={getRecordSubtitle(record) || undefined}
               selectionMode={isMultiSelectOn ? 'multi' : 'none'}
               isSelected={isRecordSelected(record.id)}
+              onSelect={() => handleRecordPress(record.id)}
               onClick={() => handleRecordPress(record.id)}
               onLongPress={() => handleLongPress(record)}
               rightElement={
@@ -211,7 +213,25 @@ export const ItemListV2 = ({
           return <View style={styles.divider} />
         }}
       />
-      <View style={styles.fadeGradient} pointerEvents="none" />
+      <View style={styles.fadeGradient} pointerEvents="none">
+        <Svg width="100%" height={70}>
+          <Defs>
+            <LinearGradient id="fade-bottom" x1="0" y1="0" x2="0" y2="1">
+              <Stop
+                offset="0"
+                stopColor={theme.colors.colorSurfacePrimary}
+                stopOpacity="0"
+              />
+              <Stop
+                offset="1"
+                stopColor={theme.colors.colorSurfacePrimary}
+                stopOpacity="1"
+              />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height={70} fill="url(#fade-bottom)" />
+        </Svg>
+      </View>
     </View>
   )
 }

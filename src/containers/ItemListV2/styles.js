@@ -41,8 +41,6 @@ export const createStyles = (colors) => ({
     left: 0,
     right: 0,
     height: 70,
-    zIndex: 1,
-    backgroundColor: colors.colorSurfacePrimary,
-    opacity: 0.85
+    zIndex: 1
   }
 })
