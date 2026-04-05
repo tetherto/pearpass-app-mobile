@@ -27,11 +27,15 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName, onDismiss }) => {
   const { hapticButtonPrimary } = useHapticFeedback()
 
   const actionTakenRef = useRef(false)
+  const onDismissRef = useRef(onDismiss)
+  useEffect(() => {
+    onDismissRef.current = onDismiss
+  })
 
   useEffect(
     () => () => {
       if (!actionTakenRef.current) {
-        onDismiss?.()
+        onDismissRef.current?.()
       }
     },
     []

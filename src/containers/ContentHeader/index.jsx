@@ -17,6 +17,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
+import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
 import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
 import { BottomSheetVaultSelectorContent } from '../BottomSheetVaultSelectorContent'
@@ -38,6 +39,7 @@ export const ContentHeader = ({
   const { data: vaultData } = useVault()
   const { state } = useSharedFilter()
   const styles = createStyles(theme.colors)
+  const menuItems = useRecordMenuItems({ exclude: ['password'] })
 
   const bgColor = theme.colors.colorSurfacePrimary
   const vaultName = vaultData?.name || t`Personal Vault`
@@ -79,12 +81,8 @@ export const ContentHeader = ({
   }
 
   const handleToggleMultiSelect = () => {
-    if (isMultiSelectOn) {
-      setIsMultiSelectOn(false)
-      setSelectedRecords([])
-    } else {
-      setIsMultiSelectOn(true)
-    }
+    setIsMultiSelectOn((prev) => !prev)
+    setSelectedRecords([])
   }
 
   const renderBreadcrumbPill = (icon, label, onPress) => (
@@ -167,7 +165,8 @@ export const ContentHeader = ({
               </View>
               {renderBreadcrumbPill(
                 <Layers />,
-                t`All Items`,
+                menuItems.find((i) => i.type === recordType)?.name ??
+                  t`All Items`,
                 handleCategoryPress
               )}
               <View style={styles.chevronSeparator}>

@@ -3,5 +3,4 @@ export const getRecordSubtitle = (record) =>
   record.data?.email ||
   record.data?.name ||
   record.data?.fullName ||
-  record.folder ||
   ''

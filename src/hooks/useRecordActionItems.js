@@ -69,10 +69,9 @@ export const useRecordActionItems = ({
     collapse?.()
     navigation.navigate('MultiSelectMove', {
       selectedRecordIds: [record?.id],
-      selectedRecordObjects: [record],
-      onComplete: onDelete
+      selectedRecordObjects: [record]
     })
-  }, [record, onDelete])
+  }, [record])
 
   const handleCopy = useCallback((value) => {
     if (!value?.length) {

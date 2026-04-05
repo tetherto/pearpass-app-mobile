@@ -16,6 +16,7 @@ import { View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { createStyles } from './styles'
+import { SORT_KEYS } from '../../constants/sortOptions'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { ContentContainer } from '../ContentContainer'
@@ -30,24 +31,24 @@ export const BottomSheetSortContentV2 = () => {
   const bottom = insets?.bottom ?? 0
 
   const sortOptions = [
-    { key: 'Title A-Z', label: t`Title (A-Z)`, icon: SortByAlpha },
+    { key: SORT_KEYS.TITLE_AZ, label: t`Title (A-Z)`, icon: SortByAlpha },
     {
-      key: 'Last Updated Newest',
+      key: SORT_KEYS.LAST_UPDATED_NEWEST,
       label: t`Last Updated (Newest first)`,
       icon: CalendarToday
     },
     {
-      key: 'Last Updated Oldest',
+      key: SORT_KEYS.LAST_UPDATED_OLDEST,
       label: t`Last Updated (Oldest first)`,
       icon: CalendarToday
     },
     {
-      key: 'Date Added Newest',
+      key: SORT_KEYS.DATE_ADDED_NEWEST,
       label: t`Date Added (Newest first)`,
       icon: CalendarToday
     },
     {
-      key: 'Date Added Oldest',
+      key: SORT_KEYS.DATE_ADDED_OLDEST,
       label: t`Date Added (Oldest first)`,
       icon: CalendarToday
     }

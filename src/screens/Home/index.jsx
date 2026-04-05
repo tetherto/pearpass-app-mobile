@@ -6,6 +6,7 @@ import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
 
 import { Container, CurrentFolder, FolderName } from './styles'
+import { SORT_BY_TYPE } from '../../constants/sortOptions'
 import { BottomSheetSortContentV2 } from '../../containers/BottomSheetSortContentV2'
 import { Categories } from '../../containers/Categories'
 import { ContentContainer } from '../../containers/ContentContainer'
@@ -25,14 +26,6 @@ import {
 } from '../../context/SharedFilterContext'
 import { useJobQueueProcessor } from '../../jobQueue'
 import { groupRecordsByTimePeriod } from '../../utils/groupRecordsByTimePeriod'
-
-const SORT_BY_TYPE = {
-  'Title A-Z': { key: 'data.title', direction: 'asc' },
-  'Last Updated Newest': { key: 'updatedAt', direction: 'desc' },
-  'Last Updated Oldest': { key: 'updatedAt', direction: 'asc' },
-  'Date Added Newest': { key: 'createdAt', direction: 'desc' },
-  'Date Added Oldest': { key: 'createdAt', direction: 'asc' }
-}
 
 export const Home = () => {
   useJobQueueProcessor()

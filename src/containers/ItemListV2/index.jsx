@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
-import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
 import { ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
   ErrorFilled,
@@ -9,54 +8,14 @@ import {
   KeyboardArrowRightFilled,
   StarFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useFavicon } from '@tetherto/pearpass-lib-vault'
-import { Image, Pressable, SectionList, View } from 'react-native'
+import { Pressable, SectionList, View } from 'react-native'
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { createStyles } from './styles'
-import { RECORD_COLOR_BY_TYPE } from '../../constants/recordColorByType'
+import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { getRecordSubtitle } from '../../utils/getRecordSubtitle'
 import { BottomSheetRecordActionsContentV2 } from '../BottomSheetRecordActionsContentV2'
-
-const RecordItemIcon = ({ record }) => {
-  const { theme } = useTheme()
-  const websiteDomain =
-    record.type === 'login' ? record?.data?.websites?.[0] : null
-  const { faviconSrc } = useFavicon({ url: websiteDomain })
-
-  return (
-    <View
-      style={{
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        overflow: 'hidden',
-        backgroundColor: theme.colors.colorSurfaceHover,
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}
-    >
-      {faviconSrc ? (
-        <Image
-          source={{ uri: faviconSrc }}
-          style={{ width: 32, height: 32, borderRadius: 8 }}
-          resizeMode="contain"
-        />
-      ) : (
-        <Text
-          variant="label"
-          style={{
-            color: RECORD_COLOR_BY_TYPE[record.type],
-            fontWeight: '700'
-          }}
-        >
-          {generateAvatarInitials(record.data?.title)}
-        </Text>
-      )}
-    </View>
-  )
-}
 
 const CollapsibleSectionHeader = ({
   section,
@@ -105,9 +64,14 @@ export const ItemListV2 = ({
     setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }))
   }, [])
 
-  const isRecordSelected = useCallback(
-    (recordId) => selectedRecords.includes(recordId),
+  const selectedRecordsSet = useMemo(
+    () => new Set(selectedRecords),
     [selectedRecords]
+  )
+
+  const isRecordSelected = useCallback(
+    (recordId) => selectedRecordsSet.has(recordId),
+    [selectedRecordsSet]
   )
 
   const handleRecordPress = useCallback(

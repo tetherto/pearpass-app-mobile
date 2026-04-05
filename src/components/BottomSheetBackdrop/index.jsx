@@ -1,7 +1,13 @@
 import { Animated, TouchableOpacity } from 'react-native'
 
-export const BackDrop = ({ animatedOpacity, onPress, testID }) => (
+export const BackDrop = ({
+  animatedOpacity,
+  onPress,
+  testID,
+  pointerEvents = 'auto'
+}) => (
   <Animated.View
+    pointerEvents={pointerEvents}
     style={{
       position: 'absolute',
       top: 0,

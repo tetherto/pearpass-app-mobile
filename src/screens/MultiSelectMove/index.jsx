@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import {
   Button,
+  ListItem,
   NavbarListItem,
   Text,
   rawTokens,
@@ -14,10 +15,11 @@ import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
 
 import { createStyles } from './styles'
-import { RecordItemRow } from '../../components/RecordItemRow'
+import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { ContentContainer } from '../../containers/ContentContainer'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { ScreenLayout } from '../../containers/ScreenLayout'
+import { getRecordSubtitle } from '../../utils/getRecordSubtitle'
 
 export const MultiSelectMove = () => {
   const { t } = useLingui()
@@ -38,7 +40,7 @@ export const MultiSelectMove = () => {
   })
 
   const folderList = useMemo(
-    () => Object.values(folders.customFolders ?? {}),
+    () => Object.values(folders?.customFolders ?? {}),
     [folders]
   )
 
@@ -82,16 +84,19 @@ export const MultiSelectMove = () => {
             {t`Selected items`}
           </Text>
           {selectedRecordObjects.map((record) => (
-            <RecordItemRow
+            <ListItem
               key={record.id}
-              record={record}
+              icon={<RecordItemIcon record={record} />}
+              iconSize={32}
+              title={record.data?.title ?? ''}
+              subtitle={getRecordSubtitle(record) || undefined}
               style={styles.recordItem}
             />
           ))}
         </View>
         <View style={styles.folderSection}>
           <Text variant="caption" style={styles.sectionLabel}>
-            {t`Choose the destination folder of this items`}
+            {t`Choose the destination folder for these items`}
           </Text>
           <View style={styles.folderList}>
             {folderList.map((folder) => (

@@ -89,8 +89,14 @@ export const BottomSheetV2Provider = ({ children }) => {
   const ctx = useMemo(() => ({ expand, collapse }), [expand, collapse])
 
   const renderBackdrop = useCallback(
-    () => <BackDrop animatedOpacity={backdropAnim} onPress={collapse} />,
-    [backdropAnim, collapse]
+    () => (
+      <BackDrop
+        animatedOpacity={backdropAnim}
+        onPress={collapse}
+        pointerEvents={content ? 'auto' : 'none'}
+      />
+    ),
+    [backdropAnim, collapse, content]
   )
 
   return (

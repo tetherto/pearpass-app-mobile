@@ -35,7 +35,7 @@ export const groupRecordsByTimePeriod = (records, sort) => {
   const yesterdayStart = new Date(todayStart)
   yesterdayStart.setDate(yesterdayStart.getDate() - 1)
   const weekStart = new Date(todayStart)
-  weekStart.setDate(weekStart.getDate() - todayStart.getDay())
+  weekStart.setDate(weekStart.getDate() - 7)
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
   const favorites = []

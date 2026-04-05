@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import {
   Button,
+  ListItem,
   Text,
   rawTokens,
   useTheme
@@ -10,10 +11,11 @@ import { useRecords } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
 
 import { createStyles } from './styles'
-import { RecordItemRow } from '../../components/RecordItemRow'
+import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { ContentContainer } from '../../containers/ContentContainer'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { ScreenLayout } from '../../containers/ScreenLayout'
+import { getRecordSubtitle } from '../../utils/getRecordSubtitle'
 
 export const MultiSelectDelete = () => {
   const { t } = useLingui()
@@ -65,9 +67,12 @@ export const MultiSelectDelete = () => {
             {t`Selected items`}
           </Text>
           {selectedRecordObjects.map((record) => (
-            <RecordItemRow
+            <ListItem
               key={record.id}
-              record={record}
+              icon={<RecordItemIcon record={record} />}
+              iconSize={32}
+              title={record.data?.title ?? ''}
+              subtitle={getRecordSubtitle(record) || undefined}
               style={styles.recordItem}
             />
           ))}
