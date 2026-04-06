@@ -12,7 +12,7 @@ import {
   StarOutlined,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useCreateRecord } from '@tetherto/pearpass-lib-vault'
+import { useCreateRecord, vaultGetFile } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -46,15 +46,39 @@ export const BottomSheetRecordActionsContentV2 = ({
     onSelectItem?.()
   }, [collapse, onSelectItem])
 
+  const fetchFileBuffers = useCallback(
+    (files) =>
+      Promise.all(
+        (files ?? []).map(async ({ id, name }) => {
+          const buffer = await vaultGetFile(`record/${record.id}/file/${id}`)
+          return { name, buffer }
+        })
+      ),
+    [record.id]
+  )
+
   const handleDuplicate = useCallback(async () => {
+    const attachments = await fetchFileBuffers(record.data?.attachments)
+    const data = { ...record.data, attachments }
+
+    if (record.type === 'identity') {
+      data.passportPicture = await fetchFileBuffers(
+        record.data?.passportPicture
+      )
+      data.idCardPicture = await fetchFileBuffers(record.data?.idCardPicture)
+      data.drivingLicensePicture = await fetchFileBuffers(
+        record.data?.drivingLicensePicture
+      )
+    }
+
     await createRecord({
       type: record.type,
       folder: record.folder,
       isFavorite: record.isFavorite,
-      data: { ...record.data }
+      data
     })
     collapse()
-  }, [record, createRecord, collapse])
+  }, [record, createRecord, collapse, fetchFileBuffers])
 
   const actionItems = useMemo(
     () => [

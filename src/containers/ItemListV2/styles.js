@@ -9,7 +9,7 @@ export const createStyles = (colors) => ({
   },
   sectionList: {
     flex: 1,
-    paddingHorizontal: rawTokens.spacing16,
+    paddingHorizontal: rawTokens.spacing12,
     paddingVertical: rawTokens.spacing12
   },
   sectionListContent: {

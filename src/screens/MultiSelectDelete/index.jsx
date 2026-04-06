@@ -60,6 +60,9 @@ export const MultiSelectDelete = () => {
         style={styles.recordsSection}
         onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
       >
+        <Text variant="caption" style={styles.sectionLabel}>
+          {t`Selected items`}
+        </Text>
         <ScrollView
           style={styles.recordsScroll}
           contentContainerStyle={[
@@ -69,9 +72,6 @@ export const MultiSelectDelete = () => {
           showsVerticalScrollIndicator={false}
           onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
         >
-          <Text variant="caption" style={styles.sectionLabel}>
-            {t`Selected items`}
-          </Text>
           {selectedRecordObjects.map((record) => (
             <ListItem
               key={record.id}

@@ -7,15 +7,13 @@ export const createStyles = (colors) => ({
     position: 'relative'
   },
   recordsScroll: {
-    paddingHorizontal: rawTokens.spacing16
+    paddingHorizontal: rawTokens.spacing12
   },
-  recordsContent: {
-    paddingTop: rawTokens.spacing12,
-    paddingBottom: rawTokens.spacing12,
-    gap: rawTokens.spacing8
-  },
+  recordsContent: {},
   sectionLabel: {
-    color: colors.colorTextSecondary
+    color: colors.colorTextSecondary,
+    paddingHorizontal: rawTokens.spacing16,
+    paddingVertical: rawTokens.spacing12
   },
   recordItem: {
     borderRadius: rawTokens.radius8,
