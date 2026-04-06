@@ -29,13 +29,15 @@ export const MultiSelectMove = () => {
   const { params } = useRoute()
   const { theme } = useTheme()
   const [selectedFolder, setSelectedFolder] = useState(null)
-  const styles = createStyles(theme.colors)
+  const styles = useMemo(() => createStyles(theme.colors), [theme.colors])
 
   const [containerHeight, setContainerHeight] = useState(0)
-  const [recordsContentHeight, setRecordsContentHeight] = useState(0)
-  const [recordsLayoutHeight, setRecordsLayoutHeight] = useState(0)
+  const [recordsScrollableHeight, setRecordsScrollableHeight] = useState(0)
+  const [recordsVisibleHeight, setRecordsVisibleHeight] = useState(0)
   const [folderLabelHeight, setFolderLabelHeight] = useState(0)
   const [folderButtonsHeight, setFolderButtonsHeight] = useState(0)
+  const [foldersScrollableHeight, setFoldersScrollableHeight] = useState(0)
+  const [foldersVisibleHeight, setFoldersVisibleHeight] = useState(0)
 
   const half = containerHeight / 2
   // Math.ceil guards against sub-pixel truncation in onLayout measurements
@@ -46,14 +48,15 @@ export const MultiSelectMove = () => {
       folderButtonsHeight +
       rawTokens.spacing12
   )
-  const foldersExceedsHalf = containerHeight > 0 && foldersNaturalHeight > half
-  const foldersMaxHeight = foldersExceedsHalf ? half : undefined
-  const foldersNeeds = foldersExceedsHalf ? half : foldersNaturalHeight
+  const foldersAllocatedHeight =
+    containerHeight > 0 && foldersNaturalHeight > half
+      ? half
+      : foldersNaturalHeight
   const recordsMaxHeight =
-    containerHeight > 0 ? containerHeight - foldersNeeds : undefined
+    containerHeight > 0 ? containerHeight - foldersAllocatedHeight : undefined
 
-  const showRecordsGradient = recordsContentHeight > recordsLayoutHeight
-  const showFoldersGradient = foldersExceedsHalf
+  const showRecordsGradient = recordsScrollableHeight > recordsVisibleHeight
+  const showFoldersGradient = foldersScrollableHeight > foldersVisibleHeight
 
   const { selectedRecordIds, selectedRecordObjects, onComplete } = params
 
@@ -104,7 +107,7 @@ export const MultiSelectMove = () => {
             styles.recordsSection,
             recordsMaxHeight !== undefined && { maxHeight: recordsMaxHeight }
           ]}
-          onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
+          onLayout={(e) => setRecordsVisibleHeight(e.nativeEvent.layout.height)}
         >
           <Text variant="caption" style={styles.sectionLabel}>
             {t`Selected items`}
@@ -116,7 +119,7 @@ export const MultiSelectMove = () => {
               showRecordsGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
             ]}
             showsVerticalScrollIndicator={false}
-            onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
+            onContentSizeChange={(_, h) => setRecordsScrollableHeight(h)}
           >
             {selectedRecordObjects.map((record) => (
               <ListItem
@@ -137,12 +140,7 @@ export const MultiSelectMove = () => {
           )}
         </View>
 
-        <View
-          style={[
-            styles.foldersSection,
-            foldersMaxHeight !== undefined && { maxHeight: foldersMaxHeight }
-          ]}
-        >
+        <View style={styles.foldersSection}>
           <View
             onLayout={(e) => setFolderLabelHeight(e.nativeEvent.layout.height)}
           >
@@ -155,6 +153,10 @@ export const MultiSelectMove = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={
               showFoldersGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
+            }
+            onContentSizeChange={(_, h) => setFoldersScrollableHeight(h)}
+            onLayout={(e) =>
+              setFoldersVisibleHeight(e.nativeEvent.layout.height)
             }
           >
             <View
