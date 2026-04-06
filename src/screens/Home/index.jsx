@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
-import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
 
@@ -9,7 +7,6 @@ import { Container, CurrentFolder, FolderName } from './styles'
 import { SORT_BY_TYPE } from '../../constants/sortOptions'
 import { BottomSheetSortContentV2 } from '../../containers/BottomSheetSortContentV2'
 import { Categories } from '../../containers/Categories'
-import { ContentContainer } from '../../containers/ContentContainer'
 import { ContentHeader } from '../../containers/ContentHeader'
 import { EmptyCollectionView } from '../../containers/EmptyCollectionView'
 import { EmptyCollectionViewV2 } from '../../containers/EmptyCollectionViewV2'
@@ -17,8 +14,8 @@ import { EmptyResultsView } from '../../containers/EmptyResultsView'
 import { Header } from '../../containers/Header'
 import { ItemList } from '../../containers/ItemList'
 import { ItemListV2 } from '../../containers/ItemListV2'
+import { Layout } from '../../containers/Layout'
 import { MultiSelectBar } from '../../containers/MultiSelectBar'
-import { ScreenLayout } from '../../containers/ScreenLayout'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import {
   INITIAL_STATE,
@@ -36,7 +33,6 @@ export const Home = () => {
   const [selectedRecords, setSelectedRecords] = useState([])
 
   const { state, setState } = useSharedFilter()
-  const { theme } = useTheme()
   const { expand } = useBottomSheet()
 
   const sort = useMemo(() => SORT_BY_TYPE[state.sort], [state.sort])
@@ -85,11 +81,11 @@ export const Home = () => {
   }, [selectedFolder, state.isFavorite])
 
   const sections = useMemo(
-    () => (DESIGN_VERSION === 2 ? groupRecordsByTimePeriod(records, sort) : []),
+    () => (isV2() ? groupRecordsByTimePeriod(records, sort) : []),
     [records, sort]
   )
 
-  if (DESIGN_VERSION === 2) {
+  if (isV2()) {
     const headerProps = {
       setIsMultiSelectOn,
       isMultiSelectOn,
@@ -101,51 +97,46 @@ export const Home = () => {
     }
 
     return (
-      <ScreenLayout
+      <Layout
         header={<Header {...headerProps} />}
-        contentStyle={{
-          paddingHorizontal: 0,
-          backgroundColor: theme.colors.colorBackground
-        }}
+        contentStyle={{ padding: 0 }}
       >
-        <ContentContainer contentStyle={{ padding: 0 }}>
-          <ContentHeader
-            isMultiSelectOn={isMultiSelectOn}
-            setIsMultiSelectOn={setIsMultiSelectOn}
+        <ContentHeader
+          isMultiSelectOn={isMultiSelectOn}
+          setIsMultiSelectOn={setIsMultiSelectOn}
+          setSelectedRecords={setSelectedRecords}
+          recordType={recordType}
+          onCategoryChange={handleRecordType}
+          onSortPress={() =>
+            expand({
+              children: <BottomSheetSortContentV2 />
+            })
+          }
+        />
+
+        {isMultiSelectOn && (
+          <MultiSelectBar
+            selectedRecords={selectedRecords}
             setSelectedRecords={setSelectedRecords}
-            recordType={recordType}
-            onCategoryChange={handleRecordType}
-            onSortPress={() =>
-              expand({
-                children: <BottomSheetSortContentV2 />
-              })
-            }
+            setIsMultiSelectOn={setIsMultiSelectOn}
+            records={records}
           />
+        )}
 
-          {isMultiSelectOn && (
-            <MultiSelectBar
-              selectedRecords={selectedRecords}
-              setSelectedRecords={setSelectedRecords}
-              setIsMultiSelectOn={setIsMultiSelectOn}
-              records={records}
-            />
-          )}
+        {!!records.length && (
+          <ItemListV2
+            sections={sections}
+            isMultiSelectOn={isMultiSelectOn}
+            selectedRecords={selectedRecords}
+            setSelectedRecords={setSelectedRecords}
+            setIsMultiSelectOn={setIsMultiSelectOn}
+          />
+        )}
 
-          {!!records.length && (
-            <ItemListV2
-              sections={sections}
-              isMultiSelectOn={isMultiSelectOn}
-              selectedRecords={selectedRecords}
-              setSelectedRecords={setSelectedRecords}
-              setIsMultiSelectOn={setIsMultiSelectOn}
-            />
-          )}
+        {!records.length && !searchValue.length && <EmptyCollectionViewV2 />}
 
-          {!records.length && !searchValue.length && <EmptyCollectionViewV2 />}
-
-          {!records.length && !!searchValue.length && <EmptyResultsView />}
-        </ContentContainer>
-      </ScreenLayout>
+        {!records.length && !!searchValue.length && <EmptyResultsView />}
+      </Layout>
     )
   }
 

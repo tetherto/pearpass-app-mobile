@@ -22,7 +22,7 @@ import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
-import { ContentContainer } from '../ContentContainer'
+import { Layout } from '../Layout'
 
 export const BottomSheetFolderSelectorContent = () => {
   const { t } = useLingui()
@@ -52,7 +52,8 @@ export const BottomSheetFolderSelectorContent = () => {
   const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
   return (
-    <ContentContainer
+    <Layout
+      mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={
@@ -122,6 +123,6 @@ export const BottomSheetFolderSelectorContent = () => {
         showDivider={false}
         onClick={handleCreateFolder}
       />
-    </ContentContainer>
+    </Layout>
   )
 }

@@ -16,7 +16,7 @@ import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
-import { ContentContainer } from '../ContentContainer'
+import { Layout } from '../Layout'
 
 export const BottomSheetCategorySelectorContent = ({
   recordType,
@@ -52,7 +52,8 @@ export const BottomSheetCategorySelectorContent = ({
   const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
   return (
-    <ContentContainer
+    <Layout
+      mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={
@@ -97,6 +98,6 @@ export const BottomSheetCategorySelectorContent = ({
           />
         )
       })}
-    </ContentContainer>
+    </Layout>
   )
 }

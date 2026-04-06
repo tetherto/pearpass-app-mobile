@@ -17,7 +17,7 @@ import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useGlobalLoading } from '../../context/LoadingContext'
 import { useModal } from '../../context/ModalContext'
 import { BottomSheetVaultAction } from '../BottomSheetVaultAction'
-import { ContentContainer } from '../ContentContainer'
+import { Layout } from '../Layout'
 import { VaultPasswordFormModalContent } from '../Modal/VaultPasswordFormModalContent'
 
 export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
@@ -92,7 +92,8 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
   return (
-    <ContentContainer
+    <Layout
+      mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={
@@ -148,6 +149,6 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
         iconSize={16}
         onClick={onCreateVault}
       />
-    </ContentContainer>
+    </Layout>
   )
 }

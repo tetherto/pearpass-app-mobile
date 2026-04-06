@@ -16,7 +16,7 @@ import Toast from 'react-native-toast-message'
 
 import { BottomSheetFileMoreActionsContentV2 } from 'src/containers/BottomSheetFileMoreActionsContentV2/BottomSheetFileMoreActionsContentV2'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
+import { Layout } from 'src/containers/Layout'
 import { withAutoLockBypass } from '../../HOCs'
 import { convertDataUriToFileUri } from '../../utils/convertDataUriToFileUri'
 import { getMimeType } from '../../utils/getMimeType'
@@ -102,7 +102,7 @@ export const ImagePreviewV2 = withAutoLockBypass(
     }
 
     return (
-      <ScreenLayout
+      <Layout
         header={
           <BackScreenHeader
             title={currentImageName}
@@ -141,7 +141,7 @@ export const ImagePreviewV2 = withAutoLockBypass(
             onLoad={handleImageLoad}
           />
         </View>
-      </ScreenLayout>
+      </Layout>
     )
   }
 )

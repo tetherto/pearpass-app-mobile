@@ -19,7 +19,7 @@ import { createStyles } from './styles'
 import { SORT_KEYS } from '../../constants/sortOptions'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
-import { ContentContainer } from '../ContentContainer'
+import { Layout } from '../Layout'
 
 export const BottomSheetSortContentV2 = () => {
   const { t } = useLingui()
@@ -64,7 +64,8 @@ export const BottomSheetSortContentV2 = () => {
   const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
   return (
-    <ContentContainer
+    <Layout
+      mode="sheet"
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={
         <>
@@ -101,6 +102,6 @@ export const BottomSheetSortContentV2 = () => {
           onClick={() => handleSelect(key)}
         />
       ))}
-    </ContentContainer>
+    </Layout>
   )
 }

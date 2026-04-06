@@ -9,9 +9,8 @@ import { ScrollView, View } from 'react-native'
 import { createStyles } from './styles'
 import { FadeGradient } from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
-import { ContentContainer } from '../../containers/ContentContainer'
+import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../containers/ScreenLayout'
 import { getRecordSubtitle } from '../../utils/getRecordSubtitle'
 
 export const MultiSelectDelete = () => {
@@ -36,68 +35,61 @@ export const MultiSelectDelete = () => {
   })
 
   return (
-    <ScreenLayout
+    <Layout
       header={
         <BackScreenHeader
           title={`${t`Delete`} ${selectedRecordIds.length} ${t`Items`}`}
           onBack={() => navigation.goBack()}
         />
       }
-      contentStyle={{
-        paddingHorizontal: 0,
-        backgroundColor: theme.colors.colorBackground
-      }}
-    >
-      <ContentContainer
-        contentStyle={{ padding: 0 }}
-        footer={
-          <Button
-            variant="destructive"
-            fullWidth
-            onClick={() => deleteRecords(selectedRecordIds)}
-          >
-            {t`Delete Items`}
-          </Button>
-        }
-      >
-        <View
-          style={styles.recordsSection}
-          onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
+      contentStyle={{ padding: 0 }}
+      footer={
+        <Button
+          variant="destructive"
+          fullWidth
+          onClick={() => deleteRecords(selectedRecordIds)}
         >
-          <ScrollView
-            style={styles.recordsScroll}
-            contentContainerStyle={[
-              styles.recordsContent,
-              showGradient && { paddingBottom: 70 }
-            ]}
-            showsVerticalScrollIndicator={false}
-            onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
-          >
-            <Text variant="caption" style={styles.sectionLabel}>
-              {t`Selected items`}
-            </Text>
-            {selectedRecordObjects.map((record) => (
-              <ListItem
-                key={record.id}
-                icon={<RecordItemIcon record={record} />}
-                iconSize={32}
-                title={record.data?.title ?? ''}
-                subtitle={getRecordSubtitle(record) || undefined}
-                style={styles.recordItem}
-              />
-            ))}
-          </ScrollView>
-          {showGradient && (
-            <FadeGradient
-              color={theme.colors.colorSurfacePrimary}
-              style={styles.fadeGradient}
+          {t`Delete Items`}
+        </Button>
+      }
+    >
+      <View
+        style={styles.recordsSection}
+        onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
+      >
+        <ScrollView
+          style={styles.recordsScroll}
+          contentContainerStyle={[
+            styles.recordsContent,
+            showGradient && { paddingBottom: 70 }
+          ]}
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
+        >
+          <Text variant="caption" style={styles.sectionLabel}>
+            {t`Selected items`}
+          </Text>
+          {selectedRecordObjects.map((record) => (
+            <ListItem
+              key={record.id}
+              icon={<RecordItemIcon record={record} />}
+              iconSize={32}
+              title={record.data?.title ?? ''}
+              subtitle={getRecordSubtitle(record) || undefined}
+              style={styles.recordItem}
             />
-          )}
-        </View>
-        <Text variant="caption" style={styles.confirmText}>
-          {t`Are you sure to delete the selected items?`}
-        </Text>
-      </ContentContainer>
-    </ScreenLayout>
+          ))}
+        </ScrollView>
+        {showGradient && (
+          <FadeGradient
+            color={theme.colors.colorSurfacePrimary}
+            style={styles.fadeGradient}
+          />
+        )}
+      </View>
+      <Text variant="caption" style={styles.confirmText}>
+        {t`Are you sure to delete the selected items?`}
+      </Text>
+    </Layout>
   )
 }

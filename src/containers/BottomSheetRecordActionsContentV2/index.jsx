@@ -18,7 +18,7 @@ import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useRecordActionItems } from '../../hooks/useRecordActionItems'
-import { ContentContainer } from '../ContentContainer'
+import { Layout } from '../Layout'
 
 export const BottomSheetRecordActionsContentV2 = ({
   record,
@@ -96,7 +96,8 @@ export const BottomSheetRecordActionsContentV2 = ({
   const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
   return (
-    <ContentContainer
+    <Layout
+      mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={
@@ -127,6 +128,6 @@ export const BottomSheetRecordActionsContentV2 = ({
           />
         )
       )}
-    </ContentContainer>
+    </Layout>
   )
 }

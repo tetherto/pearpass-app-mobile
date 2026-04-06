@@ -16,9 +16,8 @@ import { ScrollView, View } from 'react-native'
 import { createStyles } from './styles'
 import { FadeGradient } from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
-import { ContentContainer } from '../../containers/ContentContainer'
+import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../containers/ScreenLayout'
 import { getRecordSubtitle } from '../../utils/getRecordSubtitle'
 
 export const MultiSelectMove = () => {
@@ -74,133 +73,120 @@ export const MultiSelectMove = () => {
   }
 
   return (
-    <ScreenLayout
+    <Layout
       header={
         <BackScreenHeader
           title={`${t`Move`} ${selectedRecordIds.length} ${t`Items`}`}
           onBack={() => navigation.goBack()}
         />
       }
-      contentStyle={{
-        paddingHorizontal: 0,
-        backgroundColor: theme.colors.colorBackground
-      }}
+      contentStyle={{ padding: 0 }}
+      footer={
+        <Button
+          variant="primary"
+          fullWidth
+          disabled={!selectedFolder}
+          onClick={handleMove}
+        >
+          {t`Move Items`}
+        </Button>
+      }
     >
-      <ContentContainer
-        contentStyle={{ padding: 0 }}
-        footer={
-          <Button
-            variant="primary"
-            fullWidth
-            disabled={!selectedFolder}
-            onClick={handleMove}
-          >
-            {t`Move Items`}
-          </Button>
-        }
+      <View
+        style={{ flex: 1 }}
+        onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
       >
         <View
-          style={{ flex: 1 }}
-          onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
+          style={[
+            styles.recordsSection,
+            recordsMaxHeight !== null && { maxHeight: recordsMaxHeight }
+          ]}
+          onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
+        >
+          <ScrollView
+            style={styles.recordsScroll}
+            contentContainerStyle={[
+              styles.recordsContent,
+              showRecordsGradient && { paddingBottom: 70 }
+            ]}
+            showsVerticalScrollIndicator={false}
+            onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
+          >
+            <Text variant="caption" style={styles.sectionLabel}>
+              {t`Selected items`}
+            </Text>
+            {selectedRecordObjects.map((record) => (
+              <ListItem
+                key={record.id}
+                icon={<RecordItemIcon record={record} />}
+                iconSize={32}
+                title={record.data?.title ?? ''}
+                subtitle={getRecordSubtitle(record) || undefined}
+                style={styles.recordItem}
+              />
+            ))}
+          </ScrollView>
+          {showRecordsGradient && (
+            <FadeGradient
+              color={theme.colors.colorSurfacePrimary}
+              style={styles.fadeGradient}
+            />
+          )}
+        </View>
+
+        <View
+          style={[
+            styles.foldersSection,
+            foldersMaxHeight !== null && { maxHeight: foldersMaxHeight }
+          ]}
         >
           <View
-            style={[
-              styles.recordsSection,
-              recordsMaxHeight !== null && { maxHeight: recordsMaxHeight }
-            ]}
-            onLayout={(e) =>
-              setRecordsLayoutHeight(e.nativeEvent.layout.height)
-            }
+            onLayout={(e) => setFolderLabelHeight(e.nativeEvent.layout.height)}
           >
-            <ScrollView
-              style={styles.recordsScroll}
-              contentContainerStyle={[
-                styles.recordsContent,
-                showRecordsGradient && { paddingBottom: 70 }
-              ]}
-              showsVerticalScrollIndicator={false}
-              onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
-            >
-              <Text variant="caption" style={styles.sectionLabel}>
-                {t`Selected items`}
-              </Text>
-              {selectedRecordObjects.map((record) => (
-                <ListItem
-                  key={record.id}
-                  icon={<RecordItemIcon record={record} />}
-                  iconSize={32}
-                  title={record.data?.title ?? ''}
-                  subtitle={getRecordSubtitle(record) || undefined}
-                  style={styles.recordItem}
-                />
-              ))}
-            </ScrollView>
-            {showRecordsGradient && (
-              <FadeGradient
-                color={theme.colors.colorSurfacePrimary}
-                style={styles.fadeGradient}
-              />
-            )}
+            <Text variant="caption" style={styles.sectionLabel}>
+              {t`Choose the destination folder for these items`}
+            </Text>
           </View>
-
-          <View
-            style={[
-              styles.foldersSection,
-              foldersMaxHeight !== null && { maxHeight: foldersMaxHeight }
-            ]}
+          <ScrollView
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={showFoldersGradient && { paddingBottom: 70 }}
           >
             <View
+              style={styles.foldersList}
               onLayout={(e) =>
-                setFolderLabelHeight(e.nativeEvent.layout.height)
+                setFolderButtonsHeight(e.nativeEvent.layout.height)
               }
             >
-              <Text variant="caption" style={styles.sectionLabel}>
-                {t`Choose the destination folder for these items`}
-              </Text>
+              {folderList.map((folder) => (
+                <Button
+                  key={folder.name}
+                  variant="secondary"
+                  fullWidth
+                  iconBefore={<FolderOpen />}
+                  onClick={() => setSelectedFolder(folder.name)}
+                  style={[
+                    styles.folderButton,
+                    { borderColor: theme.colors.colorBorderSecondary },
+                    selectedFolder === folder.name && {
+                      backgroundColor:
+                        theme.colors.colorSurfaceElevatedOnInteraction
+                    }
+                  ]}
+                >
+                  {folder.name}
+                </Button>
+              ))}
             </View>
-            <ScrollView
-              style={{ flex: 1 }}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={
-                showFoldersGradient && { paddingBottom: 70 }
-              }
-            >
-              <View
-                style={styles.foldersList}
-                onLayout={(e) =>
-                  setFolderButtonsHeight(e.nativeEvent.layout.height)
-                }
-              >
-                {folderList.map((folder) => (
-                  <Button
-                    key={folder.name}
-                    variant="secondary"
-                    fullWidth
-                    iconBefore={<FolderOpen />}
-                    onClick={() => setSelectedFolder(folder.name)}
-                    style={[
-                      styles.folderButton,
-                      { borderColor: theme.colors.colorBorderSecondary },
-                      selectedFolder === folder.name && {
-                        backgroundColor:
-                          theme.colors.colorSurfaceElevatedOnInteraction
-                      }
-                    ]}
-                  >
-                    {folder.name}
-                  </Button>
-                ))}
-              </View>
-            </ScrollView>
-            {showFoldersGradient && (
-              <FadeGradient
-                color={theme.colors.colorSurfacePrimary}
-                style={styles.foldersFadeGradient}
-              />
-            )}
-          </View>
+          </ScrollView>
+          {showFoldersGradient && (
+            <FadeGradient
+              color={theme.colors.colorSurfacePrimary}
+              style={styles.foldersFadeGradient}
+            />
+          )}
         </View>
-      </ContentContainer>
-    </ScreenLayout>
+      </View>
+    </Layout>
   )
 }
