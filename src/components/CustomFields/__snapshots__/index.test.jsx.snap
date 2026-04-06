@@ -15,6 +15,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
   >
     <View>
       <View
+        accessibilityLabel="New comment input field"
         accessibilityState={
           {
             "busy": undefined,
@@ -174,6 +175,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
               }
             >
               <TextInput
+                accessibilityLabel="New comment input field"
                 accessible={true}
                 editable={true}
                 ellipsizeMode="tail"
@@ -215,6 +217,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
             }
           >
             <View
+              accessibilityLabel="Delete new comment field button"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -264,6 +267,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                   "paddingTop": 7,
                 }
               }
+              testID="delete-new-comment-field-button"
             >
               <RNSVGSvgView
                 align="xMidYMid"
@@ -336,6 +340,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
   >
     <View>
       <View
+        accessibilityLabel="New comment input field"
         accessibilityState={
           {
             "busy": undefined,
@@ -495,6 +500,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
               }
             >
               <TextInput
+                accessibilityLabel="New comment input field"
                 accessible={true}
                 editable={true}
                 ellipsizeMode="tail"
@@ -536,6 +542,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
             }
           >
             <View
+              accessibilityLabel="Delete new comment field button"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -585,6 +592,7 @@ exports[`CustomFields component renders correctly with note custom fields 1`] = 
                   "paddingTop": 7,
                 }
               }
+              testID="delete-new-comment-field-button"
             >
               <RNSVGSvgView
                 align="xMidYMid"
