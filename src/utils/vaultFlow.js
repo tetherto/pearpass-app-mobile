@@ -1,42 +1,13 @@
-import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
-
-const PASSWORD_STRENGTH_META = {
-  vulnerable: {
-    progress: 0.33,
-    color: '#F87171',
-    tone: 'critical'
-  },
-  weak: {
-    progress: 0.66,
-    color: '#FBBF24',
-    tone: 'warning'
-  },
-  safe: {
-    progress: 1,
-    color: '#A3E635',
-    tone: 'success'
-  }
-}
+import { getPasswordStrengthMeta } from './passwordPolicy'
 
 export const getVaultPasswordStrengthMeta = (password, errors = {}) => {
-  if (!password?.length) {
-    return {
-      result: null,
-      progress: 0,
-      color: '#2B3320',
-      tone: 'idle'
-    }
-  }
-
-  const result = checkPasswordStrength(password, { errors })
-  const strengthMeta =
-    PASSWORD_STRENGTH_META[result.type] || PASSWORD_STRENGTH_META.vulnerable
+  const meta = getPasswordStrengthMeta(password, errors)
 
   return {
-    result,
-    progress: strengthMeta.progress,
-    color: strengthMeta.color,
-    tone: strengthMeta.tone
+    result: meta.result,
+    progress: meta.progress,
+    color: meta.color,
+    tone: meta.tone
   }
 }
 

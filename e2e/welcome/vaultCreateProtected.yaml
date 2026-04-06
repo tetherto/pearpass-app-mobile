@@ -6,10 +6,10 @@ appId: com.pears.pass
 - assertVisible: "Create New Vault"
 - tapOn: "Enter Name"
 - inputText: "My protected vault"
-- tapOn: "new-vault-password-toggle"
+- tapOn: "Set Vault Password"
 - tapOn: "Enter vault password"
-- inputText: 1234
+- inputText: "StrongVault#2026"
 - tapOn: "Repeat vault password"
-- inputText: 1234
-- tapOn: "Create Vault"
+- inputText: "StrongVault#2026"
+- tapOn: "Create New Vault"
 - assertVisible: "This collection is empty."

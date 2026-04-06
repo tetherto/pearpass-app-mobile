@@ -13,16 +13,15 @@ import {
   clearBuffer,
   stringToBuffer
 } from '@tetherto/pearpass-lib-vault/src/utils/buffer'
-import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
 import { Platform } from 'react-native'
 
 import { logger } from '../../../utils/logger'
-
-const STRENGTH_TO_INDICATOR = {
-  vulnerable: 'vulnerable',
-  weak: 'decent',
-  safe: 'strong'
-}
+import {
+  getPasswordIndicatorVariant,
+  getPasswordValidationMessages,
+  getPasswordsMatch,
+  getPasswordStrengthMeta
+} from '../../../utils/passwordPolicy'
 
 export const usePasswordCreation = () => {
   const { t } = useLingui()
@@ -43,13 +42,7 @@ export const usePasswordCreation = () => {
     []
   )
 
-  const errors = {
-    minLength: t`Password must be at least 8 characters long`,
-    hasLowerCase: t`Password must contain at least one lowercase letter`,
-    hasUpperCase: t`Password must contain at least one uppercase letter`,
-    hasNumbers: t`Password must contain at least one number`,
-    hasSymbols: t`Password must contain at least one special character`
-  }
+  const errors = getPasswordValidationMessages(t)
 
   const schema = Validator.object({
     password: Validator.string().required(t`Password is required`),
@@ -70,13 +63,11 @@ export const usePasswordCreation = () => {
   const { ...passwordConfirmRegisterProps } = register('passwordConfirm')
 
   const validateMasterPassword = (password) => {
-    const result = checkPasswordStrength(password, { errors })
+    const result = getPasswordStrengthMeta(password, errors).result
 
     if (!result.success) {
       setErrors((prev) => ({ ...prev, password: result.errors[0] }))
-      setPasswordIndicatorVariant(
-        STRENGTH_TO_INDICATOR[result.type] || 'vulnerable'
-      )
+      setPasswordIndicatorVariant(getPasswordIndicatorVariant(password, errors))
       return false
     }
 
@@ -98,7 +89,7 @@ export const usePasswordCreation = () => {
     validateMasterPassword(val)
 
     if (values.passwordConfirm) {
-      setPasswordsMatch(val === values.passwordConfirm)
+      setPasswordsMatch(getPasswordsMatch(val, values.passwordConfirm))
     }
   }
 
@@ -106,7 +97,7 @@ export const usePasswordCreation = () => {
     setValue('passwordConfirm', val)
 
     if (values.password && val) {
-      const match = values.password === val
+      const match = getPasswordsMatch(values.password, val)
       setPasswordsMatch(match)
 
       if (match) {

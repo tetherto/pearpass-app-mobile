@@ -6,5 +6,5 @@ appId: com.pears.pass
 - assertVisible: "Create New Vault"
 - tapOn: "Enter Name"
 - inputText: "My Vault"
-- tapOn: "Create Vault"
+- tapOn: "Create New Vault"
 - assertVisible: "This collection is empty."
