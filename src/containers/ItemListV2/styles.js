@@ -1,7 +1,5 @@
 import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
-import { FADE_GRADIENT_HEIGHT } from '../../components/FadeGradient'
-
 export const createStyles = (colors) => ({
   contentContainer: {
     flex: 1,
@@ -11,9 +9,6 @@ export const createStyles = (colors) => ({
     flex: 1,
     paddingHorizontal: rawTokens.spacing12,
     paddingVertical: rawTokens.spacing12
-  },
-  sectionListContent: {
-    paddingBottom: FADE_GRADIENT_HEIGHT
   },
   sectionHeaderContainer: {
     flexDirection: 'row',
@@ -42,7 +37,6 @@ export const createStyles = (colors) => ({
     bottom: 0,
     left: 0,
     right: 0,
-    height: FADE_GRADIENT_HEIGHT,
     zIndex: 1
   }
 })

@@ -13,8 +13,7 @@ export const createStyles = (colors) => ({
     overflow: 'hidden'
   },
   breadcrumbScrollContainer: {
-    flex: 1,
-    height: 57
+    flex: 1
   },
   breadcrumbScroll: {
     flexDirection: 'row',

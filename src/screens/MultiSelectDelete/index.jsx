@@ -7,10 +7,7 @@ import { useRecords } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, View } from 'react-native'
 
 import { createStyles } from './styles'
-import {
-  FADE_GRADIENT_HEIGHT,
-  FadeGradient
-} from '../../components/FadeGradient'
+import { FadeGradient } from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
@@ -25,6 +22,7 @@ export const MultiSelectDelete = () => {
 
   const [recordsContentHeight, setRecordsContentHeight] = useState(0)
   const [recordsLayoutHeight, setRecordsLayoutHeight] = useState(0)
+  const [listItemHeight, setListItemHeight] = useState(0)
 
   const showGradient = recordsContentHeight > recordsLayoutHeight
 
@@ -67,12 +65,13 @@ export const MultiSelectDelete = () => {
           style={styles.recordsScroll}
           contentContainerStyle={[
             styles.recordsContent,
-            showGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
+            showGradient &&
+              listItemHeight > 0 && { paddingBottom: listItemHeight }
           ]}
           showsVerticalScrollIndicator={false}
           onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
         >
-          {selectedRecordObjects.map((record) => (
+          {selectedRecordObjects.map((record, index) => (
             <ListItem
               key={record.id}
               icon={<RecordItemIcon record={record} />}
@@ -80,13 +79,18 @@ export const MultiSelectDelete = () => {
               title={record.data?.title ?? ''}
               subtitle={getRecordSubtitle(record) || undefined}
               style={styles.recordItem}
+              onLayout={
+                index === 0
+                  ? (e) => setListItemHeight(e.nativeEvent.layout.height)
+                  : undefined
+              }
             />
           ))}
         </ScrollView>
         {showGradient && (
           <FadeGradient
             color={theme.colors.colorSurfacePrimary}
-            style={styles.fadeGradient}
+            style={[styles.fadeGradient, { height: listItemHeight }]}
           />
         )}
       </View>

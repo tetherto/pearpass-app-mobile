@@ -14,10 +14,7 @@ import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, View } from 'react-native'
 
 import { createStyles } from './styles'
-import {
-  FADE_GRADIENT_HEIGHT,
-  FadeGradient
-} from '../../components/FadeGradient'
+import { FadeGradient } from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
@@ -38,6 +35,8 @@ export const MultiSelectMove = () => {
   const [folderButtonsHeight, setFolderButtonsHeight] = useState(0)
   const [foldersScrollableHeight, setFoldersScrollableHeight] = useState(0)
   const [foldersVisibleHeight, setFoldersVisibleHeight] = useState(0)
+  const [listItemHeight, setListItemHeight] = useState(0)
+  const [folderButtonHeight, setFolderButtonHeight] = useState(0)
 
   const half = containerHeight / 2
   // Math.ceil guards against sub-pixel truncation in onLayout measurements
@@ -116,12 +115,13 @@ export const MultiSelectMove = () => {
             style={styles.recordsScroll}
             contentContainerStyle={[
               styles.recordsContent,
-              showRecordsGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
+              showRecordsGradient &&
+                listItemHeight > 0 && { paddingBottom: listItemHeight }
             ]}
             showsVerticalScrollIndicator={false}
             onContentSizeChange={(_, h) => setRecordsScrollableHeight(h)}
           >
-            {selectedRecordObjects.map((record) => (
+            {selectedRecordObjects.map((record, index) => (
               <ListItem
                 key={record.id}
                 icon={<RecordItemIcon record={record} />}
@@ -129,13 +129,18 @@ export const MultiSelectMove = () => {
                 title={record.data?.title ?? ''}
                 subtitle={getRecordSubtitle(record) || undefined}
                 style={styles.recordItem}
+                onLayout={
+                  index === 0
+                    ? (e) => setListItemHeight(e.nativeEvent.layout.height)
+                    : undefined
+                }
               />
             ))}
           </ScrollView>
           {showRecordsGradient && (
             <FadeGradient
               color={theme.colors.colorSurfacePrimary}
-              style={styles.fadeGradient}
+              style={[styles.fadeGradient, { height: listItemHeight }]}
             />
           )}
         </View>
@@ -152,7 +157,8 @@ export const MultiSelectMove = () => {
             style={{ flex: 1 }}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={
-              showFoldersGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
+              showFoldersGradient &&
+              folderButtonHeight > 0 && { paddingBottom: folderButtonHeight }
             }
             onContentSizeChange={(_, h) => setFoldersScrollableHeight(h)}
             onLayout={(e) =>
@@ -165,13 +171,19 @@ export const MultiSelectMove = () => {
                 setFolderButtonsHeight(e.nativeEvent.layout.height)
               }
             >
-              {folderList.map((folder) => (
+              {folderList.map((folder, index) => (
                 <Button
                   key={folder.name}
                   variant="secondary"
                   fullWidth
                   iconBefore={<FolderOpen />}
                   onClick={() => setSelectedFolder(folder.name)}
+                  onLayout={
+                    index === 0
+                      ? (e) =>
+                          setFolderButtonHeight(e.nativeEvent.layout.height)
+                      : undefined
+                  }
                   style={[
                     styles.folderButton,
                     { borderColor: theme.colors.colorBorderSecondary },
@@ -189,7 +201,10 @@ export const MultiSelectMove = () => {
           {showFoldersGradient && (
             <FadeGradient
               color={theme.colors.colorSurfacePrimary}
-              style={styles.foldersFadeGradient}
+              style={[
+                styles.foldersFadeGradient,
+                { height: folderButtonHeight }
+              ]}
             />
           )}
         </View>

@@ -35,7 +35,7 @@ const CollapsibleSectionHeader = ({
         { transform: [{ rotate: isCollapsed ? '-90deg' : '0deg' }] }
       ]}
     >
-      <ExpandMore width={10} height={10} color={iconColor} />
+      <ExpandMore width={16} height={16} color={iconColor} />
     </View>
 
     {section.isFavorites && (
@@ -60,6 +60,7 @@ export const ItemListV2 = ({
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
   const [collapsedSections, setCollapsedSections] = useState({})
+  const [listItemHeight, setListItemHeight] = useState(0)
   const styles = createStyles(theme.colors)
 
   const sectionTitleMap = useMemo(
@@ -138,7 +139,9 @@ export const ItemListV2 = ({
     <View style={styles.contentContainer}>
       <SectionList
         style={styles.sectionList}
-        contentContainerStyle={styles.sectionListContent}
+        contentContainerStyle={
+          listItemHeight > 0 && { paddingBottom: listItemHeight }
+        }
         sections={visibleSections}
         keyExtractor={(item) => item.id}
         extraData={selectedRecords}
@@ -152,8 +155,15 @@ export const ItemListV2 = ({
             iconColor={theme.colors.colorTextSecondary}
           />
         )}
-        renderItem={({ item: record }) => (
-          <View style={styles.recordItem}>
+        renderItem={({ item: record, index }) => (
+          <View
+            style={styles.recordItem}
+            onLayout={
+              index === 0
+                ? (e) => setListItemHeight(e.nativeEvent.layout.height)
+                : undefined
+            }
+          >
             <ListItem
               icon={<RecordItemIcon record={record} />}
               iconSize={32}
@@ -195,7 +205,7 @@ export const ItemListV2 = ({
       />
       <FadeGradient
         color={theme.colors.colorSurfacePrimary}
-        style={styles.fadeGradient}
+        style={[styles.fadeGradient, { height: listItemHeight }]}
       />
     </View>
   )
