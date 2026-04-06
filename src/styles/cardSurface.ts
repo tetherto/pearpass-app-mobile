@@ -7,5 +7,5 @@ export const cardSurface = {
   borderTopWidth: 1,
   borderLeftWidth: 1,
   borderRightWidth: 1,
-  overflow: 'hidden'
+  overflow: 'hidden' as const
 }
