@@ -9,6 +9,7 @@ import {
   AssignmentInd,
   FormatQuote,
   GridView,
+  LockOutlined,
   Note,
   WiFi
 } from '@tetherto/pearpass-lib-ui-kit/icons'
@@ -131,7 +132,8 @@ export const useRecordMenuItems = ({ exclude } = {}) => {
         {
           name: t`Password`,
           type: 'password',
-          description: t`Create a safe password or passphrase`
+          description: t`Create a safe password or passphrase`,
+          icon: LockOutlined
         }
       ].filter((item) => !exclude?.includes(item.type)),
     [t, exclude]

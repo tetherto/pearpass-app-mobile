@@ -7,7 +7,10 @@ import { useRecords } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, View } from 'react-native'
 
 import { createStyles } from './styles'
-import { FadeGradient } from '../../components/FadeGradient'
+import {
+  FADE_GRADIENT_HEIGHT,
+  FadeGradient
+} from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
@@ -38,7 +41,7 @@ export const MultiSelectDelete = () => {
     <Layout
       header={
         <BackScreenHeader
-          title={`${t`Delete`} ${selectedRecordIds.length} ${t`Items`}`}
+          title={t`Delete ${selectedRecordIds.length} Items`}
           onBack={() => navigation.goBack()}
         />
       }
@@ -61,7 +64,7 @@ export const MultiSelectDelete = () => {
           style={styles.recordsScroll}
           contentContainerStyle={[
             styles.recordsContent,
-            showGradient && { paddingBottom: 70 }
+            showGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
           ]}
           showsVerticalScrollIndicator={false}
           onContentSizeChange={(_, h) => setRecordsContentHeight(h)}

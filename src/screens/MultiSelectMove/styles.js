@@ -1,5 +1,7 @@
 import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
+import { FADE_GRADIENT_HEIGHT } from '../../components/FadeGradient'
+
 export const createStyles = (colors) => ({
   recordsSection: {
     position: 'relative'
@@ -24,7 +26,7 @@ export const createStyles = (colors) => ({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 70
+    height: FADE_GRADIENT_HEIGHT
   },
   foldersSection: {
     flex: 1,
@@ -46,6 +48,6 @@ export const createStyles = (colors) => ({
     bottom: rawTokens.spacing12,
     left: 0,
     right: 0,
-    height: 70
+    height: FADE_GRADIENT_HEIGHT
   }
 })

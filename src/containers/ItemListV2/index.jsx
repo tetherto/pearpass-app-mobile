@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 
+import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
@@ -54,11 +55,25 @@ export const ItemListV2 = ({
   setSelectedRecords,
   setIsMultiSelectOn
 }) => {
+  const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
   const [collapsedSections, setCollapsedSections] = useState({})
   const styles = createStyles(theme.colors)
+
+  const sectionTitleMap = useMemo(
+    () => ({
+      favorites: t`Favorites`,
+      all: t`All Items`,
+      today: t`Today`,
+      yesterday: t`Yesterday`,
+      thisWeek: t`This Week`,
+      thisMonth: t`This Month`,
+      older: t`Older`
+    }),
+    [t]
+  )
 
   const toggleSection = useCallback((key) => {
     setCollapsedSections((prev) => ({ ...prev, [key]: !prev[key] }))
@@ -113,9 +128,10 @@ export const ItemListV2 = ({
     () =>
       sections.map((section) => ({
         ...section,
+        title: sectionTitleMap[section.key] ?? section.title,
         data: collapsedSections[section.key] ? [] : section.data
       })),
-    [sections, collapsedSections]
+    [sections, collapsedSections, sectionTitleMap]
   )
 
   return (
@@ -172,8 +188,8 @@ export const ItemListV2 = ({
           </View>
         )}
         renderSectionFooter={({ section }) => {
-          const idx = visibleSections.findIndex((s) => s.key === section.key)
-          if (idx === visibleSections.length - 1) return null
+          if (section.key === visibleSections[visibleSections.length - 1]?.key)
+            return null
           return <View style={styles.divider} />
         }}
       />

@@ -1,21 +1,12 @@
-import { useContext } from 'react'
-
 import { useLingui } from '@lingui/react/macro'
-import {
-  Button,
-  NavbarListItem,
-  Text,
-  useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
-import { View } from 'react-native'
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
+import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { Layout } from '../Layout'
 
 export const BottomSheetCategorySelectorContent = ({
@@ -26,9 +17,7 @@ export const BottomSheetCategorySelectorContent = ({
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
   const { state } = useSharedFilter()
-  const styles = createStyles()
-  const insets = useContext(SafeAreaInsetsContext)
-  const bottom = insets?.bottom ?? 0
+  const { bottom } = useSafeAreaInsets()
 
   const menuItems = useRecordMenuItems({ exclude: ['password'] })
 
@@ -49,35 +38,12 @@ export const BottomSheetCategorySelectorContent = ({
     collapse()
   }
 
-  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
-
   return (
     <Layout
       mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
-      header={
-        <>
-          <View style={styles.dragHandleArea}>
-            <View
-              style={[styles.dragHandle, { backgroundColor: handleColor }]}
-            />
-          </View>
-          <View style={styles.header}>
-            <View style={styles.headerSpacer} />
-            <Text variant="bodyEmphasized" style={styles.headerTitle}>
-              {t`Categories`}
-            </Text>
-            <Button
-              variant="tertiary"
-              size="medium"
-              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-              onClick={collapse}
-              aria-label={t`Close`}
-            />
-          </View>
-        </>
-      }
+      header={<SheetHeader title={t`Categories`} onClose={collapse} />}
     >
       {menuItems.map((item, index) => {
         const Icon = item.icon

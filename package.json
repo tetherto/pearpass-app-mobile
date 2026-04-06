@@ -49,7 +49,7 @@
     "@tetherto/pear-apps-utils-pattern-search": "git+https://github.com/tetherto/pear-apps-utils-pattern-search.git",
     "@tetherto/pear-apps-utils-qr": "git+https://github.com/tetherto/pear-apps-utils-qr.git",
     "@tetherto/pear-apps-utils-validator": "git+https://github.com/tetherto/pear-apps-utils-validator.git",
-    "@tetherto/pearpass-lib-constants": "git+https://github.com/tetherto/pearpass-lib-constants.git",
+    "@tetherto/pearpass-lib-constants": "git+https://github.com/tetherto/pearpass-lib-constants.git#vault-screen-v2",
     "@tetherto/pearpass-lib-data-export": "git+https://github.com/tetherto/pearpass-lib-data-export.git",
     "@tetherto/pearpass-lib-data-import": "git+https://github.com/tetherto/pearpass-lib-data-import.git",
     "@tetherto/pearpass-lib-ui-kit": "github:shavtvalishvili/pearpass-lib-ui-react-native-components#vault-screen-v2",

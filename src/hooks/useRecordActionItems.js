@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
+import { SORT_KEYS } from '../constants/sortOptions'
 import { BottomSheetSortContent } from '../containers/BottomSheetSortContent'
 import { useBottomSheet } from '../context/BottomSheetContext'
 import { useSharedFilter } from '../context/SharedFilterContext'
@@ -49,12 +50,12 @@ export const useRecordActionItems = ({
       selectedRecordObjects: [record],
       onComplete: onDelete
     })
-  }, [record, onDelete])
+  }, [record, onDelete, collapse, navigation])
 
   const handleFavoriteToggle = useCallback(() => {
     updateFavoriteState([record?.id], !record?.isFavorite)
     collapse?.()
-  }, [record])
+  }, [record, collapse, updateFavoriteState])
 
   const handleEdit = useCallback(() => {
     navigation.navigate('CreateRecord', {
@@ -63,7 +64,7 @@ export const useRecordActionItems = ({
       selectedFolder: record.folder
     })
     collapse?.()
-  }, [record])
+  }, [record, navigation, collapse])
 
   const handleMoveClick = useCallback(() => {
     collapse?.()
@@ -71,21 +72,27 @@ export const useRecordActionItems = ({
       selectedRecordIds: [record?.id],
       selectedRecordObjects: [record]
     })
-  }, [record])
+  }, [record, navigation, collapse])
 
-  const handleCopy = useCallback((value) => {
-    if (!value?.length) {
-      return
-    }
+  const handleCopy = useCallback(
+    (value) => {
+      if (!value?.length) {
+        return
+      }
 
-    copyToClipboard(value)
-    collapse?.()
-  }, [])
+      copyToClipboard(value)
+      collapse?.()
+    },
+    [copyToClipboard, collapse]
+  )
 
-  const handleSort = useCallback((sortOrder) => {
-    setState((prev) => ({ ...prev, sort: sortOrder }))
-    collapse?.()
-  }, [])
+  const handleSort = useCallback(
+    (sortOrder) => {
+      setState((prev) => ({ ...prev, sort: sortOrder }))
+      collapse?.()
+    },
+    [setState, collapse]
+  )
 
   const actionsByType = useMemo(
     () => ({
@@ -200,28 +207,22 @@ export const useRecordActionItems = ({
   const recordSortActions = useMemo(
     () => [
       {
-        name: t`Recent`,
-        type: 'recent',
-        click: () => {
-          handleSort('Recent')
-        }
+        name: t`Last Updated (Newest first)`,
+        type: 'sort',
+        click: () => handleSort(SORT_KEYS.LAST_UPDATED_NEWEST)
       },
       {
-        name: t`Newest to oldest`,
+        name: t`Last Updated (Oldest first)`,
         type: 'sort',
-        click: () => {
-          handleSort('Newest to oldest')
-        }
+        click: () => handleSort(SORT_KEYS.LAST_UPDATED_OLDEST)
       },
       {
-        name: t`Oldest to newest`,
+        name: t`Title (A-Z)`,
         type: 'sort',
-        click: () => {
-          handleSort('Oldest to newest')
-        }
+        click: () => handleSort(SORT_KEYS.TITLE_AZ)
       }
     ],
-    []
+    [handleSort, t]
   )
 
   const filteredActions = useMemo(

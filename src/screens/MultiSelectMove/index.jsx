@@ -14,7 +14,10 @@ import { useFolders, useRecords } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, View } from 'react-native'
 
 import { createStyles } from './styles'
-import { FadeGradient } from '../../components/FadeGradient'
+import {
+  FADE_GRADIENT_HEIGHT,
+  FadeGradient
+} from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
@@ -76,7 +79,7 @@ export const MultiSelectMove = () => {
     <Layout
       header={
         <BackScreenHeader
-          title={`${t`Move`} ${selectedRecordIds.length} ${t`Items`}`}
+          title={t`Move ${selectedRecordIds.length} Items`}
           onBack={() => navigation.goBack()}
         />
       }
@@ -99,7 +102,7 @@ export const MultiSelectMove = () => {
         <View
           style={[
             styles.recordsSection,
-            recordsMaxHeight !== null && { maxHeight: recordsMaxHeight }
+            recordsMaxHeight !== undefined && { maxHeight: recordsMaxHeight }
           ]}
           onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
         >
@@ -107,7 +110,7 @@ export const MultiSelectMove = () => {
             style={styles.recordsScroll}
             contentContainerStyle={[
               styles.recordsContent,
-              showRecordsGradient && { paddingBottom: 70 }
+              showRecordsGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
             ]}
             showsVerticalScrollIndicator={false}
             onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
@@ -137,7 +140,7 @@ export const MultiSelectMove = () => {
         <View
           style={[
             styles.foldersSection,
-            foldersMaxHeight !== null && { maxHeight: foldersMaxHeight }
+            foldersMaxHeight !== undefined && { maxHeight: foldersMaxHeight }
           ]}
         >
           <View
@@ -150,7 +153,9 @@ export const MultiSelectMove = () => {
           <ScrollView
             style={{ flex: 1 }}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={showFoldersGradient && { paddingBottom: 70 }}
+            contentContainerStyle={
+              showFoldersGradient && { paddingBottom: FADE_GRADIENT_HEIGHT }
+            }
           >
             <View
               style={styles.foldersList}

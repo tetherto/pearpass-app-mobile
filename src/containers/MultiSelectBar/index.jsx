@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
@@ -25,13 +27,25 @@ export const MultiSelectBar = ({
 
   const selectedCount = selectedRecords.length
 
-  const getSelectedRecordObjects = () =>
-    records.filter((r) => selectedRecords.includes(r.id))
+  const selectedRecordsSet = useMemo(
+    () => new Set(selectedRecords),
+    [selectedRecords]
+  )
+  const selectedRecordObjects = useMemo(
+    () => records.filter((r) => selectedRecordsSet.has(r.id)),
+    [records, selectedRecordsSet]
+  )
+  const allFavorited = useMemo(
+    () =>
+      selectedRecordObjects.length > 0 &&
+      selectedRecordObjects.every((r) => r.isFavorite),
+    [selectedRecordObjects]
+  )
 
   const handleMovePress = () => {
     navigation.navigate('MultiSelectMove', {
       selectedRecordIds: selectedRecords,
-      selectedRecordObjects: getSelectedRecordObjects(),
+      selectedRecordObjects,
       onComplete: () => {
         setSelectedRecords([])
         setIsMultiSelectOn(false)
@@ -41,14 +55,14 @@ export const MultiSelectBar = ({
 
   const handleFavoritePress = () => {
     if (!selectedCount) return
-    updateFavoriteState(selectedRecords, true)
+    updateFavoriteState(selectedRecords, !allFavorited)
     setSelectedRecords([])
   }
 
   const handleDeletePress = () => {
     navigation.navigate('MultiSelectDelete', {
       selectedRecordIds: selectedRecords,
-      selectedRecordObjects: getSelectedRecordObjects(),
+      selectedRecordObjects,
       onComplete: () => {
         setSelectedRecords([])
         setIsMultiSelectOn(false)

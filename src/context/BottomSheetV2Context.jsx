@@ -1,8 +1,7 @@
 import {
   createContext,
   useCallback,
-  useContext,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState
@@ -63,18 +62,18 @@ export const BottomSheetV2Provider = ({ children }) => {
     [screenHeight, backdropAnim]
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isExpanding.current) return
     pendingOpen.current = true
     ref.current?.snapToIndex(0)
 
-    const retryTimer = setTimeout(() => {
+    const retryId = setTimeout(() => {
       if (pendingOpen.current && isExpanding.current) {
         ref.current?.snapToIndex(0)
       }
-    }, 300)
+    }, 50)
 
-    return () => clearTimeout(retryTimer)
+    return () => clearTimeout(retryId)
   }, [snapPoints])
 
   const handleSheetChange = useCallback((index) => {
@@ -137,5 +136,3 @@ export const BottomSheetV2Provider = ({ children }) => {
     </BottomSheetV2Context.Provider>
   )
 }
-
-export const useBottomSheetV2 = () => useContext(BottomSheetV2Context)

@@ -1,6 +1,7 @@
-import { useCallback, useContext } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
 import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
   CheckBox,
@@ -13,7 +14,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useCreateRecord } from '@tetherto/pearpass-lib-vault'
 import { View } from 'react-native'
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -30,8 +31,7 @@ export const BottomSheetRecordActionsContentV2 = ({
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
   const styles = createStyles()
-  const insets = useContext(SafeAreaInsetsContext)
-  const bottom = insets?.bottom ?? 0
+  const { bottom } = useSafeAreaInsets()
 
   const { actions } = useRecordActionItems({ record, recordType, onDelete })
   const { createRecord } = useCreateRecord()
@@ -41,10 +41,10 @@ export const BottomSheetRecordActionsContentV2 = ({
   const moveAction = actions.find((a) => a.type === 'move')
   const deleteAction = actions.find((a) => a.type === 'delete')
 
-  const handleSelectItem = () => {
+  const handleSelectItem = useCallback(() => {
     collapse()
     onSelectItem?.()
-  }
+  }, [collapse, onSelectItem])
 
   const handleDuplicate = useCallback(async () => {
     await createRecord({
@@ -56,42 +56,52 @@ export const BottomSheetRecordActionsContentV2 = ({
     collapse()
   }, [record, createRecord, collapse])
 
-  const actionItems = [
-    {
-      icon: EditOutlined,
-      label: t`Edit`,
-      onPress: editAction?.click
-    },
-    {
-      icon: StarOutlined,
-      label: favoriteAction?.name ?? t`Add to Favorites`,
-      onPress: favoriteAction?.click
-    },
-    ...(onSelectItem
-      ? [{ icon: CheckBox, label: t`Select Item`, onPress: handleSelectItem }]
-      : []),
-    {
-      icon: Share,
-      label: t`Share Item`,
-      onPress: () => {}
-    },
-    {
-      icon: DriveFileMoveOutlined,
-      label: t`Move to Another Folder`,
-      onPress: moveAction?.click
-    },
-    {
-      icon: CopyAll,
-      label: t`Duplicate`,
-      onPress: handleDuplicate
-    },
-    {
-      icon: TrashOutlined,
-      label: t`Delete Item`,
-      onPress: deleteAction?.click,
-      isDestructive: true
-    }
-  ]
+  const actionItems = useMemo(
+    () => [
+      {
+        icon: EditOutlined,
+        label: t`Edit`,
+        onPress: editAction?.click
+      },
+      {
+        icon: StarOutlined,
+        label: favoriteAction?.name ?? t`Add to Favorites`,
+        onPress: favoriteAction?.click
+      },
+      ...(onSelectItem
+        ? [{ icon: CheckBox, label: t`Select Item`, onPress: handleSelectItem }]
+        : []),
+      ...(UNSUPPORTED
+        ? []
+        : [{ icon: Share, label: t`Share Item`, onPress: () => {} }]),
+      {
+        icon: DriveFileMoveOutlined,
+        label: t`Move to Another Folder`,
+        onPress: moveAction?.click
+      },
+      {
+        icon: CopyAll,
+        label: t`Duplicate`,
+        onPress: handleDuplicate
+      },
+      {
+        icon: TrashOutlined,
+        label: t`Delete Item`,
+        onPress: deleteAction?.click,
+        isDestructive: true
+      }
+    ],
+    [
+      editAction,
+      favoriteAction,
+      moveAction,
+      deleteAction,
+      onSelectItem,
+      handleSelectItem,
+      handleDuplicate,
+      t
+    ]
+  )
 
   const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 

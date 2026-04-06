@@ -1,27 +1,18 @@
-import { useContext } from 'react'
-
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Button,
-  NavbarListItem,
-  Text,
-  useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import {
-  Close,
   FolderCopy,
   Folder,
   CreateNewFolder,
   StarOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
-import { View } from 'react-native'
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
+import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { Layout } from '../Layout'
 
 export const BottomSheetFolderSelectorContent = () => {
@@ -30,9 +21,7 @@ export const BottomSheetFolderSelectorContent = () => {
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
   const { state, setState } = useSharedFilter()
-  const styles = createStyles()
-  const insets = useContext(SafeAreaInsetsContext)
-  const bottom = insets?.bottom ?? 0
+  const { bottom } = useSafeAreaInsets()
 
   const { data: folders } = useFolders()
   const { data: recordCountsByType } = useRecordCountsByType({})
@@ -49,35 +38,12 @@ export const BottomSheetFolderSelectorContent = () => {
     navigation.navigate('CreateFolder')
   }
 
-  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
-
   return (
     <Layout
       mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
-      header={
-        <>
-          <View style={styles.dragHandleArea}>
-            <View
-              style={[styles.dragHandle, { backgroundColor: handleColor }]}
-            />
-          </View>
-          <View style={styles.header}>
-            <View style={styles.headerSpacer} />
-            <Text variant="bodyEmphasized" style={styles.headerTitle}>
-              {t`Folders`}
-            </Text>
-            <Button
-              variant="tertiary"
-              size="medium"
-              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-              onClick={collapse}
-              aria-label={t`Close`}
-            />
-          </View>
-        </>
-      }
+      header={<SheetHeader title={t`Folders`} onClose={collapse} />}
     >
       <NavbarListItem
         icon={<FolderCopy color={theme.colors.colorTextPrimary} />}

@@ -1,3 +1,5 @@
+import { useCallback } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
@@ -24,6 +26,42 @@ import { BottomSheetVaultSelectorContent } from '../BottomSheetVaultSelectorCont
 
 const BREADCRUMB_HEIGHT = 57
 
+const BreadcrumbFade = ({ side, bgColor }) => (
+  <View
+    pointerEvents="none"
+    style={{
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      [side]: 0,
+      width: 24
+    }}
+  >
+    <Svg width={24} height={BREADCRUMB_HEIGHT}>
+      <Defs>
+        <LinearGradient
+          id={`breadcrumb-fade-${side}`}
+          x1={side === 'left' ? '1' : '0'}
+          y1="0"
+          x2={side === 'left' ? '0' : '1'}
+          y2="0"
+        >
+          <Stop offset="0" stopColor={bgColor} stopOpacity="0" />
+          <Stop offset="0.55" stopColor={bgColor} stopOpacity="0.7" />
+          <Stop offset="1" stopColor={bgColor} stopOpacity="1" />
+        </LinearGradient>
+      </Defs>
+      <Rect
+        x="0"
+        y="0"
+        width="24"
+        height={BREADCRUMB_HEIGHT}
+        fill={`url(#breadcrumb-fade-${side})`}
+      />
+    </Svg>
+  </View>
+)
+
 export const ContentHeader = ({
   isMultiSelectOn,
   setIsMultiSelectOn,
@@ -44,26 +82,26 @@ export const ContentHeader = ({
   const bgColor = theme.colors.colorSurfacePrimary
   const vaultName = vaultData?.name || t`Personal Vault`
   const folderLabel =
-    state?.folder &&
-    state?.folder !== 'allFolder' &&
-    state?.folder !== 'favorite'
-      ? state.folder
-      : t`All Folders`
+    state?.folder === 'favorite'
+      ? t`Favorites`
+      : state?.folder && state?.folder !== 'allFolder'
+        ? state.folder
+        : t`All Folders`
 
-  const handleCreateVault = () => {
+  const handleCreateVault = useCallback(() => {
     collapse()
     navigation.navigate('Welcome', { state: 'credentials' })
-  }
+  }, [collapse, navigation])
 
-  const handleVaultPress = () => {
+  const handleVaultPress = useCallback(() => {
     expand({
       children: (
         <BottomSheetVaultSelectorContent onCreateVault={handleCreateVault} />
       )
     })
-  }
+  }, [expand, handleCreateVault])
 
-  const handleCategoryPress = () => {
+  const handleCategoryPress = useCallback(() => {
     expand({
       children: (
         <BottomSheetCategorySelectorContent
@@ -72,18 +110,19 @@ export const ContentHeader = ({
         />
       )
     })
-  }
+  }, [expand, recordType, onCategoryChange])
 
-  const handleFolderPress = () => {
+  const handleFolderPress = useCallback(() => {
     expand({
       children: <BottomSheetFolderSelectorContent />
     })
-  }
+  }, [expand])
 
-  const handleToggleMultiSelect = () => {
+  const handleToggleMultiSelect = useCallback(() => {
+    collapse()
     setIsMultiSelectOn((prev) => !prev)
     setSelectedRecords([])
-  }
+  }, [collapse, setIsMultiSelectOn, setSelectedRecords])
 
   const renderBreadcrumbPill = (icon, label, onPress) => (
     <Button
@@ -96,36 +135,6 @@ export const ContentHeader = ({
     >
       {label}
     </Button>
-  )
-
-  const renderFade = (side) => (
-    <View
-      pointerEvents="none"
-      style={styles[side === 'left' ? 'fadeLeft' : 'fadeRight']}
-    >
-      <Svg width={24} height={BREADCRUMB_HEIGHT}>
-        <Defs>
-          <LinearGradient
-            id={`fade-${side}`}
-            x1={side === 'left' ? '1' : '0'}
-            y1="0"
-            x2={side === 'left' ? '0' : '1'}
-            y2="0"
-          >
-            <Stop offset="0" stopColor={bgColor} stopOpacity="0" />
-            <Stop offset="0.55" stopColor={bgColor} stopOpacity="0.7" />
-            <Stop offset="1" stopColor={bgColor} stopOpacity="1" />
-          </LinearGradient>
-        </Defs>
-        <Rect
-          x="0"
-          y="0"
-          width="24"
-          height={BREADCRUMB_HEIGHT}
-          fill={`url(#fade-${side})`}
-        />
-      </Svg>
-    </View>
   )
 
   return (
@@ -184,8 +193,8 @@ export const ContentHeader = ({
             </>
           )}
         </ScrollView>
-        {renderFade('left')}
-        {renderFade('right')}
+        <BreadcrumbFade side="left" bgColor={bgColor} />
+        <BreadcrumbFade side="right" bgColor={bgColor} />
       </View>
 
       <View style={styles.actionsArea}>

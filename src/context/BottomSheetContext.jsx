@@ -9,6 +9,7 @@ import {
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { Animated } from 'react-native'
 
 import { BackDrop } from '../components/BottomSheetBackdrop'
 
@@ -19,6 +20,7 @@ export const BottomSheetProvider = ({
   enableContentPanningGesture = true
 }) => {
   const bottomSheetRef = useRef(null)
+  const backdropAnim = useRef(new Animated.Value(1)).current
   const { theme } = useTheme()
 
   const [options, setOptions] = useState(null)
@@ -51,13 +53,9 @@ export const BottomSheetProvider = ({
 
   const renderBackdrop = useCallback(
     () => (
-      <BackDrop
-        activeOpacity={0.3}
-        onPress={collapseBottomSheet}
-        visible={!!options}
-      />
+      <BackDrop animatedOpacity={backdropAnim} onPress={collapseBottomSheet} />
     ),
-    [options, collapseBottomSheet]
+    [backdropAnim, collapseBottomSheet]
   )
 
   return (

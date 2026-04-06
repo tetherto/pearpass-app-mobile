@@ -1,24 +1,12 @@
-import { useContext } from 'react'
-
 import { useLingui } from '@lingui/react/macro'
-import {
-  Button,
-  NavbarListItem,
-  Text,
-  useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import {
-  CalendarToday,
-  Close,
-  SortByAlpha
-} from '@tetherto/pearpass-lib-ui-kit/icons'
-import { View } from 'react-native'
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { CalendarToday, SortByAlpha } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { createStyles } from './styles'
 import { SORT_KEYS } from '../../constants/sortOptions'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
+import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { Layout } from '../Layout'
 
 export const BottomSheetSortContentV2 = () => {
@@ -26,9 +14,7 @@ export const BottomSheetSortContentV2 = () => {
   const { theme } = useTheme()
   const { collapse } = useBottomSheet()
   const { state, setState } = useSharedFilter()
-  const styles = createStyles()
-  const insets = useContext(SafeAreaInsetsContext)
-  const bottom = insets?.bottom ?? 0
+  const { bottom } = useSafeAreaInsets()
 
   const sortOptions = [
     { key: SORT_KEYS.TITLE_AZ, label: t`Title (A-Z)`, icon: SortByAlpha },
@@ -61,34 +47,11 @@ export const BottomSheetSortContentV2 = () => {
     collapse()
   }
 
-  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
-
   return (
     <Layout
       mode="sheet"
       contentStyle={{ padding: 0, paddingBottom: bottom }}
-      header={
-        <>
-          <View style={styles.dragHandleArea}>
-            <View
-              style={[styles.dragHandle, { backgroundColor: handleColor }]}
-            />
-          </View>
-          <View style={styles.header}>
-            <View style={styles.headerSpacer} />
-            <Text variant="bodyEmphasized" style={styles.headerTitle}>
-              {t`Item Order`}
-            </Text>
-            <Button
-              variant="tertiary"
-              size="medium"
-              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-              onClick={collapse}
-              aria-label={t`Close`}
-            />
-          </View>
-        </>
-      }
+      header={<SheetHeader title={t`Item Order`} onClose={collapse} />}
     >
       {sortOptions.map(({ key, label, icon: Icon }, index) => (
         <NavbarListItem

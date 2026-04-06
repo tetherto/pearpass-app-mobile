@@ -13,6 +13,11 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { styles } from './styles'
 
 type LayoutProps = {
+  /**
+   * `'screen'` (default): renders the header *outside* the card surface, above it.
+   * `'sheet'`: renders the header *inside* the card (drag handle + title row).
+   * Pass a `<SheetHeader>` or equivalent when using `mode="sheet"`.
+   */
   mode?: 'screen' | 'sheet'
   header?: ReactNode
   children?: ReactNode

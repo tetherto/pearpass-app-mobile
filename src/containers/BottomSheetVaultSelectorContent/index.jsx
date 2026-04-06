@@ -1,21 +1,15 @@
-import { useContext, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { Button, ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import {
-  Add,
-  Close,
-  LockFilled,
-  MoreVert
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Button, ListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { Add, LockFilled, MoreVert } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
-import { View } from 'react-native'
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { createStyles } from './styles'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useGlobalLoading } from '../../context/LoadingContext'
 import { useModal } from '../../context/ModalContext'
+import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { BottomSheetVaultAction } from '../BottomSheetVaultAction'
 import { Layout } from '../Layout'
 import { VaultPasswordFormModalContent } from '../Modal/VaultPasswordFormModalContent'
@@ -24,10 +18,8 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const { collapse, expand } = useBottomSheet()
-  const insets = useContext(SafeAreaInsetsContext)
-  const bottom = insets?.bottom ?? 0
+  const { bottom } = useSafeAreaInsets()
   const { openModal, closeModal } = useModal()
-  const styles = createStyles()
 
   const [isLoading, setIsLoading] = useState(false)
   useGlobalLoading({ isLoading })
@@ -39,6 +31,8 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
     refetch: refetchVault
   } = useVault()
 
+  const replacingRef = useRef(false)
+
   const handleVaultPress = async (vault) => {
     if (vault.id === activeVault?.id) {
       collapse()
@@ -46,78 +40,65 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
     }
 
     setIsLoading(true)
-    const isProtected = await isVaultProtected(vault.id)
+    try {
+      const isProtected = await isVaultProtected(vault.id)
 
-    if (isProtected) {
+      if (isProtected) {
+        setIsLoading(false)
+        openModal(
+          <VaultPasswordFormModalContent
+            vault={vault}
+            onSubmit={async (password) => {
+              setIsLoading(true)
+              try {
+                await refetchVault(vault.id, { password })
+                closeModal()
+                collapse()
+              } finally {
+                setIsLoading(false)
+              }
+            }}
+          />
+        )
+      } else {
+        await refetchVault(vault.id)
+        collapse()
+      }
+    } finally {
       setIsLoading(false)
-      openModal(
-        <VaultPasswordFormModalContent
-          vault={vault}
-          onSubmit={async (password) => {
-            setIsLoading(true)
-            await refetchVault(vault.id, { password })
-            setIsLoading(false)
-            closeModal()
-            collapse()
-          }}
-        />
-      )
-    } else {
-      await refetchVault(vault.id)
-      setIsLoading(false)
-      collapse()
     }
   }
 
   const handleVaultActionsPress = (vault) => {
+    replacingRef.current = true
     expand({
       children: (
         <BottomSheetVaultAction
           vaultId={vault.id}
           vaultName={vault.name}
-          onDismiss={() =>
-            expand({
-              children: (
-                <BottomSheetVaultSelectorContent
-                  onCreateVault={onCreateVault}
-                />
-              )
-            })
-          }
+          onDismiss={() => {
+            if (!replacingRef.current) {
+              expand({
+                children: (
+                  <BottomSheetVaultSelectorContent
+                    onCreateVault={onCreateVault}
+                  />
+                )
+              })
+            }
+            replacingRef.current = false
+          }}
         />
       )
     })
   }
-
-  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
 
   return (
     <Layout
       mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
-      header={
-        <>
-          <View style={styles.dragHandleArea}>
-            <View
-              style={[styles.dragHandle, { backgroundColor: handleColor }]}
-            />
-          </View>
-          <View style={styles.header}>
-            <View style={styles.headerSpacer} />
-            <Text variant="bodyEmphasized" style={styles.headerTitle}>
-              {t`Vaults`}
-            </Text>
-            <Button
-              variant="tertiary"
-              size="medium"
-              iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-              onClick={collapse}
-              aria-label={t`Close`}
-            />
-          </View>
-        </>
-      }
+      header={<SheetHeader title={t`Vaults`} onClose={collapse} />}
     >
       {vaultsData?.map((vault) => {
         const isActive = vault.id === activeVault?.id

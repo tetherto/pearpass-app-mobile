@@ -83,7 +83,7 @@ export const groupRecordsByTimePeriod = (records, sort) => {
     timeSections.push({ title: 'Yesterday', key: 'yesterday', data: yesterday })
   }
   if (thisWeek.length) {
-    timeSections.push({ title: 'This week', key: 'thisWeek', data: thisWeek })
+    timeSections.push({ title: 'This Week', key: 'thisWeek', data: thisWeek })
   }
   if (thisMonth.length) {
     timeSections.push({

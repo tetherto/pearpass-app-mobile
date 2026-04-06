@@ -16,16 +16,6 @@ export const createStyles = (colors) => ({
     flex: 1,
     height: 57
   },
-  fadeLeft: {
-    position: 'absolute',
-    left: 0,
-    top: 0
-  },
-  fadeRight: {
-    position: 'absolute',
-    right: 0,
-    top: 0
-  },
   breadcrumbScroll: {
     flexDirection: 'row',
     alignItems: 'center',
