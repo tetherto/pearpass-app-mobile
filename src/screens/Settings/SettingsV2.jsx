@@ -56,7 +56,7 @@ export const SettingsV2 = () => {
           {
             key: 'master-password',
             label: t`Master Password`,
-            screen: 'Security',
+            screen: 'MasterPassword',
             icon: Key
           }
         ]
