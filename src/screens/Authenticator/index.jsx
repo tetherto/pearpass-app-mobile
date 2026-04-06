@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   PlusIcon,
   SaveIcon
@@ -16,6 +15,7 @@ import {
 } from '@tetherto/pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { isV2 } from 'src/utils/designVersion'
 
 import { styles } from './styles'
 import { AvatarRecord } from '../../components/AvatarRecord'
@@ -138,27 +138,27 @@ export const Authenticator = () => {
     )
   }
 
-  const Wrapper = DESIGN_VERSION === 2 ? ScreenLayout : SafeAreaView
-  const wrapperProps =
-    DESIGN_VERSION === 2
-      ? {
-          header: (
-            <Header
-              setSearchValue={setSearchValue}
-              searchValue={searchValue}
-              itemsFound={otpRecords.length}
-              setIsMultiSelectOn={() => {}}
-              isMultiSelectOn={false}
-              setSelectedRecords={() => {}}
-              selectedRecords={[]}
-            />
-          )
-        }
-      : { style: styles.container }
+  const Wrapper = isV2() ? ScreenLayout : SafeAreaView
+  const wrapperProps = isV2()
+    ? {
+        header: (
+          <Header
+            setSearchValue={setSearchValue}
+            searchValue={searchValue}
+            itemsFound={otpRecords.length}
+            setIsMultiSelectOn={() => {}}
+            isMultiSelectOn={false}
+            setSelectedRecords={() => {}}
+            selectedRecords={[]}
+          />
+        ),
+        hideFooter: true
+      }
+    : { style: styles.container }
 
   return (
     <Wrapper {...wrapperProps}>
-      {DESIGN_VERSION === 1 && (
+      {!isV2() && (
         <Header
           setSearchValue={setSearchValue}
           searchValue={searchValue}

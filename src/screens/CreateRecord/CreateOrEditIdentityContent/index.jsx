@@ -335,6 +335,13 @@ export const CreateOrEditIdentityContent = ({
     setValue(fieldName, updatedAttachments)
   }
 
+  const handleAttachmentRename = (index, fieldName, newName) => {
+    const updatedAttachments = values[fieldName].map((attachment, idx) =>
+      idx === index ? { ...attachment, name: newName } : attachment
+    )
+    setValue(fieldName, updatedAttachments)
+  }
+
   return (
     <Wrapper>
       <Header>
@@ -539,6 +546,9 @@ export const CreateOrEditIdentityContent = ({
                 onRemove={(index) =>
                   handleAttachmentDelete(index, 'passportPicture')
                 }
+                onRename={(index, newName) =>
+                  handleAttachmentRename(index, 'passportPicture', newName)
+                }
                 title={t`Passport picture`}
                 pictures={values.passportPicture}
                 testID="passport-picture-field"
@@ -600,6 +610,9 @@ export const CreateOrEditIdentityContent = ({
                 onAdd={(file) => handleFileUpload(file, 'idCardPicture')}
                 onRemove={(index) =>
                   handleAttachmentDelete(index, 'idCardPicture')
+                }
+                onRename={(index, newName) =>
+                  handleAttachmentRename(index, 'idCardPicture', newName)
                 }
                 title={t`ID card picture`}
                 pictures={values.idCardPicture}
@@ -666,6 +679,13 @@ export const CreateOrEditIdentityContent = ({
                 onRemove={(index) =>
                   handleAttachmentDelete(index, 'drivingLicensePicture')
                 }
+                onRename={(index, newName) =>
+                  handleAttachmentRename(
+                    index,
+                    'drivingLicensePicture',
+                    newName
+                  )
+                }
                 title={t`Driving license picture`}
                 pictures={values.drivingLicensePicture}
                 testID="driving-license-picture-field"
@@ -692,13 +712,16 @@ export const CreateOrEditIdentityContent = ({
                   key={attachment?.id || attachment.name}
                   attachment={attachment}
                   attachmentIndex={index}
-                  onDelete={(idx) => handleAttachmentDelete(idx, 'attachments')}
+                  onDelete={() => handleAttachmentDelete(index, 'attachments')}
                   isLast
                   label={'File'}
                   testID="new-added-file-field"
                   accessibilityLabel="New added file field"
                   textTestID="new-added-file-text"
                   textAccessibilityLabel="New added file text"
+                  onRename={(newName) =>
+                    handleAttachmentRename(index, 'attachments', newName)
+                  }
                   additionalItems={
                     <ButtonLittle
                       startIcon={DeleteIcon}

@@ -1,19 +1,19 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   HomeIcon,
   PlusIcon,
   SettingsIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { isV2 } from 'src/utils/designVersion'
 
-import { TabNavigatorV2 } from './TabNavigatorV2'
 import { BottomSheetRecordCreateContent } from '../../containers/BottomSheetRecordCreateContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { DrawerNavigator } from '../DrawerNavigator'
 import { SettingsNavigator } from '../SettingsNavigator'
+import { TabNavigatorV2 } from './TabNavigatorV2'
 
 const Tab = createBottomTabNavigator()
 
@@ -115,7 +115,7 @@ const TabNavigatorV1 = () => {
 }
 
 export const TabNavigator = () => {
-  if (DESIGN_VERSION === 2) {
+  if (isV2()) {
     return <TabNavigatorV2 />
   }
 

@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   BackIcon,
   DeleteIcon,
@@ -13,12 +12,8 @@ import {
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useRecords } from '@tetherto/pearpass-lib-vault'
 import { TouchableOpacity } from 'react-native'
+import { isV2 } from 'src/utils/designVersion'
 
-import { useBottomSheet } from '../../context/BottomSheetContext'
-import { useModal } from '../../context/ModalContext'
-import { LogoLock } from '../../svgs/LogoLock'
-import { BottomSheetFolderListContent } from '../BottomSheetFolderListContent'
-import { BottomSheetToolbarActionsContent } from '../BottomSheetToolbarActionsContent'
 import { HeaderV2 } from './HeaderV2'
 import {
   InputContainer,
@@ -29,7 +24,12 @@ import {
   SearchCountWrapper,
   SearchTextInput
 } from './styles'
+import { useBottomSheet } from '../../context/BottomSheetContext'
+import { useModal } from '../../context/ModalContext'
 import { ButtonLittle } from '../../libComponents'
+import { LogoLock } from '../../svgs/LogoLock'
+import { BottomSheetFolderListContent } from '../BottomSheetFolderListContent'
+import { BottomSheetToolbarActionsContent } from '../BottomSheetToolbarActionsContent'
 import { ConfirmModalContent } from '../Modal/ConfirmModalContent'
 
 const HeaderV1 = ({
@@ -157,7 +157,7 @@ const HeaderV1 = ({
 }
 
 export const Header = (props) => {
-  if (DESIGN_VERSION === 2) {
+  if (isV2()) {
     return <HeaderV2 {...props} />
   }
 

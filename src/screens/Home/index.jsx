@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
+import { isV2 } from 'src/utils/designVersion'
 
 import { Container, CurrentFolder, FolderName } from './styles'
 import { Categories } from '../../containers/Categories'
@@ -87,12 +87,12 @@ export const Home = () => {
     }
   }, [selectedFolder, state.isFavorite])
 
-  const Wrapper = DESIGN_VERSION === 2 ? ScreenLayout : Container
+  const Wrapper = isV2() ? ScreenLayout : Container
 
   return (
     <Wrapper
       header={
-        DESIGN_VERSION === 2 ? (
+        isV2() ? (
           <Header
             setIsMultiSelectOn={setIsMultiSelectOn}
             isMultiSelectOn={isMultiSelectOn}
@@ -104,8 +104,9 @@ export const Home = () => {
           />
         ) : undefined
       }
+      hideFooter={isV2() ? true : undefined}
     >
-      {DESIGN_VERSION === 1 && (
+      {!isV2() && (
         <Header
           setIsMultiSelectOn={setIsMultiSelectOn}
           isMultiSelectOn={isMultiSelectOn}

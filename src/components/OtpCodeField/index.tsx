@@ -36,11 +36,12 @@ export const OtpCodeField = ({
   isLast
 }: OtpCodeFieldProps) => {
   const { t } = useLingui()
-  const { code, timeRemaining, type, period, generateNext, isLoading } =
-    useOtp({
+  const { code, timeRemaining, type, period, generateNext, isLoading } = useOtp(
+    {
       recordId,
       otpPublic
-    })
+    }
+  )
 
   const formattedCode = formatOtpCode(code)
   const isTOTP = type === OTP_TYPE.TOTP
@@ -93,6 +94,9 @@ export const OtpCodeField = ({
       value={formattedCode}
       variant="outline"
       isDisabled
+      isSecure={false}
+      isColored={false}
+      isTransparent={false}
       isFirst={isFirst}
       isLast={isLast}
       belowInputContent={timerBar}

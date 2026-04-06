@@ -209,6 +209,13 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
     setValue('attachments', updatedAttachments)
   }
 
+  const handleAttachmentRename = (index, newName) => {
+    const updatedAttachments = values.attachments.map((attachment, idx) =>
+      idx === index ? { ...attachment, name: newName } : attachment
+    )
+    setValue('attachments', updatedAttachments)
+  }
+
   return (
     <Wrapper>
       <Header>
@@ -381,6 +388,8 @@ export const CreateOrEditLoginContent = ({ initialRecord, selectedFolder }) => {
                   accessibilityLabel={t`File field`}
                   inputTestID="file-input-field"
                   inputAccessibilityLabel={t`File input field`}
+                  onDelete={() => handleAttachmentDelete(index)}
+                  onRename={(newName) => handleAttachmentRename(index, newName)}
                   additionalItems={
                     <ButtonLittle
                       startIcon={DeleteIcon}

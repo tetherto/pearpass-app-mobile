@@ -31,6 +31,7 @@ import { useAutoLockContext } from '../../context/AutoLockContext'
  * @param {Array<Object>} [props.pictures=[]]
  * @param {function} [props.onAdd]
  * @param {function} [props.onRemove]
+ * @param {function} [props.onRename]
  * @param {string} [props.testID]
  * @param {string} [props.accessibilityLabel]
  * @param {string} [props.addButtonTestID]
@@ -41,6 +42,7 @@ const ImagesFieldComponent = ({
   pictures = [],
   onAdd,
   onRemove,
+  onRename,
   testID,
   accessibilityLabel,
   addButtonTestID,
@@ -70,10 +72,11 @@ const ImagesFieldComponent = ({
       navigation.navigate('ImagePreview', {
         imageUri: uri,
         imageName: name,
-        onDelete: onRemove ? () => onRemove(index) : undefined
+        onDelete: onRemove ? () => onRemove(index) : undefined,
+        onRename: onRename ? (newName) => onRename(index, newName) : undefined
       })
     },
-    [navigation, onRemove]
+    [navigation, onRemove, onRename]
   )
 
   const handleAddClick = useCallback(async () => {

@@ -1,7 +1,8 @@
 import { Buffer } from 'buffer'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { NavigationContainer } from '@react-navigation/native'
@@ -26,6 +27,7 @@ import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
 import { SharedFilterProvider } from './context/SharedFilterContext'
 import { messages } from './locales/en/messages'
+import { isV2 } from './utils/designVersion'
 import * as SplashScreen from './utils/SplashScreen'
 import { createPearpassVaultClient } from './worklet'
 
@@ -57,6 +59,8 @@ export const Main = () => {
     return null
   }
 
+  const BottomSheetWrapper = isV2() ? BottomSheetModalProvider : Fragment
+
   return (
     <UIKitProvider>
       <StatusBar backgroundColor={colors.grey500.mode1} style="light" />
@@ -66,21 +70,23 @@ export const Main = () => {
           <HapticsProvider>
             <LoadingProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
-                <VaultProvider>
-                  <SharedFilterProvider>
-                    <NavigationContainer>
-                      <AutoLockProvider>
-                        <AutoLockTouchCapture>
-                          <ModalProvider>
-                            <BottomSheetProvider>
-                              <App />
-                            </BottomSheetProvider>
-                          </ModalProvider>
-                        </AutoLockTouchCapture>
-                      </AutoLockProvider>
-                    </NavigationContainer>
-                  </SharedFilterProvider>
-                </VaultProvider>
+                <BottomSheetWrapper>
+                  <VaultProvider>
+                    <SharedFilterProvider>
+                      <NavigationContainer>
+                        <AutoLockProvider>
+                          <AutoLockTouchCapture>
+                            <ModalProvider>
+                              <BottomSheetProvider>
+                                <App />
+                              </BottomSheetProvider>
+                            </ModalProvider>
+                          </AutoLockTouchCapture>
+                        </AutoLockProvider>
+                      </NavigationContainer>
+                    </SharedFilterProvider>
+                  </VaultProvider>
+                </BottomSheetWrapper>
               </GestureHandlerRootView>
             </LoadingProvider>
           </HapticsProvider>
