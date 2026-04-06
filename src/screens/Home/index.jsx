@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
+import { isV2 } from 'src/utils/designVersion'
 
 import { Container, CurrentFolder, FolderName } from './styles'
 import { SORT_BY_TYPE } from '../../constants/sortOptions'
