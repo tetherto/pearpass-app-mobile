@@ -16,6 +16,7 @@ import {
 } from '../../screens/OnboardingV2'
 import { RecordDetails } from '../../screens/RecordDetails'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
+import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
 import { Welcome } from '../../screens/Welcome'
 import { isV2 } from '../../utils/designVersion'
 import { TabNavigator } from '../TabNavigator'
@@ -83,5 +84,6 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="CreateRecord" component={CreateRecord} />
     <Stack.Screen name="CreateFolder" component={CreateFolder} />
     <Stack.Screen name="MasterPassword" component={MasterPassword} />
+    <Stack.Screen name="BlindPeering" component={BlindPeeringSectionV2} />
   </Stack.Navigator>
 )

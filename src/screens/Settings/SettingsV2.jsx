@@ -69,7 +69,7 @@ export const SettingsV2 = () => {
           {
             key: 'blind-peering',
             label: t`Blind Peering`,
-            screen: 'Syncing',
+            screen: 'BlindPeering',
             icon: HubFilled
           },
           {
