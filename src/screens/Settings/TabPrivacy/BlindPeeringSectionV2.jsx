@@ -11,21 +11,18 @@ import {
 } from '@tetherto/pearpass-lib-constants'
 import {
   Button,
-  InputField,
   MultiSlotInput,
   Radio,
   PageHeader,
   ToggleSwitch,
   rawTokens,
-  useTheme,
-  Text
+  useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
+import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
 
 import { useLoadingContext } from '../../../context/LoadingContext'
 
@@ -69,7 +66,6 @@ export const BlindPeeringSectionV2 = () => {
   const {
     value: blindPeersList,
     addItem,
-    registerItem,
     removeItem
   } = registerArray(BLIND_PEERS_FORM_NAME)
 
@@ -191,12 +187,17 @@ export const BlindPeeringSectionV2 = () => {
 
   const isManual = peerMode === PERSONAL
   const styles = getStyles(theme)
-  const peerFields = blindPeersList.map((_, index) =>
-    registerItem('blindPeer', index)
-  )
+  const peerValues = blindPeersList.map((item) => item.blindPeer ?? '')
+
+  const handleChangeItem = (index, text) => {
+    const updated = blindPeersList.map((item, i) =>
+      i === index ? { ...item, blindPeer: text } : item
+    )
+    setValues({ blindPeers: updated })
+  }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       header={
         <BackScreenHeader
@@ -253,46 +254,19 @@ export const BlindPeeringSectionV2 = () => {
 
             {isManual && (
               <MultiSlotInput
-                actions={
-                  blindPeersList.length < BLIND_PEERS_LIMIT ? (
-                    <Button
-                      style={styles.addButton}
-                      variant="secondary"
-                      onClick={addPeerRow}
-                    >
-                      <Text
-                        color={theme.colors.colorPrimary}
-                      >{t`+ Add Another Peer`}</Text>
-                    </Button>
-                  ) : null
-                }
-              >
-                {peerFields.map((field, index) => (
-                  <InputField
-                    key={index}
-                    label={`#${index + 1} ${t`Blind Peer`}`}
-                    value={field.value ?? ''}
-                    placeholder={t`Enter Peer Code`}
-                    onChangeText={(value) => field.onChange?.(value)}
-                    rightSlot={
-                      <Button
-                        variant="tertiary"
-                        size="small"
-                        iconBefore={
-                          <Close color={theme.colors.colorTextPrimary} />
-                        }
-                        onClick={() => removeItem(index)}
-                        style={styles.closeButton}
-                      />
-                    }
-                  />
-                ))}
-              </MultiSlotInput>
+                label={t`Blind Peer`}
+                values={peerValues}
+                onAdd={addPeerRow}
+                onRemove={removeItem}
+                onChangeItem={handleChangeItem}
+                placeholder={t`Enter Peer Code`}
+                maxSlots={BLIND_PEERS_LIMIT}
+              />
             )}
           </View>
         )}
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 
@@ -312,16 +286,5 @@ const getStyles = (theme) =>
     },
     optionsContainer: {
       gap: rawTokens.spacing16
-    },
-    addButton: {
-      borderRadius: 0,
-      border: 'none',
-      width: '100%',
-      textAlign: 'left',
-      justifyContent: 'flex-start',
-      borderWidth: 0
-    },
-    closeButton: {
-      paddingRight: 0
     }
   })

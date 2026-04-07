@@ -23,8 +23,8 @@ import {
 } from '@tetherto/pearpass-utils-password-check'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
+import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
 
 import { logger } from '../../../utils/logger'
 
@@ -135,7 +135,7 @@ export const MasterPassword = () => {
   }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       header={
         <BackScreenHeader
@@ -202,7 +202,7 @@ export const MasterPassword = () => {
           icon={<ReportProblem />}
         />
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 
