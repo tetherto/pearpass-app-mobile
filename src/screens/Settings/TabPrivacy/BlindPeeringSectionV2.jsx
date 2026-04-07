@@ -11,13 +11,16 @@ import {
 } from '@tetherto/pearpass-lib-constants'
 import {
   Button,
+  InputField,
   MultiSlotInput,
   Radio,
   PageHeader,
   ToggleSwitch,
   rawTokens,
-  useTheme
+  useTheme,
+  Text
 } from '@tetherto/pearpass-lib-ui-kit'
+import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
@@ -192,7 +195,6 @@ export const BlindPeeringSectionV2 = () => {
     registerItem('blindPeer', index)
   )
 
-  console.log('peerFields', peerFields)
   return (
     <ScreenLayout
       scrollable
@@ -251,17 +253,41 @@ export const BlindPeeringSectionV2 = () => {
 
             {isManual && (
               <MultiSlotInput
-                label={t`Blind Peer`}
-                values={peerFields.map((f) => f.value ?? '')}
-                onAdd={addPeerRow}
-                onChangeItem={(index, value) =>
-                  peerFields?.[index]?.onChange?.(value)
+                actions={
+                  blindPeersList.length < BLIND_PEERS_LIMIT ? (
+                    <Button
+                      style={styles.addButton}
+                      variant="secondary"
+                      onClick={addPeerRow}
+                    >
+                      <Text
+                        color={theme.colors.colorPrimary}
+                      >{t`+ Add Another Peer`}</Text>
+                    </Button>
+                  ) : null
                 }
-                onRemove={removeItem}
-                maxSlots={BLIND_PEERS_LIMIT}
-                placeholder={t`Enter Peer Code`}
-                addButtonLabel={t`Add Another Peer`}
-              />
+              >
+                {peerFields.map((field, index) => (
+                  <InputField
+                    key={index}
+                    label={`#${index + 1} ${t`Blind Peer`}`}
+                    value={field.value ?? ''}
+                    placeholder={t`Enter Peer Code`}
+                    onChangeText={(value) => field.onChange?.(value)}
+                    rightSlot={
+                      <Button
+                        variant="tertiary"
+                        size="small"
+                        iconBefore={
+                          <Close color={theme.colors.colorTextPrimary} />
+                        }
+                        onClick={() => removeItem(index)}
+                        style={styles.closeButton}
+                      />
+                    }
+                  />
+                ))}
+              </MultiSlotInput>
             )}
           </View>
         )}
@@ -286,5 +312,16 @@ const getStyles = (theme) =>
     },
     optionsContainer: {
       gap: rawTokens.spacing16
+    },
+    addButton: {
+      borderRadius: 0,
+      border: 'none',
+      width: '100%',
+      textAlign: 'left',
+      justifyContent: 'flex-start',
+      borderWidth: 0
+    },
+    closeButton: {
+      paddingRight: 0
     }
   })
