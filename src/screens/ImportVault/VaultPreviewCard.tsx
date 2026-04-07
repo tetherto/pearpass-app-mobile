@@ -6,7 +6,7 @@ import {
   LockOutlined,
   KeyboardArrowRightFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { Pressable, View, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -69,38 +69,38 @@ export const VaultPreviewCard = ({
       ]}
       testID="import-vault-preview-card"
     >
-      <Pressable onPress={toggleExpanded} testID="import-vault-toggle-expand">
-        <ListItem
-          icon={
-            <View
-              style={[
-                styles.iconContainer,
-                { backgroundColor: theme.colors.colorSurfaceElevatedOnInteraction }
-              ]}
-            >
-              <LockOutlined
-                width={16}
-                height={16}
-                color={theme.colors.colorAccentHover}
+      <ListItem
+        onClick={toggleExpanded}
+        testID="import-vault-toggle-expand"
+        icon={
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: theme.colors.colorSurfaceElevatedOnInteraction }
+            ]}
+          >
+            <LockOutlined
+              width={16}
+              height={16}
+              color={theme.colors.colorAccentHover}
+            />
+          </View>
+        }
+        title={vaultName}
+        subtitle={subtitle}
+        platform="mobile"
+        rightElement={
+          <View style={styles.chevronButton}>
+            <Animated.View style={animatedStyle}>
+              <KeyboardArrowRightFilled
+                width={20}
+                height={20}
+                color={theme.colors.colorTextSecondary}
               />
-            </View>
-          }
-          title={vaultName}
-          subtitle={subtitle}
-          platform="mobile"
-          rightElement={
-            <View style={styles.chevronButton}>
-              <Animated.View style={animatedStyle}>
-                <KeyboardArrowRightFilled
-                  width={20}
-                  height={20}
-                  color={theme.colors.colorTextSecondary}
-                />
-              </Animated.View>
-            </View>
-          }
-        />
-      </Pressable>
+            </Animated.View>
+          </View>
+        }
+      />
 
       {expanded && records.length > 0 && (
         <View
