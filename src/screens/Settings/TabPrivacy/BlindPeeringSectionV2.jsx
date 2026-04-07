@@ -15,7 +15,8 @@ import {
   Radio,
   Text,
   ToggleSwitch,
-  rawTokens
+  rawTokens,
+  useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
@@ -31,6 +32,7 @@ const { DEFAULT, PERSONAL } = BLIND_PEER_TYPE
 export const BlindPeeringSectionV2 = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
   const { setIsLoading: setIsLoadingContext } = useLoadingContext()
 
   const {
@@ -186,6 +188,7 @@ export const BlindPeeringSectionV2 = () => {
   }
 
   const isManual = peerMode === PERSONAL
+  const styles = getStyles(theme)
 
   return (
     <ScreenLayout
@@ -257,7 +260,10 @@ export const BlindPeeringSectionV2 = () => {
                       ]}
                     >
                       <View style={styles.peerInputWrapper}>
-                        <Text variant="caption" color="#FFFFFF">
+                        <Text
+                          variant="caption"
+                          color={theme.colors.colorTextPrimary}
+                        >
                           {'#' + (index + 1) + ' ' + t`Blind Peer`}
                         </Text>
                         <TextInput
@@ -297,66 +303,67 @@ export const BlindPeeringSectionV2 = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  content: {
-    padding: rawTokens.spacing16,
-    gap: rawTokens.spacing20,
-    flexGrow: 1
-  },
-  card: {
-    borderWidth: 1,
-    borderColor: '#2C3618',
-    borderRadius: rawTokens.radius16,
-    padding: rawTokens.spacing16,
-    gap: rawTokens.spacing16
-  },
-  optionsContainer: {
-    gap: rawTokens.spacing16
-  },
-  peersContainer: {
-    borderWidth: 1,
-    borderColor: '#2C3618',
-    borderRadius: rawTokens.radius8,
-    overflow: 'hidden'
-  },
-  peerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: rawTokens.spacing12,
-    paddingVertical: rawTokens.spacing10,
-    gap: rawTokens.spacing8
-  },
-  peerRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#2C3618'
-  },
-  peerInputWrapper: {
-    flex: 1,
-    gap: rawTokens.spacing4
-  },
-  peerInput: {
-    color: colors.white.mode1,
-    fontFamily: rawTokens.fontPrimary,
-    fontSize: rawTokens.fontSize14
-  },
-  removeButton: {
-    padding: rawTokens.spacing4
-  },
-  removeButtonText: {
-    color: colors.grey200.mode1,
-    fontSize: 18,
-    lineHeight: 20
-  },
-  addPeerRow: {
-    paddingHorizontal: rawTokens.spacing12,
-    paddingVertical: rawTokens.spacing10,
-    borderTopWidth: 1,
-    borderTopColor: '#2C3618'
-  },
-  addPeerText: {
-    color: colors.primary400.mode1,
-    fontFamily: rawTokens.fontPrimary,
-    fontSize: rawTokens.fontSize12,
-    fontWeight: rawTokens.weightRegular
-  }
-})
+const getStyles = (theme) =>
+  StyleSheet.create({
+    content: {
+      padding: rawTokens.spacing16,
+      gap: rawTokens.spacing20,
+      flexGrow: 1
+    },
+    card: {
+      borderWidth: 1,
+      borderColor: theme.colors.colorBorderSecondary,
+      borderRadius: rawTokens.radius16,
+      padding: rawTokens.spacing16,
+      gap: rawTokens.spacing16
+    },
+    optionsContainer: {
+      gap: rawTokens.spacing16
+    },
+    peersContainer: {
+      borderWidth: 1,
+      borderColor: theme.colors.colorBorderSecondary,
+      borderRadius: rawTokens.radius8,
+      overflow: 'hidden'
+    },
+    peerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: rawTokens.spacing12,
+      paddingVertical: rawTokens.spacing10,
+      gap: rawTokens.spacing8
+    },
+    peerRowBorder: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.colorBorderSecondary
+    },
+    peerInputWrapper: {
+      flex: 1,
+      gap: rawTokens.spacing4
+    },
+    peerInput: {
+      color: theme.colors.colorTextPrimary,
+      fontFamily: rawTokens.fontPrimary,
+      fontSize: rawTokens.fontSize14
+    },
+    removeButton: {
+      padding: rawTokens.spacing4
+    },
+    removeButtonText: {
+      color: colors.grey200.mode1,
+      fontSize: 18,
+      lineHeight: 20
+    },
+    addPeerRow: {
+      paddingHorizontal: rawTokens.spacing12,
+      paddingVertical: rawTokens.spacing10,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.colorBorderSecondary
+    },
+    addPeerText: {
+      color: colors.primary400.mode1,
+      fontFamily: rawTokens.fontPrimary,
+      fontSize: rawTokens.fontSize12,
+      fontWeight: rawTokens.weightRegular
+    }
+  })
