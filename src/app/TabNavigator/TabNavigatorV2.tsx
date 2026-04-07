@@ -82,7 +82,7 @@ export const TabNavigatorV2 = () => {
               <View style={styles.vaultLabelContainer}>
                 <Text
                   variant="caption"
-                  style={{ color }}
+                  color={color}
                 >
                   Vault
                 </Text>
@@ -99,7 +99,7 @@ export const TabNavigatorV2 = () => {
           return (
             <Text
               variant="caption"
-              style={{ color }}
+              color={color}
             >
               {labels[route.name]}
             </Text>

@@ -17,7 +17,7 @@ export const HeaderV2 = ({ setSearchValue, searchValue }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
-  const navigation = useNavigation()
+  const navigation = useNavigation<any>()
 
   const handleAdd = () => {
     expand({

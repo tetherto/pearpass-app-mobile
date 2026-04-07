@@ -192,7 +192,7 @@ describe('useRecordActionItems', () => {
     const favoriteAction = nonFavoriteResult.current.actions.find(
       (action) => action.type === 'favorite'
     )
-    expect(favoriteAction.name).toBe('Mark as favorite')
+    expect(favoriteAction.name).toBe('Add to Favorites')
 
     const favoriteRecord = { ...mockRecord, isFavorite: true }
     const { result: favoriteResult } = renderHook(
@@ -330,7 +330,7 @@ describe('useRecordActionItems', () => {
       const favoriteAction = nonFavoriteResult.current.actions.find(
         (action) => action.type === 'favorite'
       )
-      expect(favoriteAction.name).toBe('Mark as favorite')
+      expect(favoriteAction.name).toBe('Add to Favorites')
 
       const favoriteWifiRecord = { ...wifiPasswordRecord, isFavorite: true }
       const { result: favoriteResult } = renderHook(

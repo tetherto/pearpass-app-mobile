@@ -7,7 +7,7 @@ import { Button, rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 import { ImportPreviewStep } from './ImportPreviewStep'
 import { ImportScanStep } from './ImportScanStep'
 import { useImportVault } from './useImportVault'
-import { ScreenLayout } from '../../containers/ScreenLayout'
+import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 
 type Step = 'scan' | 'preview'
@@ -91,7 +91,7 @@ export const ImportVault = () => {
     )
 
   return (
-    <ScreenLayout
+    <Layout
       header={<BackScreenHeader title={title} onBack={handleBack} />}
       footer={footer}
       scrollable
@@ -108,6 +108,6 @@ export const ImportVault = () => {
       ) : (
         <ImportPreviewStep vault={pairedVault} error={error} />
       )}
-    </ScreenLayout>
+    </Layout>
   )
 }
