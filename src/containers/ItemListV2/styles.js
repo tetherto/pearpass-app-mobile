@@ -27,6 +27,9 @@ export const createStyles = (colors) => ({
     borderRadius: rawTokens.radius8,
     overflow: 'hidden'
   },
+  chevronRight: {
+    transform: [{ rotate: '-90deg' }]
+  },
   divider: {
     height: 1,
     backgroundColor: colors.colorBorderPrimary,

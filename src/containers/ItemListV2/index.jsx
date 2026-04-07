@@ -6,7 +6,6 @@ import { ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
   ErrorFilled,
   ExpandMore,
-  KeyboardArrowRightFilled,
   StarFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { Pressable, SectionList, View } from 'react-native'
@@ -186,11 +185,13 @@ export const ItemListV2 = ({
                     {record.hasSecurityAlert && (
                       <ErrorFilled width={20} height={20} />
                     )}
-                    <KeyboardArrowRightFilled
-                      width={18}
-                      height={18}
-                      color={theme.colors.colorTextSecondary}
-                    />
+                    <View style={styles.chevronRight}>
+                      <ExpandMore
+                        width={20}
+                        height={20}
+                        color={theme.colors.colorTextSecondary}
+                      />
+                    </View>
                   </View>
                 ) : undefined
               }

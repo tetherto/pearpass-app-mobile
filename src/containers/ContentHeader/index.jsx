@@ -13,7 +13,7 @@ import {
   LockFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
-import { ScrollView, View } from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { createStyles } from './styles'
@@ -129,16 +129,21 @@ export const ContentHeader = ({
   }, [collapse, setIsMultiSelectOn, setSelectedRecords])
 
   const renderBreadcrumbPill = (icon, label, onPress) => (
-    <Button
-      variant="secondary"
-      iconBefore={icon}
-      iconAfter={<ExpandMore />}
-      onClick={onPress}
+    <Pressable
+      onPress={onPress}
       style={styles.breadcrumbPill}
-      aria-label={label}
+      accessibilityLabel={label}
     >
-      {label}
-    </Button>
+      {icon}
+      <Text variant="labelEmphasized" style={styles.breadcrumbPillLabel}>
+        {label}
+      </Text>
+      <ExpandMore
+        width={16}
+        height={16}
+        color={theme.colors.colorTextPrimary}
+      />
+    </Pressable>
   )
 
   return (
@@ -165,7 +170,11 @@ export const ContentHeader = ({
           ) : (
             <>
               {renderBreadcrumbPill(
-                <LockFilled />,
+                <LockFilled
+                  width={16}
+                  height={16}
+                  color={theme.colors.colorTextPrimary}
+                />,
                 vaultName,
                 handleVaultPress
               )}
@@ -177,7 +186,11 @@ export const ContentHeader = ({
                 />
               </View>
               {renderBreadcrumbPill(
-                <Layers />,
+                <Layers
+                  width={16}
+                  height={16}
+                  color={theme.colors.colorTextPrimary}
+                />,
                 menuItems.find((i) => i.type === recordType)?.name ??
                   t`All Items`,
                 handleCategoryPress
@@ -190,7 +203,11 @@ export const ContentHeader = ({
                 />
               </View>
               {renderBreadcrumbPill(
-                <FolderCopy />,
+                <FolderCopy
+                  width={16}
+                  height={16}
+                  color={theme.colors.colorTextPrimary}
+                />,
                 folderLabel,
                 handleFolderPress
               )}

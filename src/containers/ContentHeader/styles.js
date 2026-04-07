@@ -22,6 +22,9 @@ export const createStyles = (colors) => ({
     paddingHorizontal: rawTokens.spacing16,
     paddingVertical: rawTokens.spacing8
   },
+  breadcrumbPillLabel: {
+    lineHeight: 15
+  },
   breadcrumbPill: {
     flexDirection: 'row',
     alignItems: 'center',
