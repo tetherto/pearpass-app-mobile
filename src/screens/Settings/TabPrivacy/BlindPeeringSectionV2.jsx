@@ -11,16 +11,15 @@ import {
 } from '@tetherto/pearpass-lib-constants'
 import {
   Button,
-  PageHeader,
+  MultiSlotInput,
   Radio,
-  Text,
+  PageHeader,
   ToggleSwitch,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
-import { Pressable, StyleSheet, TextInput, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { ScreenLayout } from 'src/containers/ScreenLayout'
@@ -189,7 +188,11 @@ export const BlindPeeringSectionV2 = () => {
 
   const isManual = peerMode === PERSONAL
   const styles = getStyles(theme)
+  const peerFields = blindPeersList.map((_, index) =>
+    registerItem('blindPeer', index)
+  )
 
+  console.log('peerFields', peerFields)
   return (
     <ScreenLayout
       scrollable
@@ -247,54 +250,18 @@ export const BlindPeeringSectionV2 = () => {
             />
 
             {isManual && (
-              <View style={styles.peersContainer}>
-                {blindPeersList.map((peer, index) => {
-                  const field = registerItem('blindPeer', index)
-                  return (
-                    <View
-                      key={peer.id}
-                      style={[
-                        styles.peerRow,
-                        index < blindPeersList.length - 1 &&
-                          styles.peerRowBorder
-                      ]}
-                    >
-                      <View style={styles.peerInputWrapper}>
-                        <Text
-                          variant="caption"
-                          color={theme.colors.colorTextPrimary}
-                        >
-                          {'#' + (index + 1) + ' ' + t`Blind Peer`}
-                        </Text>
-                        <TextInput
-                          style={styles.peerInput}
-                          value={field.value}
-                          onChangeText={field.onChange}
-                          placeholder={t`Enter Peer Code`}
-                          placeholderTextColor={colors.grey100.mode1}
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                        />
-                      </View>
-                      <Pressable
-                        onPress={() => removeItem(index)}
-                        style={styles.removeButton}
-                        hitSlop={8}
-                      >
-                        <Text style={styles.removeButtonText}>×</Text>
-                      </Pressable>
-                    </View>
-                  )
-                })}
-
-                {blindPeersList.length < BLIND_PEERS_LIMIT && (
-                  <Pressable onPress={addPeerRow} style={styles.addPeerRow}>
-                    <Text style={styles.addPeerText}>
-                      {t`+ Add Another Peer`}
-                    </Text>
-                  </Pressable>
-                )}
-              </View>
+              <MultiSlotInput
+                label={t`Blind Peer`}
+                values={peerFields.map((f) => f.value ?? '')}
+                onAdd={addPeerRow}
+                onChangeItem={(index, value) =>
+                  peerFields?.[index]?.onChange?.(value)
+                }
+                onRemove={removeItem}
+                maxSlots={BLIND_PEERS_LIMIT}
+                placeholder={t`Enter Peer Code`}
+                addButtonLabel={t`Add Another Peer`}
+              />
             )}
           </View>
         )}
@@ -313,57 +280,11 @@ const getStyles = (theme) =>
     card: {
       borderWidth: 1,
       borderColor: theme.colors.colorBorderSecondary,
-      borderRadius: rawTokens.radius16,
+      borderRadius: rawTokens.radius8,
       padding: rawTokens.spacing16,
       gap: rawTokens.spacing16
     },
     optionsContainer: {
       gap: rawTokens.spacing16
-    },
-    peersContainer: {
-      borderWidth: 1,
-      borderColor: theme.colors.colorBorderSecondary,
-      borderRadius: rawTokens.radius8,
-      overflow: 'hidden'
-    },
-    peerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: rawTokens.spacing12,
-      paddingVertical: rawTokens.spacing10,
-      gap: rawTokens.spacing8
-    },
-    peerRowBorder: {
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.colorBorderSecondary
-    },
-    peerInputWrapper: {
-      flex: 1,
-      gap: rawTokens.spacing4
-    },
-    peerInput: {
-      color: theme.colors.colorTextPrimary,
-      fontFamily: rawTokens.fontPrimary,
-      fontSize: rawTokens.fontSize14
-    },
-    removeButton: {
-      padding: rawTokens.spacing4
-    },
-    removeButtonText: {
-      color: colors.grey200.mode1,
-      fontSize: 18,
-      lineHeight: 20
-    },
-    addPeerRow: {
-      paddingHorizontal: rawTokens.spacing12,
-      paddingVertical: rawTokens.spacing10,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors.colorBorderSecondary
-    },
-    addPeerText: {
-      color: colors.primary400.mode1,
-      fontFamily: rawTokens.fontPrimary,
-      fontSize: rawTokens.fontSize12,
-      fontWeight: rawTokens.weightRegular
     }
   })
