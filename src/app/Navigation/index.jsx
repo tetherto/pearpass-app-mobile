@@ -5,6 +5,7 @@ import { CreateRecord } from '../../screens/CreateRecord'
 import { ErrorScreen } from '../../screens/ErrorScreen'
 import { ImagePreview } from '../../screens/ImagePreview'
 import { ImagePreviewV2 } from '../../screens/ImagePreview/ImagePreviewV2'
+import { ImportVault } from '../../screens/ImportVault'
 import { Intro } from '../../screens/Intro'
 import { Onboarding } from '../../screens/Onboarding'
 import {
@@ -17,6 +18,7 @@ import {
 import { RecordDetails } from '../../screens/RecordDetails'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
+import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
 import { isV2 } from '../../utils/designVersion'
 import { TabNavigator } from '../TabNavigator'
@@ -85,5 +87,7 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="CreateFolder" component={CreateFolder} />
     <Stack.Screen name="MasterPassword" component={MasterPassword} />
     <Stack.Screen name="BlindPeering" component={BlindPeeringSectionV2} />
+    <Stack.Screen name="ImportVault" component={ImportVault} />
+    <Stack.Screen name="ShareVault" component={ShareVault} />
   </Stack.Navigator>
 )
