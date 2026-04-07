@@ -9,7 +9,6 @@ import {
   Button,
   PageHeader,
   PasswordField,
-  Text,
   rawTokens
 } from '@tetherto/pearpass-lib-ui-kit'
 import { ReportProblem } from '@tetherto/pearpass-lib-ui-kit/icons'
@@ -157,13 +156,10 @@ export const MasterPassword = () => {
         </Button>
       }
     >
-      <View style={styles.titleBlock}>
-        <PageHeader title={t`Master Password`} />
-        <Text
-          color="#BDC3AC"
-          variant="label"
-        >{t`Manage the password that protects your app.`}</Text>
-      </View>
+      <PageHeader
+        title={t`Master Password`}
+        subtitle={t`Manage the password that protects your app.`}
+      />
 
       <View style={styles.fieldsContainer}>
         <PasswordField
@@ -215,9 +211,6 @@ const styles = StyleSheet.create({
     padding: rawTokens.spacing16,
     gap: rawTokens.spacing20,
     flexGrow: 1
-  },
-  titleBlock: {
-    gap: rawTokens.spacing4
   },
   fieldsContainer: {
     gap: rawTokens.spacing16
