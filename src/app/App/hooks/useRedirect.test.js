@@ -36,7 +36,7 @@ describe('useRedirect', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    expect(result.current.initialRouteName).toBe('Intro')
+    expect(result.current.initialRouteName).toBe('OnboardingV2')
     expect(result.current.isLoading).toBe(false)
   })
 

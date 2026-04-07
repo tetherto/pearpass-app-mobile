@@ -42,10 +42,10 @@ describe('useRecordMenuItems', () => {
       'all',
       RECORD_TYPES.LOGIN,
       RECORD_TYPES.CREDIT_CARD,
-      RECORD_TYPES.WIFI_PASSWORD,
-      RECORD_TYPES.PASS_PHRASE,
       RECORD_TYPES.IDENTITY,
       RECORD_TYPES.NOTE,
+      RECORD_TYPES.PASS_PHRASE,
+      RECORD_TYPES.WIFI_PASSWORD,
       RECORD_TYPES.CUSTOM,
       'password'
     ])
