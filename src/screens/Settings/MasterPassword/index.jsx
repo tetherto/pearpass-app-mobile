@@ -7,11 +7,11 @@ import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
   AlertMessage,
   Button,
+  PageHeader,
   PasswordField,
   Text,
   rawTokens
 } from '@tetherto/pearpass-lib-ui-kit'
-import { Title } from '@tetherto/pearpass-lib-ui-kit'
 import { ReportProblem } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useUserData } from '@tetherto/pearpass-lib-vault'
 import {
@@ -158,7 +158,7 @@ export const MasterPassword = () => {
       }
     >
       <View style={styles.titleBlock}>
-        <Title as="h1">{t`Master Password`}</Title>
+        <PageHeader title={t`Master Password`} />
         <Text
           color="#BDC3AC"
           variant="label"
