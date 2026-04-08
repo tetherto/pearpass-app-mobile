@@ -76,11 +76,6 @@ export const VaultsV2 = () => {
     onDelete: () => {}
   })
 
-  const iconBadgeStyle = [
-    styles.iconBadge,
-    { backgroundColor: theme.colors.colorPrimary }
-  ]
-
   const renderVaultItem = (
     vault,
     showDivider = false,
@@ -93,7 +88,6 @@ export const VaultsV2 = () => {
       onAddMember={handleAddMember}
       isCurrentVault={isCurrentVault}
       vaultActions={buildVaultActions(vault)}
-      iconBadgeStyle={iconBadgeStyle}
     />
   )
 
@@ -164,21 +158,9 @@ const styles = StyleSheet.create({
   section: {
     gap: rawTokens.spacing8
   },
-  sectionLabel: {
-    fontFamily: 'Inter',
-    fontSize: 13,
-    fontWeight: '500'
-  },
   card: {
     borderWidth: 1,
     borderRadius: rawTokens.radius8,
     overflow: 'hidden'
-  },
-  iconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: rawTokens.radius8,
-    alignItems: 'center',
-    justifyContent: 'center'
   }
 })

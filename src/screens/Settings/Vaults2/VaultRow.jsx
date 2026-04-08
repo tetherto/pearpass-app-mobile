@@ -15,18 +15,18 @@ export const VaultRow = ({
   showDivider,
   onAddMember,
   vaultActions,
-  iconBadgeStyle,
   isCurrentVault
 }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
 
+  const styles = getStyles(theme)
   return (
     <View>
       <ListItem
         platform="mobile"
         icon={
-          <View style={iconBadgeStyle}>
+          <View style={styles.iconBadge}>
             <LockOutlined
               color={theme.colors.colorPrimary}
               width={18}
@@ -63,14 +63,23 @@ export const VaultRow = ({
   )
 }
 
-const styles = StyleSheet.create({
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: rawTokens.spacing4
-  },
-  divider: {
-    height: 1,
-    marginLeft: rawTokens.spacing16
-  }
-})
+const getStyles = (theme) =>
+  StyleSheet.create({
+    actions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: rawTokens.spacing4
+    },
+    divider: {
+      height: 1,
+      marginLeft: rawTokens.spacing16
+    },
+    iconBadge: {
+      width: 36,
+      height: 36,
+      borderRadius: rawTokens.radius8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.colorPrimary + '26'
+    }
+  })
