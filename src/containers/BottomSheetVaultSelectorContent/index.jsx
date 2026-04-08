@@ -1,12 +1,18 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { Button, ListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  ContextMenu,
+  ListItem,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { Add, LockFilled, MoreVert } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { useBottomSheet } from '../../context/BottomSheetContext'
+import { createStyles } from './styles'
 import { useGlobalLoading } from '../../context/LoadingContext'
 import { useModal } from '../../context/ModalContext'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
@@ -17,7 +23,8 @@ import { VaultPasswordFormModalContent } from '../Modal/VaultPasswordFormModalCo
 export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
-  const { collapse, expand } = useBottomSheet()
+  const styles = createStyles()
+  const collapse = useBottomSheetClose()
   const { bottom } = useSafeAreaInsets()
   const { openModal, closeModal } = useModal()
 
@@ -30,8 +37,6 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
     isVaultProtected,
     refetch: refetchVault
   } = useVault()
-
-  const replacingRef = useRef(false)
 
   const handleVaultPress = async (vault) => {
     if (vault.id === activeVault?.id) {
@@ -69,28 +74,9 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
     }
   }
 
-  const handleVaultActionsPress = (vault) => {
-    replacingRef.current = true
-    expand({
-      children: (
-        <BottomSheetVaultAction
-          vaultId={vault.id}
-          vaultName={vault.name}
-          onDismiss={() => {
-            if (!replacingRef.current) {
-              expand({
-                children: (
-                  <BottomSheetVaultSelectorContent
-                    onCreateVault={onCreateVault}
-                  />
-                )
-              })
-            }
-            replacingRef.current = false
-          }}
-        />
-      )
-    })
+  const handleCreateVault = () => {
+    collapse()
+    onCreateVault?.()
   }
 
   return (
@@ -100,35 +86,44 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={<SheetHeader title={t`Vaults`} onClose={collapse} />}
     >
-      {vaultsData?.map((vault) => {
-        const isActive = vault.id === activeVault?.id
-        return (
-          <ListItem
-            key={vault.id}
-            icon={<LockFilled color={theme.colors.colorTextPrimary} />}
-            title={vault.name}
-            selected={isActive}
-            showDivider
-            iconSize={16}
-            rightElement={
-              <Button
-                variant="tertiary"
-                size="small"
-                iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
-                onClick={() => handleVaultActionsPress(vault)}
-                aria-label={t`Vault actions`}
+      {vaultsData?.map((vault) => (
+        <ListItem
+          key={vault.id}
+          icon={<LockFilled color={theme.colors.colorTextPrimary} />}
+          title={vault.name}
+          selected={vault.id === activeVault?.id}
+          showDivider
+          iconSize={16}
+          style={styles.listItem}
+          rightElement={
+            <ContextMenu
+              trigger={
+                <Button
+                  variant="tertiary"
+                  size="small"
+                  iconBefore={
+                    <MoreVert color={theme.colors.colorTextPrimary} />
+                  }
+                  aria-label={t`Vault actions`}
+                />
+              }
+            >
+              <BottomSheetVaultAction
+                vaultId={vault.id}
+                vaultName={vault.name}
               />
-            }
-            onClick={() => handleVaultPress(vault)}
-          />
-        )
-      })}
+            </ContextMenu>
+          }
+          onClick={() => handleVaultPress(vault)}
+        />
+      ))}
 
       <ListItem
         icon={<Add color={theme.colors.colorTextPrimary} />}
         title={t`Create New Vault`}
         iconSize={16}
-        onClick={onCreateVault}
+        style={styles.listItem}
+        onClick={handleCreateVault}
       />
     </Layout>
   )

@@ -1,6 +1,10 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  NavbarListItem,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import {
   FolderCopy,
   Folder,
@@ -10,7 +14,6 @@ import {
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { Layout } from '../Layout'
@@ -19,7 +22,7 @@ export const BottomSheetFolderSelectorContent = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
-  const { collapse } = useBottomSheet()
+  const collapse = useBottomSheetClose()
   const { state, setState } = useSharedFilter()
   const { bottom } = useSafeAreaInsets()
 

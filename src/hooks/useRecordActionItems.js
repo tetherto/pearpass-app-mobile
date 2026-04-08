@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { useBottomSheetClose } from '@tetherto/pearpass-lib-ui-kit'
 import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
@@ -38,7 +39,8 @@ export const useRecordActionItems = ({
 } = {}) => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const { collapse, expand } = useBottomSheet()
+  const collapse = useBottomSheetClose()
+  const { expand } = useBottomSheet()
   const { copyToClipboard } = useCopyToClipboard()
   const { updateFavoriteState } = useRecords()
   const { setState } = useSharedFilter()

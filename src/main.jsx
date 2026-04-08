@@ -72,27 +72,27 @@ export const Main = () => {
           <HapticsProvider>
             <LoadingProvider>
               <GestureHandlerRootView style={{ flex: 1 }}>
-                <BottomSheetWrapper>
-                  <SafeAreaProvider>
-                    <VaultProvider>
-                      <SharedFilterProvider>
-                        <NavigationContainer>
-                          <AutoLockProvider>
-                            <AutoLockTouchCapture>
-                              <ModalProvider>
-                                <BottomSheetProvider>
-                                  <BottomSheetV2Provider>
+                <SafeAreaProvider>
+                  <VaultProvider>
+                    <SharedFilterProvider>
+                      <NavigationContainer>
+                        <AutoLockProvider>
+                          <AutoLockTouchCapture>
+                            <ModalProvider>
+                              <BottomSheetProvider>
+                                <BottomSheetV2Provider>
+                                  <BottomSheetWrapper>
                                     <App />
-                                  </BottomSheetV2Provider>
-                                </BottomSheetProvider>
-                              </ModalProvider>
-                            </AutoLockTouchCapture>
-                          </AutoLockProvider>
-                        </NavigationContainer>
-                      </SharedFilterProvider>
-                    </VaultProvider>
-                  </SafeAreaProvider>
-                </BottomSheetWrapper>
+                                  </BottomSheetWrapper>
+                                </BottomSheetV2Provider>
+                              </BottomSheetProvider>
+                            </ModalProvider>
+                          </AutoLockTouchCapture>
+                        </AutoLockProvider>
+                      </NavigationContainer>
+                    </SharedFilterProvider>
+                  </VaultProvider>
+                </SafeAreaProvider>
               </GestureHandlerRootView>
             </LoadingProvider>
           </HapticsProvider>

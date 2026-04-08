@@ -9,16 +9,6 @@ import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View } from 'react-native'
 
 const styles = {
-  dragHandleArea: {
-    alignItems: 'center',
-    paddingTop: rawTokens.spacing12,
-    paddingBottom: rawTokens.spacing8
-  },
-  dragHandle: {
-    width: 32,
-    height: 4,
-    borderRadius: 10
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -41,16 +31,6 @@ export const SheetHeader = ({ title, onClose }) => {
 
   return (
     <>
-      <View style={styles.dragHandleArea}>
-        <View
-          style={[
-            styles.dragHandle,
-            {
-              backgroundColor: theme.colors.colorSurfaceElevatedOnInteraction
-            }
-          ]}
-        />
-      </View>
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
         <Text variant="bodyEmphasized" style={styles.headerTitle}>

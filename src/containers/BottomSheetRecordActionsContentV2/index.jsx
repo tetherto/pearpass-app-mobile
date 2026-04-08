@@ -2,7 +2,11 @@ import { useCallback, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
-import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  NavbarListItem,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import {
   CheckBox,
   CopyAll,
@@ -13,11 +17,8 @@ import {
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useCreateRecord, vaultGetFile } from '@tetherto/pearpass-lib-vault'
-import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { createStyles } from './styles'
-import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useRecordActionItems } from '../../hooks/useRecordActionItems'
 import { Layout } from '../Layout'
 
@@ -29,8 +30,7 @@ export const BottomSheetRecordActionsContentV2 = ({
 }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
-  const { collapse } = useBottomSheet()
-  const styles = createStyles()
+  const collapse = useBottomSheetClose()
   const { bottom } = useSafeAreaInsets()
 
   const { actions } = useRecordActionItems({ record, recordType, onDelete })
@@ -127,18 +127,11 @@ export const BottomSheetRecordActionsContentV2 = ({
     ]
   )
 
-  const handleColor = theme.colors.colorSurfaceElevatedOnInteraction
-
   return (
     <Layout
       mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
-      header={
-        <View style={styles.dragHandleArea}>
-          <View style={[styles.dragHandle, { backgroundColor: handleColor }]} />
-        </View>
-      }
     >
       {actionItems.map(
         ({ icon: Icon, label, onPress, isDestructive }, index) => (

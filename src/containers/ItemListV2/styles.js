@@ -41,5 +41,12 @@ export const createStyles = (colors) => ({
     left: 0,
     right: 0,
     zIndex: 1
+  },
+  itemTitle: {
+    fontWeight: '500'
+  },
+  itemSubtitle: {
+    fontWeight: '400',
+    color: '#BDC3AC'
   }
 })

@@ -2,7 +2,12 @@ import { useCallback, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  ContextMenu,
+  ListItem,
+  Text,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import {
   ErrorFilled,
   ExpandMore,
@@ -13,7 +18,6 @@ import { Pressable, SectionList, View } from 'react-native'
 import { createStyles } from './styles'
 import { FadeGradient } from '../../components/FadeGradient'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
-import { useBottomSheet } from '../../context/BottomSheetContext'
 import { getRecordSubtitle } from '../../utils/getRecordSubtitle'
 import { BottomSheetRecordActionsContentV2 } from '../BottomSheetRecordActionsContentV2'
 
@@ -57,7 +61,6 @@ export const ItemListV2 = ({
   const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
-  const { expand } = useBottomSheet()
   const [collapsedSections, setCollapsedSections] = useState({})
   const [listItemHeight, setListItemHeight] = useState(0)
   const styles = createStyles(theme.colors)
@@ -104,26 +107,6 @@ export const ItemListV2 = ({
     [isMultiSelectOn, navigation, setSelectedRecords]
   )
 
-  const handleLongPress = useCallback(
-    (record) => {
-      expand({
-        children: (
-          <BottomSheetRecordActionsContentV2
-            record={record}
-            recordType={record.type}
-            onSelectItem={() => {
-              setIsMultiSelectOn?.(true)
-              setSelectedRecords((prev) =>
-                prev.includes(record.id) ? prev : [...prev, record.id]
-              )
-            }}
-          />
-        )
-      })
-    },
-    [expand, setIsMultiSelectOn, setSelectedRecords]
-  )
-
   const visibleSections = useMemo(
     () =>
       sections.map((section) => ({
@@ -163,39 +146,56 @@ export const ItemListV2 = ({
                 : undefined
             }
           >
-            <ListItem
-              icon={<RecordItemIcon record={record} />}
-              iconSize={32}
-              title={record.data?.title ?? ''}
-              subtitle={getRecordSubtitle(record) || undefined}
-              selectionMode={isMultiSelectOn ? 'multi' : 'none'}
-              isSelected={isRecordSelected(record.id)}
-              onSelect={() => handleRecordPress(record.id)}
-              onClick={() => handleRecordPress(record.id)}
-              onLongPress={() => handleLongPress(record)}
-              rightElement={
-                !isMultiSelectOn ? (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 4
-                    }}
-                  >
-                    {record.hasSecurityAlert && (
-                      <ErrorFilled width={20} height={20} />
-                    )}
-                    <View style={styles.chevronRight}>
-                      <ExpandMore
-                        width={20}
-                        height={20}
-                        color={theme.colors.colorTextSecondary}
-                      />
-                    </View>
-                  </View>
-                ) : undefined
+            <ContextMenu
+              openOnLongPress
+              trigger={
+                <ListItem
+                  icon={<RecordItemIcon record={record} />}
+                  iconSize={32}
+                  title={record.data?.title ?? ''}
+                  titleStyle={styles.itemTitle}
+                  subtitle={getRecordSubtitle(record) || undefined}
+                  subtitleStyle={styles.itemSubtitle}
+                  selectionMode={isMultiSelectOn ? 'multi' : 'none'}
+                  isSelected={isRecordSelected(record.id)}
+                  onSelect={() => handleRecordPress(record.id)}
+                  onClick={() => handleRecordPress(record.id)}
+                  rightElement={
+                    !isMultiSelectOn ? (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 4
+                        }}
+                      >
+                        {record.hasSecurityAlert && (
+                          <ErrorFilled width={20} height={20} />
+                        )}
+                        <View style={styles.chevronRight}>
+                          <ExpandMore
+                            width={20}
+                            height={20}
+                            color={theme.colors.colorTextSecondary}
+                          />
+                        </View>
+                      </View>
+                    ) : undefined
+                  }
+                />
               }
-            />
+            >
+              <BottomSheetRecordActionsContentV2
+                record={record}
+                recordType={record.type}
+                onSelectItem={() => {
+                  setIsMultiSelectOn?.(true)
+                  setSelectedRecords((prev) =>
+                    prev.includes(record.id) ? prev : [...prev, record.id]
+                  )
+                }}
+              />
+            </ContextMenu>
           </View>
         )}
         renderSectionFooter={({ section }) => {

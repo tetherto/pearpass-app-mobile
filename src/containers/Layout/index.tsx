@@ -55,7 +55,7 @@ export const Layout = ({
   const card = (
     <CardWrapper
       style={[
-        styles.surface,
+        isSheetMode ? styles.sheetSurface : styles.surface,
         {
           borderColor: theme.colors.colorSurfaceDisabled,
           backgroundColor: theme.colors.colorSurfacePrimary

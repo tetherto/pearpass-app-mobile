@@ -6,7 +6,6 @@ import { isV2 } from 'src/utils/designVersion'
 
 import { Container, CurrentFolder, FolderName } from './styles'
 import { SORT_BY_TYPE } from '../../constants/sortOptions'
-import { BottomSheetSortContentV2 } from '../../containers/BottomSheetSortContentV2'
 import { Categories } from '../../containers/Categories'
 import { ContentHeader } from '../../containers/ContentHeader'
 import { EmptyCollectionView } from '../../containers/EmptyCollectionView'
@@ -17,7 +16,6 @@ import { ItemList } from '../../containers/ItemList'
 import { ItemListV2 } from '../../containers/ItemListV2'
 import { Layout } from '../../containers/Layout'
 import { MultiSelectBar } from '../../containers/MultiSelectBar'
-import { useBottomSheet } from '../../context/BottomSheetContext'
 import {
   INITIAL_STATE,
   useSharedFilter
@@ -34,8 +32,6 @@ export const Home = () => {
   const [selectedRecords, setSelectedRecords] = useState([])
 
   const { state, setState } = useSharedFilter()
-  const { expand } = useBottomSheet()
-
   const sort = useMemo(() => SORT_BY_TYPE[state.sort], [state.sort])
 
   const { data: vaultData } = useVault()
@@ -108,11 +104,6 @@ export const Home = () => {
           setSelectedRecords={setSelectedRecords}
           recordType={recordType}
           onCategoryChange={handleRecordType}
-          onSortPress={() =>
-            expand({
-              children: <BottomSheetSortContentV2 />
-            })
-          }
         />
 
         {isMultiSelectOn && (

@@ -1,10 +1,13 @@
 import { useLingui } from '@lingui/react/macro'
-import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  NavbarListItem,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { CalendarToday, SortByAlpha } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { SORT_KEYS } from '../../constants/sortOptions'
-import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { Layout } from '../Layout'
@@ -12,7 +15,7 @@ import { Layout } from '../Layout'
 export const BottomSheetSortContentV2 = () => {
   const { t } = useLingui()
   const { theme } = useTheme()
-  const { collapse } = useBottomSheet()
+  const collapse = useBottomSheetClose()
   const { state, setState } = useSharedFilter()
   const { bottom } = useSafeAreaInsets()
 

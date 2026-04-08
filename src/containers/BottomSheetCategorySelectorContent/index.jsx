@@ -1,9 +1,12 @@
 import { useLingui } from '@lingui/react/macro'
-import { NavbarListItem, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  NavbarListItem,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
@@ -15,7 +18,7 @@ export const BottomSheetCategorySelectorContent = ({
 }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
-  const { collapse } = useBottomSheet()
+  const collapse = useBottomSheetClose()
   const { state } = useSharedFilter()
   const { bottom } = useSafeAreaInsets()
 

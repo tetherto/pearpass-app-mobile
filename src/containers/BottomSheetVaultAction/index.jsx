@@ -1,48 +1,22 @@
-import { useEffect, useRef } from 'react'
-
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
 import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
+import { useBottomSheetClose } from '@tetherto/pearpass-lib-ui-kit'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 
 import { VAULT_ACTION } from '../../constants/vaultActions'
 import { ModifyVaultModalContent } from '../../containers/Modal/ModifyVaultModalContent'
-import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useModal } from '../../context/ModalContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
-/**
- *
- * @param {Object} props - Component props
- * @param {string} props.vaultId - The unique identifier of the vault
- * @param {string} props.vaultName - The current name of the vault
- * @returns {JSX.Element} Bottom sheet with vault modification options
- *
- */
-export const BottomSheetVaultAction = ({ vaultId, vaultName, onDismiss }) => {
+export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
   const { t } = useLingui()
-  const { collapse } = useBottomSheet()
+  const collapse = useBottomSheetClose()
   const { openModal } = useModal()
   const { hapticButtonPrimary } = useHapticFeedback()
 
-  const actionTakenRef = useRef(false)
-  const onDismissRef = useRef(onDismiss)
-  useEffect(() => {
-    onDismissRef.current = onDismiss
-  })
-
-  useEffect(
-    () => () => {
-      if (!actionTakenRef.current) {
-        onDismissRef.current?.()
-      }
-    },
-    []
-  )
-
   const handleName = () => {
-    actionTakenRef.current = true
     hapticButtonPrimary()
     collapse()
     openModal(
@@ -55,7 +29,6 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName, onDismiss }) => {
   }
 
   const handlePassword = () => {
-    actionTakenRef.current = true
     hapticButtonPrimary()
     collapse()
     openModal(
