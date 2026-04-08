@@ -18,6 +18,7 @@ import {
 import { RecordDetails } from '../../screens/RecordDetails'
 import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
+import { MyDevices } from '../../screens/Settings/MyDevices'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
 import { VaultsV2 } from '../../screens/Settings/Vaults2'
 import { ShareVault } from '../../screens/ShareVault'
@@ -93,5 +94,6 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="ShareVault" component={ShareVault} />
     <Stack.Screen name="Feedback" component={Feedback} />
     <Stack.Screen name="Vaults2" component={VaultsV2} />
+    <Stack.Screen name="MyDevices" component={MyDevices} />
   </Stack.Navigator>
 )

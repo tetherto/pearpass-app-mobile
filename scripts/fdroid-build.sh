@@ -186,7 +186,7 @@ run_build() {
     printf 'android.enableDependencyInfoInBundle=false\n' >> gradle.properties
   fi
   ensure_java_home
-  JAVA_HOME="$JAVA_HOME" GRADLE_USER_HOME=/tmp/pearpass-gradle-home ./gradlew :app:clean :app:assembleRelease --no-daemon -Dorg.gradle.vfs.watch=false -Dorg.gradle.java.installations.auto-download=false -Dorg.gradle.java.installations.auto-detect=false -Dorg.gradle.java.installations.paths="$JAVA_HOME" -Pandroid.enableDependencyInfoInApk=false -Pandroid.enableDependencyInfoInBundle=false
+  JAVA_HOME="$JAVA_HOME" GRADLE_USER_HOME=/tmp/pearpass-gradle-home ./gradlew :app:clean :app:assembleFdroidRelease --no-daemon -Dorg.gradle.vfs.watch=false -Dorg.gradle.java.installations.auto-download=false -Dorg.gradle.java.installations.auto-detect=false -Dorg.gradle.java.installations.paths="$JAVA_HOME" -Pandroid.enableDependencyInfoInApk=false -Pandroid.enableDependencyInfoInBundle=false -Ppearpass.enableAbiSplits=true -Ppearpass.abis=arm64-v8a,armeabi-v7a
 }
 
 case "$phase" in
