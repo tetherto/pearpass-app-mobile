@@ -1,6 +1,6 @@
 import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
-export const createStyles = (colors) => ({
+export const createStyles = () => ({
   recordsSection: {
     position: 'relative'
   },
@@ -9,12 +9,10 @@ export const createStyles = (colors) => ({
   },
   recordsContent: {},
   sectionLabel: {
-    color: colors.colorTextSecondary,
     paddingHorizontal: rawTokens.spacing16,
     paddingVertical: rawTokens.spacing12
   },
   folderSectionLabel: {
-    color: colors.colorTextSecondary,
     paddingTop: rawTokens.spacing12
   },
   recordItem: {

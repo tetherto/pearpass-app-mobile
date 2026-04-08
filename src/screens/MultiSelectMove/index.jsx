@@ -26,7 +26,7 @@ export const MultiSelectMove = () => {
   const { params } = useRoute()
   const { theme } = useTheme()
   const [selectedFolder, setSelectedFolder] = useState(null)
-  const styles = useMemo(() => createStyles(theme.colors), [theme.colors])
+  const styles = useMemo(() => createStyles(), [])
 
   const [containerHeight, setContainerHeight] = useState(0)
   const [recordsScrollableHeight, setRecordsScrollableHeight] = useState(0)
@@ -108,9 +108,11 @@ export const MultiSelectMove = () => {
           ]}
           onLayout={(e) => setRecordsVisibleHeight(e.nativeEvent.layout.height)}
         >
-          <Text variant="caption" style={styles.sectionLabel}>
-            {t`Selected items`}
-          </Text>
+          <View style={styles.sectionLabel}>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              {t`Selected items`}
+            </Text>
+          </View>
           <ScrollView
             style={styles.recordsScroll}
             contentContainerStyle={[
@@ -147,9 +149,10 @@ export const MultiSelectMove = () => {
 
         <View style={styles.foldersSection}>
           <View
+            style={styles.folderSectionLabel}
             onLayout={(e) => setFolderLabelHeight(e.nativeEvent.layout.height)}
           >
-            <Text variant="caption" style={styles.folderSectionLabel}>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
               {t`Choose the destination folder for these items`}
             </Text>
           </View>

@@ -12,18 +12,12 @@ export const createStyles = (colors) => ({
     flex: 1,
     overflow: 'hidden'
   },
-  breadcrumbScrollContainer: {
-    flex: 1
-  },
   breadcrumbScroll: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: rawTokens.spacing4,
     paddingHorizontal: rawTokens.spacing16,
     paddingVertical: rawTokens.spacing8
-  },
-  breadcrumbPillLabel: {
-    lineHeight: 15
   },
   breadcrumbPill: {
     flexDirection: 'row',
@@ -45,19 +39,12 @@ export const createStyles = (colors) => ({
     flexDirection: 'row',
     alignItems: 'center',
     gap: rawTokens.spacing4,
-    paddingHorizontal: rawTokens.spacing8,
-    paddingVertical: rawTokens.spacing8,
+    paddingHorizontal: rawTokens.spacing4,
+    paddingVertical: rawTokens.spacing4,
     borderLeftWidth: 1,
     borderLeftColor: colors.colorBorderPrimary,
     backgroundColor: colors.colorSurfacePrimary,
     alignSelf: 'stretch',
     justifyContent: 'center'
-  },
-  actionButton: {
-    width: 40,
-    height: 40,
-    borderRadius: rawTokens.radius8,
-    justifyContent: 'center',
-    alignItems: 'center'
   }
 })

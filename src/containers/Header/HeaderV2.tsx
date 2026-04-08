@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import { useNavigation } from '@react-navigation/native'
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
 import {
   useTheme,
   rawTokens,
@@ -17,7 +17,7 @@ export const HeaderV2 = ({ setSearchValue, searchValue }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
-  const navigation = useNavigation<any>()
+  const navigation = useNavigation<NavigationProp<ParamListBase>>()
 
   const handleAdd = () => {
     expand({

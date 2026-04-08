@@ -73,9 +73,11 @@ export const MultiSelectBar = ({
   return (
     <View style={styles.container}>
       <View style={styles.leftSection}>
-        <Text variant="labelEmphasized" style={{ flex: 1 }}>
-          {selectedCount} {t`Items selected`}
-        </Text>
+        <View style={{ flex: 1 }}>
+          <Text variant="labelEmphasized">
+            {selectedCount} {t`Items selected`}
+          </Text>
+        </View>
 
         <View style={styles.actions}>
           <Button

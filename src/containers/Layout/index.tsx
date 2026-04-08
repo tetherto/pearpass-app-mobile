@@ -43,11 +43,12 @@ export const Layout = ({
   const { theme } = useTheme()
   const { bottom } = useSafeAreaInsets()
 
-  const CardWrapper = mode === 'screen' ? KeyboardAvoidingView : View
-  const cardWrapperProps =
-    mode === 'screen'
-      ? { behavior: Platform.OS === 'ios' ? ('padding' as const) : ('height' as const) }
-      : {}
+  const isSheetMode = mode === 'sheet'
+
+  const CardWrapper = isSheetMode ? View : KeyboardAvoidingView
+  const cardWrapperProps = isSheetMode
+    ? {}
+    : { behavior: Platform.OS === 'ios' ? ('padding' as const) : ('height' as const) }
 
   const showFooter = !!footer && !hideFooter
 
@@ -63,7 +64,7 @@ export const Layout = ({
       ]}
       {...cardWrapperProps}
     >
-      {mode === 'sheet' && header}
+      {isSheetMode && header}
 
       {scrollable ? (
         <ScrollView
@@ -96,7 +97,7 @@ export const Layout = ({
     </CardWrapper>
   )
 
-  if (mode === 'sheet') return card
+  if (isSheetMode) return card
 
   return (
     <View
@@ -107,4 +108,3 @@ export const Layout = ({
     </View>
   )
 }
-

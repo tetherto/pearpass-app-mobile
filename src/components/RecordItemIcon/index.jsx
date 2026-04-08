@@ -30,13 +30,7 @@ export const RecordItemIcon = ({ record }) => {
           resizeMode="contain"
         />
       ) : (
-        <Text
-          variant="label"
-          style={{
-            color: RECORD_COLOR_BY_TYPE[record.type],
-            fontWeight: '700'
-          }}
-        >
+        <Text variant="label" color={RECORD_COLOR_BY_TYPE[record.type]}>
           {generateAvatarInitials(record.data?.title)}
         </Text>
       )}

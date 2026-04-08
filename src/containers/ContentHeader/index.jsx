@@ -153,7 +153,6 @@ export const ContentHeader = ({
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.breadcrumbScroll}
-          style={styles.breadcrumbScrollContainer}
         >
           {isMultiSelectOn ? (
             <>
@@ -223,14 +222,12 @@ export const ContentHeader = ({
           variant="tertiary"
           iconBefore={<Checklist color={theme.colors.colorTextPrimary} />}
           onClick={handleToggleMultiSelect}
-          style={styles.actionButton}
           aria-label={t`Toggle multi-select`}
         />
         <Button
           variant="tertiary"
           iconBefore={<FilterList color={theme.colors.colorTextPrimary} />}
           onClick={onSortPress}
-          style={styles.actionButton}
           aria-label={t`Sort items`}
         />
       </View>
