@@ -1,6 +1,6 @@
 import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
-export const createStyles = (colors) => ({
+export const createStyles = () => ({
   container: {
     flex: 1,
     alignItems: 'center',
@@ -9,18 +9,14 @@ export const createStyles = (colors) => ({
     paddingBottom: rawTokens.spacing40
   },
   title: {
-    fontFamily: rawTokens.fontDisplay,
-    fontSize: rawTokens.fontSize24,
-    textAlign: 'center',
     marginTop: rawTokens.spacing24,
     marginBottom: rawTokens.spacing12
   },
   description: {
-    color: colors.colorTextSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: rawTokens.spacing32,
-    paddingHorizontal: rawTokens.spacing16
+    marginBottom: rawTokens.spacing24
+  },
+  textCenter: {
+    textAlign: 'center'
   },
   buttonsContainer: {
     width: '100%',

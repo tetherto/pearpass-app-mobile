@@ -1,23 +1,33 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Text, Title, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { Add, ImportOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View } from 'react-native'
 
 import { createStyles } from './styles'
+import { ItemCardIllustration } from '../../svgs/ItemCardIllustration'
 
 export const EmptyCollectionViewV2 = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
-  const styles = createStyles(theme.colors)
+  const styles = createStyles()
 
   return (
     <View style={styles.container}>
-      <Text variant="label" style={styles.title}>{t`No item saved`}</Text>
-      <Text variant="label" style={styles.description}>
-        {t`Start using PearPass creating your first item or import your items from a different password manager`}
-      </Text>
+      <ItemCardIllustration />
+      <View style={styles.title}>
+        <Title style={styles.textCenter}>{t`No item saved`}</Title>
+      </View>
+      <View style={styles.description}>
+        <Text
+          variant="label"
+          color={theme.colors.colorTextSecondary}
+          style={styles.textCenter}
+        >
+          {t`Start using PearPass creating your first item or import your items from a different password manager`}
+        </Text>
+      </View>
       <View style={styles.buttonsContainer}>
         <Button
           variant="primary"
