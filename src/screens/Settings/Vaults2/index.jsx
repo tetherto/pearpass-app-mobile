@@ -6,10 +6,11 @@ import {
   Button,
   PageHeader,
   rawTokens,
-  useTheme
+  useTheme,
+  Text
 } from '@tetherto/pearpass-lib-ui-kit'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { ScreenLayout } from 'src/containers/ScreenLayout'
 
@@ -119,12 +120,7 @@ export const VaultsV2 = () => {
 
       {currentVault && (
         <View style={styles.section}>
-          <Text
-            style={[
-              styles.sectionLabel,
-              { color: theme.colors.colorTextSecondary }
-            ]}
-          >
+          <Text variant="caption" color={theme.colors.colorTextSecondary}>
             {t`Current Vault`}
           </Text>
           <View
@@ -140,12 +136,7 @@ export const VaultsV2 = () => {
 
       {otherVaults.length > 0 && (
         <View style={styles.section}>
-          <Text
-            style={[
-              styles.sectionLabel,
-              { color: theme.colors.colorTextSecondary }
-            ]}
-          >
+          <Text variant="caption" color={theme.colors.colorTextSecondary}>
             {t`Other Vaults`}
           </Text>
           <View
