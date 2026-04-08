@@ -77,7 +77,7 @@ export const VaultsV2 = () => {
 
   const iconBadgeStyle = [
     styles.iconBadge,
-    { backgroundColor: theme.colors.colorPrimary + '26' }
+    { backgroundColor: theme.colors.colorPrimary }
   ]
 
   const renderVaultItem = (
