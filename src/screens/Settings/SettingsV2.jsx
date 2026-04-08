@@ -75,7 +75,7 @@ export const SettingsV2 = () => {
           {
             key: 'your-devices',
             label: t`Your Devices`,
-            screen: 'Vaults',
+            screen: 'MyDevices',
             icon: Devices
           }
         ]
