@@ -27,56 +27,9 @@ module.exports = class SwarmConfig {
 EOF
 }
 
-write_expo_camera_stub() {
-  rm -rf node_modules/expo-camera
-  mkdir -p node_modules/expo-camera
-  cat > node_modules/expo-camera/package.json <<'EOF'
-{
-  "name": "expo-camera",
-  "version": "16.1.11-fdroid",
-  "main": "index.js",
-  "expo": {
-    "plugin": "./app.plugin.js"
-  }
-}
-EOF
-  cat > node_modules/expo-camera/app.plugin.js <<'EOF'
-module.exports = (config) => config
-EOF
-  cat > node_modules/expo-camera/index.js <<'EOF'
-const PermissionStatus = {
-  GRANTED: "granted",
-  DENIED: "denied"
-}
-
-const Camera = {
-  async getCameraPermissionsAsync() {
-    return { status: PermissionStatus.DENIED }
-  },
-  async requestCameraPermissionsAsync() {
-    return { status: PermissionStatus.DENIED, canAskAgain: false }
-  },
-  async scanFromURLAsync() {
-    return []
-  }
-}
-
-function CameraView() {
-  return null
-}
-
-module.exports = {
-  Camera,
-  CameraView,
-  PermissionStatus
-}
-EOF
-}
-
 run_prebuild() {
   npm ci --install-links --legacy-peer-deps --no-audit --no-fund
   write_swarmconf_stub
-  write_expo_camera_stub
   npm run fdroid:patches:prebuild
   npm run build
   ./node_modules/.bin/expo prebuild --platform android --clean --no-install
@@ -168,10 +121,10 @@ run_build() {
   rm -f app/google-services.json
   perl -i -ne "print unless /com\\.google\\.gms\\.google-services/" app/build.gradle build.gradle
   if ! grep -q "fdroid-root-excludes" build.gradle; then
-    printf '\n// fdroid-root-excludes\nsubprojects {\n  configurations.all {\n    exclude group: "com.google.firebase"\n    exclude group: "com.google.firebase", module: "firebase-messaging"\n  }\n}\n' >> build.gradle
+    printf '\n// fdroid-root-excludes\nsubprojects {\n  configurations.all {\n    exclude group: "com.google.firebase", module: "firebase-messaging"\n  }\n}\n' >> build.gradle
   fi
   if ! grep -q "fdroid-global-excludes" app/build.gradle; then
-    printf '\n// fdroid-global-excludes\nconfigurations.all {\n  exclude group: "com.google.firebase"\n  exclude group: "com.google.firebase", module: "firebase-messaging"\n  exclude group: "com.google.android.gms", module: "play-services-fido"\n  exclude group: "com.google.android.gms", module: "play-services-auth"\n  exclude group: "androidx.credentials", module: "credentials-play-services-auth"\n}\n' >> app/build.gradle
+    printf '\n// fdroid-global-excludes\nconfigurations.all {\n  exclude group: "com.google.firebase", module: "firebase-messaging"\n  exclude group: "com.google.android.gms", module: "play-services-fido"\n  exclude group: "com.google.android.gms", module: "play-services-auth"\n  exclude group: "androidx.credentials", module: "credentials-play-services-auth"\n}\n' >> app/build.gradle
   fi
   if ! grep -q "dependenciesInfo {" app/build.gradle; then
     perl -0777 -i -pe "s/android\\s*\\{\\n/android {\\n    dependenciesInfo {\\n        includeInApk = false\\n        includeInBundle = false\\n    }\\n/s" app/build.gradle
