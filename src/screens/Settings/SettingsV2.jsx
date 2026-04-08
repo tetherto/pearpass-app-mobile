@@ -126,7 +126,7 @@ export const SettingsV2 = () => {
           {
             key: 'report-a-problem',
             label: t`Report a problem`,
-            screen: 'About',
+            screen: 'Feedback',
             icon: BugReportFilled
           },
           {

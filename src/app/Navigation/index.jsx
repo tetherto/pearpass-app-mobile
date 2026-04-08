@@ -16,6 +16,7 @@ import {
   OnboardingV2Sync
 } from '../../screens/OnboardingV2'
 import { RecordDetails } from '../../screens/RecordDetails'
+import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
 import { ShareVault } from '../../screens/ShareVault'
@@ -89,5 +90,6 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="BlindPeering" component={BlindPeeringSectionV2} />
     <Stack.Screen name="ImportVault" component={ImportVault} />
     <Stack.Screen name="ShareVault" component={ShareVault} />
+    <Stack.Screen name="Feedback" component={Feedback} />
   </Stack.Navigator>
 )
