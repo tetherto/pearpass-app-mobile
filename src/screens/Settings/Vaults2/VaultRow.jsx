@@ -1,7 +1,12 @@
 import { useLingui } from '@lingui/react/macro'
-import { ListItem, rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  ListItem,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { LockOutlined, PersonAdd } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 import { VaultActionsMenu } from './VaultActionsMenu'
 
@@ -34,13 +39,12 @@ export const VaultRow = ({
         rightElement={
           <View style={styles.actions}>
             {isCurrentVault && (
-              <TouchableOpacity onPress={onAddMember} hitSlop={8}>
-                <PersonAdd
-                  color={theme.colors.colorTextPrimary}
-                  width={20}
-                  height={20}
-                />
-              </TouchableOpacity>
+              <Button
+                variant="tertiary"
+                size="small"
+                iconBefore={<PersonAdd color={theme.colors.colorTextPrimary} />}
+                onClick={onAddMember}
+              />
             )}
             <VaultActionsMenu {...vaultActions} />
           </View>
