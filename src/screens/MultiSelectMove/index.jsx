@@ -187,14 +187,8 @@ export const MultiSelectMove = () => {
                           setFolderButtonHeight(e.nativeEvent.layout.height)
                       : undefined
                   }
-                  style={[
-                    styles.folderButton,
-                    { borderColor: theme.colors.colorBorderSecondary },
-                    selectedFolder === folder.name && {
-                      backgroundColor:
-                        theme.colors.colorSurfaceElevatedOnInteraction
-                    }
-                  ]}
+                  pressed={selectedFolder === folder.name}
+                  style={styles.folderButton}
                 >
                   {folder.name}
                 </Button>
