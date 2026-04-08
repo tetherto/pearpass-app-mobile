@@ -32,6 +32,7 @@ import { StyleSheet, View } from 'react-native'
 
 import { ScreenHeader } from '../../containers/ScreenHeader'
 import { ScreenLayout } from '../../containers/ScreenLayout'
+import { isV2 } from '../../utils/designVersion'
 
 export const SettingsV2 = () => {
   const { t } = useLingui()
@@ -88,7 +89,7 @@ export const SettingsV2 = () => {
           {
             key: 'your-vaults',
             label: t`Your Vaults`,
-            screen: 'Vaults',
+            screen: isV2() ? 'Vaults2' : 'Vaults',
             icon: LayerFilled
           },
           {
