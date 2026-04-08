@@ -1,5 +1,9 @@
 import { useLingui } from '@lingui/react/macro'
-import { useNavigation } from '@react-navigation/native'
+import {
+  useNavigation,
+  type NavigationProp,
+  type ParamListBase
+} from '@react-navigation/native'
 import {
   useTheme,
   rawTokens,
@@ -13,11 +17,16 @@ import { useBottomSheet } from '../../context/BottomSheetContext'
 import { BottomSheetRecordCreateContent } from '../BottomSheetRecordCreateContent'
 import { ScreenHeader } from '../ScreenHeader'
 
-export const HeaderV2 = ({ setSearchValue, searchValue }) => {
+interface HeaderV2Props {
+  setSearchValue: (value: string) => void
+  searchValue: string
+}
+
+export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const { expand } = useBottomSheet()
-  const navigation = useNavigation()
+  const navigation = useNavigation<NavigationProp<ParamListBase>>()
 
   const handleAdd = () => {
     expand({

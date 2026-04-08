@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { ImportItems } from 'src/screens/ImportItems'
 
 import { CreateFolder } from '../../screens/CreateFolder'
 import { CreateRecord } from '../../screens/CreateRecord'
@@ -91,5 +92,6 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="ImportVault" component={ImportVault} />
     <Stack.Screen name="ShareVault" component={ShareVault} />
     <Stack.Screen name="Feedback" component={Feedback} />
+    <Stack.Screen name="ImportItems" component={ImportItems} />
   </Stack.Navigator>
 )

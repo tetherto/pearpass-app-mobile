@@ -44,8 +44,7 @@ export const ShareVault = () => {
     navigation.goBack()
   }, [navigation])
 
-  const targetOffset =
-    (1 - secondsLeft / EXPIRE_PERIOD) * TIMER_CIRCUMFERENCE
+  const targetOffset = (1 - secondsLeft / EXPIRE_PERIOD) * TIMER_CIRCUMFERENCE
   const animatedOffset = useSharedValue(targetOffset)
 
   useEffect(() => {
@@ -61,121 +60,114 @@ export const ShareVault = () => {
 
   return (
     <ScreenLayout
-      header={<BackScreenHeader title={t`Share Personal Vault`} onBack={handleBack} />}
+      header={
+        <BackScreenHeader title={t`Share Personal Vault`} onBack={handleBack} />
+      }
       scrollable
       hideFooter
-      contentStyle={{ paddingTop: rawTokens.spacing16, paddingHorizontal: rawTokens.spacing16 }}
     >
       <View style={styles.content}>
-          <Text variant="caption" color={theme.colors.colorTextSecondary}>
-            {t`Access Code`}
-          </Text>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Access Code`}
+        </Text>
+
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: theme.colors.colorSurfacePrimary,
+              borderColor: theme.colors.colorBorderPrimary
+            }
+          ]}
+        >
+          <View style={styles.qrSection}>
+            <View
+              style={[
+                styles.qrContainer,
+                { backgroundColor: theme.colors.colorSurfaceHover }
+              ]}
+            >
+              {svg.length > 0 && (
+                <SvgXml
+                  testID="share-vault-qr-code"
+                  xml={svg}
+                  width="100%"
+                  height="100%"
+                />
+              )}
+            </View>
+
+            <View style={styles.timerRow}>
+              <View style={styles.timerCircle}>
+                <Svg
+                  width={TIMER_SIZE}
+                  height={TIMER_SIZE}
+                  viewBox={`0 0 ${TIMER_SIZE} ${TIMER_SIZE}`}
+                  style={styles.timerSvg}
+                >
+                  <Circle
+                    cx={TIMER_CENTER}
+                    cy={TIMER_CENTER}
+                    r={TIMER_RADIUS}
+                    fill="none"
+                    stroke={theme.colors.colorSurfaceElevatedOnInteraction}
+                    strokeWidth={TIMER_STROKE_WIDTH}
+                  />
+                  <AnimatedCircle
+                    cx={TIMER_CENTER}
+                    cy={TIMER_CENTER}
+                    r={TIMER_RADIUS}
+                    fill="none"
+                    stroke={theme.colors.colorPrimary}
+                    strokeWidth={TIMER_STROKE_WIDTH}
+                    strokeLinecap="round"
+                    strokeDasharray={TIMER_CIRCUMFERENCE}
+                    animatedProps={animatedProps}
+                  />
+                </Svg>
+              </View>
+
+              <Text variant="caption" color={theme.colors.colorTextSecondary}>
+                {isExpired ? t`Code expired` : t`Code expires in`}
+              </Text>
+              {!isExpired && (
+                <Text variant="caption" color={theme.colors.colorPrimary}>
+                  {formattedTime}s
+                </Text>
+              )}
+            </View>
+          </View>
 
           <View
             style={[
-              styles.card,
-              {
-                backgroundColor: theme.colors.colorSurfacePrimary,
-                borderColor: theme.colors.colorBorderPrimary
-              }
+              styles.vaultLinkSection,
+              { borderTopColor: theme.colors.colorBorderPrimary }
             ]}
           >
-            <View style={styles.qrSection}>
-              <View
-                style={[
-                  styles.qrContainer,
-                  { backgroundColor: theme.colors.colorSurfaceHover }
-                ]}
-              >
-                {svg.length > 0 && (
-                  <SvgXml
-                    testID="share-vault-qr-code"
-                    xml={svg}
-                    width="100%"
-                    height="100%"
-                  />
-                )}
-              </View>
-
-              <View style={styles.timerRow}>
-                <View style={styles.timerCircle}>
-                  <Svg
-                    width={TIMER_SIZE}
-                    height={TIMER_SIZE}
-                    viewBox={`0 0 ${TIMER_SIZE} ${TIMER_SIZE}`}
-                    style={styles.timerSvg}
-                  >
-                    <Circle
-                      cx={TIMER_CENTER}
-                      cy={TIMER_CENTER}
-                      r={TIMER_RADIUS}
-                      fill="none"
-                      stroke={
-                        theme.colors.colorSurfaceElevatedOnInteraction
-                      }
-                      strokeWidth={TIMER_STROKE_WIDTH}
-                    />
-                    <AnimatedCircle
-                      cx={TIMER_CENTER}
-                      cy={TIMER_CENTER}
-                      r={TIMER_RADIUS}
-                      fill="none"
-                      stroke={theme.colors.colorPrimary}
-                      strokeWidth={TIMER_STROKE_WIDTH}
-                      strokeLinecap="round"
-                      strokeDasharray={TIMER_CIRCUMFERENCE}
-                      animatedProps={animatedProps}
-                    />
-                  </Svg>
-                </View>
-
-                <Text
-                  variant="caption"
-                  color={theme.colors.colorTextSecondary}
-                >
-                  {isExpired ? t`Code expired` : t`Code expires in`}
-                </Text>
-                {!isExpired && (
-                  <Text variant="caption" color={theme.colors.colorPrimary}>
-                    {formattedTime}s
-                  </Text>
-                )}
-              </View>
+            <View style={styles.vaultLinkContent}>
+              <Text variant="caption" color={theme.colors.colorTextSecondary}>
+                {t`Vault Link`}
+              </Text>
+              <Text numberOfLines={1} color={theme.colors.colorTextPrimary}>
+                {vaultLink || t`Generating link...`}
+              </Text>
             </View>
-
-            <View
-              style={[
-                styles.vaultLinkSection,
-                { borderTopColor: theme.colors.colorBorderPrimary }
-              ]}
-            >
-              <View style={styles.vaultLinkContent}>
-                <Text
-                  variant="caption"
-                  color={theme.colors.colorTextSecondary}
-                >
-                  {t`Vault Link`}
-                </Text>
-                <Text numberOfLines={1} color={theme.colors.colorTextPrimary}>
-                  {vaultLink || t`Generating link...`}
-                </Text>
-              </View>
-              <Button
-                variant="tertiary"
-                size="small"
-                onClick={handleCopy}
-                aria-label="Copy"
-                data-testid="share-vault-copy-button"
-                iconBefore={
-                  <ContentCopy
-                    width={24}
-                    height={24}
-                    color={theme.colors.colorTextPrimary}
-                  />
-                }
-              />
-            </View>
+            <Button
+              variant="tertiary"
+              size="small"
+              onClick={handleCopy}
+              aria-label="Copy"
+              data-testid="share-vault-copy-button"
+              iconBefore={
+                <ContentCopy
+                  width={24}
+                  height={24}
+                  color={theme.colors.colorTextPrimary}
+                />
+              }
+            />
           </View>
+        </View>
       </View>
     </ScreenLayout>
   )

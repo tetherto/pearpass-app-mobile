@@ -94,7 +94,7 @@ export const SettingsV2 = () => {
           {
             key: 'import-items',
             label: t`Import Items`,
-            screen: 'Vaults',
+            screen: 'ImportItems',
             icon: Login
           },
           {
@@ -279,9 +279,6 @@ export const SettingsV2 = () => {
 const styles = StyleSheet.create({
   searchContainer: {
     flex: 1
-  },
-  scrollContent: {
-    padding: rawTokens.spacing16
   },
   sectionCard: {
     paddingBottom: rawTokens.spacing8,

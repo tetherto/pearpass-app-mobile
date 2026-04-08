@@ -77,7 +77,7 @@ export const ScreenLayout = ({
                 borderTopColor: theme.colors.colorSurfaceDisabled,
                 paddingBottom: bottom
               },
-              footer && styles.footerWithContent,
+              footer ? styles.footerWithContent : undefined,
               footerStyle
             ]}
           >
@@ -111,7 +111,8 @@ const styles = StyleSheet.create({
     flex: 1
   },
   scrollContent: {
-    flexGrow: 1
+    flexGrow: 1,
+    padding: rawTokens.spacing16
   },
   footer: {
     borderWidth: 1,
