@@ -175,23 +175,26 @@ export const MultiSelectMove = () => {
               }
             >
               {folderList.map((folder, index) => (
-                <Button
+                <View
                   key={folder.name}
-                  variant="secondary"
-                  fullWidth
-                  iconBefore={<FolderOpen />}
-                  onClick={() => setSelectedFolder(folder.name)}
                   onLayout={
                     index === 0
                       ? (e) =>
                           setFolderButtonHeight(e.nativeEvent.layout.height)
                       : undefined
                   }
-                  pressed={selectedFolder === folder.name}
-                  style={styles.folderButton}
                 >
-                  {folder.name}
-                </Button>
+                  <Button
+                    variant="secondary"
+                    fullWidth
+                    iconBefore={<FolderOpen />}
+                    onClick={() => setSelectedFolder(folder.name)}
+                    pressed={selectedFolder === folder.name}
+                    style={styles.folderButton}
+                  >
+                    {folder.name}
+                  </Button>
+                </View>
               ))}
             </View>
           </ScrollView>
