@@ -76,6 +76,10 @@ export const Vaults = () => {
                     key={device.name + index}
                     name={getDeviceDisplayName(device?.name)}
                     date={device.createdAt}
+                    nameTestID="linked-device-name"
+                    nameAccessibilityLabel="Linked Device Name"
+                    dateTestID="linked-device-date"
+                    dateAccessibilityLabel="Linked Device Date"
                   />
                 ))}
               </View>

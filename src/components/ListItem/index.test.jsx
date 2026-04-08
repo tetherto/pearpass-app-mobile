@@ -20,12 +20,12 @@ jest.mock('./styles', () => {
       <View testID="vault-description" {...props} />
     ),
     ListItemName: (props) => (
-      <Text testID="vault-name" {...props}>
+      <Text testID={props.testID || 'vault-name'} {...props}>
         {props.children}
       </Text>
     ),
     ListItemDate: (props) => (
-      <Text testID="vault-date" {...props}>
+      <Text testID={props.testID || 'vault-date'} {...props}>
         {props.children}
       </Text>
     ),
@@ -59,7 +59,11 @@ describe('ListItem', () => {
     onEditClick: () => {},
     onDeleteClick: () => {},
     onShareClick: () => {},
-    onPress: jest.fn()
+    onPress: jest.fn(),
+    nameTestID: 'vault-name',
+    nameAccessibilityLabel: 'Vault Name',
+    dateTestID: 'vault-date',
+    dateAccessibilityLabel: 'Vault Date'
   }
 
   it('renders correctly with provided vault data', () => {
