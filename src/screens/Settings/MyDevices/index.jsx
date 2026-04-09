@@ -20,8 +20,8 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { Pressable, StyleSheet, View } from 'react-native'
+import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
 import { unsupportedFeaturesEnabled } from 'src/utils/unsupportedFeatures'
 
 const formatDeviceDate = (dateInput) => {
@@ -74,7 +74,7 @@ export const MyDevices = () => {
   const styles = getStyles(theme)
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       header={
         <BackScreenHeader
@@ -196,7 +196,7 @@ export const MyDevices = () => {
           </View>
         </View>
       )}
-    </ScreenLayout>
+    </Layout>
   )
 }
 
