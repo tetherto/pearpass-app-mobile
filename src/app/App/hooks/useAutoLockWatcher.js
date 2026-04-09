@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
+import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
 import {
   closeAllInstances,
   useUserData,
@@ -17,6 +18,7 @@ import {
   getLastActivityAt,
   setLastActivityAt
 } from '../../../utils/autoLockStorage'
+import { isV2 } from '../../../utils/designVersion'
 import { clearAllFileCache } from '../../../utils/filesCache'
 
 /**
@@ -81,15 +83,23 @@ export const useAutoLockWatcher = () => {
     closeAllInstances()
     clearAllFileCache()
 
-    navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'Welcome',
-          params: { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD }
-        }
-      ]
-    })
+    if (isV2()) {
+      const routeName = UNSUPPORTED ? 'AuthV2Pin' : 'AuthV2MasterPassword'
+      navigation.reset({
+        index: 0,
+        routes: [{ name: routeName }]
+      })
+    } else {
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Welcome',
+            params: { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD }
+          }
+        ]
+      })
+    }
 
     resetState()
   }, [

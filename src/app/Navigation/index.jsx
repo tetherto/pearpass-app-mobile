@@ -1,5 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+import {
+  AuthV2PinScreen,
+  AuthV2MasterPasswordScreen
+} from '../../screens/AuthV2'
 import { CreateFolder } from '../../screens/CreateFolder'
 import { CreateRecord } from '../../screens/CreateRecord'
 import { ErrorScreen } from '../../screens/ErrorScreen'
@@ -72,6 +76,16 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen
       name="OnboardingV2Biometrics"
       component={OnboardingV2Biometrics}
+      options={noGestureNoAnimation}
+    />
+    <Stack.Screen
+      name="AuthV2Pin"
+      component={AuthV2PinScreen}
+      options={noGesture}
+    />
+    <Stack.Screen
+      name="AuthV2MasterPassword"
+      component={AuthV2MasterPasswordScreen}
       options={noGestureNoAnimation}
     />
     <Stack.Screen name="Welcome" component={Welcome} options={noGesture} />
