@@ -86,7 +86,7 @@ export const StepIdentity = ({ initialData, onSubmit, onBack }) => {
           onClick={handleSubmit}
           disabled={!canSubmit}
           iconAfter={<KeyboardArrowRightFilled />}
-          testID="new-vault-submit-button"
+          data-testid="new-vault-submit-button"
         >
           {t`Create New Vault`}
         </Button>

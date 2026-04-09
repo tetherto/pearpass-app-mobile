@@ -55,11 +55,7 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
 
   logger.log('[pearpass] init: worklet started')
 
-  const sharedDirectory = await withTimeout(
-    getSharedDirectoryPath(),
-    10_000,
-    'getSharedDirectoryPath'
-  )
+  const sharedDirectory = await getSharedDirectoryPath()
 
   logger.log('[pearpass] init: shared directory resolved')
 

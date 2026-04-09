@@ -12,7 +12,6 @@ import { useVault } from '@tetherto/pearpass-lib-vault'
 import {
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -26,6 +25,7 @@ import Toast from 'react-native-toast-message'
 import { TOAST_CONFIG } from '../../../constants/toast'
 import { ButtonPrimary } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
+import { isIOS } from '../../../utils/platform'
 
 export const VaultRenameScreen = ({ route }) => {
   const { t } = useLingui()
@@ -125,7 +125,7 @@ export const VaultRenameScreen = ({ route }) => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={isIOS() ? 'padding' : undefined}
     >
       <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>
         <Defs>

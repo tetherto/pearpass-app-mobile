@@ -31,6 +31,7 @@ export const usePasswordCreation = () => {
   const { addDevice } = useVault()
 
   const mountedRef = useRef(true)
+  const submitInFlightRef = useRef(false)
   const [isLoading, setIsLoading] = useState(false)
   const [passwordIndicatorVariant, setPasswordIndicatorVariant] = useState(null)
   const [passwordsMatch, setPasswordsMatch] = useState(false)
@@ -119,6 +120,10 @@ export const usePasswordCreation = () => {
   const canSubmit = isValid && passwordsMatch
 
   const submit = async (onSuccess) => {
+    if (submitInFlightRef.current) {
+      return
+    }
+
     const password = values.password
     const passwordConfirm = values.passwordConfirm
 
@@ -136,6 +141,7 @@ export const usePasswordCreation = () => {
     const passwordBuffer = stringToBuffer(password)
 
     try {
+      submitInFlightRef.current = true
       setIsLoading(true)
       await createMasterPassword(passwordBuffer)
 
@@ -158,6 +164,8 @@ export const usePasswordCreation = () => {
       if (mountedRef.current) {
         setIsLoading(false)
       }
+    } finally {
+      submitInFlightRef.current = false
     }
   }
 

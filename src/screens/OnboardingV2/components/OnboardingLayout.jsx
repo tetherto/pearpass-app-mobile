@@ -1,14 +1,7 @@
-import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { Button, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import * as NavigationBar from 'expo-navigation-bar'
 import { StatusBar } from 'expo-status-bar'
-import {
-  Dimensions,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View
-} from 'react-native'
+import { Dimensions, Platform, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg'
 
@@ -31,6 +24,7 @@ export const OnboardingLayout = ({
     { color: backgroundColor, offset: '100%', opacity: 0 }
   ]
   const insets = useSafeAreaInsets()
+  const shouldRenderHeader = showLogo || Boolean(rightAction)
 
   if (Platform.OS === 'android') {
     NavigationBar.setBackgroundColorAsync(backgroundColor)
@@ -72,30 +66,38 @@ export const OnboardingLayout = ({
         </View>
       )}
 
-      <View
-        style={[
-          styles.header,
-          { paddingTop: insets.top + (Platform.OS === 'android' ? 24 : 16) }
-        ]}
-      >
-        {showLogo && (
-          <View style={styles.logoContainer} testID="onboarding-v2-logo">
-            <LogoTextWithLock width={120} />
-          </View>
-        )}
-        {rightAction && (
-          <TouchableOpacity
-            style={[
-              styles.rightAction,
-              { top: insets.top + (Platform.OS === 'android' ? 16 : 8) }
-            ]}
-            onPress={rightAction.onPress}
-            testID="onboarding-v2-right-action"
-          >
-            <Text style={styles.rightActionText}>{rightAction.label}</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      {shouldRenderHeader ? (
+        <View
+          style={[
+            styles.header,
+            { paddingTop: insets.top + (Platform.OS === 'android' ? 24 : 16) }
+          ]}
+        >
+          {showLogo && (
+            <View style={styles.logoContainer} testID="onboarding-v2-logo">
+              <LogoTextWithLock width={120} />
+            </View>
+          )}
+          {rightAction && (
+            <View
+              style={[
+                styles.rightAction,
+                { top: insets.top + (Platform.OS === 'android' ? 16 : 8) }
+              ]}
+              testID="onboarding-v2-right-action"
+            >
+              <Button
+                variant="tertiary"
+                size="medium"
+                aria-label={rightAction.label}
+                onClick={rightAction.onPress}
+              >
+                {rightAction.label}
+              </Button>
+            </View>
+          )}
+        </View>
+      ) : null}
       <View style={styles.content}>{children}</View>
     </View>
   )
@@ -129,12 +131,6 @@ const styles = StyleSheet.create({
   rightAction: {
     position: 'absolute',
     right: 20
-  },
-  rightActionText: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.white.mode1
   },
   content: {
     flex: 1,

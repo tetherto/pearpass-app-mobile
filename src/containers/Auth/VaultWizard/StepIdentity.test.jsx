@@ -12,14 +12,20 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
   const RN = require('react-native')
 
   return {
-    Button: ({ children, onClick, disabled, testID }) => (
+    Button: ({
+      children,
+      onClick,
+      disabled,
+      testID,
+      'data-testid': dataTestId
+    }) => (
       <RN.Pressable
         onPress={() => {
           if (!disabled) {
             onClick?.()
           }
         }}
-        testID={testID}
+        testID={dataTestId ?? testID}
       >
         <RN.Text>{children}</RN.Text>
       </RN.Pressable>

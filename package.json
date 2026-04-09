@@ -8,7 +8,7 @@
     "start": "expo start --dev-client",
     "build": "npm run bundle-bare && npm run lingui:extract && npm run lingui:compile",
     "android": "expo run:android",
-    "ios": "npm run barekit:link-ios-addons && npm run pods:install && expo run:ios",
+    "ios": "expo run:ios",
     "lint:fix": "eslint --fix ./src",
     "lint": "eslint ./src",
     "typecheck": "tsc --noEmit",

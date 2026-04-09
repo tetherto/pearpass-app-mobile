@@ -4,6 +4,7 @@ import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
   ListItem,
   Text,
+  Title,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
@@ -15,7 +16,6 @@ import {
   TrashOutlined,
   VerifiedUser
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { StyleSheet, View } from 'react-native'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -60,9 +60,11 @@ export const BottomSheetVaultAction = ({
   return (
     <>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>{t`Vault actions`}</Text>
-        <Text style={styles.title}>{vaultName}</Text>
-        <Text style={styles.subtitle}>
+        <Text variant="caption" color={theme.colors.colorPrimary}>
+          {t`Vault actions`}
+        </Text>
+        <Title as="h2">{vaultName}</Title>
+        <Text as="p" variant="label" color={theme.colors.colorTextSecondary}>
           {t`Jump straight to the action you need without leaving the settings hub.`}
         </Text>
       </View>
@@ -135,9 +137,15 @@ export const BottomSheetVaultAction = ({
           <ListItem
             title={t`Delete Vault`}
             subtitle={t`Requires master password confirmation before removal.`}
-            icon={<TrashOutlined color="#FCA5A5" />}
+            icon={
+              <TrashOutlined
+                color={theme.colors.colorSurfaceDestructiveElevated}
+              />
+            }
             rightElement={
-              <KeyboardArrowRightOutlined color="rgba(252,165,165,0.82)" />
+              <KeyboardArrowRightOutlined
+                color={theme.colors.colorSurfaceDestructiveElevated}
+              />
             }
             variant="destructive"
             platform="mobile"
@@ -155,35 +163,17 @@ export const BottomSheetVaultAction = ({
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-    gap: 6
-  },
-  eyebrow: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.primary400.mode1,
-    letterSpacing: 1,
-    textTransform: 'uppercase'
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.white.mode1,
-    textAlign: 'left'
-  },
-  subtitle: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.68)',
-    lineHeight: 20
+    paddingHorizontal: rawTokens.spacing20,
+    paddingTop: rawTokens.spacing20,
+    paddingBottom: rawTokens.spacing8,
+    gap: rawTokens.spacing6
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: 20
+    paddingHorizontal: rawTokens.spacing20
   },
   scrollContent: {
-    paddingBottom: 40
+    paddingBottom: rawTokens.spacing20 * 2
   },
   buttonsContainer: {
     marginTop: 8,

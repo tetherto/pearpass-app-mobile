@@ -67,32 +67,30 @@ export const AuthFlowFormLayout = ({
           >
             <View style={[styles.content, contentStyle]}>
               {showTitle ? (
-                <Title
-                  style={[
-                    styles.title,
-                    { color: theme.colors.colorTextPrimary }
-                  ]}
-                  data-testid={titleTestID}
-                >
-                  {title}
-                </Title>
+                <View style={styles.titleContainer}>
+                  <Title data-testid={titleTestID}>{title}</Title>
+                </View>
               ) : null}
 
               {subtitle ? (
-                <Text
+                <View
                   style={[
-                    styles.subtitle,
-                    onBack && styles.subtitleWithBack,
-                    {
-                      color: onBack
+                    styles.subtitleContainer,
+                    onBack && styles.subtitleWithBackContainer
+                  ]}
+                >
+                  <Text
+                    as="p"
+                    color={
+                      onBack
                         ? theme.colors.colorTextSecondary
                         : theme.colors.colorTextPrimary
                     }
-                  ]}
-                  data-testid={subtitleTestID}
-                >
-                  {subtitle}
-                </Text>
+                    data-testid={subtitleTestID}
+                  >
+                    {subtitle}
+                  </Text>
+                </View>
               ) : null}
 
               {children}
@@ -134,17 +132,14 @@ const styles = StyleSheet.create({
     paddingTop: rawTokens.spacing20 * 2,
     gap: rawTokens.spacing20
   },
-  title: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    textAlign: 'center'
+  titleContainer: {
+    alignItems: 'center'
   },
-  subtitle: {
-    textAlign: 'center'
+  subtitleContainer: {
+    alignItems: 'center'
   },
-  subtitleWithBack: {
-    textAlign: 'left',
-    lineHeight: 20
+  subtitleWithBackContainer: {
+    alignItems: 'flex-start'
   },
   bottomSection: {
     paddingHorizontal: rawTokens.spacing16,

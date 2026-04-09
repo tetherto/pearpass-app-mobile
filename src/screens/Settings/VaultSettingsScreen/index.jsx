@@ -22,8 +22,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
+import { VAULT_ACTION } from '../../../constants/vaultActions'
 import { BottomSheetVaultAction } from '../../../containers/BottomSheetVaultAction'
 import { ConfirmModalContent } from '../../../containers/Modal/ConfirmModalContent'
+import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
 import {
@@ -31,6 +33,7 @@ import {
   ButtonPrimary,
   ButtonSecondary
 } from '../../../libComponents'
+import { isModifyVaultModalV2Enabled } from '../../../utils/modifyVaultModalV2Flag'
 import { buildVaultAccessEntries } from '../../../utils/vaultFlow'
 
 const getRoleLabel = (role, t) => {
@@ -134,7 +137,22 @@ export const VaultSettingsScreen = ({ route }) => {
     checkProtection()
   }, [isVaultProtected, vaultId])
 
+  const openModifyVaultModal = (action) => {
+    openModal(
+      <ModifyVaultModalContentV2
+        vaultId={vaultId}
+        vaultName={vaultName}
+        action={action}
+      />
+    )
+  }
+
   const handleRename = () => {
+    if (isModifyVaultModalV2Enabled()) {
+      openModifyVaultModal(VAULT_ACTION.NAME)
+      return
+    }
+
     navigation.navigate('VaultRenameScreen', {
       vaultId,
       vaultName
@@ -142,6 +160,11 @@ export const VaultSettingsScreen = ({ route }) => {
   }
 
   const handlePassword = () => {
+    if (isModifyVaultModalV2Enabled()) {
+      openModifyVaultModal(VAULT_ACTION.PASSWORD)
+      return
+    }
+
     navigation.navigate('VaultPasswordScreen', {
       vaultId,
       vaultName

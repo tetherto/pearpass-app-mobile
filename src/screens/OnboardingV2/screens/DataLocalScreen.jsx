@@ -4,7 +4,6 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, useTheme, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVideoPlayer as useExpoVideoPlayer, VideoView } from 'expo-video'
 import { Dimensions, Platform, StyleSheet, View } from 'react-native'
 
@@ -128,19 +127,23 @@ export const DataLocalScreen = () => {
             <OnboardingVideo />
           </RadialGradientBackground>
 
-          <Title
-            style={styles.title}
-            data-testid="onboarding-v2-data-local-title"
-          >
-            {t`Your data stays on your devices`}
-          </Title>
+          <View style={styles.copyContainer}>
+            <View style={styles.titleContainer}>
+              <Title data-testid="onboarding-v2-data-local-title">
+                {t`Your data stays on your devices`}
+              </Title>
+            </View>
 
-          <Text
-            style={styles.description}
-            data-testid="onboarding-v2-data-local-description"
-          >
-            {t`Your items are stored locally, not on our servers.\nOnly you have access to them.`}
-          </Text>
+            <View style={styles.descriptionContainer}>
+              <Text
+                as="p"
+                color={theme.colors.colorTextSecondary}
+                data-testid="onboarding-v2-data-local-description"
+              >
+                {t`Your items are stored locally, not on our servers.\nOnly you have access to them.`}
+              </Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.buttonContainer}>
@@ -187,18 +190,15 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     width: '100%'
   },
-  title: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    color: colors.white.mode1,
-    textAlign: 'center',
+  copyContainer: {
+    alignItems: 'center'
+  },
+  titleContainer: {
     marginTop: 22,
     marginBottom: 14
   },
-  description: {
-    color: colors.white.mode1,
-    textAlign: 'center',
-    lineHeight: 18,
+  descriptionContainer: {
+    alignItems: 'center',
     marginBottom: 30
   }
 })

@@ -2,9 +2,8 @@ import { useEffect, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { Button, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Text, Title, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { AppState, Dimensions, Platform, StyleSheet, View } from 'react-native'
 import Rive from 'rive-react-native'
 
@@ -22,6 +21,7 @@ export const AutofillScreen = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const route = useRoute()
+  const { theme } = useTheme()
   const password = route.params?.password
 
   const waitingForSettings = useRef(false)
@@ -90,19 +90,23 @@ export const AutofillScreen = () => {
             />
           </View>
 
-          <Title
-            style={styles.title}
-            data-testid="onboarding-v2-autofill-title"
-          >
-            {t`Faster, safer sign-ins`}
-          </Title>
+          <View style={styles.copyContainer}>
+            <View style={styles.titleContainer}>
+              <Title data-testid="onboarding-v2-autofill-title">
+                {t`Faster, safer sign-ins`}
+              </Title>
+            </View>
 
-          <Text
-            style={styles.description}
-            data-testid="onboarding-v2-autofill-description"
-          >
-            {t`Allow autofill to sign in instantly on apps and websites. PearPass fills your credentials securely, so you don't need to remember, copy, or retype passwords.`}
-          </Text>
+            <View style={styles.descriptionContainer}>
+              <Text
+                as="p"
+                color={theme.colors.colorTextSecondary}
+                data-testid="onboarding-v2-autofill-description"
+              >
+                {t`Allow autofill to sign in instantly on apps and websites. PearPass fills your credentials securely, so you don't need to remember, copy, or retype passwords.`}
+              </Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.buttonContainer}>
@@ -146,16 +150,14 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     width: '100%'
   },
-  title: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    color: colors.white.mode1,
-    textAlign: 'center',
+  copyContainer: {
+    alignItems: 'center'
+  },
+  titleContainer: {
     marginBottom: 14
   },
-  description: {
-    color: '#BDC3AC',
-    textAlign: 'center',
+  descriptionContainer: {
+    alignItems: 'center',
     marginBottom: 30
   }
 })

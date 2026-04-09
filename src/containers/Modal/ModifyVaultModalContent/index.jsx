@@ -3,10 +3,16 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { InputField, PasswordField } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  InputField,
+  PasswordField,
+  Text,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { validatePasswordChange } from '@tetherto/pearpass-utils-password-check'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
@@ -23,6 +29,7 @@ export const ModifyVaultModalContent = ({
 }) => {
   const { closeModal } = useModal()
   const { t } = useLingui()
+  const { theme } = useTheme()
 
   const isPasswordChangeAction = action === VAULT_ACTION.PASSWORD
 
@@ -91,6 +98,13 @@ export const ModifyVaultModalContent = ({
     () => getPasswordStrengthMeta(newPasswordValue, passwordErrors),
     [newPasswordValue, passwordErrors]
   )
+
+  const strengthText = passwordStrengthMeta.result?.strengthText
+    ? t(passwordStrengthMeta.result.strengthText)
+    : t`Not set`
+
+  const strengthTextLabel =
+    strengthText.charAt(0).toUpperCase() + strengthText.slice(1)
 
   const { onChange: onNameChange, ...nameField } = register('name')
   const { onChange: onCurrentPasswordChange, ...currentPasswordField } =
@@ -188,8 +202,8 @@ export const ModifyVaultModalContent = ({
       {action === 'name' && (
         <>
           <View style={styles.copyBlock}>
-            <Text style={styles.copyTitle}>{t`Vault identity`}</Text>
-            <Text style={styles.copyText}>
+            <Text variant="bodyEmphasized">{t`Vault identity`}</Text>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
               {t`The vault name appears in the selector, sharing flow, and settings hub.`}
             </Text>
           </View>
@@ -218,8 +232,8 @@ export const ModifyVaultModalContent = ({
       {action === 'password' && (
         <>
           <View style={styles.copyBlock}>
-            <Text style={styles.copyTitle}>{t`Extra encryption layer`}</Text>
-            <Text style={styles.copyText}>
+            <Text variant="bodyEmphasized">{t`Extra encryption layer`}</Text>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
               {t`Vault passwords are separate from the master password and protect this vault when it is reopened or shared.`}
             </Text>
           </View>
@@ -247,16 +261,11 @@ export const ModifyVaultModalContent = ({
 
           <View style={styles.strengthCard}>
             <View style={styles.strengthHeader}>
-              <Text style={styles.strengthLabel}>{t`Strength`}</Text>
-              <Text
-                style={[
-                  styles.strengthValue,
-                  { color: passwordStrengthMeta.color }
-                ]}
-              >
-                {passwordStrengthMeta.result?.strengthText
-                  ? t(passwordStrengthMeta.result.strengthText)
-                  : t`Not set`}
+              <Text variant="caption" color={theme.colors.colorTextSecondary}>
+                {t`Strength`}
+              </Text>
+              <Text variant="caption" color={passwordStrengthMeta.color}>
+                {strengthTextLabel}
               </Text>
             </View>
             <View style={styles.strengthTrack}>
@@ -287,11 +296,12 @@ export const ModifyVaultModalContent = ({
                   ]}
                 >
                   <Text
-                    style={[
-                      styles.ruleChipText,
-                      passwordStrengthMeta.result?.rules?.[rule.key] &&
-                        styles.ruleChipTextActive
-                    ]}
+                    variant="caption"
+                    color={
+                      passwordStrengthMeta.result?.rules?.[rule.key]
+                        ? theme.colors.colorPrimary
+                        : theme.colors.colorTextSecondary
+                    }
                   >
                     {rule.label}
                   </Text>
@@ -315,22 +325,10 @@ export const ModifyVaultModalContent = ({
 
 const styles = StyleSheet.create({
   copyBlock: {
-    gap: 8
-  },
-  copyTitle: {
-    color: '#FFFFFF',
-    fontFamily: 'Inter',
-    fontSize: 15,
-    fontWeight: '700'
-  },
-  copyText: {
-    color: 'rgba(255,255,255,0.68)',
-    fontFamily: 'Inter',
-    fontSize: 13,
-    lineHeight: 20
+    gap: rawTokens.spacing8
   },
   strengthCard: {
-    gap: 10,
+    gap: rawTokens.spacing8,
     borderRadius: 18,
     padding: 14,
     backgroundColor: '#0F130A',
@@ -341,18 +339,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
-  },
-  strengthLabel: {
-    color: 'rgba(255,255,255,0.68)',
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '700'
-  },
-  strengthValue: {
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'capitalize'
   },
   strengthTrack: {
     height: 8,
@@ -367,7 +353,7 @@ const styles = StyleSheet.create({
   ruleRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8
+    gap: rawTokens.spacing8
   },
   ruleChip: {
     borderRadius: 999,
@@ -380,14 +366,5 @@ const styles = StyleSheet.create({
   ruleChipActive: {
     backgroundColor: 'rgba(163,230,53,0.12)',
     borderColor: 'rgba(163,230,53,0.24)'
-  },
-  ruleChipText: {
-    color: 'rgba(255,255,255,0.56)',
-    fontFamily: 'Inter',
-    fontSize: 11,
-    fontWeight: '600'
-  },
-  ruleChipTextActive: {
-    color: '#A3E635'
   }
 })

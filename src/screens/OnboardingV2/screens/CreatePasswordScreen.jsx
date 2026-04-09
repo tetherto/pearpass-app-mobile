@@ -1,10 +1,9 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { TERMS_OF_USE } from '@tetherto/pearpass-lib-constants'
-import { Button, Text } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Link, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { Keyboard, Linking, Pressable, StyleSheet } from 'react-native'
+import { Keyboard, StyleSheet, View } from 'react-native'
 
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { AuthFlowFormLayout } from '../../../containers/Auth/shared/AuthFlowFormLayout'
@@ -15,6 +14,7 @@ import { usePasswordCreation } from '../hooks/usePasswordCreation'
 export const CreatePasswordScreen = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
   const { isKeyboardVisible } = useKeyboardVisibility()
 
   const {
@@ -35,11 +35,6 @@ export const CreatePasswordScreen = () => {
     })
   }
 
-  const handleTermsPress = () => {
-    Keyboard.dismiss()
-    Linking.openURL(TERMS_OF_USE)
-  }
-
   const handleContinue = () => {
     submit((password) => {
       navigation.navigate('OnboardingV2Autofill', { password })
@@ -54,31 +49,35 @@ export const CreatePasswordScreen = () => {
       subtitle={
         <>
           {t`This is the key to access PearPass. Already using PearPass?`}{' '}
-          <Pressable onPress={handleTransferData} style={styles.inlineLink}>
-            <Text
-              style={styles.linkText}
-              data-testid="onboarding-v2-transfer-data-link"
-            >
-              {t`Transfer Data`}
-            </Text>
-          </Pressable>
+          <Link
+            onClick={handleTransferData}
+            data-testid="onboarding-v2-transfer-data-link"
+          >
+            {t`Transfer Data`}
+          </Link>
         </>
       }
       avoidBottomInset={isKeyboardVisible}
       footer={
         <>
-          <Text style={styles.termsText} data-testid="onboarding-v2-terms-text">
-            {t`By clicking Continue, you confirm that you have read and agree to the`}{' '}
-            <Pressable onPress={handleTermsPress} style={styles.inlineLink}>
-              <Text
-                style={styles.termsLink}
+          <View style={styles.termsContainer}>
+            <Text
+              as="p"
+              color={theme.colors.colorTextSecondary}
+              data-testid="onboarding-v2-terms-text"
+            >
+              {t`By clicking Continue, you confirm that you have read and agree to the`}{' '}
+              <Link
+                href={TERMS_OF_USE}
+                isExternal
+                onClick={() => Keyboard.dismiss()}
                 data-testid="onboarding-v2-terms-link"
               >
                 {t`PearPass Application Terms of Use`}
-              </Text>
-            </Pressable>
-            .
-          </Text>
+              </Link>
+              .
+            </Text>
+          </View>
 
           <Button
             variant="primary"
@@ -121,19 +120,7 @@ export const CreatePasswordScreen = () => {
 }
 
 const styles = StyleSheet.create({
-  inlineLink: {
-    transform: [{ translateY: 4 }]
-  },
-  linkText: {
-    color: colors.primary400.option1,
-    textDecorationLine: 'underline'
-  },
-  termsText: {
-    color: '#BDC3AC',
-    textAlign: 'center'
-  },
-  termsLink: {
-    color: colors.primary400.option1,
-    textDecorationLine: 'underline'
+  termsContainer: {
+    alignItems: 'center'
   }
 })
