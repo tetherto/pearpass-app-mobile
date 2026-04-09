@@ -7,6 +7,15 @@ export const createStyles = (colors) => ({
     borderBottomWidth: 1,
     borderBottomColor: colors.colorBorderPrimary
   },
+  backSection: {
+    borderRightWidth: 1,
+    borderRightColor: colors.colorBorderPrimary,
+    padding: rawTokens.spacing8,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.colorSurfacePrimary
+  },
   leftSection: {
     flex: 1,
     flexDirection: 'row',

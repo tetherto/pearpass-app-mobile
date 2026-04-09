@@ -29,22 +29,24 @@ export const createStyles = (colors) => ({
     borderWidth: 1,
     borderColor: colors.colorBorderSecondary
   },
+  breadcrumbText: {
+    paddingVertical: rawTokens.spacing12,
+    borderWidth: 1,
+    borderColor: 'transparent'
+  },
   chevronSeparator: {
     width: 16,
     height: 16,
     justifyContent: 'center',
     alignItems: 'center'
   },
-  actionsArea: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: rawTokens.spacing4,
-    paddingHorizontal: rawTokens.spacing4,
-    paddingVertical: rawTokens.spacing4,
+  buttonSection: {
     borderLeftWidth: 1,
     borderLeftColor: colors.colorBorderPrimary,
-    backgroundColor: colors.colorSurfacePrimary,
+    padding: rawTokens.spacing8,
     alignSelf: 'stretch',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.colorSurfacePrimary
   }
 })

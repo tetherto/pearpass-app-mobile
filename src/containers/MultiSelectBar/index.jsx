@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import {
+  ArrowBackOutined,
   DriveFileMoveOutlined,
   StarOutlined,
   TrashOutlined
@@ -42,6 +43,11 @@ export const MultiSelectBar = ({
     [selectedRecordObjects]
   )
 
+  const handleExitMultiSelect = () => {
+    setSelectedRecords([])
+    setIsMultiSelectOn(false)
+  }
+
   const handleMovePress = () => {
     navigation.navigate('MultiSelectMove', {
       selectedRecordIds: selectedRecords,
@@ -72,6 +78,16 @@ export const MultiSelectBar = ({
 
   return (
     <View style={styles.container}>
+      <View style={styles.backSection}>
+        <Button
+          variant="tertiary"
+          iconBefore={
+            <ArrowBackOutined color={theme.colors.colorTextPrimary} />
+          }
+          onClick={handleExitMultiSelect}
+          aria-label={t`Exit multi-select`}
+        />
+      </View>
       <View style={styles.leftSection}>
         <View style={{ flex: 1 }}>
           <Text variant="labelEmphasized">

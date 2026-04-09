@@ -9,13 +9,12 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Checklist,
   ExpandMore,
-  FilterList,
   FolderCopy,
   KeyboardArrowRightFilled,
   Layers,
-  LockFilled
+  LockFilled,
+  SwapVert
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, View } from 'react-native'
@@ -73,8 +72,6 @@ const BreadcrumbFade = ({ side, bgColor }) => {
 
 export const ContentHeader = ({
   isMultiSelectOn,
-  setIsMultiSelectOn,
-  setSelectedRecords,
   recordType,
   onCategoryChange
 }) => {
@@ -99,11 +96,6 @@ export const ContentHeader = ({
     navigation.navigate('Welcome', { state: 'credentials' })
   }, [navigation])
 
-  const handleToggleMultiSelect = useCallback(() => {
-    setIsMultiSelectOn((prev) => !prev)
-    setSelectedRecords([])
-  }, [setIsMultiSelectOn, setSelectedRecords])
-
   const renderBreadcrumbPill = (icon, label) => (
     <View style={styles.breadcrumbPill} accessibilityLabel={label}>
       {icon}
@@ -126,7 +118,12 @@ export const ContentHeader = ({
         >
           {isMultiSelectOn ? (
             <>
-              <Text variant="labelEmphasized">{t`All Items`}</Text>
+              <View style={styles.breadcrumbText}>
+                <Text variant="labelEmphasized">
+                  {menuItems.find((i) => i.type === recordType)?.name ??
+                    t`All Items`}
+                </Text>
+              </View>
               <View style={styles.chevronSeparator}>
                 <KeyboardArrowRightFilled
                   width={16}
@@ -134,7 +131,9 @@ export const ContentHeader = ({
                   color={theme.colors.colorTextPrimary}
                 />
               </View>
-              <Text variant="labelEmphasized">{folderLabel}</Text>
+              <View style={styles.breadcrumbText}>
+                <Text variant="labelEmphasized">{folderLabel}</Text>
+              </View>
             </>
           ) : (
             <>
@@ -205,18 +204,12 @@ export const ContentHeader = ({
         <BreadcrumbFade side="right" bgColor={bgColor} />
       </View>
 
-      <View style={styles.actionsArea}>
-        <Button
-          variant="tertiary"
-          iconBefore={<Checklist color={theme.colors.colorTextPrimary} />}
-          onClick={handleToggleMultiSelect}
-          aria-label={t`Toggle multi-select`}
-        />
+      <View style={styles.buttonSection}>
         <ContextMenu
           trigger={
             <Button
               variant="tertiary"
-              iconBefore={<FilterList color={theme.colors.colorTextPrimary} />}
+              iconBefore={<SwapVert color={theme.colors.colorTextPrimary} />}
               aria-label={t`Sort items`}
             />
           }

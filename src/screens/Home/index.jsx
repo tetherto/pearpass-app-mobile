@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
@@ -20,6 +20,7 @@ import {
   INITIAL_STATE,
   useSharedFilter
 } from '../../context/SharedFilterContext'
+import { useBackHandler } from '../../hooks/useBackHandler'
 import { useJobQueueProcessor } from '../../jobQueue'
 import { groupRecordsByTimePeriod } from '../../utils/groupRecordsByTimePeriod'
 
@@ -35,6 +36,15 @@ export const Home = () => {
   const sort = useMemo(() => SORT_BY_TYPE[state.sort], [state.sort])
 
   const { data: vaultData } = useVault()
+
+  const handleExitMultiSelect = useCallback(() => {
+    setSelectedRecords([])
+    setIsMultiSelectOn(false)
+  }, [])
+
+  useBackHandler({
+    callback: isMultiSelectOn ? handleExitMultiSelect : undefined
+  })
 
   const selectedFolder =
     state?.folder !== 'allFolder' && state?.folder !== 'favorite'
@@ -100,8 +110,6 @@ export const Home = () => {
       >
         <ContentHeader
           isMultiSelectOn={isMultiSelectOn}
-          setIsMultiSelectOn={setIsMultiSelectOn}
-          setSelectedRecords={setSelectedRecords}
           recordType={recordType}
           onCategoryChange={handleRecordType}
         />
