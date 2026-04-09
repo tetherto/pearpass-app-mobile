@@ -20,13 +20,7 @@ export const createStyles = (colors) => ({
     paddingVertical: rawTokens.spacing8
   },
   breadcrumbPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: rawTokens.spacing8,
-    paddingHorizontal: rawTokens.spacing12,
-    paddingVertical: rawTokens.spacing12,
-    borderRadius: rawTokens.radius8,
-    borderWidth: 1,
     borderColor: colors.colorBorderSecondary
   },
   breadcrumbText: {

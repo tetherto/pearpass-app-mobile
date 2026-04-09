@@ -85,6 +85,8 @@ export const ContentHeader = ({
 
   const bgColor = theme.colors.colorSurfacePrimary
   const vaultName = vaultData?.name || t`Personal Vault`
+  const categoryLabel =
+    menuItems.find((item) => item.type === recordType)?.name ?? t`All Items`
   const folderLabel =
     state?.folder === 'favorite'
       ? t`Favorites`
@@ -97,15 +99,22 @@ export const ContentHeader = ({
   }, [navigation])
 
   const renderBreadcrumbPill = (icon, label) => (
-    <View style={styles.breadcrumbPill} accessibilityLabel={label}>
-      {icon}
-      <Text variant="labelEmphasized">{label}</Text>
-      <ExpandMore
-        width={16}
-        height={16}
-        color={theme.colors.colorTextPrimary}
-      />
-    </View>
+    <Button
+      variant="secondary"
+      size="medium"
+      iconBefore={icon}
+      iconAfter={
+        <ExpandMore
+          width={16}
+          height={16}
+          color={theme.colors.colorTextPrimary}
+        />
+      }
+      style={styles.breadcrumbPill}
+      aria-label={label}
+    >
+      {label}
+    </Button>
   )
 
   return (
@@ -119,10 +128,7 @@ export const ContentHeader = ({
           {isMultiSelectOn ? (
             <>
               <View style={styles.breadcrumbText}>
-                <Text variant="labelEmphasized">
-                  {menuItems.find((i) => i.type === recordType)?.name ??
-                    t`All Items`}
-                </Text>
+                <Text variant="labelEmphasized">{categoryLabel}</Text>
               </View>
               <View style={styles.chevronSeparator}>
                 <KeyboardArrowRightFilled
