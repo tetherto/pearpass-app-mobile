@@ -68,7 +68,7 @@ export const MultiSelectMove = () => {
   })
 
   const folderList = useMemo(
-    () => Object.values(folders?.customFolders ?? {}),
+    () => Object.values(folders?.customFolders ?? {}).slice(0, 3),
     [folders]
   )
 
@@ -106,7 +106,6 @@ export const MultiSelectMove = () => {
             styles.recordsSection,
             recordsMaxHeight !== undefined && { maxHeight: recordsMaxHeight }
           ]}
-          onLayout={(e) => setRecordsVisibleHeight(e.nativeEvent.layout.height)}
         >
           <View style={styles.sectionLabel}>
             <Text variant="caption" color={theme.colors.colorTextSecondary}>
@@ -115,6 +114,9 @@ export const MultiSelectMove = () => {
           </View>
           <ScrollView
             style={styles.recordsScroll}
+            onLayout={(e) =>
+              setRecordsVisibleHeight(e.nativeEvent.layout.height)
+            }
             contentContainerStyle={[
               styles.recordsContent,
               showRecordsGradient &&
@@ -124,19 +126,22 @@ export const MultiSelectMove = () => {
             onContentSizeChange={(_, h) => setRecordsScrollableHeight(h)}
           >
             {selectedRecordObjects.map((record, index) => (
-              <ListItem
+              <View
                 key={record.id}
-                icon={<RecordItemIcon record={record} />}
-                iconSize={32}
-                title={record.data?.title ?? ''}
-                subtitle={getRecordSubtitle(record) || undefined}
-                style={styles.recordItem}
                 onLayout={
                   index === 0
                     ? (e) => setListItemHeight(e.nativeEvent.layout.height)
                     : undefined
                 }
-              />
+              >
+                <ListItem
+                  icon={<RecordItemIcon record={record} />}
+                  iconSize={32}
+                  title={record.data?.title ?? ''}
+                  subtitle={getRecordSubtitle(record) || undefined}
+                  style={styles.recordItem}
+                />
+              </View>
             ))}
           </ScrollView>
           {showRecordsGradient && (
@@ -188,7 +193,11 @@ export const MultiSelectMove = () => {
                     variant="secondary"
                     fullWidth
                     iconBefore={<FolderOpen />}
-                    onClick={() => setSelectedFolder(folder.name)}
+                    onClick={() =>
+                      setSelectedFolder((prev) =>
+                        prev === folder.name ? null : folder.name
+                      )
+                    }
                     pressed={selectedFolder === folder.name}
                     style={styles.folderButton}
                   >
