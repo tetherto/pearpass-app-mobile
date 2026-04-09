@@ -193,7 +193,7 @@ export const MasterPasswordScreen = () => {
                 data-testid="auth-v2-master-password-input"
               />
 
-              {(failedAttempts >= 2 || true) && (
+              {failedAttempts >= 2 ? (
                 <AlertMessage
                   variant="warning"
                   title={t`Forgot your Master Password?`}
@@ -205,7 +205,7 @@ export const MasterPasswordScreen = () => {
                   }
                   testID="auth-v2-master-password-alert"
                 />
-              )}
+              ) : null}
             </View>
           </View>
         </ScrollView>
