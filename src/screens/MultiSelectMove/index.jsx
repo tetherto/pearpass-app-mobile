@@ -68,7 +68,7 @@ export const MultiSelectMove = () => {
   })
 
   const folderList = useMemo(
-    () => Object.values(folders?.customFolders ?? {}).slice(0, 3),
+    () => Object.values(folders?.customFolders ?? {}),
     [folders]
   )
 
