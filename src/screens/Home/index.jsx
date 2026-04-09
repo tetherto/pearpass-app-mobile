@@ -83,7 +83,6 @@ export const Home = () => {
   useEffect(() => {
     if (vaultData?.id) {
       setSearchValue('')
-      setRecordType('all')
     }
   }, [selectedFolder, state.isFavorite])
 
