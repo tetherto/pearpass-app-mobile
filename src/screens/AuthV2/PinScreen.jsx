@@ -1,8 +1,14 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef, createRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  InputField,
+  Text,
+  Title,
+  useTheme,
+  Link
+} from '@tetherto/pearpass-lib-ui-kit'
 import {
   Backspace,
   FaceId,
@@ -11,7 +17,7 @@ import {
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVaults } from '@tetherto/pearpass-lib-vault'
 import * as SecureStore from 'expo-secure-store'
-import { Platform, Pressable, StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { useAutoSelectVault } from './hooks/useAutoSelectVault'
@@ -40,6 +46,9 @@ export const PinScreen = () => {
 
   const [pin, setPin] = useState('')
   const [isAuthenticating, setIsAuthenticating] = useState(false)
+  const inputRefs = useRef(
+    Array.from({ length: PIN_LENGTH }, () => createRef())
+  ).current
 
   const { isBiometricsEnabled, isBiometricsSupported, biometricTypes } =
     useBiometricsAuthentication()
@@ -109,6 +118,20 @@ export const PinScreen = () => {
     }
   }, [isBiometricAvailable])
 
+  useEffect(() => {
+    inputRefs.forEach((ref) => {
+      ref.current?.setNativeProps?.({
+        showSoftInputOnFocus: false,
+        style: { textAlign: 'center', marginTop: -8, marginBottom: 8 }
+      })
+    })
+  }, [])
+
+  useEffect(() => {
+    const activeIndex = pin.length < PIN_LENGTH ? pin.length : PIN_LENGTH - 1
+    inputRefs[activeIndex]?.current?.focus()
+  }, [pin])
+
   const handlePadPress = useCallback(
     (digit) => {
       if (pin.length >= PIN_LENGTH) return
@@ -131,29 +154,16 @@ export const PinScreen = () => {
     <View style={styles.pinSlotsContainer}>
       {Array.from({ length: PIN_LENGTH }).map((_, index) => {
         const isFilled = index < pin.length
-        const isActive = index === pin.length
 
         return (
-          <View
-            key={index}
-            style={[
-              styles.pinSlot,
-              {
-                backgroundColor: isActive
-                  ? theme.colors.colorSurfaceHover
-                  : theme.colors.colorSurfacePrimary,
-                borderColor: isActive
-                  ? colors.primary400.mode1
-                  : theme.colors.colorBorderPrimary
-              },
-              isActive && styles.pinSlotActive
-            ]}
-          >
-            {isFilled ? (
-              <View style={styles.pinDot} />
-            ) : (
-              <Text style={styles.pinSlotPlaceholder}>0</Text>
-            )}
+          <View key={index} style={styles.pinSlotWrapper}>
+            <InputField
+              label=""
+              value={isFilled ? '\u2022' : ''}
+              placeholder="0"
+              inputRef={inputRefs[index]}
+              testID={`pin-slot-${index}`}
+            />
           </View>
         )
       })}
@@ -216,7 +226,7 @@ export const PinScreen = () => {
                   onPress={() => handlePadPress(String(item))}
                   testID={`pin-pad-${item}`}
                 >
-                  <Text style={styles.numpadText}>{item}</Text>
+                  <Title>{item}</Title>
                 </Pressable>
               )
             })}
@@ -231,8 +241,8 @@ export const PinScreen = () => {
       <View style={styles.content}>
         <View style={styles.body}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>{t`Enter Your PIN`}</Text>
-            <Text style={styles.subtitle}>
+            <Title>{t`Enter Your PIN`}</Title>
+            <Text color={theme.colors.colorTextSecondary}>
               {t`Please enter your 6-digit PIN to continue`}
             </Text>
           </View>
@@ -243,18 +253,16 @@ export const PinScreen = () => {
         <View style={styles.footer}>
           {renderNumpad()}
 
-          <Pressable
-            onPress={handleMasterPassword}
-            style={styles.masterPasswordLink}
-            testID="pin-master-password-link"
-          >
-            <Text style={styles.masterPasswordText}>
-              {t`Forgot PIN?`}{' '}
-              <Text style={styles.masterPasswordHighlight}>
-                {t`Proceed with Master Password`}
-              </Text>
-            </Text>
-          </Pressable>
+          <Text style={styles.masterPasswordText}>
+            {t`Forgot PIN?`}{' '}
+            <Link
+              data-testid="pin-master-password-link"
+              onClick={handleMasterPassword}
+              style={styles.masterPasswordHighlight}
+            >
+              {t`Proceed with Master Password`}
+            </Link>
+          </Text>
         </View>
       </View>
     </OnboardingLayout>
@@ -277,53 +285,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12
   },
-  title: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    color: colors.white.mode1,
-    textAlign: 'center'
-  },
-  subtitle: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#BDC3AC',
-    textAlign: 'center'
-  },
   pinSlotsContainer: {
     flexDirection: 'row',
     gap: 8,
     width: '100%'
   },
-  pinSlot: {
-    flex: 1,
-    height: 57,
-    borderRadius: 8,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden'
-  },
-  pinSlotActive: {
-    shadowColor: 'rgba(176, 217, 68, 0.35)',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
-    elevation: 4
-  },
-  pinSlotPlaceholder: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#BDC3AC',
-    textAlign: 'center'
-  },
-  pinDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.primary400.mode1
+  pinSlotWrapper: {
+    flex: 1
   },
   footer: {
     paddingHorizontal: 16,
@@ -349,21 +317,10 @@ const styles = StyleSheet.create({
   numpadButtonPressed: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)'
   },
-  numpadText: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    color: colors.white.mode1,
-    textAlign: 'center'
-  },
   masterPasswordLink: {
     alignItems: 'center'
   },
   masterPasswordText: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.white.mode1,
     textAlign: 'center'
   },
   masterPasswordHighlight: {

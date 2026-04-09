@@ -5,16 +5,16 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
+  AlertMessage,
   Button,
+  Link,
   PasswordField,
   Text,
+  Title,
+  rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import {
-  KeyboardArrowRightFilled,
-  ReportProblem
-} from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useUserData, useVaults } from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
@@ -24,7 +24,6 @@ import * as SecureStore from 'expo-secure-store'
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   View
@@ -52,6 +51,7 @@ export const MasterPasswordScreen = () => {
   const { theme } = useTheme()
   const { isKeyboardVisible } = useKeyboardVisibility()
   const insets = useSafeAreaInsets()
+  const styles = getStyles(theme)
 
   const [isLoading, setIsLoading] = useState(false)
   const [failedAttempts, setFailedAttempts] = useState(0)
@@ -177,68 +177,54 @@ export const MasterPasswordScreen = () => {
         >
           <View style={styles.topSection}>
             <View style={styles.titleContainer}>
-              <Text style={styles.title}>{t`Enter Your Master Password`}</Text>
-              <Text style={styles.subtitle}>
-                {t`Please enter your master password to continue`}
-              </Text>
+              <Title>{t`Enter Your Master Password`}</Title>
+              <Text
+                color={theme.colors.colorTextSecondary}
+              >{t`Please enter your master password to continue`}</Text>
             </View>
 
             <View style={styles.inputSection}>
               <PasswordField
                 label={t`Password`}
-                placeholderText={t`Enter Master Password`}
+                placeholder={t`Enter Master Password`}
                 value={passwordRegisterProps.value}
-                onChangeText={passwordRegisterProps.onChange}
-                variant={passwordRegisterProps.error ? 'error' : 'default'}
-                errorMessage={passwordRegisterProps.error}
+                onChange={passwordRegisterProps.onChange}
+                error={passwordRegisterProps.error}
                 data-testid="auth-v2-master-password-input"
               />
 
-              {failedAttempts >= 2 && (
-                <View
-                  style={styles.alertContainer}
-                  testID="auth-v2-master-password-alert"
-                >
-                  <ReportProblem color="#FFAE00" width={16} height={16} />
-                  <Text style={styles.alertText}>
-                    {t`Forgot your Master Password?`}
-                    {'\n'}
-                    <Text style={styles.alertLink}>
-                      {t`Use your Recovery Phrase`}
+              {(failedAttempts >= 2 || true) && (
+                <AlertMessage
+                  variant="warning"
+                  title={t`Forgot your Master Password?`}
+                  description={
+                    <Text>
+                      <Link>{t`Use your Recovery Phrase`}</Link>
+                      {` ${t`to reset it and restore access.`}`}
                     </Text>
-                    {` ${t`to reset it and restore access.`}`}
-                  </Text>
-                </View>
+                  }
+                  testID="auth-v2-master-password-alert"
+                />
               )}
             </View>
           </View>
         </ScrollView>
 
-        <View
-          style={[
-            styles.bottomSection,
-            { backgroundColor: theme.colors.colorSurfacePrimary }
-          ]}
-        >
-          {isBiometricAvailable && biometricLabel ? (
-            <Pressable
-              onPress={handleBiometricRetry}
-              style={styles.biometricLink}
-              testID="auth-v2-biometric-retry"
-            >
-              <Text style={styles.biometricLinkText}>{biometricLabel}</Text>
-            </Pressable>
-          ) : unsupportedFeaturesEnabled() ? (
-            <Pressable
-              onPress={() => navigation.goBack()}
-              style={styles.biometricLink}
-              testID="auth-v2-pin-retry"
-            >
-              <Text style={styles.biometricLinkText}>
+        <View style={styles.bottomSection}>
+          <View style={styles.linkContainer}>
+            {isBiometricAvailable && biometricLabel ? (
+              <Link
+                onPress={handleBiometricRetry}
+                data-testid="auth-v2-biometric-retry"
+              >
+                {biometricLabel}
+              </Link>
+            ) : unsupportedFeaturesEnabled() ? (
+              <Link onClick={navigation.goBack} data-testid="auth-v2-pin-retry">
                 {t`Try again with PIN`}
-              </Text>
-            </Pressable>
-          ) : null}
+              </Link>
+            ) : null}
+          </View>
 
           <Button
             variant="primary"
@@ -257,78 +243,35 @@ export const MasterPasswordScreen = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  flex: {
-    flex: 1
-  },
-  scrollViewContent: {
-    flexGrow: 1,
-    paddingHorizontal: 16
-  },
-  topSection: {
-    paddingTop: 40,
-    gap: 48
-  },
-  titleContainer: {
-    alignItems: 'center',
-    gap: 12
-  },
-  title: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    fontSize: 28,
-    color: colors.white.mode1,
-    textAlign: 'center'
-  },
-  subtitle: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#BDC3AC',
-    textAlign: 'center'
-  },
-  inputSection: {
-    gap: 16
-  },
-  bottomSection: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-    paddingTop: 16,
-    gap: 16
-  },
-  biometricLink: {
-    alignItems: 'center',
-    paddingVertical: 8
-  },
-  biometricLinkText: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400',
-    color: colors.primary400.mode1,
-    textDecorationLine: 'underline',
-    textAlign: 'center'
-  },
-  alertContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#212814'
-  },
-  alertText: {
-    flex: 1,
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '400',
-    color: colors.white.mode1,
-    lineHeight: 16
-  },
-  alertLink: {
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '400',
-    color: colors.primary400.mode1,
-    textDecorationLine: 'underline'
-  }
-})
+const getStyles = (theme) =>
+  StyleSheet.create({
+    flex: {
+      flex: 1
+    },
+    scrollViewContent: {
+      flexGrow: 1,
+      paddingHorizontal: rawTokens.spacing16
+    },
+    topSection: {
+      paddingTop: rawTokens.spacing40,
+      gap: rawTokens.spacing48
+    },
+    titleContainer: {
+      alignItems: 'center',
+      gap: rawTokens.spacing12
+    },
+    inputSection: {
+      gap: rawTokens.spacing16
+    },
+    bottomSection: {
+      paddingHorizontal: rawTokens.spacing16,
+      paddingBottom: rawTokens.spacing20,
+      paddingTop: rawTokens.spacing16,
+      gap: rawTokens.spacing16,
+      backgroundColor: theme.colors.colorSurfacePrimary
+    },
+    linkContainer: {
+      alignItems: 'center',
+      gap: rawTokens.spacing16
+    }
+  })
