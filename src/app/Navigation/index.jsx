@@ -18,7 +18,9 @@ import {
   OnboardingV2Sync
 } from '../../screens/OnboardingV2'
 import { RecordDetails } from '../../screens/RecordDetails'
+import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
+import { MyDevices } from '../../screens/Settings/MyDevices'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
 import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
@@ -93,5 +95,7 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="ShareVault" component={ShareVault} />
     <Stack.Screen name="MultiSelectDelete" component={MultiSelectDelete} />
     <Stack.Screen name="MultiSelectMove" component={MultiSelectMove} />
+    <Stack.Screen name="Feedback" component={Feedback} />
+    <Stack.Screen name="MyDevices" component={MyDevices} />
   </Stack.Navigator>
 )

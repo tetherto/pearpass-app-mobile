@@ -75,7 +75,7 @@ export const SettingsV2 = () => {
           {
             key: 'your-devices',
             label: t`Your Devices`,
-            screen: 'Vaults',
+            screen: 'MyDevices',
             icon: Devices
           }
         ]
@@ -126,7 +126,7 @@ export const SettingsV2 = () => {
           {
             key: 'report-a-problem',
             label: t`Report a problem`,
-            screen: 'About',
+            screen: 'Feedback',
             icon: BugReportFilled
           },
           {

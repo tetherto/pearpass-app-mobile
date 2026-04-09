@@ -48,12 +48,14 @@ npm run fdroid:patches:build
 cd android
 ANDROID_HOME=$HOME/Library/Android/sdk \
   GRADLE_USER_HOME=/tmp/pearpass-gradle-home \
-  ./gradlew :app:assembleFdroidRelease --no-daemon -Dorg.gradle.vfs.watch=false
+  ./gradlew :app:assembleFdroidRelease --no-daemon -Dorg.gradle.vfs.watch=false \
+    -Ppearpass.enableAbiSplits=true \
+    -Ppearpass.abis=arm64-v8a,armeabi-v7a
 ```
 
-Expected output path (Gradle default):
+Expected output path (ABI split):
 
-- `android/app/build/outputs/apk/fdroid/release/app-fdroid-release.apk`
+- `android/app/build/outputs/apk/fdroid/release/app-fdroid-*-release.apk`
 
 ## Feature differences (current)
 
