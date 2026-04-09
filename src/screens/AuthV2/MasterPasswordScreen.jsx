@@ -4,7 +4,6 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
 import {
   Button,
   PasswordField,
@@ -44,6 +43,7 @@ import {
   isFingerprintSupported as getIsFingerprintSupported
 } from '../../utils/biometricLogin'
 import { logger } from '../../utils/logger'
+import { unsupportedFeaturesEnabled } from '../../utils/unsupportedFeatures'
 import { OnboardingLayout } from '../OnboardingV2/components/OnboardingLayout'
 
 export const MasterPasswordScreen = () => {
@@ -228,7 +228,7 @@ export const MasterPasswordScreen = () => {
             >
               <Text style={styles.biometricLinkText}>{biometricLabel}</Text>
             </Pressable>
-          ) : UNSUPPORTED ? (
+          ) : unsupportedFeaturesEnabled() ? (
             <Pressable
               onPress={() => navigation.goBack()}
               style={styles.biometricLink}

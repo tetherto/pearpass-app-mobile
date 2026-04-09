@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
 import { useUserData } from '@tetherto/pearpass-lib-vault'
 
 import { isV2 } from '../../../utils/designVersion'
 import { logger } from '../../../utils/logger'
 import * as SplashScreen from '../../../utils/SplashScreen'
+import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 
 /**
  * Custom hook to determine the initial route for navigation.
@@ -35,7 +35,7 @@ export const useRedirect = () => {
 
         if (isV2()) {
           setInitialRouteName(
-            UNSUPPORTED ? 'AuthV2Pin' : 'AuthV2MasterPassword'
+            unsupportedFeaturesEnabled() ? 'AuthV2Pin' : 'AuthV2MasterPassword'
           )
           return
         }

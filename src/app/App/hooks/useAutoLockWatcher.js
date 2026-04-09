@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
-import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
 import {
   closeAllInstances,
   useUserData,
@@ -20,6 +19,7 @@ import {
 } from '../../../utils/autoLockStorage'
 import { isV2 } from '../../../utils/designVersion'
 import { clearAllFileCache } from '../../../utils/filesCache'
+import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 
 /**
  * Hook responsible for monitoring user inactivity and handling auto-lock logic.
@@ -84,7 +84,9 @@ export const useAutoLockWatcher = () => {
     clearAllFileCache()
 
     if (isV2()) {
-      const routeName = UNSUPPORTED ? 'AuthV2Pin' : 'AuthV2MasterPassword'
+      const routeName = unsupportedFeaturesEnabled()
+        ? 'AuthV2Pin'
+        : 'AuthV2MasterPassword'
       navigation.reset({
         index: 0,
         routes: [{ name: routeName }]
