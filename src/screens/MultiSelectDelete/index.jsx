@@ -54,15 +54,13 @@ export const MultiSelectDelete = () => {
         </Button>
       }
     >
-      <View
-        style={styles.recordsSection}
-        onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
-      >
+      <View style={styles.recordsSection}>
         <Text variant="caption" style={styles.sectionLabel}>
           {t`Selected items`}
         </Text>
         <ScrollView
           style={styles.recordsScroll}
+          onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
           contentContainerStyle={[
             styles.recordsContent,
             showGradient &&
@@ -72,19 +70,22 @@ export const MultiSelectDelete = () => {
           onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
         >
           {selectedRecordObjects.map((record, index) => (
-            <ListItem
+            <View
               key={record.id}
-              icon={<RecordItemIcon record={record} />}
-              iconSize={32}
-              title={record.data?.title ?? ''}
-              subtitle={getRecordSubtitle(record) || undefined}
-              style={styles.recordItem}
               onLayout={
                 index === 0
                   ? (e) => setListItemHeight(e.nativeEvent.layout.height)
                   : undefined
               }
-            />
+            >
+              <ListItem
+                icon={<RecordItemIcon record={record} />}
+                iconSize={32}
+                title={record.data?.title ?? ''}
+                subtitle={getRecordSubtitle(record) || undefined}
+                style={styles.recordItem}
+              />
+            </View>
           ))}
         </ScrollView>
         {showGradient && (

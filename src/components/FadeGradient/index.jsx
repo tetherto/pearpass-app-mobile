@@ -15,7 +15,7 @@ export const FadeGradient = ({ color, style }) => {
       onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
     >
       {height > 0 && (
-        <Svg width="100%" height={height}>
+        <Svg width="100%" height={Math.ceil(height)}>
           <Defs>
             <LinearGradient id={fadeId} x1="0" y1="0" x2="0" y2="1">
               <Stop offset="0" stopColor={color} stopOpacity="0" />
@@ -26,7 +26,7 @@ export const FadeGradient = ({ color, style }) => {
             x="0"
             y="0"
             width="100%"
-            height={height}
+            height={Math.ceil(height)}
             fill={`url(#${fadeId})`}
           />
         </Svg>

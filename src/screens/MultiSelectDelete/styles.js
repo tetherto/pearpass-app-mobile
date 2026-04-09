@@ -2,9 +2,11 @@ import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
 export const createStyles = (colors) => ({
   recordsSection: {
+    flex: 1,
     position: 'relative'
   },
   recordsScroll: {
+    flex: 1,
     paddingHorizontal: rawTokens.spacing12
   },
   recordsContent: {},
