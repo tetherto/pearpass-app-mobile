@@ -1,32 +1,33 @@
 import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
-  CalendarIcon,
-  CreditCardIcon,
-  CommonFileIcon,
-  NineDotsIcon,
-  UserIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import {
+  AttachmentField,
   InputField,
-  PasswordField,
-  MultiSlotInput
+  MultiSlotInput,
+  PasswordField
 } from '@tetherto/pearpass-lib-ui-kit'
-import { CopyButton } from '../../../libComponents/CopyButton'
+import { StyleSheet, View } from 'react-native'
 
-import { AttachmentField } from '../../../containers/AttachmentField'
-import { FormGroup } from '../../../components/FormGroup'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { CreditCardRecord } from './types'
+import { getMimeType } from '../../../utils/getMimeType'
+import { handleDownloadFile } from '../../../utils/handleDownloadFile'
+import { Attachment, CreditCardRecord } from './types'
+import { toReadOnlyFieldProps } from './utils'
 
-const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: unknown) => void
-}) => ({
-  name: registerResult.name,
-  value: registerResult.value,
-})
+type ImagePreviewNavigation = {
+  navigate: (
+    screen: 'ImagePreview',
+    params: {
+      imageUri: string
+      imageName?: string
+    }
+  ) => void
+}
 
 export const CreditCardRecordDetailsForm = ({
   initialRecord,
@@ -36,6 +37,11 @@ export const CreditCardRecordDetailsForm = ({
   selectedFolder?: string
 }) => {
   const { t } = useLingui()
+  const navigation = useNavigation() as ImagePreviewNavigation
+  const { setShouldBypassAutoLock } = useAutoLockContext() as {
+    setShouldBypassAutoLock: (value: boolean) => void
+  }
+  const { copyToClipboard } = useCopyToClipboard()
 
   const initialValues = useMemo(
     () => ({
@@ -63,7 +69,7 @@ export const CreditCardRecordDetailsForm = ({
   })
 
   useEffect(() => {
-    setValues({ ...initialValues, attachments: values.attachments })
+    setValues(initialValues)
   }, [initialValues, setValues])
 
   const hasName = !!values?.name?.length
@@ -75,102 +81,169 @@ export const CreditCardRecordDetailsForm = ({
   const hasCustomFields = !!(values?.customFields as unknown[])?.length
   const hasAttachments = !!values?.attachments?.length
 
+  const handleAttachmentPress = async (attachment: Attachment) => {
+    if (getMimeType(attachment.name).startsWith('image/')) {
+      const imageUri = attachment.base64
+        ? `data:image/jpeg;base64,${attachment.base64}`
+        : ''
+
+      navigation.navigate('ImagePreview', {
+        imageUri,
+        imageName: attachment.name
+      })
+
+      return
+    }
+
+    try {
+      setShouldBypassAutoLock(true)
+      await handleDownloadFile({
+        base64: attachment.base64 ?? '',
+        name: attachment.name ?? ''
+      })
+    } finally {
+      setShouldBypassAutoLock(false)
+    }
+  }
+
   return (
-    <>
-      {(hasName || hasNumber || hasExpireDate || hasSecurityCode || hasPinCode) && (
-        <FormGroup>
-          {hasName && (
+    <View style={styles.container}>
+      <View style={styles.topContent}>
+        {(hasName ||
+          hasNumber ||
+          hasExpireDate ||
+          hasSecurityCode ||
+          hasPinCode) && (
+          <MultiSlotInput testID="card-details-multi-slot-input">
+            {hasName && (
+              <InputField
+                label={t`Name on card`}
+                placeholder={t`John Smith`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="card-details-multi-slot-input-slot-0"
+                {...toReadOnlyFieldProps(register('name'))}
+              />
+            )}
+
+            {hasNumber && (
+              <InputField
+                label={t`Number on card`}
+                placeholder={t`1234 1234 1234 1234`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="card-details-multi-slot-input-slot-1"
+                {...toReadOnlyFieldProps(register('number'))}
+              />
+            )}
+
+            {hasExpireDate && (
+              <InputField
+                label={t`Date of expire`}
+                placeholder={t`MM YY`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="card-details-multi-slot-input-slot-2"
+                {...toReadOnlyFieldProps(register('expireDate'))}
+              />
+            )}
+
+            {hasSecurityCode && (
+              <PasswordField
+                label={t`Security code`}
+                placeholder={t`123`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="card-details-multi-slot-input-slot-3"
+                {...toReadOnlyFieldProps(register('securityCode'))}
+              />
+            )}
+
+            {hasPinCode && (
+              <PasswordField
+                label={t`Pin code`}
+                placeholder={t`1234`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="card-details-multi-slot-input-slot-4"
+                {...toReadOnlyFieldProps(register('pinCode'))}
+              />
+            )}
+          </MultiSlotInput>
+        )}
+
+        {hasAttachments && (
+          <MultiSlotInput testID="attachments-multi-slot-input">
+            {(values.attachments as Attachment[]).map((attachment, index) => (
+              <AttachmentField
+                key={attachment?.id || attachment.name}
+                label={t`Attachment`}
+                value={attachment?.name ?? ''}
+                isGrouped
+                testID={`attachment-field-${index}`}
+                onClick={() => {
+                  void handleAttachmentPress(attachment)
+                }}
+              />
+            ))}
+          </MultiSlotInput>
+        )}
+
+        {hasNote && (
+          <MultiSlotInput testID="comments-multi-slot-input">
             <InputField
-              leftSlot={<UserIcon />}
-              rightSlot={<CopyButton value={values.name} />}
-              label={t`Name on card`}
-              placeholder={t`John Smith`}
-              disabled
-              {...toDisabledRegister(register('name'))}
+              label={t`Comment`}
+              placeholder={t`Add comment`}
+              readOnly
+              copyable
+              onCopy={copyToClipboard}
+              isGrouped
+              testID="comments-multi-slot-input-slot-0"
+              {...toReadOnlyFieldProps(register('note'))}
             />
-          )}
+          </MultiSlotInput>
+        )}
 
-          {hasNumber && (
-            <InputField
-              leftSlot={<CreditCardIcon />}
-              rightSlot={<CopyButton value={values.number} />}
-              label={t`Number on card`}
-              placeholder={t`1234 1234 1234 1234`}
-              disabled
-              {...toDisabledRegister(register('number'))}
-            />
-          )}
-
-          {hasExpireDate && (
-            <InputField
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.expireDate} />}
-              label={t`Date of expire`}
-              placeholder={t`MM YY`}
-              disabled
-              {...toDisabledRegister(register('expireDate'))}
-            />
-          )}
-
-          {hasSecurityCode && (
-            <PasswordField
-              leftSlot={<CreditCardIcon />}
-              rightSlot={<CopyButton value={values.securityCode} />}
-              label={t`Security code`}
-              placeholder={t`12C3`}
-              disabled
-              {...toDisabledRegister(register('securityCode'))}
-            />
-          )}
-
-          {hasPinCode && (
-            <PasswordField
-              leftSlot={<NineDotsIcon />}
-              rightSlot={<CopyButton value={values.pinCode} />}
-              label={t`Pin code`}
-              placeholder={t`1234`}
-              disabled
-              {...toDisabledRegister(register('pinCode'))}
-            />
-          )}
-        </FormGroup>
-      )}
-
-      {hasAttachments && (
-        <FormGroup>
-          {(values.attachments as { id?: string; name?: string }[]).map((attachment) => (
-            <AttachmentField
-              key={attachment?.id || attachment.name}
-              attachment={attachment}
-              label={'File'}
-            />
-          ))}
-        </FormGroup>
-      )}
-
-      {hasNote && (
-        <InputField
-          label={t`Note`}
-          placeholder={t`Add note`}
-          leftSlot={<CommonFileIcon />}
-          rightSlot={<CopyButton value={values.note} />}
-          disabled
-          {...toDisabledRegister(register('note'))}
-        />
-      )}
-
-      {hasCustomFields && (
-        <MultiSlotInput
-          label={t`Custom fields`}
-          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-          onAdd={() => {}}
-          onChangeItem={() => {}}
-          onRemove={() => {}}
-          testID="custom-fields-multi-slot-input"
-          disabled
-          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
-        />
-      )}
-    </>
+        {hasCustomFields && (
+          <MultiSlotInput testID="hidden-messages-multi-slot-input">
+            {(values.customFields as Array<{ type: string; note: string }>).map(
+              (field, index) => (
+                <PasswordField
+                  key={`${field.type}-${index}`}
+                  label={t`Hidden Message`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Hidden Message`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                />
+              )
+            )}
+          </MultiSlotInput>
+        )}
+      </View>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'space-between'
+  },
+  topContent: {
+    gap: 8
+  }
+})

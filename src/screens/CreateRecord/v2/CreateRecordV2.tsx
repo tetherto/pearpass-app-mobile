@@ -13,12 +13,6 @@ import { CreateOrEditWifiPasswordContent } from './CreateOrEditWifiPasswordConte
 import { KeyboardAvoidingWrapper } from '../../../components/KeyboardAvoidingWrapper'
 import { useSharedFilter } from '../../../context/SharedFilterContext'
 
-const RecordFormContainer = styled.View`
-  padding: 16px;
-  padding-top: 64px;
-  height: 100%;
-  background-color: ${({ theme }) => theme.colors.grey500.mode1};
-`
 type CreateRecordV2Props = {
   route: {
     params: {
@@ -66,9 +60,7 @@ export const CreateRecordV2 = ({ route }: CreateRecordV2Props) => {
   return (
     <KeyboardAvoidingWrapper>
       <GestureHandlerRootView>
-        <RecordFormContainer>
           {renderContent()}
-        </RecordFormContainer>
       </GestureHandlerRootView>
     </KeyboardAvoidingWrapper>
   )

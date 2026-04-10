@@ -1,4 +1,4 @@
-import { Children, cloneElement, useCallback, useState } from 'react'
+import { Children, cloneElement, isValidElement, useCallback, useState } from 'react'
 import { ReactNode } from 'react'
 import {
   ArrowDownIcon,
@@ -13,6 +13,14 @@ interface FormGroupProps {
   isCollapse?: boolean      // optional
   onToggle?: (isOpen: boolean) => void
   isOpened?: boolean
+}
+
+type FormGroupChildProps = {
+  index?: number
+  isFirst?: boolean
+  isLast?: boolean
+  onFocus?: () => void
+  focusedIndex?: number | null
 }
 
 export const FormGroup = ({
@@ -45,9 +53,11 @@ export const FormGroup = ({
       {isOpen && (
         <View>
           {Children.toArray(children)
-            .filter((child) => child !== null)
+            .filter((child): child is React.ReactElement<FormGroupChildProps> =>
+              isValidElement<FormGroupChildProps>(child)
+            )
             .map((child, index, filteredArray) =>
-              cloneElement(child as React.ReactElement, {
+              cloneElement(child, {
                 index,
                 isFirst: index === 0,
                 isLast: index === filteredArray.length - 1,

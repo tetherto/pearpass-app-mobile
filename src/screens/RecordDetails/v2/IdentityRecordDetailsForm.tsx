@@ -1,34 +1,106 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { DATE_FORMAT } from '@tetherto/pearpass-lib-constants'
 import {
-  EmailIcon,
-  PhoneIcon,
-  UserIcon,
-  NationalityIcon,
-  CalendarIcon,
-  GroupIcon,
-  GenderIcon,
-  CommonFileIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
+  AttachmentField,
+  InputField,
+  MultiSlotInput,
+  Text,
+  rawTokens
+} from '@tetherto/pearpass-lib-ui-kit'
+import { StyleSheet, View } from 'react-native'
 
-import { FormGroup } from '../../../components/FormGroup'
-import { AttachmentField } from '../../../containers/AttachmentField'
-import { ImagesField } from '../../../containers/ImagesField'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { CopyButton } from '../../../libComponents/CopyButton'
-import { IdentityRecord } from './types'
+import { getMimeType } from '../../../utils/getMimeType'
+import { handleDownloadFile } from '../../../utils/handleDownloadFile'
+import { Attachment, IdentityRecord } from './types'
+import { toReadOnlyFieldProps } from './utils'
 
-const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: unknown) => void
-}) => ({
-  name: registerResult.name,
-  value: registerResult.value,
-})
+type ImagePreviewNavigation = {
+  navigate: (
+    screen: 'ImagePreview',
+    params: {
+      imageUri: string
+      imageName?: string
+    }
+  ) => void
+}
+
+type FileFieldName =
+  | 'attachments'
+  | 'passportPicture'
+  | 'idCardPicture'
+  | 'drivingLicensePicture'
+
+type AttachmentSource = {
+  attachment: Attachment
+  fieldName: FileFieldName
+  index: number
+}
+
+const getAttachmentKey = (
+  attachment: Pick<Attachment, 'id' | 'name'>,
+  fieldName: FileFieldName,
+  index: number
+) => {
+  if (attachment.id) {
+    return `id:${attachment.id}`
+  }
+
+  if (attachment.name) {
+    return `name:${attachment.name}`
+  }
+
+  return `${fieldName}:${index}`
+}
+
+const buildIdentityAttachmentSources = (values: {
+  attachments?: Attachment[]
+  passportPicture?: Attachment[]
+  idCardPicture?: Attachment[]
+  drivingLicensePicture?: Attachment[]
+}): AttachmentSource[] => {
+  const sources: AttachmentSource[] = []
+  const sourceIndexByKey = new Map<string, number>()
+  const attachmentGroups: Array<{ fieldName: FileFieldName; items: Attachment[] }> = [
+    { fieldName: 'attachments', items: values.attachments ?? [] },
+    { fieldName: 'passportPicture', items: values.passportPicture ?? [] },
+    { fieldName: 'idCardPicture', items: values.idCardPicture ?? [] },
+    { fieldName: 'drivingLicensePicture', items: values.drivingLicensePicture ?? [] }
+  ]
+
+  attachmentGroups.forEach(({ fieldName, items }) => {
+    items.forEach((attachment, index) => {
+      const key = getAttachmentKey(attachment, fieldName, index)
+      const existingIndex = sourceIndexByKey.get(key)
+
+      if (existingIndex === undefined) {
+        sourceIndexByKey.set(key, sources.length)
+        sources.push({ attachment, fieldName, index })
+        return
+      }
+
+      const existingSource = sources[existingIndex]
+
+      if (!existingSource.attachment.base64 && attachment.base64) {
+        sources[existingIndex] = {
+          ...existingSource,
+          attachment: {
+            ...existingSource.attachment,
+            ...attachment
+          }
+        }
+      }
+    })
+  })
+
+  return sources
+}
 
 export const IdentityRecordDetailsForm = ({
   initialRecord,
@@ -38,9 +110,11 @@ export const IdentityRecordDetailsForm = ({
   selectedFolder?: string
 }) => {
   const { t } = useLingui()
-  const [isPassportOpen, setIsPassportOpen] = useState(true)
-  const [isIdCardOpen, setIsIdCardOpen] = useState(true)
-  const [isDrivingOpen, setIsDrivingOpen] = useState(true)
+  const navigation = useNavigation() as ImagePreviewNavigation
+  const { setShouldBypassAutoLock } = useAutoLockContext() as {
+    setShouldBypassAutoLock: (value: boolean) => void
+  }
+  const { copyToClipboard } = useCopyToClipboard()
 
   const initialValues = useMemo(
     () => ({
@@ -53,7 +127,7 @@ export const IdentityRecordDetailsForm = ({
       region: initialRecord?.data?.region ?? '',
       country: initialRecord?.data?.country ?? '',
       note: initialRecord?.data?.note ?? '',
-      customFields: initialRecord?.data?.customFields || [],
+      customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       passportFullName: initialRecord?.data?.passportFullName ?? '',
       passportNumber: initialRecord?.data?.passportNumber ?? '',
@@ -74,16 +148,14 @@ export const IdentityRecordDetailsForm = ({
       drivingLicenseExpiryDate: initialRecord?.data?.drivingLicenseExpiryDate ?? '',
       drivingLicenseIssuingCountry: initialRecord?.data?.drivingLicenseIssuingCountry ?? '',
       drivingLicensePicture: initialRecord?.data?.drivingLicensePicture ?? [],
-      attachments: initialRecord?.data.attachments ?? []
+      attachments: initialRecord?.attachments ?? []
     }),
     [initialRecord, selectedFolder]
   )
 
-  const { register, registerArray, setValues, values, setValue } = useForm({
-    initialValues: initialValues
+  const { register, setValues, values, setValue } = useForm({
+    initialValues
   })
-
-  const { value: list } = registerArray('customFields')
 
   const { refetch } = useGetMultipleFiles({
     fieldNames: [
@@ -104,7 +176,7 @@ export const IdentityRecordDetailsForm = ({
   )
 
   useEffect(() => {
-    const imageFields = [
+    const imageFields: FileFieldName[] = [
       'attachments',
       'passportPicture',
       'idCardPicture',
@@ -114,6 +186,7 @@ export const IdentityRecordDetailsForm = ({
 
     imageFields.forEach((fieldName) => {
       const currentValue = values[fieldName]
+
       if (
         currentValue &&
         Array.isArray(currentValue) &&
@@ -133,396 +206,499 @@ export const IdentityRecordDetailsForm = ({
     setValues(preservedValues)
   }, [initialValues, setValues])
 
-  const hasFullName = !!values?.fullName?.length
-  const hasEmail = !!values?.email?.length
-  const hasPhoneNumber = !!values?.phoneNumber?.length
-  const hasAddress = !!values?.address?.length
-  const hasZip = !!values?.zip?.length
-  const hasCity = !!values?.city?.length
-  const hasRegion = !!values?.region?.length
-  const hasCountry = !!values?.country?.length
-  const hasNote = !!values?.note?.length
-  const hasCustomFields = !!list.length
-  const hasPassportFullName = !!values?.passportFullName?.length
-  const hasPassportNumber = !!values?.passportNumber?.length
-  const hasPassportIssuingCountry = !!values?.passportIssuingCountry?.length
-  const hasPassportDateOfIssue = !!values?.passportDateOfIssue?.length
-  const hasPassportExpiryDate = !!values?.passportExpiryDate?.length
-  const hasPassportNationality = !!values?.passportNationality?.length
-  const hasPassportDob = !!values?.passportDob?.length
-  const hasPassportGender = !!values?.passportGender?.length
-  const hasPassportPicture = !!values.passportPicture?.length
-  const hasIdCardNumber = !!values?.idCardNumber?.length
-  const hasIdCardDateOfIssue = !!values?.idCardDateOfIssue?.length
-  const hasIdCardExpiryDate = !!values?.idCardExpiryDate?.length
-  const hasIdCardIssuingCountry = !!values?.idCardIssuingCountry?.length
-  const hasIdCardPicture = !!values.idCardPicture?.length
-  const hasDrivingLicenseNumber = !!values?.drivingLicenseNumber?.length
-  const hasDrivingLicenseDateOfIssue = !!values?.drivingLicenseDateOfIssue?.length
-  const hasDrivingLicenseExpiryDate = !!values?.drivingLicenseExpiryDate?.length
-  const hasDrivingLicenseIssuingCountry = !!values?.drivingLicenseIssuingCountry?.length
-  const hasDrivingLicensePicture = !!values.drivingLicensePicture?.length
-  const hasAttachments = !!values?.attachments?.length
-
+  const hasPersonalInformation =
+    !!values?.fullName?.length ||
+    !!values?.email?.length ||
+    !!values?.phoneNumber?.length
+  const hasAddress =
+    !!values?.address?.length ||
+    !!values?.zip?.length ||
+    !!values?.city?.length ||
+    !!values?.region?.length ||
+    !!values?.country?.length
   const hasPassport =
-    hasPassportFullName ||
-    hasPassportNumber ||
-    hasPassportIssuingCountry ||
-    hasPassportDateOfIssue ||
-    hasPassportExpiryDate ||
-    hasPassportNationality ||
-    hasPassportDob ||
-    hasPassportGender ||
-    hasPassportPicture
-
+    !!values?.passportFullName?.length ||
+    !!values?.passportNumber?.length ||
+    !!values?.passportIssuingCountry?.length ||
+    !!values?.passportDateOfIssue?.length ||
+    !!values?.passportExpiryDate?.length ||
+    !!values?.passportNationality?.length ||
+    !!values?.passportDob?.length ||
+    !!values?.passportGender?.length
   const hasIdCard =
-    hasIdCardNumber ||
-    hasIdCardDateOfIssue ||
-    hasIdCardExpiryDate ||
-    hasIdCardIssuingCountry ||
-    hasIdCardPicture
-
+    !!values?.idCardNumber?.length ||
+    !!values?.idCardDateOfIssue?.length ||
+    !!values?.idCardExpiryDate?.length ||
+    !!values?.idCardIssuingCountry?.length
   const hasDrivingLicense =
-    hasDrivingLicenseNumber ||
-    hasDrivingLicenseDateOfIssue ||
-    hasDrivingLicenseExpiryDate ||
-    hasDrivingLicenseIssuingCountry ||
-    hasDrivingLicensePicture
+    !!values?.drivingLicenseNumber?.length ||
+    !!values?.drivingLicenseDateOfIssue?.length ||
+    !!values?.drivingLicenseExpiryDate?.length ||
+    !!values?.drivingLicenseIssuingCountry?.length
+
+  const identityAttachmentSources = useMemo(
+    () =>
+      buildIdentityAttachmentSources({
+        attachments: values.attachments,
+        passportPicture: values.passportPicture,
+        idCardPicture: values.idCardPicture,
+        drivingLicensePicture: values.drivingLicensePicture
+      }),
+    [
+      values.attachments,
+      values.passportPicture,
+      values.idCardPicture,
+      values.drivingLicensePicture
+    ]
+  )
+  const hasAttachments = identityAttachmentSources.length > 0
+
+  const commentValues = [
+    ...(values?.note?.length ? [values.note] : []),
+    ...((values?.customFields as Array<{ type: string; note: string }>) ?? [])
+      .map((field) => field.note ?? '')
+      .filter(Boolean)
+  ]
+
+  const handleAttachmentPress = async (attachment: Attachment) => {
+    if (getMimeType(attachment.name).startsWith('image/')) {
+      const imageUri = attachment.base64
+        ? `data:image/jpeg;base64,${attachment.base64}`
+        : ''
+
+      navigation.navigate('ImagePreview', {
+        imageUri,
+        imageName: attachment.name
+      })
+
+      return
+    }
+
+    try {
+      setShouldBypassAutoLock(true)
+      await handleDownloadFile({
+        base64: attachment.base64 ?? '',
+        name: attachment.name ?? ''
+      })
+    } finally {
+      setShouldBypassAutoLock(false)
+    }
+  }
 
   return (
-    <>
-      {(hasFullName || hasEmail || hasPhoneNumber) && (
-        <FormGroup title={t`Personal information`} isCollapse>
-          {hasFullName && (
-            <InputField
-              label={t`Full name`}
-              placeholder={t`John Smith`}
-              leftSlot={<UserIcon />}
-              rightSlot={<CopyButton value={values.fullName} />}
-              disabled
-              {...toDisabledRegister(register('fullName'))}
-            />
-          )}
-          {hasEmail && (
-            <InputField
-              label={t`Email`}
-              placeholder={t`Insert email`}
-              leftSlot={<EmailIcon />}
-              rightSlot={<CopyButton value={values.email} />}
-              disabled
-              {...toDisabledRegister(register('email'))}
-            />
-          )}
-          {hasPhoneNumber && (
-            <InputField
-              label={t`Phone number`}
-              placeholder={t`Insert phone number`}
-              leftSlot={<PhoneIcon />}
-              rightSlot={<CopyButton value={values.phoneNumber} />}
-              disabled
-              {...toDisabledRegister(register('phoneNumber'))}
-            />
-          )}
-        </FormGroup>
-      )}
+    <View style={styles.container}>
+      <View style={styles.topContent}>
+        {hasPersonalInformation && (
+          <View style={styles.section}>
+            <Text variant="caption">{t`Personal Information`}</Text>
 
-      {(hasAddress || hasZip || hasCity || hasRegion || hasCountry) && (
-        <FormGroup title={t`Detail of address`} isCollapse>
-          {hasAddress && (
-            <InputField
-              label={t`Address`}
-              placeholder={t`Insert address`}
-              rightSlot={<CopyButton value={values.address} />}
-              disabled
-              {...toDisabledRegister(register('address'))}
-            />
-          )}
-          {hasZip && (
-            <InputField
-              label={t`ZIP`}
-              placeholder={t`Insert ZIP`}
-              rightSlot={<CopyButton value={values.zip} />}
-              disabled
-              {...toDisabledRegister(register('zip'))}
-            />
-          )}
-          {hasCity && (
-            <InputField
-              label={t`City`}
-              placeholder={t`Insert city`}
-              rightSlot={<CopyButton value={values.city} />}
-              disabled
-              {...toDisabledRegister(register('city'))}
-            />
-          )}
-          {hasRegion && (
-            <InputField
-              label={t`Region`}
-              placeholder={t`Insert region`}
-              rightSlot={<CopyButton value={values.region} />}
-              disabled
-              {...toDisabledRegister(register('region'))}
-            />
-          )}
-          {hasCountry && (
-            <InputField
-              label={t`Country`}
-              placeholder={t`Insert country`}
-              rightSlot={<CopyButton value={values.country} />}
-              disabled
-              {...toDisabledRegister(register('country'))}
-            />
-          )}
-        </FormGroup>
-      )}
+            <MultiSlotInput testID="personal-information-multi-slot-input">
+              {!!values.fullName?.length && (
+                <InputField
+                  label={t`Full Name`}
+                  placeholder={t`John Smith`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="personal-information-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('fullName'))}
+                />
+              )}
 
-      {hasPassport && (
-        <FormGroup
-          title={t`Passport`}
-          isCollapse
-          onToggle={setIsPassportOpen}
-          isOpened={true}
-        >
-          {hasPassportFullName && (
-            <InputField
-              label={t`Full name`}
-              placeholder={t`John Smith`}
-              leftSlot={<UserIcon />}
-              rightSlot={<CopyButton value={values.passportFullName} />}
-              disabled
-              {...toDisabledRegister(register('passportFullName'))}
-            />
-          )}
-          {hasPassportNumber && (
-            <InputField
-              label={t`Passport number`}
-              placeholder={t`Insert numbers`}
-              leftSlot={<GroupIcon />}
-              rightSlot={<CopyButton value={values.passportNumber} />}
-              disabled
-              {...toDisabledRegister(register('passportNumber'))}
-            />
-          )}
-          {hasPassportIssuingCountry && (
-            <InputField
-              label={t`Issuing country`}
-              placeholder={t`Insert country`}
-              leftSlot={<NationalityIcon />}
-              rightSlot={<CopyButton value={values.passportIssuingCountry} />}
-              disabled
-              {...toDisabledRegister(register('passportIssuingCountry'))}
-            />
-          )}
-          {hasPassportDateOfIssue && (
-            <InputField
-              label={t`Date of issue`}
-              placeholder={DATE_FORMAT}
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.passportDateOfIssue} />}
-              disabled
-              {...toDisabledRegister(register('passportDateOfIssue'))}
-            />
-          )}
-          {hasPassportExpiryDate && (
-            <InputField
-              label={t`Expiry date`}
-              placeholder={DATE_FORMAT}
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.passportExpiryDate} />}
-              disabled
-              {...toDisabledRegister(register('passportExpiryDate'))}
-            />
-          )}
-          {hasPassportNationality && (
-            <InputField
-              label={t`Nationality`}
-              placeholder={t`Insert your nationality`}
-              leftSlot={<NationalityIcon />}
-              rightSlot={<CopyButton value={values.passportNationality} />}
-              disabled
-              {...toDisabledRegister(register('passportNationality'))}
-            />
-          )}
-          {hasPassportDob && (
-            <InputField
-              label={t`Date of birth`}
-              placeholder={DATE_FORMAT}
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.passportDob} />}
-              disabled
-              {...toDisabledRegister(register('passportDob'))}
-            />
-          )}
-          {hasPassportGender && (
-            <InputField
-              label={t`Gender`}
-              placeholder={t`M/F`}
-              leftSlot={<GenderIcon />}
-              rightSlot={<CopyButton value={values.passportGender} />}
-              disabled
-              {...toDisabledRegister(register('passportGender'))}
-            />
-          )}
-        </FormGroup>
-      )}
+              {!!values.email?.length && (
+                <InputField
+                  label={t`Email`}
+                  placeholder={t`Insert email`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="personal-information-multi-slot-input-slot-1"
+                  {...toReadOnlyFieldProps(register('email'))}
+                />
+              )}
 
-      {hasPassportPicture && isPassportOpen && (
-        <ImagesField
-          title={t`Passport picture`}
-          pictures={values.passportPicture}
-        />
-      )}
+              {!!values.phoneNumber?.length && (
+                <InputField
+                  label={t`Phone Number`}
+                  placeholder={t`Insert phone number`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="personal-information-multi-slot-input-slot-2"
+                  {...toReadOnlyFieldProps(register('phoneNumber'))}
+                />
+              )}
+            </MultiSlotInput>
+          </View>
+        )}
 
-      {hasIdCard && (
-        <FormGroup
-          title={t`Identity card`}
-          isCollapse
-          onToggle={setIsIdCardOpen}
-          isOpened={true}
-        >
-          {hasIdCardNumber && (
-            <InputField
-              label={t`ID number`}
-              placeholder={'123456789'}
-              leftSlot={<GroupIcon />}
-              rightSlot={<CopyButton value={values.idCardNumber} />}
-              disabled
-              {...toDisabledRegister(register('idCardNumber'))}
-            />
-          )}
-          {hasIdCardDateOfIssue && (
-            <InputField
-              label={t`Creation date`}
-              placeholder={DATE_FORMAT}
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.idCardDateOfIssue} />}
-              disabled
-              {...toDisabledRegister(register('idCardDateOfIssue'))}
-            />
-          )}
-          {hasIdCardExpiryDate && (
-            <InputField
-              label={t`Expiry date`}
-              placeholder={DATE_FORMAT}
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.idCardExpiryDate} />}
-              disabled
-              {...toDisabledRegister(register('idCardExpiryDate'))}
-            />
-          )}
-          {hasIdCardIssuingCountry && (
-            <InputField
-              label={t`Issuing country`}
-              placeholder={t`Insert country`}
-              leftSlot={<NationalityIcon />}
-              rightSlot={<CopyButton value={values.idCardIssuingCountry} />}
-              disabled
-              {...toDisabledRegister(register('idCardIssuingCountry'))}
-            />
-          )}
-        </FormGroup>
-      )}
+        {hasAddress && (
+          <View style={styles.section}>
+            <Text variant="caption">{t`Address`}</Text>
 
-      {hasIdCardPicture && isIdCardOpen && (
-        <ImagesField
-          title={t`ID card picture`}
-          pictures={values.idCardPicture}
-        />
-      )}
+            <MultiSlotInput testID="address-multi-slot-input">
+              {!!values.address?.length && (
+                <InputField
+                  label={t`Address`}
+                  placeholder={t`Insert address`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="address-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('address'))}
+                />
+              )}
 
-      {hasDrivingLicense && (
-        <FormGroup
-          title={t`Driving license`}
-          isCollapse
-          onToggle={setIsDrivingOpen}
-          isOpened={true}
-        >
-          {hasDrivingLicenseNumber && (
-            <InputField
-              label={t`ID number`}
-              placeholder={t`123456789`}
-              leftSlot={<GroupIcon />}
-              rightSlot={<CopyButton value={values.drivingLicenseNumber} />}
-              disabled
-              {...toDisabledRegister(register('drivingLicenseNumber'))}
-            />
-          )}
-          {hasDrivingLicenseDateOfIssue && (
-            <InputField
-              label={t`Creation date`}
-              placeholder={DATE_FORMAT}
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.drivingLicenseDateOfIssue} />}
-              disabled
-              {...toDisabledRegister(register('drivingLicenseDateOfIssue'))}
-            />
-          )}
-          {hasDrivingLicenseExpiryDate && (
-            <InputField
-              label={t`Expiry date`}
-              placeholder={DATE_FORMAT}
-              leftSlot={<CalendarIcon />}
-              rightSlot={<CopyButton value={values.drivingLicenseExpiryDate} />}
-              disabled
-              {...toDisabledRegister(register('drivingLicenseExpiryDate'))}
-            />
-          )}
-          {hasDrivingLicenseIssuingCountry && (
-            <InputField
-              label={t`Issuing country`}
-              placeholder={t`Insert country`}
-              leftSlot={<NationalityIcon />}
-              rightSlot={<CopyButton value={values.drivingLicenseIssuingCountry} />}
-              disabled
-              {...toDisabledRegister(register('drivingLicenseIssuingCountry'))}
-            />
-          )}
-        </FormGroup>
-      )}
+              {!!values.zip?.length && (
+                <InputField
+                  label={t`ZIP`}
+                  placeholder={t`Insert ZIP`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="address-multi-slot-input-slot-1"
+                  {...toReadOnlyFieldProps(register('zip'))}
+                />
+              )}
 
-      {hasDrivingLicensePicture && isDrivingOpen && (
-        <ImagesField
-          title={t`Driving license picture`}
-          pictures={values.drivingLicensePicture}
-        />
-      )}
+              {!!values.city?.length && (
+                <InputField
+                  label={t`City`}
+                  placeholder={t`Insert city`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="address-multi-slot-input-slot-2"
+                  {...toReadOnlyFieldProps(register('city'))}
+                />
+              )}
 
-      {hasAttachments && (
-        <FormGroup>
-          {(values.attachments as { id?: string; name?: string }[]).map((attachment) => (
-            <AttachmentField
-              key={attachment?.id || attachment.name}
-              attachment={attachment}
-              label={'File'}
-            />
-          ))}
-        </FormGroup>
-      )}
+              {!!values.region?.length && (
+                <InputField
+                  label={t`Region`}
+                  placeholder={t`Insert region`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="address-multi-slot-input-slot-3"
+                  {...toReadOnlyFieldProps(register('region'))}
+                />
+              )}
 
-      {hasNote && (
-        <InputField
-          label={t`Comment`}
-          placeholder={t`Add comment`}
-          leftSlot={<CommonFileIcon />}
-          rightSlot={<CopyButton value={values.note} />}
-          disabled
-          {...toDisabledRegister(register('note'))}
-        />
-      )}
+              {!!values.country?.length && (
+                <InputField
+                  label={t`Country`}
+                  placeholder={t`Insert country`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="address-multi-slot-input-slot-4"
+                  {...toReadOnlyFieldProps(register('country'))}
+                />
+              )}
+            </MultiSlotInput>
+          </View>
+        )}
 
-      {hasCustomFields && (
-        <MultiSlotInput
-          label={t`Custom fields`}
-          placeholder={t`Add comment`}
-          values={(list as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-          onAdd={() => {}}
-          onChangeItem={() => {}}
-          onRemove={() => {}}
-          testID="custom-fields-multi-slot-input"
-          disabled
-          rightSlot={(index) => <CopyButton value={(list as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
-        />
-      )}
-    </>
+        {hasPassport && (
+          <View style={styles.section}>
+            <Text variant="caption">{t`Passport`}</Text>
+
+            <MultiSlotInput testID="passport-multi-slot-input">
+              {!!values.passportFullName?.length && (
+                <InputField
+                  label={t`Full Name`}
+                  placeholder={t`John Smith`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('passportFullName'))}
+                />
+              )}
+
+              {!!values.passportNumber?.length && (
+                <InputField
+                  label={t`Passport Number`}
+                  placeholder={t`Insert numbers`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-1"
+                  {...toReadOnlyFieldProps(register('passportNumber'))}
+                />
+              )}
+
+              {!!values.passportIssuingCountry?.length && (
+                <InputField
+                  label={t`Issuing Country`}
+                  placeholder={t`Insert country`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-2"
+                  {...toReadOnlyFieldProps(register('passportIssuingCountry'))}
+                />
+              )}
+
+              {!!values.passportDateOfIssue?.length && (
+                <InputField
+                  label={t`Date of Issue`}
+                  placeholder={DATE_FORMAT}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-3"
+                  {...toReadOnlyFieldProps(register('passportDateOfIssue'))}
+                />
+              )}
+
+              {!!values.passportExpiryDate?.length && (
+                <InputField
+                  label={t`Expiry Date`}
+                  placeholder={DATE_FORMAT}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-4"
+                  {...toReadOnlyFieldProps(register('passportExpiryDate'))}
+                />
+              )}
+
+              {!!values.passportNationality?.length && (
+                <InputField
+                  label={t`Nationality`}
+                  placeholder={t`Insert your nationality`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-5"
+                  {...toReadOnlyFieldProps(register('passportNationality'))}
+                />
+              )}
+
+              {!!values.passportDob?.length && (
+                <InputField
+                  label={t`Date of Birth`}
+                  placeholder={DATE_FORMAT}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-6"
+                  {...toReadOnlyFieldProps(register('passportDob'))}
+                />
+              )}
+
+              {!!values.passportGender?.length && (
+                <InputField
+                  label={t`Gender`}
+                  placeholder={t`M/F`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="passport-multi-slot-input-slot-7"
+                  {...toReadOnlyFieldProps(register('passportGender'))}
+                />
+              )}
+            </MultiSlotInput>
+
+          </View>
+        )}
+
+        {hasIdCard && (
+          <View style={styles.section}>
+            <Text variant="caption">{t`Identity Card`}</Text>
+
+            <MultiSlotInput testID="identity-card-multi-slot-input">
+              {!!values.idCardNumber?.length && (
+                <InputField
+                  label={t`ID Number`}
+                  placeholder={t`123456789`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="identity-card-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('idCardNumber'))}
+                />
+              )}
+
+              {!!values.idCardDateOfIssue?.length && (
+                <InputField
+                  label={t`Creation Date`}
+                  placeholder={DATE_FORMAT}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="identity-card-multi-slot-input-slot-1"
+                  {...toReadOnlyFieldProps(register('idCardDateOfIssue'))}
+                />
+              )}
+
+              {!!values.idCardExpiryDate?.length && (
+                <InputField
+                  label={t`Expiry Date`}
+                  placeholder={DATE_FORMAT}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="identity-card-multi-slot-input-slot-2"
+                  {...toReadOnlyFieldProps(register('idCardExpiryDate'))}
+                />
+              )}
+
+              {!!values.idCardIssuingCountry?.length && (
+                <InputField
+                  label={t`Issuing Country`}
+                  placeholder={t`Insert country`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="identity-card-multi-slot-input-slot-3"
+                  {...toReadOnlyFieldProps(register('idCardIssuingCountry'))}
+                />
+              )}
+            </MultiSlotInput>
+
+          </View>
+        )}
+
+        {hasDrivingLicense && (
+          <View style={styles.section}>
+            <Text variant="caption">{t`Driving License`}</Text>
+
+            <MultiSlotInput testID="driving-license-multi-slot-input">
+              {!!values.drivingLicenseNumber?.length && (
+                <InputField
+                  label={t`ID Number`}
+                  placeholder={t`123456789`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="driving-license-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('drivingLicenseNumber'))}
+                />
+              )}
+
+              {!!values.drivingLicenseDateOfIssue?.length && (
+                <InputField
+                  label={t`Creation Date`}
+                  placeholder={DATE_FORMAT}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="driving-license-multi-slot-input-slot-1"
+                  {...toReadOnlyFieldProps(register('drivingLicenseDateOfIssue'))}
+                />
+              )}
+
+              {!!values.drivingLicenseExpiryDate?.length && (
+                <InputField
+                  label={t`Expiry Date`}
+                  placeholder={DATE_FORMAT}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="driving-license-multi-slot-input-slot-2"
+                  {...toReadOnlyFieldProps(register('drivingLicenseExpiryDate'))}
+                />
+              )}
+
+              {!!values.drivingLicenseIssuingCountry?.length && (
+                <InputField
+                  label={t`Issuing Country`}
+                  placeholder={t`Insert country`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="driving-license-multi-slot-input-slot-3"
+                  {...toReadOnlyFieldProps(register('drivingLicenseIssuingCountry'))}
+                />
+              )}
+            </MultiSlotInput>
+
+          </View>
+        )}
+
+        {hasAttachments && (
+          <View style={styles.section}>
+            <Text variant="caption">{t`Attachments`}</Text>
+
+            <MultiSlotInput testID="attachments-multi-slot-input">
+              {identityAttachmentSources.map(({ attachment }, index) => (
+                <AttachmentField
+                  key={attachment?.id || attachment.name || `attachment-${index}`}
+                  label={t`Attachment`}
+                  value={attachment?.name ?? ''}
+                  isGrouped
+                  testID={`attachment-field-${index}`}
+                  onClick={() => {
+                    void handleAttachmentPress(attachment)
+                  }}
+                />
+              ))}
+            </MultiSlotInput>
+          </View>
+        )}
+
+        {!!commentValues.length && (
+          <View style={styles.section}>
+            <Text variant="caption">{t`Additional`}</Text>
+
+            <MultiSlotInput testID="comments-multi-slot-input">
+              {commentValues.map((comment, index) => (
+                <InputField
+                  key={`comment-${index}`}
+                  label={t`Comment`}
+                  value={comment}
+                  placeholder={t`Enter Comment`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID={`comments-multi-slot-input-slot-${index}`}
+                />
+              ))}
+            </MultiSlotInput>
+          </View>
+        )}
+      </View>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent'
+  },
+  topContent: {
+    gap: rawTokens.spacing8
+  },
+  section: {
+    gap: rawTokens.spacing12
+  }
+})

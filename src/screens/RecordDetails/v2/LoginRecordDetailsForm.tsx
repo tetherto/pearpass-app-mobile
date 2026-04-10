@@ -1,45 +1,61 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useFocusEffect } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { isBefore, subtractDateUnits } from '@tetherto/pear-apps-utils-date'
+import { ErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
-  CommonFileIcon,
-  KeyIcon,
-  UserIcon,
-  WebsiteIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { CopyButton } from '../../../libComponents/CopyButton'
-import {
+  AlertMessage,
+  AttachmentField,
+  Button,
   InputField,
+  MultiSlotInput,
   PasswordField,
-  MultiSlotInput
+  useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { AttachmentField } from '../../../containers/AttachmentField'
+import { OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Linking, StyleSheet, View } from 'react-native'
 
-import { AppWarning } from '../../../components/AppWarning'
-import { FormGroup } from '../../../components/FormGroup'
 import { OtpCodeField } from '../../../components/OtpCodeField'
+import { FormGroup } from '../../../components/FormGroup'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { usePasswordChangeReminder } from '../../../hooks/usePasswordChangeReminder'
+import { addHttps } from '../../../utils/addHttps'
 import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
-import { LoginRecord } from './types'
+import { getMimeType } from '../../../utils/getMimeType'
+import { handleDownloadFile } from '../../../utils/handleDownloadFile'
+import { Attachment, LoginRecord } from './types'
+import { toReadOnlyFieldProps } from './utils'
 
 interface LoginRecordDetailsFormProps {
   initialRecord?: LoginRecord
   selectedFolder?: string
 }
 
-const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: unknown) => void
-}) => ({
-  name: registerResult.name,
-  value: registerResult.value,
-})
+type ImagePreviewNavigation = {
+  navigate: (
+    screen: 'ImagePreview',
+    params: {
+      imageUri: string
+      imageName?: string
+    }
+  ) => void
+}
 
-export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }: LoginRecordDetailsFormProps) => {
+export const LoginRecordDetailsForm = ({
+  initialRecord,
+  selectedFolder
+}: LoginRecordDetailsFormProps) => {
   const { t } = useLingui()
+  const navigation = useNavigation() as ImagePreviewNavigation
+  const { theme } = useTheme()
+  const { setShouldBypassAutoLock } = useAutoLockContext() as {
+    setShouldBypassAutoLock: (value: boolean) => void
+  }
+  const { copyToClipboard } = useCopyToClipboard()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
 
   const initialValues = useMemo(
@@ -47,12 +63,10 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }: LoginR
       username: initialRecord?.data?.username ?? '',
       password: initialRecord?.data?.password ?? '',
       note: initialRecord?.data?.note ?? '',
-      websites: initialRecord?.data?.websites?.length
-        ? initialRecord.data.websites
-        : [],
+      websites: initialRecord?.data?.websites ?? [],
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.data?.attachments ?? [],
+      attachments: initialRecord?.attachments ?? [],
       credential: initialRecord?.data?.credential?.id ?? '',
       passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
     }),
@@ -63,17 +77,11 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }: LoginR
     initialValues: initialValues
   })
 
-  const { refetch } = useGetMultipleFiles({
+  useGetMultipleFiles({
     fieldNames: ['attachments'],
     updateValues: setValue,
     initialRecord
   })
-
-  useFocusEffect(
-    useCallback(() => {
-      refetch()
-    }, [refetch])
-  )
 
   useEffect(() => {
     setValues(initialValues)
@@ -89,121 +97,195 @@ export const LoginRecordDetailsForm = ({ initialRecord, selectedFolder }: LoginR
 
   const isPasswordSixMonthsOld = () => {
     const { passwordUpdatedAt } = initialRecord?.data || {}
+
     return (
       !!passwordUpdatedAt &&
       isBefore(passwordUpdatedAt, subtractDateUnits(6, 'month'))
     )
   }
 
+  const shouldShowSecurityWarning =
+    isPasswordChangeReminderEnabled && isPasswordSixMonthsOld()
+
+  const handleAttachmentPress = async (attachment: Attachment) => {
+    if (getMimeType(attachment.name).startsWith('image/')) {
+      const imageUri = attachment.base64
+        ? `data:image/jpeg;base64,${attachment.base64}`
+        : ''
+
+      navigation.navigate('ImagePreview', {
+        imageUri,
+        imageName: attachment.name
+      })
+
+      return
+    }
+
+    try {
+      setShouldBypassAutoLock(true)
+      await handleDownloadFile({
+        base64: attachment.base64 ?? '',
+        name: attachment.name ?? ''
+      })
+    } finally {
+      setShouldBypassAutoLock(false)
+    }
+  }
+
   return (
-    <>
-      {(hasUsername || hasPassword) && (
-        <FormGroup>
-          {isPasswordSixMonthsOld() && isPasswordChangeReminderEnabled && (
-            <AppWarning
-              warning={t`It's been 6 months since you last updated this password. 
-Consider changing it to keep your account secure.`}
-              containerStyles={{ marginBottom: 15 }}
-            />
-          )}
-          {hasUsername && (
-            <InputField
-              testID="username-field"
-              disabled
-              leftSlot={<UserIcon />}
-              rightSlot={<CopyButton value={values.username} />}
-              label={t`Email or username`}
-              placeholder={t`Email or username`}
-              {...toDisabledRegister(register('username'))}
-            />
-          )}
+    <View style={styles.container}>
+      <View style={styles.topContent}>
+        {(hasUsername || hasPassword) && (
+          <MultiSlotInput testID="credentials-multi-slot-input">
+            {hasUsername && (
+              <InputField
+                label={t`Email / Username`}
+                placeholder={t`Email / Username`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="credentials-multi-slot-input-slot-0"
+                {...toReadOnlyFieldProps(register('username'))}
+              />
+            )}
 
-          {hasPassword && (
-            <PasswordField
-              leftSlot={<KeyIcon />}
-              rightSlot={<CopyButton value={values.password} />}
-              label={t`Password`}
-              placeholder={t`Insert password`}
-              disabled
-              {...toDisabledRegister(register('password'))}
-            />
-          )}
-        </FormGroup>
-      )}
+            {hasPassword && (
+              <PasswordField
+                label={t`Password`}
+                placeholder={t`Password`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="credentials-multi-slot-input-slot-1"
+                {...toReadOnlyFieldProps(register('password'))}
+              />
+            )}
+          </MultiSlotInput>
+        )}
 
-      {hasPasskey && (
-        <FormGroup>
+        {hasWebsites && (
+          <MultiSlotInput testID="website-multi-slot-input">
+            {(values.websites as string[]).map((website, index) => (
+              <InputField
+                key={`${website}-${index}`}
+                label={t`Website`}
+                value={website}
+                placeholder={t`Enter Website`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID={`website-multi-slot-input-slot-${index}`}
+                rightSlot={
+                  website?.length ? (
+                    <Button
+                      variant="tertiary"
+                      size="small"
+                      aria-label="Open website"
+                      iconBefore={
+                        <OpenInNew color={theme.colors.colorTextPrimary} />
+                      }
+                      onClick={() => Linking.openURL(addHttps(website))}
+                    />
+                  ) : undefined
+                }
+              />
+            ))}
+          </MultiSlotInput>
+        )}
+
+        {!!initialRecord?.otpPublic && initialRecord?.id && (
+          <FormGroup>
+            <OtpCodeField
+              key={initialRecord.id}
+              recordId={initialRecord.id}
+              otpPublic={initialRecord.otpPublic}
+            />
+          </FormGroup>
+        )}
+
+        {hasPasskey && (
           <InputField
-            leftSlot={<KeyIcon />}
             label={t`Passkey`}
             placeholder={t`Passkey`}
-            disabled
             value={formatPasskeyDate(values.passkeyCreatedAt) || t`Passkey Stored`}
+            readOnly
           />
-        </FormGroup>
-      )}
+        )}
 
-      {/* TODO: implement. seperate task*/}
-      {!!initialRecord?.otpPublic && (
-        <FormGroup>
-          <OtpCodeField
-            key={initialRecord.id}
-            recordId={initialRecord.id}
-            otpPublic={initialRecord.otpPublic}
-          />
-        </FormGroup>
-      )}
+        {hasAttachments && (
+          <MultiSlotInput testID="attachments-multi-slot-input">
+            {(values.attachments as Attachment[]).map((attachment, index) => (
+              <AttachmentField
+                key={attachment?.id || attachment.name}
+                label={t`Attachment`}
+                value={attachment?.name ?? ''}
+                isGrouped
+                testID={`attachment-field-${index}`}
+                onClick={() => {
+                  void handleAttachmentPress(attachment)
+                }}
+              />
+            ))}
+          </MultiSlotInput>
+        )}
 
-      {hasWebsites && (
-        <MultiSlotInput
-          label={t`Website`}
-          values={values.websites as string[]}
-          onAdd={() => {}}
-          onChangeItem={() => {}}
-          onRemove={() => {}}
-          testID="website-multi-slot-input"
-          disabled
-          leftSlot={<WebsiteIcon />}
-          rightSlot={(index) => <CopyButton value={(values.websites as string[])[index]} />}
-        />
-      )}
-
-      {hasAttachments && (
-        <FormGroup>
-          {(values.attachments as { id?: string; name?: string }[]).map((attachment) => (
-            <AttachmentField
-              key={attachment?.id || attachment.name}
-              attachment={attachment}
-              label={'File'}
+        {hasNote && (
+          <MultiSlotInput testID="comments-multi-slot-input">
+            <InputField
+              label={t`Comment`}
+              placeholder={t`Add comment`}
+              readOnly
+              copyable
+              onCopy={copyToClipboard}
+              isGrouped
+              testID="comments-multi-slot-input-slot-0"
+              {...toReadOnlyFieldProps(register('note'))}
             />
-          ))}
-        </FormGroup>
-      )}
+          </MultiSlotInput>
+        )}
 
-      {hasNote && (
-        <InputField
-          label={t`Comment`}
-          placeholder={t`Add comment`}
-          leftSlot={<CommonFileIcon />}
-          rightSlot={<CopyButton value={values.note} />}
-          disabled
-          {...toDisabledRegister(register('note'))}
+        {hasCustomFields && (
+          <MultiSlotInput testID="hidden-messages-multi-slot-input">
+            {(values.customFields as Array<{ type: string; note: string }>).map(
+              (field, index) => (
+                <PasswordField
+                  key={`${field.type}-${index}`}
+                  label={t`Hidden Message`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Hidden Message`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                />
+              )
+            )}
+          </MultiSlotInput>
+        )}
+      </View>
+
+      {shouldShowSecurityWarning && (
+        <AlertMessage
+          variant="error"
+          size="big"
+          title={t`Password Warning`}
+          description={t`It's been 6 months since you last updated this password. Consider changing it to keep your account secure.`}
         />
       )}
-
-      {hasCustomFields && (
-        <MultiSlotInput
-          label={t`Custom fields`}
-          placeholder={t`Add comment`}
-          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-          onAdd={() => {}}
-          onChangeItem={() => {}}
-          onRemove={() => {}}
-          testID="custom-fields-multi-slot-input"
-          disabled
-          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
-        />
-      )}
-    </>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'space-between'
+  },
+  topContent: {
+    gap: 8
+  }
+})

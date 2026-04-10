@@ -3,30 +3,32 @@ import { useEffect, useMemo } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
-  CommonFileIcon,
-  PasswordIcon,
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
-import { CopyButton } from '../../../libComponents/CopyButton'
-import { PasswordField } from '../../../libComponents'
-import { FormGroup } from '../../../components/FormGroup'
-import { WifiPasswordQRCode } from '../../../components/WifiPasswordQRCode'
+  InputField,
+  MultiSlotInput,
+  PasswordField,
+  Text,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { StyleSheet, View } from 'react-native'
+
+import { WifiPasswordQRCodeV2 } from '../../../components/WifiPasswordQRCode/WifiPasswordQRCodeV2'
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { WifiPasswordRecord } from './types'
+import { toReadOnlyFieldProps } from './utils'
 
 interface WifiPasswordDetailsFormProps {
   initialRecord?: WifiPasswordRecord
   selectedFolder?: string
 }
 
-const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: unknown) => void
-}) => ({
-  name: registerResult.name,
-  value: registerResult.value,
-})
-
-export const WifiPasswordDetailsForm = ({ initialRecord, selectedFolder }: WifiPasswordDetailsFormProps) => {
+export const WifiPasswordDetailsForm = ({
+  initialRecord,
+  selectedFolder
+}: WifiPasswordDetailsFormProps) => {
   const { t } = useLingui()
+  const { theme } = useTheme()
+  const { copyToClipboard } = useCopyToClipboard()
 
   const initialValues = useMemo(
     () => ({
@@ -52,50 +54,90 @@ export const WifiPasswordDetailsForm = ({ initialRecord, selectedFolder }: WifiP
   const hasCustomFields = !!(values?.customFields as unknown[])?.length
 
   return (
-    <>
-      {hasPassword && (
-        <FormGroup>
-          <PasswordField
-            icon={PasswordIcon}
-            label={t`Wi-Fi Password`}
-            placeholder={t`Insert Wi-Fi Password`}
-            variant="outline"
-            isDisabled
-            belowInputContent={
-              <WifiPasswordQRCode
-                ssid={values.title}
-                password={values.password}
+    <View style={styles.container}>
+      <View style={styles.topContent}>
+        {hasPassword && (
+          <View style={styles.section}>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              {t`Credentials`}
+            </Text>
+
+            <MultiSlotInput testID="credentials-multi-slot-input">
+              <PasswordField
+                label={t`Wi-Fi Password`}
+                placeholder={t`Insert Wi-Fi Password`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="credentials-multi-slot-input-slot-0"
+                {...toReadOnlyFieldProps(register('password'))}
               />
-            }
-            {...register('password')}
-          />
-        </FormGroup>
-      )}
+            </MultiSlotInput>
 
-      {hasNote && (
-        <InputField
-          label={t`Comment`}
-          placeholder={t`Add comment`}
-          leftSlot={<CommonFileIcon />}
-          rightSlot={<CopyButton value={values.note} />}
-          disabled
-          {...toDisabledRegister(register('note'))}
-        />
-      )}
+            <WifiPasswordQRCodeV2
+              ssid={values.title}
+              password={values.password}
+            />
+          </View>
+        )}
 
-      {hasCustomFields && (
-        <MultiSlotInput
-          label={t`Custom fields`}
-          placeholder={t`Add comment`}
-          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-          onAdd={() => { }}
-          onChangeItem={() => { }}
-          onRemove={() => { }}
-          testID="custom-fields-multi-slot-input"
-          disabled
-          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
-        />
-      )}
-    </>
+        {(hasNote || hasCustomFields) && (
+          <View style={styles.section}>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              {t`Additional`}
+            </Text>
+
+            {hasNote && (
+              <MultiSlotInput testID="comments-multi-slot-input">
+                <InputField
+                  label={t`Comment`}
+                  placeholder={t`Add comment`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="comments-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('note'))}
+                />
+              </MultiSlotInput>
+            )}
+
+            {hasCustomFields && (
+              <MultiSlotInput testID="hidden-messages-multi-slot-input">
+                {(values.customFields as Array<{ type: string; note: string }>).map(
+                  (field, index) => (
+                    <PasswordField
+                      key={`${field.type}-${index}`}
+                      label={t`Hidden Message`}
+                      value={field.note ?? ''}
+                      placeholder={t`Enter Hidden Message`}
+                      readOnly
+                      copyable
+                      onCopy={copyToClipboard}
+                      isGrouped
+                      testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                    />
+                  )
+                )}
+              </MultiSlotInput>
+            )}
+          </View>
+        )}
+      </View>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'space-between'
+  },
+  topContent: {
+    gap: rawTokens.spacing8
+  },
+  section: {
+    gap: rawTokens.spacing12
+  }
+})

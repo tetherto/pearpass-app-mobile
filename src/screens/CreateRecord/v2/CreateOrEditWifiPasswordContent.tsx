@@ -2,24 +2,28 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { PasswordIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { RECORD_TYPES, useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
-import { InputField, MultiSlotInput, PasswordField } from '@tetherto/pearpass-lib-ui-kit'
-
-import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { BottomSheetPassGeneratorContent } from '../../../containers/BottomSheetPassGeneratorContent'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
-import { useLoadingContext } from '../../../context/LoadingContext'
-import { ButtonLittle } from '../../../libComponents'
-import { logger } from '../../../utils/logger'
-import { adaptRegister } from './CreateOrEditLoginContent'
 import {
-  FormWrapper,
-  Header,
-  ScrollContainer,
-  ScrollView,
-  Wrapper
-} from './styles'
+  RECORD_TYPES,
+  useCreateRecord,
+  useRecords
+} from '@tetherto/pearpass-lib-vault'
+import {
+  Button,
+  InputField,
+  MultiSlotInput,
+  PasswordField,
+  Text,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { StyleSheet, View } from 'react-native'
+import Toast from 'react-native-toast-message'
+
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
+import { ScreenLayout } from '../../../containers/ScreenLayout'
+import { useLoadingContext } from '../../../context/LoadingContext'
+import { logger } from '../../../utils/logger'
 
 type WifiRecord = {
   data?: {
@@ -37,11 +41,32 @@ type Props = {
   selectedFolder?: string
 }
 
-export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder }: Props) => {
+type CreatePasswordItemNavigation = {
+  navigate: (
+    screen: 'CreatePasswordItem',
+    params: { onPasswordInsert: (value: string) => void }
+  ) => void
+  goBack: () => void
+}
+
+type FormValues = {
+  title: string
+  password: string
+  note: string
+  customFields: Array<{ type: string; note: string }>
+  folder: string
+}
+
+export const CreateOrEditWifiPasswordContent = ({
+  initialRecord,
+  selectedFolder
+}: Props) => {
   const { t } = useLingui()
-  const navigation = useNavigation()
-  const { expand } = useBottomSheet()
+  const navigation = useNavigation<CreatePasswordItemNavigation>()
   const { setIsLoading, isLoading } = useLoadingContext()
+  const { theme } = useTheme()
+  const isEditing = !!initialRecord
+  const actionLabel = isEditing ? t`Save Changes` : t`Add Item`
 
   const { createRecord } = useCreateRecord({
     onCompleted: () => navigation.goBack()
@@ -63,29 +88,41 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
     folder: Validator.string()
   })
 
-  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
-    initialValues: {
-      title: initialRecord?.data?.title ?? '',
-      password: initialRecord?.data?.password ?? '',
-      note: initialRecord?.data?.note ?? '',
-      customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder
-    },
-    validate: (values) => schema.validate(values)
-  })
+  const { handleSubmit, registerArray, values, setValue, errors } =
+    useForm({
+      initialValues: {
+        title: initialRecord?.data?.title ?? '',
+        password: initialRecord?.data?.password ?? '',
+        note: initialRecord?.data?.note ?? '',
+        customFields: initialRecord?.data?.customFields ?? [],
+        folder: selectedFolder ?? initialRecord?.folder
+      },
+      validate: (formValues) => schema.validate(formValues)
+    })
 
-  const onSubmit = async (values: Record<string, unknown>) => {
-    if (isLoading) return
+  const onError = (error: Error) => {
+    Toast.show({
+      type: 'baseToast',
+      text1: error.message,
+      position: 'bottom',
+      bottomOffset: 100
+    })
+  }
+
+  const onSubmit = async (formValues: FormValues) => {
+    if (isLoading) {
+      return
+    }
 
     const data = {
       type: RECORD_TYPES.WIFI_PASSWORD,
-      folder: values.folder,
+      folder: formValues.folder,
       isFavorite: initialRecord?.isFavorite,
       data: {
-        title: values.title,
-        password: values.password,
-        note: values.note,
-        customFields: values.customFields
+        title: formValues.title,
+        password: formValues.password,
+        note: formValues.note,
+        customFields: formValues.customFields
       }
     }
 
@@ -93,98 +130,178 @@ export const CreateOrEditWifiPasswordContent = ({ initialRecord, selectedFolder 
       setIsLoading(true)
 
       if (initialRecord) {
-        await updateRecords([{ ...initialRecord, ...data }])
+        await updateRecords([{ ...initialRecord, ...data }], onError)
       } else {
-        await createRecord(data)
+        await createRecord(data, onError)
       }
 
       setIsLoading(false)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error)
       setIsLoading(false)
     }
   }
 
   const {
-    value: customFieldsList,
     addItem: addCustomField,
     removeItem: removeCustomField
   } = registerArray('customFields')
 
+  const handleFirstHiddenMessageChange = (value: string) => {
+    setValue('customFields', [{ type: 'note', note: value }])
+  }
+
+  const openPasswordGenerator = () => {
+    navigation.navigate('CreatePasswordItem', {
+      onPasswordInsert: (value: string) => setValue('password', value)
+    })
+  }
+
   return (
-    <Wrapper>
-      <Header>
-        <ToolbarCreateOrEditCategory
-          isLoading={isLoading}
-          selectedFolder={values.folder}
-          onFolderSelect={(folder: { name: string }) =>
-            setValue('folder', folder.name === values.folder ? '' : folder.name)
-          }
-          onSave={handleSubmit(onSubmit)}
+    <ScreenLayout
+      scrollable
+      style={{ flex: 1 }}
+      contentStyle={styles.content}
+      containerStyle={{
+        flex: 1,
+        backgroundColor: theme.colors.colorBackground
+      }}
+      header={
+        <BackScreenHeader
+          title={isEditing ? t`Edit Wi-Fi Item` : t`New Wi-Fi Item`}
+          onBack={() => navigation.goBack()}
         />
-      </Header>
+      }
+      footer={
+        <Button
+          variant="primary"
+          fullWidth
+          isLoading={isLoading}
+          disabled={isLoading}
+          onClick={handleSubmit(onSubmit)}
+        >
+          {actionLabel}
+        </Button>
+      }
+    >
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Credentials`}
+        </Text>
 
-      <ScrollContainer>
-        <ScrollView>
-          <FormWrapper>
-            <InputField
-              label={t`Wi-Fi Name`}
-              placeholder={t`Insert Wi-Fi Name`}
-              testID="wifi-name-input-field"
-              {...adaptRegister(register('title'))}
-            />
+        <MultiSlotInput
+          actions={
+            <Button
+              variant="tertiary"
+              iconBefore={<SyncLock />}
+              onClick={openPasswordGenerator}
+            >
+              {t`Generate Password`}
+            </Button>
+          }
+          testID="credentials-multi-slot-input"
+        >
+          <InputField
+            label={t`Wi-Fi Name`}
+            value={values.title}
+            placeholder={t`Enter Name of Network`}
+            onChangeText={(val) => setValue('title', val)}
+            testID="wifi-name-input-field"
+          />
+          <PasswordField
+            label={t`Password`}
+            placeholder={t`Enter Password`}
+            value={values.password}
+            onChangeText={(val) => setValue('password', val)}
+            testID="wifi-password-input-field"
+          />
+        </MultiSlotInput>
+      </View>
 
-            <PasswordField
-              label={t`Wi-Fi Password`}
-              placeholder={t`Insert Wi-Fi Password`}
-              testID="wifi-password-input-field"
-              rightSlot={
-                <ButtonLittle
-                  startIcon={PasswordIcon}
-                  variant="secondary"
-                  borderRadius="md"
-                  testID="password-generator-button"
-                  accessibilityLabel={t`Password generator button`}
-                  onPress={() =>
-                    expand({
-                      children: (
-                        <BottomSheetPassGeneratorContent
-                          onPasswordInsert={(value: string) =>
-                            setValue('password', value)
-                          }
-                        />
-                      ),
-                      snapPoints: ['10%', '75%', '75%']
-                    })
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Additional`}
+        </Text>
+
+        <InputField
+          label={t`Comment`}
+          value={values.note}
+          placeholder={t`Enter Comment`}
+          onChangeText={(val) => setValue('note', val)}
+          testID="comments-multi-slot-input-slot-0"
+        />
+
+        <MultiSlotInput
+          actions={
+            <Button
+              size="small"
+              variant="tertiary"
+              iconBefore={<Add />}
+              onClick={() => addCustomField({ type: 'note', note: '' })}
+            >
+              {t`Add Another Message`}
+            </Button>
+          }
+          errorMessage={
+            (
+              errors as Record<string, { error?: { note?: string } }[]>
+            )?.customFields?.find(Boolean)?.error?.note
+          }
+          testID="hidden-messages-multi-slot-input"
+        >
+          {(values.customFields as Array<{ type: string; note: string }>).length
+            ? (values.customFields as Array<{ type: string; note: string }>).map(
+              (field, index) => (
+                <PasswordField
+                  key={index}
+                  label={t`Hidden Message`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Hidden Message`}
+                  onChangeText={(val) =>
+                    setValue(`customFields[${index}].note`, val)
+                  }
+                  isGrouped
+                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                  rightSlot={
+                    (values.customFields as Array<{ type: string; note: string }>)
+                      .length > 1 ? (
+                      <Button
+                        size="small"
+                        variant="tertiary"
+                        aria-label="Delete hidden message"
+                        iconBefore={
+                          <TrashOutlined color={theme.colors.colorTextPrimary} />
+                        }
+                        onClick={() => removeCustomField(index)}
+                      />
+                    ) : undefined
                   }
                 />
-              }
-              {...adaptRegister(register('password'))}
-            />
-
-            <InputField
-              label={t`Comment`}
-              placeholder={t`Add comment`}
-              testID="add-note-field"
-              {...adaptRegister(register('note'))}
-            />
-
-            <MultiSlotInput
-              label={t`Custom fields`}
-              placeholder={t`Add comment`}
-              addButtonLabel={t`Add another comment`}
-              values={(customFieldsList as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-              onAdd={() => addCustomField({ type: 'note', note: '' })}
-              onChangeItem={(index: number, val: string) => {
-                setValue(`customFields[${index}].note`, val)
-              }}
-              onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
-              testID="custom-fields-multi-slot-input"
-            />
-          </FormWrapper>
-        </ScrollView>
-      </ScrollContainer>
-    </Wrapper>
+              )
+            )
+            : (
+              <PasswordField
+                label={t`Hidden Message`}
+                value=""
+                placeholder={t`Enter Hidden Message`}
+                onChangeText={handleFirstHiddenMessageChange}
+                isGrouped
+                testID="hidden-messages-multi-slot-input-slot-0"
+              />
+            )}
+        </MultiSlotInput>
+      </View>
+    </ScreenLayout>
   )
 }
+
+const styles = StyleSheet.create({
+  content: {
+    padding: rawTokens.spacing16,
+    gap: rawTokens.spacing24,
+    paddingBottom: rawTokens.spacing24
+  },
+  section: {
+    gap: rawTokens.spacing12
+  }
+})

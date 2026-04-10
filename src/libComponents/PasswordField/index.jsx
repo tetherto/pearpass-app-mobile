@@ -139,7 +139,7 @@ export const PasswordField = ({
       <InputField
         label={label || 'Password'}
         variant="outline"
-        icon={icon || KeyIcon}
+        icon={icon === undefined ? KeyIcon : icon}
         isDisabled={isDisabled}
         value={value}
         onChange={handleChange}

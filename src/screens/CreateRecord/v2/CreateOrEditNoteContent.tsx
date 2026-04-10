@@ -2,37 +2,48 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { InputField, MultiSlotInput, TextArea } from '@tetherto/pearpass-lib-ui-kit'
 import { RECORD_TYPES, useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
+import {
+  Button,
+  InputField,
+  MultiSlotInput,
+  Text,
+  TextArea,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Add,
+  TrashOutlined
+} from '@tetherto/pearpass-lib-ui-kit/icons'
+import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
-import { AttachmentField } from '../../../containers/AttachmentField'
-import { FormGroup } from '../../../components/FormGroup'
-import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
+import { ScreenLayout } from '../../../containers/ScreenLayout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { ButtonLittle } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
-import { adaptRegister } from './CreateOrEditLoginContent'
-import {
-  FormWrapper,
-  Header,
-  ScrollContainer,
-  ScrollView,
-  Wrapper
-} from '../v1/ScrollViewFormWrapper/styles'
+import { AttachmentFieldsV2 } from './AttachmentFieldsV2'
+
+type UploadedNoteAttachment = {
+  base64: string
+  id?: string | number
+  name: string
+}
+
+type NoteAttachment = Partial<UploadedNoteAttachment>
 
 type NoteRecord = {
   data?: {
     title?: string
     note?: string
-    customFields?: unknown[]
+    customFields?: Array<{ type: string; note?: string }>
   }
   folder?: string
   isFavorite?: boolean
-  attachments?: unknown[]
+  attachments?: NoteAttachment[]
 }
 
 type Props = {
@@ -40,21 +51,31 @@ type Props = {
   selectedFolder?: string
 }
 
-export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props) => {
+type FormValues = {
+  title: string
+  note: string
+  customFields: Array<{ type: string; note?: string }>
+  folder: string
+  attachments: NoteAttachment[]
+}
+
+export const CreateOrEditNoteContent = ({
+  initialRecord,
+  selectedFolder
+}: Props) => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
   const { setIsLoading, isLoading } = useLoadingContext()
+  const isEditing = !!initialRecord
+  const actionLabel = isEditing ? t`Save Changes` : t`Add Item`
 
   const { createRecord } = useCreateRecord({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
   const { updateRecords } = useRecords({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
   const schema = Validator.object({
@@ -74,15 +95,15 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
     )
   })
 
-  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
+  const { handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder,
+      folder: selectedFolder ?? initialRecord?.folder ?? '',
       attachments: initialRecord?.attachments ?? []
     },
-    validate: (values) => schema.validate(values)
+    validate: (formValues) => schema.validate(formValues)
   })
 
   useGetMultipleFiles({
@@ -97,7 +118,11 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
     removeItem: removeCustomField
   } = registerArray('customFields')
 
-  const onError = (error) => {
+  const handleFirstCustomFieldChange = (value: string) => {
+    setValue('customFields', [{ type: 'note', note: value }])
+  }
+
+  const onError = (error: Error) => {
     Toast.show({
       type: 'baseToast',
       text1: error.message,
@@ -106,20 +131,22 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
     })
   }
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (formValues: FormValues) => {
     if (isLoading) {
       return
     }
 
     const data = {
       type: RECORD_TYPES.NOTE,
-      folder: values.folder,
+      folder: formValues.folder,
       isFavorite: initialRecord?.isFavorite,
       data: {
-        title: values.title,
-        note: values.note,
-        customFields: values.customFields,
-        attachments: convertBase64FilesToUint8(values.attachments)
+        title: formValues.title,
+        note: formValues.note,
+        customFields: formValues.customFields,
+        attachments: convertBase64FilesToUint8(
+          formValues.attachments as UploadedNoteAttachment[]
+        )
       }
     }
 
@@ -127,27 +154,19 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
       setIsLoading(true)
 
       if (initialRecord) {
-        await updateRecords(
-          [
-            {
-              ...initialRecord,
-              ...data
-            }
-          ],
-          onError
-        )
+        await updateRecords([{ ...initialRecord, ...data }], onError)
       } else {
         await createRecord(data, onError)
       }
 
       setIsLoading(false)
-    } catch (error) {
-      setIsLoading(false)
+    } catch (error: unknown) {
       logger.error(error)
+      setIsLoading(false)
     }
   }
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = (file?: NoteAttachment | null) => {
     if (!file) {
       return
     }
@@ -155,141 +174,159 @@ export const CreateOrEditNoteContent = ({ initialRecord, selectedFolder }: Props
     setValue('attachments', [...values.attachments, file])
   }
 
-  const handleAttachmentDelete = (index) => {
-    const updatedAttachments = values.attachments.filter((_, idx) => idx !== index)
+  const handleAttachmentReplace = (index: number, file?: NoteAttachment | null) => {
+    if (!file) {
+      return
+    }
+
+    const updatedAttachments = values.attachments.map((attachment, idx) =>
+      idx === index ? file : attachment
+    )
+
     setValue('attachments', updatedAttachments)
   }
 
-  const handleAttachmentRename = (index, newName) => {
-    const updatedAttachments = values.attachments.map((attachment, idx) =>
-      idx === index ? { ...attachment, name: newName } : attachment
+  const handleAttachmentDelete = (index: number) => {
+    const updatedAttachments = values.attachments.filter(
+      (_, idx) => idx !== index
     )
     setValue('attachments', updatedAttachments)
   }
 
   return (
-    <Wrapper>
-      <Header>
-        <ToolbarCreateOrEditCategory
-          isLoading={isLoading}
-          selectedFolder={values.folder}
-          onFolderSelect={(folder) =>
-            setValue('folder', folder.name === values.folder ? '' : folder.name)
-          }
-          onSave={handleSubmit(onSubmit)}
+    <ScreenLayout
+      scrollable
+      style={{ flex: 1 }}
+      contentStyle={styles.content}
+      containerStyle={{
+        flex: 1,
+        backgroundColor: theme.colors.colorBackground
+      }}
+      header={
+        <BackScreenHeader
+          title={isEditing ? t`Edit Note Item` : t`New Note Item`}
+          onBack={() => navigation.goBack()}
         />
-      </Header>
-      <ScrollContainer>
-        <ScrollView>
-          <FormWrapper>
-            <FormGroup>
-              <InputField
-                accessibilityLabel="Title field"
-                inputAccessibilityLabel="Title input field"
-                testID="title-input-field"
-                label={t`Title`}
-                placeholder={t`No title`}
-                variant="outline"
-                {...register('title')}
-              />
-            </FormGroup>
-            <FormGroup>
-              <TextArea
-                accessibilityLabel="Add note field"
-                inputAccessibilityLabel="Add note input field"
-                testID="add-note"
-                {...register('note')}
-                placeholder={t`Write a comment...`}
-              />
-            </FormGroup>
+      }
+      footer={
+        <Button
+          variant="primary"
+          fullWidth
+          isLoading={isLoading}
+          disabled={isLoading}
+          onClick={handleSubmit(onSubmit)}
+        >
+          {actionLabel}
+        </Button>
+      }
+    >
+      <View>
+        <InputField
+          label={t`Title`}
+          value={values.title}
+          placeholder={t`Enter Title`}
+          onChangeText={(value) => setValue('title', value)}
+          testID="title-field"
+        />
+      </View>
 
-            <FormGroup>
-              <AttachmentField
-                onUpload={handleFileUpload}
-                isLast
-                label={'File'}
-              />
-              {values.attachments.map((attachment, index) => (
-                <AttachmentField
-                  key={attachment?.id || attachment.name}
-                  attachment={attachment}
-                  isLast
-                  label={'File'}
-                  onDelete={() => handleAttachmentDelete(index)}
-                  onRename={(newName) => handleAttachmentRename(index, newName)}
-                  additionalItems={
-                    <ButtonLittle
-                      startIcon={DeleteIcon}
-                      variant="secondary"
-                      borderRadius="md"
-                      onPress={() => handleAttachmentDelete(index)}
-                    />
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Details`}
+        </Text>
+
+        <TextArea
+          label={t`Note`}
+          value={values.note}
+          placeholder={t`Enter Note`}
+          onChange={(value) => setValue('note', value)}
+          testID="note-field"
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Additional`}
+        </Text>
+
+        <MultiSlotInput
+          actions={
+            <Button
+              size="small"
+              variant="tertiary"
+              iconBefore={<Add />}
+              onClick={() => addCustomField({ type: 'note', note: '' })}
+            >
+              {t`Add Another Note`}
+            </Button>
+          }
+          errorMessage={
+            (
+              errors as Record<string, { error?: { note?: string } }[]>
+            )?.customFields?.find(Boolean)?.error?.note
+          }
+          testID="comments-multi-slot-input"
+        >
+          {customFieldsList.length ? (
+            (customFieldsList as Array<{ type: string; note?: string }>).map(
+              (field, index) => (
+                <InputField
+                  key={`${field.type}-${index}`}
+                  label={t`Comment`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Comment`}
+                  onChangeText={(value) =>
+                    setValue(`customFields[${index}].note`, value)
+                  }
+                  isGrouped
+                  testID={`comments-multi-slot-input-slot-${index}`}
+                  rightSlot={
+                    customFieldsList.length > 1 ? (
+                      <Button
+                        size="small"
+                        variant="tertiary"
+                        aria-label="Delete comment"
+                        iconBefore={
+                          <TrashOutlined color={theme.colors.colorTextPrimary} />
+                        }
+                        onClick={() => removeCustomField(index)}
+                      />
+                    ) : undefined
                   }
                 />
-              ))}
-            </FormGroup>
-
-            <CustomFields
-              removeItem={removeItem}
-              customFields={list}
-              register={registerItem}
-            />
+              )
+            )
+          ) : (
             <InputField
-              label={t`Title`}
-              placeholderText={t`No title`}
-              testID="title-input-field"
-              {...adaptRegister(register('title'))}
+              label={t`Comment`}
+              value=""
+              placeholder={t`Enter Comment`}
+              onChangeText={handleFirstCustomFieldChange}
+              isGrouped
+              testID="comments-multi-slot-input-slot-0"
             />
+          )}
+        </MultiSlotInput>
 
-            <FormGroup>
-              <TextArea
-                label={t`Note`}
-                placeholder={t`Write a comment...`}
-                testID="add-note"
-                {...register('note')}
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <AttachmentField
-                onUpload={handleFileUpload}
-                isLast
-                label={'File'}
-              />
-              {values.attachments.map((attachment, index) => (
-                <AttachmentField
-                  key={attachment?.id || attachment.name}
-                  attachment={attachment}
-                  isLast
-                  label={'File'}
-                  additionalItems={
-                    <ButtonLittle
-                      startIcon={DeleteIcon}
-                      variant="secondary"
-                      borderRadius="md"
-                      onPress={() => handleAttachmentDelete(index)}
-                    />
-                  }
-                />
-              ))}
-            </FormGroup>
-
-            <MultiSlotInput
-              label={t`Notes`}
-              placeholder={t`Add note`}
-              addButtonLabel={t`Add another note`}
-              values={(customFieldsList as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-              onAdd={() => addCustomField({ type: 'note', note: '' })}
-              onChangeItem={(index: number, val: string) => {
-                setValue(`customFields[${index}].note`, val)
-              }}
-              onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as Record<string, { error?: { note?: string } }[]>)?.customFields?.find(Boolean)?.error?.note}
-              testID="notes-multi-slot-input"
-            />
-          </FormWrapper>
-        </ScrollView>
-      </ScrollContainer>
-    </Wrapper>
+        <AttachmentFieldsV2<NoteAttachment>
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
+        />
+      </View>
+    </ScreenLayout>
   )
 }
+
+const styles = StyleSheet.create({
+  content: {
+    padding: rawTokens.spacing16,
+    gap: rawTokens.spacing24,
+    paddingBottom: rawTokens.spacing24
+  },
+  section: {
+    gap: rawTokens.spacing12
+  }
+})

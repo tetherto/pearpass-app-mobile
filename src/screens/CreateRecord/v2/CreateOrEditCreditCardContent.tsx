@@ -3,11 +3,8 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
-  CalendarIcon,
-  CreditCardIcon,
-  NineDotsIcon,
-  UserIcon,
-  DeleteIcon
+  DeleteIcon,
+  PlusIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   RECORD_TYPES,
@@ -15,29 +12,26 @@ import {
   useRecords
 } from '@tetherto/pearpass-lib-vault'
 import {
+  Button,
   InputField,
   MultiSlotInput,
   PasswordField,
+  Text,
+  rawTokens,
+  useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
+import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
-import { ButtonLittle } from 'src/libComponents'
-import { AttachmentField } from '../../../containers/AttachmentField'
-import { FormGroup } from '../../../components/FormGroup'
-
-import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { adaptRegister } from './CreateOrEditLoginContent'
+import { DateField } from '../../../components/DateField'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
+import { ScreenLayout } from '../../../containers/ScreenLayout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
-import {
-  FormWrapper,
-  Header,
-  ScrollContainer,
-  ScrollView,
-  Wrapper
-} from './styles'
+import { AttachmentFieldsV2 } from './AttachmentFieldsV2'
+import { adaptRegister } from './CreateOrEditLoginContent'
 
 type CreditCardRecord = {
   data?: {
@@ -60,21 +54,36 @@ type Props = {
   selectedFolder?: string
 }
 
-export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }: Props) => {
+type FormValues = {
+  title: string
+  name: string
+  number: string
+  expireDate: string
+  securityCode: string
+  pinCode: string
+  note: string
+  customFields: unknown[]
+  folder: string
+  attachments: { base64: string; id?: string | number; name: string }[]
+}
+
+export const CreateOrEditCreditCardContent = ({
+  initialRecord,
+  selectedFolder
+}: Props) => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { setIsLoading, isLoading } = useLoadingContext()
+  const { theme } = useTheme()
+  const isEditing = !!initialRecord
+  const actionLabel = isEditing ? t`Save Changes` : t`Add Item`
 
   const { createRecord } = useCreateRecord({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
   const { updateRecords } = useRecords({
-    onCompleted: () => {
-      navigation.goBack()
-    }
+    onCompleted: () => navigation.goBack()
   })
 
   const schema = Validator.object({
@@ -99,21 +108,23 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     )
   })
 
-  const { values, register, handleSubmit, setValue, registerArray, errors } = useForm({
-    initialValues: {
-      title: initialRecord?.data?.title ?? '',
-      name: initialRecord?.data?.name ?? '',
-      number: initialRecord?.data?.number ?? '',
-      expireDate: initialRecord?.data?.expireDate ?? '',
-      securityCode: initialRecord?.data?.securityCode ?? '',
-      pinCode: initialRecord?.data?.pinCode ?? '',
-      note: initialRecord?.data?.note ?? '',
-      customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.attachments ?? []
-    },
-    validate: (values) => schema.validate(values)
-  })
+  const { values, register, handleSubmit, setValue, registerArray, errors } =
+    useForm({
+      initialValues: {
+        title: initialRecord?.data?.title ?? '',
+        name: initialRecord?.data?.name ?? '',
+        number: initialRecord?.data?.number ?? '',
+        expireDate: initialRecord?.data?.expireDate ?? '',
+        securityCode: initialRecord?.data?.securityCode ?? '',
+        pinCode: initialRecord?.data?.pinCode ?? '',
+        note: initialRecord?.data?.note ?? '',
+        customFields: initialRecord?.data?.customFields ?? [],
+        folder: selectedFolder ?? initialRecord?.folder,
+        attachments: initialRecord?.attachments ?? []
+      },
+      validate: (formValues: Record<string, unknown>) =>
+        schema.validate(formValues)
+    })
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -121,7 +132,7 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     initialRecord
   })
 
-  const onError = (error) => {
+  const onError = (error: Error) => {
     Toast.show({
       type: 'baseToast',
       text1: error.message,
@@ -130,23 +141,25 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     })
   }
 
-  const onSubmit = async (values) => {
-    if (isLoading) return
+  const onSubmit = async (formValues: FormValues) => {
+    if (isLoading) {
+      return
+    }
 
     const data = {
       type: RECORD_TYPES.CREDIT_CARD,
-      folder: values.folder,
+      folder: formValues.folder,
       isFavorite: initialRecord?.isFavorite,
       data: {
-        title: values.title,
-        name: values.name,
-        number: values.number,
-        expireDate: values.expireDate,
-        securityCode: values.securityCode,
-        pinCode: values.pinCode,
-        note: values.note,
-        customFields: values.customFields,
-        attachments: convertBase64FilesToUint8(values.attachments)
+        title: formValues.title,
+        name: formValues.name,
+        number: formValues.number,
+        expireDate: formValues.expireDate,
+        securityCode: formValues.securityCode,
+        pinCode: formValues.pinCode,
+        note: formValues.note,
+        customFields: formValues.customFields,
+        attachments: convertBase64FilesToUint8(formValues.attachments)
       }
     }
 
@@ -160,7 +173,7 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
       }
 
       setIsLoading(false)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error)
       setIsLoading(false)
     }
@@ -171,22 +184,43 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     removeItem: removeCustomField
   } = registerArray('customFields')
 
-  const handleExpireDateChange = (inputValue) => {
+  const handleFirstHiddenMessageChange = (value: string) => {
+    setValue('customFields', [{ type: 'note', note: value }])
+  }
+
+  const handleExpireDateChange = (inputValue: string) => {
     let value = inputValue.replace(/\D/g, '')
-    if (value.length > 4) value = value.slice(0, 4)
-    if (value.length > 2) value = `${value.slice(0, 2)} ${value.slice(2)}`
+
+    if (value.length > 4) {
+      value = value.slice(0, 4)
+    }
+
+    if (value.length > 2) {
+      value = `${value.slice(0, 2)} ${value.slice(2)}`
+    }
+
     setValue('expireDate', value)
   }
 
-  const handleCardNumberChange = (inputValue) => {
+  const handleCardNumberChange = (inputValue: string) => {
     let value = inputValue.replace(/\D/g, '')
-    if (value.length > 16) value = value.slice(0, 16)
-    if (value.length > 0) value = value.match(/.{1,4}/g).join(' ')
+
+    if (value.length > 16) {
+      value = value.slice(0, 16)
+    }
+
+    if (value.length > 0) {
+      value = value.match(/.{1,4}/g)?.join(' ') ?? value
+    }
+
     setValue('number', value)
   }
 
-
-  const handleFileUpload = (file) => {
+  const handleFileUpload = (file: {
+    base64: string
+    id?: string | number
+    name: string
+  } | null) => {
     if (!file) {
       return
     }
@@ -194,135 +228,203 @@ export const CreateOrEditCreditCardContent = ({ initialRecord, selectedFolder }:
     setValue('attachments', [...values.attachments, file])
   }
 
-  const handleAttachmentDelete = (index) => {
+  const handleAttachmentReplace = (
+    index: number,
+    file: {
+      base64: string
+      id?: string | number
+      name: string
+    } | null
+  ) => {
+    if (!file) {
+      return
+    }
+
+    const updatedAttachments = values.attachments.map((attachment, idx) =>
+      idx === index ? file : attachment
+    )
+
+    setValue('attachments', updatedAttachments)
+  }
+
+  const handleAttachmentDelete = (index: number) => {
     const updatedAttachments = values.attachments.filter(
       (_, idx) => idx !== index
     )
+
     setValue('attachments', updatedAttachments)
   }
 
   return (
-    <Wrapper>
-      <Header>
-        <ToolbarCreateOrEditCategory
-          isLoading={isLoading}
-          selectedFolder={values.folder}
-          onFolderSelect={(folder) =>
-            setValue('folder', folder.name === values.folder ? '' : folder.name)
-          }
-          onSave={handleSubmit(onSubmit)}
+    <ScreenLayout
+      scrollable
+      style={{ flex: 1 }}
+      contentStyle={styles.content}
+      containerStyle={{
+        flex: 1,
+        backgroundColor: theme.colors.colorBackground
+      }}
+      header={
+        <BackScreenHeader
+          title={isEditing ? t`Edit Credit Card` : t`New Credit Card`}
+          onBack={() => navigation.goBack()}
         />
-      </Header>
+      }
+      footer={
+        <Button
+          variant="primary"
+          fullWidth
+          isLoading={isLoading}
+          disabled={isLoading}
+          onClick={handleSubmit(onSubmit)}
+        >
+          {actionLabel}
+        </Button>
+      }
+    >
+      <View>
+        <InputField
+          label={t`Title`}
+          placeholder={t`Enter Title`}
+          testID="title-field-input"
+          {...adaptRegister(register('title'))}
+        />
+      </View>
 
-      <ScrollContainer>
-        <ScrollView>
-          <FormWrapper>
-            <FormGroup>
-              <InputField
-                label={t`Title`}
-                placeholder={t`No title`}
-                testID="title-field-input"
-                {...adaptRegister(register('title'))}
-              />
-            </FormGroup>
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Card Details`}
+        </Text>
 
-            <FormGroup>
-              <InputField
-                label={t`Name on card`}
-                placeholder={t`John Smith`}
-                leftSlot={<UserIcon />}
-                testID="name-on-card-input-field"
-                {...adaptRegister(register('name'))}
-              />
-              <InputField
-                label={t`Number on card`}
-                placeholder={t`1234 1234 1234 1234`}
-                leftSlot={<CreditCardIcon />}
-                testID="number-on-card-input-field"
-                value={values.number}
-                onChange={handleCardNumberChange}
-              />
-              <InputField
-                label={t`Date of expire`}
-                placeholder={t`MM YY`}
-                leftSlot={<CalendarIcon />}
-                testID="date-of-expire-input-field"
-                value={values.expireDate}
-                onChange={handleExpireDateChange}
-              />
-              <PasswordField
-                label={t`Security code`}
-                placeholder={t`123`}
-                leftSlot={<CreditCardIcon />}
-                testID="security-code-input-field"
-                {...adaptRegister(register('securityCode'))}
-              />
-              <PasswordField
-                label={t`Pin code`}
-                placeholder={t`1234`}
-                leftSlot={<NineDotsIcon />}
-                testID="pin-code-input-field"
-                {...adaptRegister(register('pinCode'))}
-              />
-            </FormGroup>
+        <MultiSlotInput testID="card-details-multi-slot-input">
+          <InputField
+            label={t`Name on card`}
+            value={values.name}
+            placeholder={t`Enter Name`}
+            onChangeText={(val) => setValue('name', val)}
+            testID="name-on-card-input-field"
+          />
+          <InputField
+            label={t`Number on card`}
+            value={values.number}
+            placeholder={t`Enter Card Number`}
+            onChangeText={handleCardNumberChange}
+            testID="number-on-card-input-field"
+          />
+          <DateField
+            label={t`Date of expire`}
+            value={values.expireDate}
+            placeholder={t`Enter Expire Date`}
+            onChangeText={handleExpireDateChange}
+            pickerMode="month-year"
+            testID="date-of-expire-input-field"
+          />
+          <PasswordField
+            label={t`Security code`}
+            placeholder={t`Enter Security Code`}
+            testID="security-code-input-field"
+            {...adaptRegister(register('securityCode'))}
+          />
+          <PasswordField
+            label={t`Pin code`}
+            placeholder={t`Enter PIN`}
+            testID="pin-code-input-field"
+            {...adaptRegister(register('pinCode'))}
+          />
+        </MultiSlotInput>
+      </View>
 
-            <FormGroup>
-              <AttachmentField
-                onUpload={handleFileUpload}
-                isLast
-                label={'File'}
-                testID="file-field"
-                accessibilityLabel={t`File field`}
-                inputTestID="file-input-field"
-                inputAccessibilityLabel={t`File input field`}
-                addButtonTestID="add-file-button"
-                addButtonAccessibilityLabel={t`Add file button`}
-              />
-              {values.attachments.map((attachment, index) => (
-                <AttachmentField
-                  key={attachment?.id || attachment.name}
-                  attachment={attachment}
-                  isLast
-                  label={'File'}
-                  testID="file-field"
-                  accessibilityLabel={t`File field`}
-                  inputTestID="file-input-field"
-                  inputAccessibilityLabel={t`File input field`}
-                  additionalItems={
-                    <ButtonLittle
-                      startIcon={DeleteIcon}
-                      variant="secondary"
-                      borderRadius="md"
-                      onPress={() => handleAttachmentDelete(index)}
-                    />
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Additional`}
+        </Text>
+
+        <InputField
+          label={t`Comment`}
+          value={values.note}
+          placeholder={t`Enter Comment`}
+          onChangeText={(val) => setValue('note', val)}
+          testID="comments-multi-slot-input-slot-0"
+        />
+
+        <AttachmentFieldsV2
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
+        />
+
+        <MultiSlotInput
+          actions={
+            <Button
+              size="small"
+              variant="tertiary"
+              iconBefore={<PlusIcon />}
+              onClick={() => addCustomField({ type: 'note', note: '' })}
+            >
+              {t`Add Another Message`}
+            </Button>
+          }
+          errorMessage={
+            (
+              errors as Record<string, { error?: { note?: string } }[]>
+            )?.customFields?.find(Boolean)?.error?.note
+          }
+          testID="hidden-messages-multi-slot-input"
+        >
+          {(values.customFields as Array<{ type: string; note: string }>).length
+            ? (values.customFields as Array<{ type: string; note: string }>).map(
+              (field, index) => (
+                <PasswordField
+                  key={index}
+                  label={t`Hidden Message`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Hidden Message`}
+                  onChangeText={(val) =>
+                    setValue(`customFields[${index}].note`, val)
+                  }
+                  isGrouped
+                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                  rightSlot={
+                    (values.customFields as Array<{ type: string; note: string }>).length > 1 ? (
+                      <Button
+                        size="small"
+                        variant="tertiary"
+                        aria-label="Delete hidden message"
+                        iconBefore={
+                          <DeleteIcon color={theme.colors.colorTextPrimary} />
+                        }
+                        onClick={() => removeCustomField(index)}
+                      />
+                    ) : undefined
                   }
                 />
-              ))}
-            </FormGroup>
-
-            <InputField
-              label={t`Comment`}
-              placeholder={t`Add comment`}
-              testID="note-input-field"
-              {...adaptRegister(register('note'))}
-            />
-
-            <MultiSlotInput
-              label={t`Custom fields`}
-              placeholder={t`Add comment`}
-              addButtonLabel={t`Add another comment`}
-              values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-              onAdd={() => addCustomField({ type: 'note', note: '' })}
-              onChangeItem={(index: number, val: string) => {
-                setValue(`customFields[${index}].note`, val)
-              }}
-              onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
-              testID="custom-fields-multi-slot-input"
-            />
-          </FormWrapper>
-        </ScrollView>
-      </ScrollContainer>
-    </Wrapper>
+              )
+            )
+            : (
+              <PasswordField
+                label={t`Hidden Message`}
+                value=""
+                placeholder={t`Enter Hidden Message`}
+                onChangeText={handleFirstHiddenMessageChange}
+                isGrouped
+                testID="hidden-messages-multi-slot-input-slot-0"
+              />
+            )}
+        </MultiSlotInput>
+      </View>
+    </ScreenLayout>
   )
 }
+
+const styles = StyleSheet.create({
+  content: {
+    padding: rawTokens.spacing16,
+    gap: rawTokens.spacing24,
+    paddingBottom: rawTokens.spacing24
+  },
+  section: {
+    gap: rawTokens.spacing12
+  }
+})

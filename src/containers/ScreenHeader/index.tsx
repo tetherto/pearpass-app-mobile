@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
   },
   centerContainer: {
     flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start'
@@ -72,6 +73,7 @@ const styles = StyleSheet.create({
   rightContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: rawTokens.spacing16
+    gap: rawTokens.spacing16,
+    flexShrink: 0
   }
 })

@@ -2,28 +2,29 @@ import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
-import { CommonFileIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
-import { CopyButton } from '../../../libComponents/CopyButton'
+import {
+  InputField,
+  MultiSlotInput,
+  rawTokens
+} from '@tetherto/pearpass-lib-ui-kit'
+import { StyleSheet, View } from 'react-native'
 
-import { FormGroup } from '../../../components/FormGroup'
-import { PassPhrase } from '../../../containers/PassPhrase'
+import { PassPhraseV2 } from '../../../containers/PassPhrase/PassPhraseV2'
+import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { PassPhraseRecord } from './types'
+import { toReadOnlyFieldProps } from './utils'
 
 interface PassPhraseRecordDetailsFormProps {
   initialRecord?: PassPhraseRecord
   selectedFolder?: string
 }
 
-const toDisabledRegister = (registerResult: {
-  name: string; value: string; error?: string; onChange: (e: unknown) => void
-}) => ({
-  name: registerResult.name,
-  value: registerResult.value,
-})
-
-export const PassPhraseRecordDetailsForm = ({ initialRecord, selectedFolder }: PassPhraseRecordDetailsFormProps) => {
+export const PassPhraseRecordDetailsForm = ({
+  initialRecord,
+  selectedFolder
+}: PassPhraseRecordDetailsFormProps) => {
   const { t } = useLingui()
+  const { copyToClipboard } = useCopyToClipboard()
 
   const initialValues = useMemo(
     () => ({
@@ -37,7 +38,7 @@ export const PassPhraseRecordDetailsForm = ({ initialRecord, selectedFolder }: P
   )
 
   const { register, setValues, values } = useForm({
-    initialValues: initialValues
+    initialValues
   })
 
   useEffect(() => {
@@ -49,37 +50,55 @@ export const PassPhraseRecordDetailsForm = ({ initialRecord, selectedFolder }: P
   const hasCustomFields = !!(values?.customFields as unknown[])?.length
 
   return (
-    <>
-      {hasPassPhrase && (
-        <FormGroup>
-          <PassPhrase {...register('passPhrase')} />
-        </FormGroup>
-      )}
+    <View style={styles.container}>
+      <View style={styles.topContent}>
+        {hasPassPhrase && (
+          <PassPhraseV2 value={values.passPhrase} />
+        )}
 
-      {hasNote && (
-        <InputField
-          label={t`Comment`}
-          placeholder={t`Add comment`}
-          leftSlot={<CommonFileIcon />}
-          rightSlot={<CopyButton value={values.note} />}
-          disabled
-          {...toDisabledRegister(register('note'))}
-        />
-      )}
+        {(hasNote || hasCustomFields) && (
+          <MultiSlotInput testID="comments-multi-slot-input">
+            {hasNote && (
+              <InputField
+                label={t`Comment`}
+                placeholder={t`Enter Comment`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="comments-multi-slot-input-slot-0"
+                {...toReadOnlyFieldProps(register('note'))}
+              />
+            )}
 
-      {hasCustomFields && (
-        <MultiSlotInput
-          label={t`Custom fields`}
-          placeholder={t`Add comment`}
-          values={(values.customFields as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-          onAdd={() => {}}
-          onChangeItem={() => {}}
-          onRemove={() => {}}
-          testID="custom-fields-multi-slot-input"
-          disabled
-          rightSlot={(index) => <CopyButton value={(values.customFields as Array<{ type: string; note: string }>)[index]?.note ?? ''} />}
-        />
-      )}
-    </>
+            {(values.customFields as Array<{ type: string; note: string }>).map(
+              (field, index) => (
+                <InputField
+                  key={`${field.type}-${index}`}
+                  label={t`Comment`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Comment`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID={`comments-multi-slot-input-slot-${hasNote ? index + 1 : index}`}
+                />
+              )
+            )}
+          </MultiSlotInput>
+        )}
+      </View>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent'
+  },
+  topContent: {
+    gap: rawTokens.spacing8
+  }
+})

@@ -2,45 +2,55 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { RECORD_TYPES, useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
 import {
-  RECORD_TYPES,
-  useCreateRecord,
-  useRecords
-} from '@tetherto/pearpass-lib-vault'
-import { InputField, MultiSlotInput } from '@tetherto/pearpass-lib-ui-kit'
+  Button,
+  InputField,
+  MultiSlotInput,
+  Text,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
-import { AttachmentField } from '../../../containers/AttachmentField'
-import { FormGroup } from '../../../components/FormGroup'
-import { ToolbarCreateOrEditCategory } from '../../../components/ToolbarCreateOrEditCategory'
-import { adaptRegister } from './CreateOrEditLoginContent'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
+import { ScreenLayout } from '../../../containers/ScreenLayout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { ButtonLittle } from '../../../libComponents'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
-import {
-  FormWrapper,
-  Header,
-  ScrollContainer,
-  ScrollView,
-  Wrapper
-} from './styles'
+import { AttachmentFieldsV2 } from './AttachmentFieldsV2'
+
+type UploadedCustomAttachment = {
+  base64: string
+  id?: string | number
+  name: string
+}
+
+type CustomAttachment = Partial<UploadedCustomAttachment>
 
 type CustomContentRecord = {
   data?: {
     title?: string
-    customFields?: unknown[]
+    customFields?: Array<{ type: string; note?: string }>
   }
   folder?: string
   isFavorite?: boolean
-  attachments?: unknown[]
+  attachments?: CustomAttachment[]
 }
 
 type Props = {
   initialRecord?: CustomContentRecord
   selectedFolder?: string
+}
+
+type FormValues = {
+  title: string
+  folder: string
+  customFields: Array<{ type: string; note?: string }>
+  attachments: CustomAttachment[]
 }
 
 export const CreateOrEditCustomContent = ({
@@ -49,7 +59,10 @@ export const CreateOrEditCustomContent = ({
 }: Props) => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
   const { setIsLoading, isLoading } = useLoadingContext()
+  const isEditing = !!initialRecord
+  const actionLabel = isEditing ? t`Save Changes` : t`Add Item`
 
   const { createRecord } = useCreateRecord({
     onCompleted: () => navigation.goBack()
@@ -84,14 +97,15 @@ export const CreateOrEditCustomContent = ({
     )
   })
 
-  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
+  const { handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
-      title: initialRecord?.data?.title || '',
+      title: initialRecord?.data?.title ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder,
+      folder: selectedFolder ?? initialRecord?.folder ?? '',
       attachments: initialRecord?.attachments ?? []
     },
-    validate: (values: Record<string, unknown>) => schema.validate(values)
+    validate: (formValues: Record<string, unknown>) =>
+      schema.validate(formValues)
   })
 
   useGetMultipleFiles({
@@ -101,23 +115,25 @@ export const CreateOrEditCustomContent = ({
   })
 
   const {
-    value: customFieldsList,
     addItem: addCustomField,
     removeItem: removeCustomField
   } = registerArray('customFields')
 
-  type FormValues = { title: string; folder: string; customFields: unknown[]; attachments: { base64: string; id?: string | number; name: string }[] }
-  const onSubmit = async (values: FormValues) => {
-    if (isLoading) return
+  const onSubmit = async (formValues: FormValues) => {
+    if (isLoading) {
+      return
+    }
 
     const data = {
       type: RECORD_TYPES.CUSTOM,
-      folder: values.folder,
+      folder: formValues.folder,
       isFavorite: initialRecord?.isFavorite,
       data: {
-        title: values.title,
-        customFields: values.customFields,
-        attachments: convertBase64FilesToUint8(values.attachments)
+        title: formValues.title,
+        customFields: formValues.customFields,
+        attachments: convertBase64FilesToUint8(
+          formValues.attachments as UploadedCustomAttachment[]
+        )
       }
     }
 
@@ -137,87 +153,169 @@ export const CreateOrEditCustomContent = ({
     }
   }
 
-  const handleFileUpload = (file: { base64: string; id?: string | number; name: string } | null) => {
-    if (!file) return
+  const handleFirstCustomFieldChange = (value: string) => {
+    setValue('customFields', [{ type: 'note', note: value }])
+  }
+
+  const handleFileUpload = (file?: CustomAttachment | null) => {
+    if (!file) {
+      return
+    }
+
     setValue('attachments', [...values.attachments, file])
   }
 
+  const handleAttachmentReplace = (
+    index: number,
+    file?: CustomAttachment | null
+  ) => {
+    if (!file) {
+      return
+    }
+
+    const updatedAttachments = values.attachments.map((attachment, idx) =>
+      idx === index ? file : attachment
+    )
+
+    setValue('attachments', updatedAttachments)
+  }
+
   const handleAttachmentDelete = (index: number) => {
-    setValue('attachments', values.attachments.filter((_, idx) => idx !== index))
+    setValue(
+      'attachments',
+      values.attachments.filter((_, idx) => idx !== index)
+    )
   }
 
   return (
-    <Wrapper>
-      <Header>
-        <ToolbarCreateOrEditCategory
-          isLoading={isLoading}
-          selectedFolder={values.folder}
-          onFolderSelect={(folder: { name: string }) =>
-            setValue('folder', folder.name === values.folder ? '' : folder.name)
-          }
-          onSave={handleSubmit(onSubmit)}
+    <ScreenLayout
+      scrollable
+      style={{ flex: 1 }}
+      contentStyle={styles.content}
+      containerStyle={{
+        flex: 1,
+        backgroundColor: theme.colors.colorBackground
+      }}
+      header={
+        <BackScreenHeader
+          title={isEditing ? t`Edit Other Item` : t`New Other Item`}
+          onBack={() => navigation.goBack()}
         />
-      </Header>
-      <ScrollContainer>
-        <ScrollView>
-          <FormWrapper>
-            <InputField
-              label={t`Title`}
-              placeholder={t`No title`}
-              testID="title-input-field"
-              {...adaptRegister(register('title'))}
-            />
+      }
+      footer={
+        <Button
+          variant="primary"
+          fullWidth
+          isLoading={isLoading}
+          disabled={isLoading}
+          onClick={handleSubmit(onSubmit)}
+        >
+          {actionLabel}
+        </Button>
+      }
+    >
+      <View>
+        <InputField
+          label={t`Title`}
+          value={values.title}
+          placeholder={t`Enter Title`}
+          onChangeText={(value) => setValue('title', value)}
+          testID="title-field"
+        />
+      </View>
 
-            <FormGroup>
-              <AttachmentField
-                onUpload={handleFileUpload}
-                isLast
-                label={'File'}
-                testID="file-field"
-                accessibilityLabel={t`File field`}
-                inputTestID="file-input-field"
-                inputAccessibilityLabel={t`File input field`}
-                addButtonTestID="add-file-button"
-                addButtonAccessibilityLabel={t`Add file button`}
-              />
-              {values.attachments.map((attachment: { id?: string; name?: string }, index: number) => (
-                <AttachmentField
-                  key={attachment?.id || attachment.name}
-                  attachment={attachment}
-                  isLast
-                  label={'File'}
-                  testID="file-field"
-                  accessibilityLabel={t`File field`}
-                  inputTestID="file-input-field"
-                  inputAccessibilityLabel={t`File input field`}
-                  additionalItems={
-                    <ButtonLittle
-                      startIcon={DeleteIcon}
-                      variant="secondary"
-                      borderRadius="md"
-                      onPress={() => handleAttachmentDelete(index)}
-                    />
-                  }
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Details`}
+        </Text>
+
+        <MultiSlotInput
+          actions={
+            <Button
+              size="small"
+              variant="tertiary"
+              iconBefore={<Add />}
+              onClick={() => addCustomField({ type: 'note', note: '' })}
+            >
+              {t`Add Another Field`}
+            </Button>
+          }
+          errorMessage={
+            (
+              errors as Record<string, { error?: { note?: string } }[]>
+            )?.customFields?.find(Boolean)?.error?.note
+          }
+          testID="custom-fields-multi-slot-input"
+        >
+          {(values.customFields as Array<{ type: string; note?: string }>).length
+            ? (values.customFields as Array<{ type: string; note?: string }>).map(
+                (field, index) => (
+                  <InputField
+                    key={`${field.type}-${index}`}
+                    label={t`Other Field`}
+                    value={field.note ?? ''}
+                    placeholder={t`Enter Value`}
+                    onChangeText={(value) =>
+                      setValue(`customFields[${index}].note`, value)
+                    }
+                    isGrouped
+                    testID={`custom-fields-multi-slot-input-slot-${index}`}
+                    rightSlot={
+                      (values.customFields as Array<{ type: string; note?: string }>)
+                        .length > 1 ? (
+                        <Button
+                          size="small"
+                          variant="tertiary"
+                          aria-label="Delete custom field"
+                          iconBefore={
+                            <TrashOutlined
+                              color={theme.colors.colorTextPrimary}
+                            />
+                          }
+                          onClick={() => removeCustomField(index)}
+                        />
+                      ) : undefined
+                    }
+                  />
+                )
+              )
+            : (
+                <InputField
+                  label={t`Other Field`}
+                  value=""
+                  placeholder={t`Enter Value`}
+                  onChangeText={handleFirstCustomFieldChange}
+                  isGrouped
+                  testID="custom-fields-multi-slot-input-slot-0"
                 />
-              ))}
-            </FormGroup>
+              )}
+        </MultiSlotInput>
+      </View>
 
-            <MultiSlotInput
-              label={t`Custom fields`}
-              placeholder={t`Add comment`}
-              addButtonLabel={t`Add another comment`}
-              values={(customFieldsList as Array<{ type: string; note: string }>).map((f) => f.note ?? '')}
-              onAdd={() => addCustomField({ type: 'note', note: '' })}
-              onChangeItem={(index: number, val: string) => {
-                setValue(`customFields[${index}].note`, val)
-              }}
-              onRemove={(index: number) => removeCustomField(index)}
-              errorMessage={(errors as Record<string, {error?: {note?: string}}[]>)?.customFields?.find(Boolean)?.error?.note}
-              testID="custom-fields-multi-slot-input"
-            />
-          </FormWrapper>
-        </ScrollView>
-      </ScrollContainer>
-    </Wrapper>
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Additional`}
+        </Text>
+
+        <AttachmentFieldsV2<CustomAttachment>
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
+        />
+      </View>
+    </ScreenLayout>
   )
 }
+
+const styles = StyleSheet.create({
+  content: {
+    padding: rawTokens.spacing16,
+    gap: rawTokens.spacing24,
+    paddingBottom: rawTokens.spacing24
+  },
+  section: {
+    gap: rawTokens.spacing12
+  }
+})

@@ -1,162 +1,146 @@
-import { useEffect, useState } from 'react'
-
-import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import {
-  BackIcon,
-  BrushIcon,
-  FolderIcon,
-  KebabMenuIcon,
-  StarIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { useRecordById, useRecords } from '@tetherto/pearpass-lib-vault'
-import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
-import { TouchableOpacity } from 'react-native'
+import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
+import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { Share as ShareIcon } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { RECORD_TYPES, useRecordById } from '@tetherto/pearpass-lib-vault'
+import { Share, StyleSheet, View } from 'react-native'
 
 import { RecordDetailsContent } from './RecordDetailsContentWrapper'
-import {
-  Container,
-  Folder,
-  FolderName,
-  Header,
-  HeaderActions,
-  Record,
-  RecordForm,
-  RecordInfo,
-  ScrollContainer,
-  ScrollView,
-  Title
-} from './styles'
-import { AvatarRecord } from '../../../components/AvatarRecord'
-import { BottomSheetRecordActionsContent } from '../../../containers/BottomSheetRecordActionsContent'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
-import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
-import { ButtonLittle } from '../../../libComponents'
+import { HeaderContent } from './styles'
+import { RECORD_COLOR_BY_TYPE } from '../../../constants/recordColorByType'
+import { BottomSheetRecordActionsContentV2 } from '../../../containers/BottomSheetRecordActionsContent/BottomSheetRecordActionsContentV2'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
+import { ScreenLayout } from '../../../containers/ScreenLayout'
 
 export const RecordDetailsV2 = ({ route }) => {
   const { recordId } = route.params
-  const { expand } = useBottomSheet()
+  const { theme } = useTheme()
+
   const { data: record } = useRecordById({
     variables: {
       id: recordId
     }
   })
 
-  const { updateFavoriteState } = useRecords()
-
-  const { hapticButtonSecondary } = useHapticFeedback()
-  const { t } = useLingui()
-
   const navigation = useNavigation()
 
-  const [isFavorite, setIsFavorite] = useState(record?.isFavorite ?? false)
-
-  useEffect(() => {
-    setIsFavorite(record?.isFavorite ?? false)
-  }, [record?.isFavorite])
-
-  const websiteDomain =
-    record?.type === RECORD_TYPES.LOGIN ? record?.data?.websites?.[0] : null
-
   if (!record) {
-    return <Container />
+    return null
+  }
+
+  const handleShare = async () => {
+    const website =
+      record?.type === RECORD_TYPES.LOGIN ? record?.data?.websites?.[0] : null
+
+    await Share.share({
+      title: record?.data?.title || 'Record',
+      message: [record?.data?.title, website].filter(Boolean).join('\n')
+    })
   }
 
   return (
-    <Container>
-      <Header>
-        <ButtonLittle
-          startIcon={BackIcon}
-          variant="secondary"
-          borderRadius="md"
-          onPress={() => navigation.goBack()}
+    <ScreenLayout
+      scrollable
+      contentStyle={styles.scrollContent}
+      footerStyle={styles.hiddenFooter}
+      header={
+        <BackScreenHeader
+          title={record?.data?.title || ''}
+          onBack={() => navigation.goBack()}
+          rightActions={
+            <View style={styles.actionButtonsContainer}>
+              <Button
+                variant="tertiary"
+                size="medium"
+                aria-label="Share"
+                iconBefore={<ShareIcon color={theme.colors.colorTextPrimary} />}
+                onClick={handleShare}
+              />
+              <BottomSheetRecordActionsContentV2
+                record={record}
+                recordType={record.type}
+                excludeTypes={['copy']}
+                onDelete={() => navigation.goBack()}
+              />
+            </View>
+          }
+          centerSlot={
+            <HeaderContent>
+              <View style={styles.headerTitleRow}>
+                <View
+                  style={[
+                    styles.headerIcon,
+                    { backgroundColor: theme.colors.colorSurfaceHover }
+                  ]}
+                >
+                  <Text
+                    variant="bodyEmphasized"
+                    style={[
+                      styles.headerIconText,
+                      {
+                        color:
+                          RECORD_COLOR_BY_TYPE[record.type] ||
+                          theme.colors.colorTextPrimary
+                      }
+                    ]}
+                  >
+                    {generateAvatarInitials(record?.data?.title)}
+                  </Text>
+                </View>
+
+                <View style={styles.headerTitleWrapper}>
+                  <Text variant="bodyEmphasized" numberOfLines={1}>
+                    {record?.data?.title || ''}
+                  </Text>
+                </View>
+              </View>
+            </HeaderContent>
+          }
         />
-
-        <HeaderActions>
-          <TouchableOpacity
-            onPress={() => {
-              hapticButtonSecondary()
-              const newFavoriteValue = !isFavorite
-              setIsFavorite(newFavoriteValue)
-              updateFavoriteState([record?.id], newFavoriteValue)
-            }}
-          >
-            <StarIcon
-              size="30"
-              color={colors.primary400.mode1}
-              fill={isFavorite}
-            />
-          </TouchableOpacity>
-
-          <ButtonLittle
-            startIcon={BrushIcon}
-            onPress={() =>
-              navigation.navigate('CreateRecord', {
-                record: record,
-                recordType: record.type,
-                selectedFolder: record.folder
-              })
-            }
-          >
-            {t`Edit`}
-          </ButtonLittle>
-
-          <ButtonLittle
-            startIcon={KebabMenuIcon}
-            disableHaptics
-            onPress={() =>
-              expand({
-                children: (
-                  <BottomSheetRecordActionsContent
-                    record={record}
-                    recordType={record.type}
-                    excludeTypes={['copy', 'edit']}
-                    onDelete={() => navigation.goBack()}
-                  />
-                ),
-                snapPoints: ['10%', '25%', '25%']
-              })
-            }
-            variant="secondary"
-            borderRadius="md"
-          />
-        </HeaderActions>
-      </Header>
-
-      <Record>
-        <AvatarRecord
-          websiteDomain={websiteDomain}
-          record={record}
-          size="md"
-          isFavorite={isFavorite}
-        />
-        <RecordInfo>
-          <Title numberOfLines={1} ellipsizeMode="tail">
-            {record?.data?.title}
-          </Title>
-
-          {!!record?.folder?.length && (
-            <Folder>
-              <FolderIcon />
-              <FolderName numberOfLines={1} ellipsizeMode="tail">
-                {record?.folder}
-              </FolderName>
-            </Folder>
-          )}
-        </RecordInfo>
-      </Record>
-
-      <ScrollContainer>
-        <ScrollView>
-          <RecordForm>
-            <RecordDetailsContent
-              record={record}
-              selectedFolder={record?.folder}
-            />
-          </RecordForm>
-        </ScrollView>
-      </ScrollContainer>
-    </Container>
+      }
+    >
+      <RecordDetailsContent record={record} selectedFolder={record?.folder} />
+    </ScreenLayout>
   )
 }
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    padding: 16,
+    flexGrow: 1
+  },
+  hiddenFooter: {
+    display: 'none'
+  },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4
+  },
+  headerIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 0,
+    flex: 1
+  },
+  headerTitleWrapper: {
+    flex: 1,
+    minWidth: 0
+  },
+  headerIconText: {
+    width: '100%',
+    height: '100%',
+    textAlign: 'center',
+    lineHeight: 24,
+    fontSize: 16,
+    fontWeight: '700'
+  }
+})

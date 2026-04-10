@@ -17,6 +17,7 @@ type ScreenLayoutProps = {
   footer?: ReactNode
   hideFooter?: boolean
   scrollable?: boolean
+  containerStyle?: StyleProp<ViewStyle>
   style?: StyleProp<ViewStyle>
   contentStyle?: StyleProp<ViewStyle>
   footerStyle?: StyleProp<ViewStyle>
@@ -26,6 +27,7 @@ export const ScreenLayout = ({
   header,
   children,
   scrollable = false,
+  containerStyle,
   style,
   contentStyle,
   footerStyle,
@@ -39,7 +41,8 @@ export const ScreenLayout = ({
     <View
       style={[
         styles.container,
-        { backgroundColor: theme.colors.colorBackground }
+        { backgroundColor: theme.colors.colorBackground },
+        containerStyle
       ]}
     >
       {header}
