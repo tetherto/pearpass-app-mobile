@@ -1,9 +1,10 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { act, renderHook } from '@testing-library/react-native'
-import { Camera } from 'expo-camera'
 import * as ImagePicker from 'expo-image-picker'
 import { Alert } from 'react-native'
+import { Camera } from 'react-native-vision-camera'
+import { decodeBase64 } from 'vision-camera-zxing'
 
 import { useQRScanner } from './useQRScanner'
 import messages from '../locales/en/messages'
@@ -11,18 +12,34 @@ import messages from '../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
-// Mock Camera and ImagePicker
-jest.mock('expo-camera', () => ({
+jest.mock('react-native-vision-camera', () => ({
   Camera: {
-    requestCameraPermissionsAsync: jest.fn(),
-    getCameraPermissionsAsync: jest.fn(),
-    scanFromURLAsync: jest.fn()
+    getCameraPermissionStatus: jest.fn(),
+    requestCameraPermission: jest.fn()
   },
-  PermissionStatus: {
-    GRANTED: 'granted',
-    DENIED: 'denied',
-    UNDETERMINED: 'undetermined'
+  useCameraDevice: jest.fn(() => ({ id: 'back', position: 'back' })),
+  useFrameProcessor: jest.fn(() => jest.fn()),
+  VisionCameraProxy: { initFrameProcessorPlugin: jest.fn() }
+}))
+
+jest.mock('react-native-reanimated', () => ({
+  useSharedValue: jest.fn((val) => ({ value: val }))
+}))
+
+jest.mock('react-native-worklets-core', () => ({
+  Worklets: {
+    createRunOnJS: jest.fn((fn) => fn)
   }
+}))
+
+jest.mock('vision-camera-zxing', () => ({
+  zxing: jest.fn(),
+  decodeBase64: jest.fn()
+}))
+
+jest.mock('expo-file-system', () => ({
+  readAsStringAsync: jest.fn(() => Promise.resolve('base64data')),
+  EncodingType: { Base64: 'base64' }
 }))
 
 jest.mock('expo-image-picker', () => ({
@@ -44,11 +61,7 @@ describe('useQRScanner', () => {
     onError = jest.fn()
     jest.clearAllMocks()
     jest.useFakeTimers()
-    // Default mock for getCameraPermissionsAsync
-    Camera.getCameraPermissionsAsync.mockResolvedValue({
-      status: 'granted',
-      canAskAgain: true
-    })
+    Camera.getCameraPermissionStatus.mockReturnValue('granted')
   })
 
   afterEach(() => {
@@ -57,14 +70,8 @@ describe('useQRScanner', () => {
   })
 
   it('should request and grant camera permission', async () => {
-    Camera.getCameraPermissionsAsync.mockResolvedValue({
-      status: 'granted',
-      canAskAgain: true
-    })
-    Camera.requestCameraPermissionsAsync.mockResolvedValue({
-      status: 'granted',
-      canAskAgain: true
-    })
+    Camera.getCameraPermissionStatus.mockReturnValue('granted')
+    Camera.requestCameraPermission.mockResolvedValue('granted')
 
     const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
       wrapper: ({ children }) => (
@@ -81,14 +88,7 @@ describe('useQRScanner', () => {
   })
 
   it('should deny camera permission and show alert', async () => {
-    Camera.getCameraPermissionsAsync.mockResolvedValue({
-      status: 'denied',
-      canAskAgain: false
-    })
-    Camera.requestCameraPermissionsAsync.mockResolvedValue({
-      status: 'denied',
-      canAskAgain: false
-    })
+    Camera.getCameraPermissionStatus.mockReturnValue('denied')
 
     const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
       wrapper: ({ children }) => (
@@ -155,8 +155,8 @@ describe('useQRScanner', () => {
       assets: [{ uri: 'image-uri' }]
     })
 
-    Camera.scanFromURLAsync.mockResolvedValue([
-      { type: 'qr', data: 'image-scanned-data' }
+    decodeBase64.mockResolvedValue([
+      { barcodeText: 'image-scanned-data', barcodeFormat: 'QR_CODE' }
     ])
 
     const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
@@ -169,10 +169,7 @@ describe('useQRScanner', () => {
       await result.current.pickImageForScan()
     })
 
-    expect(Camera.scanFromURLAsync).toHaveBeenCalledWith(
-      'image-uri',
-      expect.any(Array)
-    )
+    expect(decodeBase64).toHaveBeenCalledWith('base64data')
     expect(onScanned).toHaveBeenCalledWith('image-scanned-data', 'qr')
   })
 
@@ -187,7 +184,7 @@ describe('useQRScanner', () => {
       assets: [{ uri: 'image-uri' }]
     })
 
-    Camera.scanFromURLAsync.mockResolvedValue([])
+    decodeBase64.mockResolvedValue([])
 
     const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
       wrapper: ({ children }) => (

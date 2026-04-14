@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { Camera, PermissionStatus } from 'expo-camera'
+import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { Alert, Linking, Platform } from 'react-native'
+import { useSharedValue } from 'react-native-reanimated'
+import {
+  Camera,
+  useCameraDevice,
+  useFrameProcessor
+} from 'react-native-vision-camera'
+import { Worklets } from 'react-native-worklets-core'
+import { zxing, decodeBase64 } from 'vision-camera-zxing'
 
 import { logger } from '../utils/logger'
 
@@ -32,12 +40,15 @@ export const useQRScanner = ({
 
   const cameraRef = useRef(null)
   const lastScanTimeRef = useRef(0)
+  const isScanningShared = useSharedValue(true)
+
+  const device = useCameraDevice('back')
 
   // Check current permission status on mount
-  const checkCurrentPermissions = useCallback(async () => {
+  const checkCurrentPermissions = useCallback(() => {
     try {
-      const { status } = await Camera.getCameraPermissionsAsync()
-      const granted = status === PermissionStatus.GRANTED
+      const status = Camera.getCameraPermissionStatus()
+      const granted = status === 'granted'
       setHasPermission(granted)
       return { granted, status }
     } catch (error) {
@@ -79,35 +90,27 @@ export const useQRScanner = ({
 
   const requestPermission = useCallback(async () => {
     try {
-      // First check if permission is already granted
       const { granted: alreadyGranted, status: permissionStatus } =
-        await checkCurrentPermissions()
+        checkCurrentPermissions()
 
       if (alreadyGranted) {
         return true
       }
 
-      if (permissionStatus === PermissionStatus.DENIED) {
+      if (permissionStatus === 'denied') {
         showPermissionAlert(t`Camera`)
-
         return false
       }
 
-      // Request permission if not already granted
-      const { status, canAskAgain } =
-        await Camera.requestCameraPermissionsAsync()
-
-      const granted = status === 'granted'
+      const result = await Camera.requestCameraPermission()
+      const granted = result === 'granted'
 
       if (granted) {
-        setHasPermission(granted)
-        return granted
+        setHasPermission(true)
+        return true
       }
 
-      if (!canAskAgain) {
-        showPermissionAlert(t`Camera`)
-      }
-
+      showPermissionAlert(t`Camera`)
       setHasPermission(false)
       return false
     } catch (error) {
@@ -141,27 +144,69 @@ export const useQRScanner = ({
     [isScanning, supportedTypes, scanDelay, onScanned]
   )
 
+  // ZXing format name → expo-camera-style short name
+  const mapFormat = (zxingFormat) => {
+    const formatMap = {
+      QR_CODE: 'qr',
+      AZTEC: 'aztec',
+      CODE_128: 'code128',
+      CODE_39: 'code39',
+      CODE_93: 'code93',
+      DATA_MATRIX: 'datamatrix',
+      EAN_13: 'ean13',
+      EAN_8: 'ean8',
+      PDF_417: 'pdf417',
+      UPC_E: 'upc_e'
+    }
+    return formatMap[zxingFormat] || zxingFormat.toLowerCase()
+  }
+
+  const onCodeScannedJS = Worklets.createRunOnJS((results) => {
+    if (results.length > 0) {
+      const { barcodeText, barcodeFormat } = results[0]
+      handleBarCodeScanned({
+        type: mapFormat(barcodeFormat),
+        data: barcodeText
+      })
+    }
+  })
+
+  const frameProcessor = useFrameProcessor(
+    (frame) => {
+      'worklet'
+      if (!isScanningShared.value) return
+      const results = zxing(frame)
+      if (results && results.length > 0) {
+        onCodeScannedJS(results)
+      }
+    },
+    [onCodeScannedJS, isScanningShared]
+  )
+
   const pauseScanning = useCallback(() => {
     setIsScanning(false)
-  }, [])
+    isScanningShared.value = false
+  }, [isScanningShared])
 
   const resumeScanning = useCallback(() => {
     setIsScanning(true)
-  }, [])
+    isScanningShared.value = true
+  }, [isScanningShared])
 
   const scanBarcodeFromImage = useCallback(
     async (imageUri) => {
       try {
-        const scannedCodes = await Camera.scanFromURLAsync(
-          imageUri,
-          supportedTypes
-        )
+        const base64 = await FileSystem.readAsStringAsync(imageUri, {
+          encoding: FileSystem.EncodingType.Base64
+        })
 
-        if (scannedCodes && scannedCodes.length > 0) {
-          const { type, data } = scannedCodes[0]
+        const results = await decodeBase64(base64)
+
+        if (results && results.length > 0) {
+          const { barcodeText, barcodeFormat } = results[0]
 
           if (onScanned) {
-            onScanned(data, type)
+            onScanned(barcodeText, mapFormat(barcodeFormat))
           }
         } else {
           Alert.alert(t`Error`, t`No QR code found in the image`, [
@@ -176,7 +221,7 @@ export const useQRScanner = ({
         Alert.alert(t`Error`)
       }
     },
-    [supportedTypes, onScanned, onError, t]
+    [onScanned, onError, t]
   )
 
   const pickImageForScan = useCallback(async () => {
@@ -219,13 +264,15 @@ export const useQRScanner = ({
 
   // Check permissions on mount
   useEffect(() => {
-    void checkCurrentPermissions()
+    checkCurrentPermissions()
   }, [checkCurrentPermissions])
 
   return {
     hasPermission,
     isScanning,
     cameraRef,
+    device,
+    frameProcessor,
     pauseScanning,
     resumeScanning,
     pickImageForScan,
