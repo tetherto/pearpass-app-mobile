@@ -273,7 +273,6 @@ export const BlindPeeringSectionV2 = () => {
 const getStyles = (theme) =>
   StyleSheet.create({
     content: {
-      padding: rawTokens.spacing16,
       gap: rawTokens.spacing20,
       flexGrow: 1
     },

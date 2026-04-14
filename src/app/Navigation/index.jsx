@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { ImportItems } from 'src/screens/ImportItems'
 
 import {
   AuthV2PinScreen,
@@ -111,6 +112,7 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="MultiSelectDelete" component={MultiSelectDelete} />
     <Stack.Screen name="MultiSelectMove" component={MultiSelectMove} />
     <Stack.Screen name="Feedback" component={Feedback} />
+    <Stack.Screen name="ImportItems" component={ImportItems} />
     <Stack.Screen name="Vaults2" component={VaultsV2} />
     <Stack.Screen name="MyDevices" component={MyDevices} />
   </Stack.Navigator>

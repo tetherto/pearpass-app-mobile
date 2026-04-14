@@ -11,8 +11,8 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
+import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
 
 import { VaultRow } from './VaultRow'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
@@ -92,7 +92,7 @@ export const VaultsV2 = () => {
   )
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       header={
         <BackScreenHeader
@@ -145,7 +145,7 @@ export const VaultsV2 = () => {
           </View>
         </View>
       )}
-    </ScreenLayout>
+    </Layout>
   )
 }
 

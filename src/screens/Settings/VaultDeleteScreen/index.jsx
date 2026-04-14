@@ -12,8 +12,8 @@ import {
 import { ReportProblem } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
+import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
 
@@ -42,7 +42,7 @@ export const VaultDeleteScreen = ({ route }) => {
   }
 
   return (
-    <ScreenLayout
+    <Layout
       header={
         <BackScreenHeader
           title={t`Settings`}
@@ -88,7 +88,7 @@ export const VaultDeleteScreen = ({ route }) => {
           testID="vault-delete-warning"
         />
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 

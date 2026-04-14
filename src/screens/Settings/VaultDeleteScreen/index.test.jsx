@@ -83,9 +83,9 @@ jest.mock(
 )
 
 jest.mock(
-  'src/containers/ScreenLayout',
+  'src/containers/Layout',
   () => ({
-    ScreenLayout: ({ header, children, footer }) => {
+    Layout: ({ header, children, footer }) => {
       const { View } = require('react-native')
       return (
         <View>
