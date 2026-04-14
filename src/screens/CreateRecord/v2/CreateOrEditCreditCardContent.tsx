@@ -269,10 +269,6 @@ export const CreateOrEditCreditCardContent = ({
       scrollable
       style={{ flex: 1 }}
       contentStyle={styles.content}
-      containerStyle={{
-        flex: 1,
-        backgroundColor: theme.colors.colorBackground
-      }}
       header={
         <BackScreenHeader
           title={isEditing ? t`Edit Credit Card` : t`New Credit Card`}

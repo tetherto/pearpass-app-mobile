@@ -8,13 +8,13 @@ import {
   useTheme,
   rawTokens,
   Button,
+  ContextMenu,
   SearchField
 } from '@tetherto/pearpass-lib-ui-kit'
 import { Add, ImportOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View, StyleSheet } from 'react-native'
 
-import { useBottomSheet } from '../../context/BottomSheetContext'
-import { BottomSheetRecordCreateContent } from '../BottomSheetRecordCreateContent'
+import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { ScreenHeader } from '../ScreenHeader'
 
 interface HeaderV2Props {
@@ -25,14 +25,10 @@ interface HeaderV2Props {
 export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
   const { t } = useLingui()
   const { theme } = useTheme()
-  const { expand } = useBottomSheet()
   const navigation = useNavigation<NavigationProp<ParamListBase>>()
 
-  const handleAdd = () => {
-    expand({
-      children: <BottomSheetRecordCreateContent />,
-      snapPoints: ['1%', '80%']
-    })
+  const handleCreateRecord = (recordType: string) => {
+    navigation.navigate('CreateRecord', { recordType })
   }
 
   return (
@@ -59,13 +55,22 @@ export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
             onClick={() => navigation.navigate('ImportVault')}
           />
 
-          <Button
-            variant="primary"
-            size="medium"
-            aria-label="Add item"
-            iconBefore={<Add />}
-            onClick={handleAdd}
-          />
+          <ContextMenu
+            trigger={
+              <Button
+                variant="primary"
+                size="medium"
+                aria-label="Add item"
+                iconBefore={<Add />}
+              />
+            }
+          >
+            <BottomSheetCategorySelectorContent
+              recordType={'all'}
+              exclude={['all', 'password']}
+              onSelect={handleCreateRecord}
+            />
+          </ContextMenu>
         </View>
       }
     />

@@ -14,7 +14,8 @@ import { Layout } from '../Layout'
 
 export const BottomSheetCategorySelectorContent = ({
   recordType,
-  onSelect
+  onSelect,
+  exclude = ['password']
 }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
@@ -22,7 +23,7 @@ export const BottomSheetCategorySelectorContent = ({
   const { state } = useSharedFilter()
   const { bottom } = useSafeAreaInsets()
 
-  const menuItems = useRecordMenuItems({ exclude: ['password'] })
+  const menuItems = useRecordMenuItems({ exclude })
 
   const { data: recordCountsByType } = useRecordCountsByType({
     variables: {

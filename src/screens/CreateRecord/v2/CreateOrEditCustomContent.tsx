@@ -205,10 +205,6 @@ export const CreateOrEditCustomContent = ({
       scrollable
       style={{ flex: 1 }}
       contentStyle={styles.content}
-      containerStyle={{
-        flex: 1,
-        backgroundColor: theme.colors.colorBackground
-      }}
       header={
         <BackScreenHeader
           title={isEditing ? t`Edit Other Item` : t`New Other Item`}

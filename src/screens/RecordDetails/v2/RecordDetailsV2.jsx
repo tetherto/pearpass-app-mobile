@@ -14,8 +14,8 @@ import { RecordDetailsContent } from './RecordDetailsContentWrapper'
 import { HeaderContent } from './styles'
 import { RECORD_COLOR_BY_TYPE } from '../../../constants/recordColorByType'
 import { BottomSheetRecordActionsContentV2 } from '../../../containers/BottomSheetRecordActionsContent/BottomSheetRecordActionsContentV2'
-import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 
 export const RecordDetailsV2 = ({ route }) => {
   const { recordId } = route.params

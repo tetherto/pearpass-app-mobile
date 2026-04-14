@@ -106,6 +106,7 @@ export const Home = () => {
       <Layout
         header={<Header {...headerProps} />}
         contentStyle={{ padding: 0 }}
+        isBuiltin={false}
       >
         <ContentHeader
           isMultiSelectOn={isMultiSelectOn}

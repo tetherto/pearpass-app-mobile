@@ -24,6 +24,7 @@ type LayoutProps = {
   footer?: ReactNode
   hideFooter?: boolean
   scrollable?: boolean
+  isBuiltin?: boolean
   style?: StyleProp<ViewStyle>
   contentStyle?: StyleProp<ViewStyle>
   footerStyle?: StyleProp<ViewStyle>
@@ -34,6 +35,7 @@ export const Layout = ({
   header,
   children,
   scrollable = false,
+  isBuiltin = true,
   style,
   contentStyle,
   footerStyle,
@@ -51,6 +53,7 @@ export const Layout = ({
     : { behavior: Platform.OS === 'ios' ? ('padding' as const) : ('height' as const) }
 
   const showFooter = !!footer && !hideFooter
+  const isBuiltinApplied = isBuiltin && !isSheetMode
 
   const card = (
     <CardWrapper
@@ -69,14 +72,26 @@ export const Layout = ({
       {scrollable ? (
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={[styles.scrollContent, contentStyle]}
+          contentContainerStyle={[
+            styles.scrollContent,
+            isBuiltinApplied && styles.contentBuiltinPadding,
+            contentStyle
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           {children}
         </ScrollView>
       ) : (
-        <View style={[styles.content, contentStyle]}>{children}</View>
+        <View
+          style={[
+            styles.content,
+            isBuiltinApplied && styles.contentBuiltinPadding,
+            contentStyle
+          ]}
+        >
+          {children}
+        </View>
       )}
 
       {showFooter && (

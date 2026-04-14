@@ -18,7 +18,9 @@ export const styles = StyleSheet.create({
     flexGrow: 1
   },
   content: {
-    flex: 1,
+    flex: 1
+  },
+  contentBuiltinPadding: {
     padding: rawTokens.spacing16
   },
   footer: {
