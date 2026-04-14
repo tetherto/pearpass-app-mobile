@@ -1,22 +1,20 @@
 import { useLingui } from '@lingui/react/macro'
-import { useNavigation } from '@react-navigation/native'
 import type { NavigationProp } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { useCreateFolder, useFolders } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
-import { Button, InputField, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { View } from 'react-native'
+import { Button, InputField } from '@tetherto/pearpass-lib-ui-kit'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { styles } from './CreateFolderV2Styles'
 import { ScreenLayout } from 'src/containers/ScreenLayout'
+import { styles } from './CreateFolderV2Styles'
 
 export const CreateFolderV2 = ({ route }) => {
   const { onGoBack, initialValues } = route.params ?? {}
 
   const { t } = useLingui()
-  const { theme } = useTheme()
   const navigation = useNavigation<NavigationProp<Record<string, undefined>>>()
 
   const { renameFolder } = useFolders()

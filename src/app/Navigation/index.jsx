@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { DeleteFolderV2 } from 'src/screens/DeleteFolder/DeleteFolderv2'
 import { ImportItems } from 'src/screens/ImportItems'
 
 import {
@@ -13,9 +14,6 @@ import { ErrorScreen } from '../../screens/ErrorScreen'
 import { ImagePreview } from '../../screens/ImagePreview'
 import { ImagePreviewV2 } from '../../screens/ImagePreview/ImagePreviewV2'
 import { ImportVault } from '../../screens/ImportVault'
-import { isV2 } from '../../utils/designVersion'
-
-import { DeleteFolderV2 } from 'src/screens/DeleteFolder/DeleteFolderv2'
 import { Intro } from '../../screens/Intro'
 import { MultiSelectDelete } from '../../screens/MultiSelectDelete'
 import { MultiSelectMove } from '../../screens/MultiSelectMove'
@@ -35,6 +33,7 @@ import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPe
 import { VaultsV2 } from '../../screens/Settings/Vaults2'
 import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
+import { isV2 } from '../../utils/designVersion'
 import { TabNavigator } from '../TabNavigator'
 
 const Stack = createNativeStackNavigator()
