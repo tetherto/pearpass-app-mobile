@@ -3,8 +3,15 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { Camera, PermissionStatus } from 'expo-camera'
 import * as ImagePicker from 'expo-image-picker'
-import { Alert, Linking, Platform } from 'react-native'
+import {
+  Alert,
+  AppState,
+  Linking,
+  PermissionsAndroid,
+  Platform
+} from 'react-native'
 
+import { isFdroid } from '../constants/distribution'
 import { logger } from '../utils/logger'
 
 export const useQRScanner = ({
@@ -32,20 +39,39 @@ export const useQRScanner = ({
 
   const cameraRef = useRef(null)
   const lastScanTimeRef = useRef(0)
+  const shouldUseFdroidAndroidPermissionSync =
+    Platform.OS === 'android' && isFdroid()
 
   // Check current permission status on mount
   const checkCurrentPermissions = useCallback(async () => {
     try {
-      const { status } = await Camera.getCameraPermissionsAsync()
-      const granted = status === PermissionStatus.GRANTED
+      const permission = await Camera.getCameraPermissionsAsync()
+
+      let nativeGranted
+      if (shouldUseFdroidAndroidPermissionSync) {
+        nativeGranted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.CAMERA
+        )
+      }
+
+      const granted =
+        nativeGranted ??
+        permission.granted ??
+        permission.status === PermissionStatus.GRANTED
+      const status = granted ? PermissionStatus.GRANTED : permission.status
+      const canAskAgain =
+        typeof permission.canAskAgain === 'boolean'
+          ? permission.canAskAgain
+          : !granted
+
       setHasPermission(granted)
-      return { granted, status }
+      return { granted, status, canAskAgain }
     } catch (error) {
       logger.error('Error checking camera permissions:', error)
       setHasPermission(false)
-      return { granted: false, status: undefined }
+      return { granted: false, status: undefined, canAskAgain: false }
     }
-  }, [])
+  }, [shouldUseFdroidAndroidPermissionSync])
 
   const openSettings = useCallback(async () => {
     try {
@@ -80,31 +106,52 @@ export const useQRScanner = ({
   const requestPermission = useCallback(async () => {
     try {
       // First check if permission is already granted
-      const { granted: alreadyGranted, status: permissionStatus } =
-        await checkCurrentPermissions()
+      const {
+        granted: alreadyGranted,
+        status: permissionStatus,
+        canAskAgain
+      } = await checkCurrentPermissions()
 
       if (alreadyGranted) {
         return true
       }
 
-      if (permissionStatus === PermissionStatus.DENIED) {
+      if (
+        permissionStatus === PermissionStatus.DENIED &&
+        (!shouldUseFdroidAndroidPermissionSync || !canAskAgain)
+      ) {
         showPermissionAlert(t`Camera`)
 
         return false
       }
 
       // Request permission if not already granted
-      const { status, canAskAgain } =
+      const { status, canAskAgain: requestCanAskAgain } =
         await Camera.requestCameraPermissionsAsync()
 
-      const granted = status === 'granted'
+      if (shouldUseFdroidAndroidPermissionSync) {
+        const verifiedPermission = await checkCurrentPermissions()
+
+        if (verifiedPermission.granted) {
+          return true
+        }
+
+        if (!verifiedPermission.canAskAgain) {
+          showPermissionAlert(t`Camera`)
+        }
+
+        setHasPermission(false)
+        return false
+      }
+
+      const granted = status === PermissionStatus.GRANTED
 
       if (granted) {
         setHasPermission(granted)
         return granted
       }
 
-      if (!canAskAgain) {
+      if (!requestCanAskAgain) {
         showPermissionAlert(t`Camera`)
       }
 
@@ -120,7 +167,13 @@ export const useQRScanner = ({
       setHasPermission(false)
       return false
     }
-  }, [checkCurrentPermissions, showPermissionAlert, t, onError])
+  }, [
+    checkCurrentPermissions,
+    onError,
+    shouldUseFdroidAndroidPermissionSync,
+    showPermissionAlert,
+    t
+  ])
 
   const handleBarCodeScanned = useCallback(
     (scanResult) => {
@@ -221,6 +274,20 @@ export const useQRScanner = ({
   useEffect(() => {
     void checkCurrentPermissions()
   }, [checkCurrentPermissions])
+
+  useEffect(() => {
+    if (!shouldUseFdroidAndroidPermissionSync) {
+      return undefined
+    }
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        void checkCurrentPermissions()
+      }
+    })
+
+    return () => subscription.remove()
+  }, [checkCurrentPermissions, shouldUseFdroidAndroidPermissionSync])
 
   return {
     hasPermission,

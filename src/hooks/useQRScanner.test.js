@@ -3,9 +3,10 @@ import { I18nProvider } from '@lingui/react'
 import { act, renderHook } from '@testing-library/react-native'
 import { Camera } from 'expo-camera'
 import * as ImagePicker from 'expo-image-picker'
-import { Alert } from 'react-native'
+import { Alert, AppState, PermissionsAndroid, Platform } from 'react-native'
 
 import { useQRScanner } from './useQRScanner'
+import { isFdroid } from '../constants/distribution'
 import messages from '../locales/en/messages'
 
 i18n.load('en', messages)
@@ -34,16 +35,39 @@ jest.mock('react-native/Libraries/Linking/Linking', () => ({
   openSettings: jest.fn()
 }))
 
+jest.mock('../constants/distribution', () => ({
+  isFdroid: jest.fn(() => false)
+}))
+
 jest.spyOn(Alert, 'alert')
 
 describe('useQRScanner', () => {
   let onScanned, onError
+  let appStateSubscription
+  let permissionsCheckSpy
+  let appStateListenerSpy
+  const originalPlatformOs = Platform.OS
 
   beforeEach(() => {
     onScanned = jest.fn()
     onError = jest.fn()
     jest.clearAllMocks()
     jest.useFakeTimers()
+    isFdroid.mockReturnValue(false)
+    appStateSubscription = { remove: jest.fn() }
+    if (!PermissionsAndroid.check) {
+      PermissionsAndroid.check = jest.fn()
+    }
+    permissionsCheckSpy = jest
+      .spyOn(PermissionsAndroid, 'check')
+      .mockResolvedValue(false)
+    appStateListenerSpy = jest
+      .spyOn(AppState, 'addEventListener')
+      .mockReturnValue(appStateSubscription)
+    Object.defineProperty(Platform, 'OS', {
+      configurable: true,
+      value: originalPlatformOs
+    })
     // Default mock for getCameraPermissionsAsync
     Camera.getCameraPermissionsAsync.mockResolvedValue({
       status: 'granted',
@@ -54,6 +78,12 @@ describe('useQRScanner', () => {
   afterEach(() => {
     jest.clearAllTimers()
     jest.useRealTimers()
+    permissionsCheckSpy?.mockRestore()
+    appStateListenerSpy?.mockRestore()
+    Object.defineProperty(Platform, 'OS', {
+      configurable: true,
+      value: originalPlatformOs
+    })
   })
 
   it('should request and grant camera permission', async () => {
@@ -107,6 +137,40 @@ describe('useQRScanner', () => {
       expect.stringContaining("You've previously denied"),
       expect.any(Array)
     )
+  })
+
+  it('should trust native Android camera permission for fdroid builds', async () => {
+    isFdroid.mockReturnValue(true)
+    Object.defineProperty(Platform, 'OS', {
+      configurable: true,
+      value: 'android'
+    })
+    PermissionsAndroid.check.mockResolvedValue(true)
+    Camera.getCameraPermissionsAsync.mockResolvedValue({
+      status: 'denied',
+      canAskAgain: false
+    })
+
+    const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    await act(async () => {
+      const permission = await result.current.requestPermission()
+      expect(permission).toBe(true)
+    })
+
+    expect(PermissionsAndroid.check).toHaveBeenCalledWith(
+      PermissionsAndroid.PERMISSIONS.CAMERA
+    )
+    expect(AppState.addEventListener).toHaveBeenCalledWith(
+      'change',
+      expect.any(Function)
+    )
+    expect(Camera.requestCameraPermissionsAsync).not.toHaveBeenCalled()
+    expect(result.current.hasPermission).toBe(true)
   })
 
   it('should call onScanned when a valid QR code is scanned', () => {

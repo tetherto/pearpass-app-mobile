@@ -21,15 +21,7 @@ import {
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
-import { BottomSheetImportVaultContent } from 'src/containers/BottomSheetImportVaultContent'
-import { useBottomSheet } from 'src/context/BottomSheetContext'
 
-import { CardSingleSetting } from '../../../components/CardSingleSetting'
-import { useAutoLockContext } from '../../../context/AutoLockContext'
-import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
-import { ButtonLittle } from '../../../libComponents'
-import { logger } from '../../../utils/logger'
-import { settingsStyles } from '../styles'
 import {
   AcceptedFormats,
   Description,
@@ -40,6 +32,14 @@ import {
   SubTitle
 } from './styles'
 import { readFileContent } from './utils/readFileContent'
+import { CardSingleSetting } from '../../../components/CardSingleSetting'
+import { BottomSheetImportVaultContent } from '../../../containers/BottomSheetImportVaultContent'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { useBottomSheet } from '../../../context/BottomSheetContext'
+import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
+import { ButtonLittle } from '../../../libComponents'
+import { logger } from '../../../utils/logger'
+import { settingsStyles } from '../styles'
 
 const importOptions = [
   {

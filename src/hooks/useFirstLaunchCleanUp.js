@@ -1,18 +1,23 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as FileSystem from 'expo-file-system'
 import * as SecureStore from 'expo-secure-store'
 
 import { ASYNC_STORAGE_KEYS } from '../constants/asyncStorageKeys'
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
+import { getSharedDirectoryPath } from '../utils/AppGroupHelper'
 import { logger } from '../utils/logger'
 
 const { FIRST_LAUNCH_KEY, FAILED_KEYS_KEY } = ASYNC_STORAGE_KEYS
+const STORAGE_DIRECTORIES = ['pearpass', 'pearpass_jobs']
 
 /**
  * Custom hook to detect first launch after app installation and clear expo-secure-store data.
  */
 export const useFirstLaunchCleanUp = () => {
+  const [isReady, setIsReady] = useState(false)
+
   useEffect(() => {
     const clearDataOnFirstLaunch = async () => {
       try {
@@ -21,6 +26,7 @@ export const useFirstLaunchCleanUp = () => {
         if (!hasLaunchedBefore) {
           logger.log('First launch detected - clearing SecureStore data')
           await clearSecureStoreData()
+          await clearVaultFileData()
 
           await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true')
         } else {
@@ -28,11 +34,15 @@ export const useFirstLaunchCleanUp = () => {
         }
       } catch (error) {
         logger.error('Error clearing data on first launch:', error)
+      } finally {
+        setIsReady(true)
       }
     }
 
     clearDataOnFirstLaunch()
   }, [])
+
+  return isReady
 }
 
 /**
@@ -57,6 +67,28 @@ const clearSecureStoreData = async () => {
   } catch (error) {
     logger.error('Error clearing SecureStore data:', error)
     throw error
+  }
+}
+
+const clearVaultFileData = async () => {
+  const sharedDirectory = await getSharedDirectoryPath()
+  const baseDirectory = sharedDirectory
+    ? `file://${sharedDirectory}`
+    : FileSystem.documentDirectory?.replace(/\/$/, '')
+
+  if (!baseDirectory) {
+    return
+  }
+
+  for (const directoryName of STORAGE_DIRECTORIES) {
+    const directoryPath = `${baseDirectory}/${directoryName}`
+    const directoryInfo = await FileSystem.getInfoAsync(directoryPath)
+
+    if (!directoryInfo.exists) {
+      continue
+    }
+
+    await FileSystem.deleteAsync(directoryPath, { idempotent: true })
   }
 }
 

@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { getTimerColor, TIMER_ANIMATION_DURATION } from './utils'

@@ -18,7 +18,7 @@ export const App = () => {
   const { needsUpdate } = useVersionCheck()
   const hasOpenedUpdateModal = useRef(false)
 
-  useFirstLaunchCleanUp()
+  const isFirstLaunchCleanupReady = useFirstLaunchCleanUp()
 
   useEffect(() => {
     if (needsUpdate && !hasOpenedUpdateModal.current) {
@@ -29,7 +29,7 @@ export const App = () => {
 
   const { initialRouteName, isLoading } = useRedirect()
 
-  if (isLoading) {
+  if (isLoading || !isFirstLaunchCleanupReady) {
     return null
   }
 

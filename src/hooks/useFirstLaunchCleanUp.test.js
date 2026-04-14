@@ -1,10 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { renderHook, waitFor } from '@testing-library/react-native'
+import * as FileSystem from 'expo-file-system'
 import * as SecureStore from 'expo-secure-store'
 
 import { useFirstLaunchCleanUp } from './useFirstLaunchCleanUp'
 import { ASYNC_STORAGE_KEYS } from '../constants/asyncStorageKeys'
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
+import { getSharedDirectoryPath } from '../utils/AppGroupHelper'
 import { logger } from '../utils/logger'
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -17,6 +19,16 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn()
 }))
 
+jest.mock('expo-file-system', () => ({
+  documentDirectory: 'file:///documents/',
+  getInfoAsync: jest.fn(),
+  deleteAsync: jest.fn()
+}))
+
+jest.mock('../utils/AppGroupHelper', () => ({
+  getSharedDirectoryPath: jest.fn()
+}))
+
 jest.mock('../utils/logger', () => ({
   logger: {
     log: jest.fn(),
@@ -27,6 +39,9 @@ jest.mock('../utils/logger', () => ({
 describe('useFirstLaunchCleanUp', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    FileSystem.getInfoAsync.mockResolvedValue({ exists: false })
+    FileSystem.deleteAsync.mockResolvedValue()
+    getSharedDirectoryPath.mockResolvedValue(null)
   })
 
   describe('First launch scenarios', () => {
@@ -48,9 +63,41 @@ describe('useFirstLaunchCleanUp', () => {
         expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(key)
       }
 
+      expect(FileSystem.getInfoAsync).toHaveBeenCalledWith(
+        'file:///documents/pearpass'
+      )
+      expect(FileSystem.getInfoAsync).toHaveBeenCalledWith(
+        'file:///documents/pearpass_jobs'
+      )
+
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         ASYNC_STORAGE_KEYS.FIRST_LAUNCH_KEY,
         'true'
+      )
+    })
+
+    it('should clear shared vault directories on first launch when app group path is available', async () => {
+      AsyncStorage.getItem.mockResolvedValue(null)
+      AsyncStorage.setItem.mockResolvedValue()
+      SecureStore.deleteItemAsync.mockResolvedValue()
+      getSharedDirectoryPath.mockResolvedValue('/shared/group')
+      FileSystem.getInfoAsync
+        .mockResolvedValueOnce({ exists: true })
+        .mockResolvedValueOnce({ exists: true })
+      FileSystem.deleteAsync.mockResolvedValue()
+
+      renderHook(() => useFirstLaunchCleanUp())
+
+      await waitFor(() => {
+        expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+          'file:///shared/group/pearpass',
+          { idempotent: true }
+        )
+      })
+
+      expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+        'file:///shared/group/pearpass_jobs',
+        { idempotent: true }
       )
     })
 
@@ -254,6 +301,18 @@ describe('useFirstLaunchCleanUp', () => {
   })
 
   describe('Hook behavior', () => {
+    it('should report ready after cleanup finishes', async () => {
+      AsyncStorage.getItem.mockResolvedValue('true')
+
+      const { result } = renderHook(() => useFirstLaunchCleanUp())
+
+      expect(result.current).toBe(false)
+
+      await waitFor(() => {
+        expect(result.current).toBe(true)
+      })
+    })
+
     it('should run cleanup only once on mount', async () => {
       AsyncStorage.getItem.mockResolvedValue('true')
       AsyncStorage.getItem.mockResolvedValueOnce(null) // No failed keys

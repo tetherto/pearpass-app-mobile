@@ -1,5 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+import {
+  AuthV2PinScreen,
+  AuthV2MasterPasswordScreen
+} from '../../screens/AuthV2'
 import { CreateFolder } from '../../screens/CreateFolder'
 import { CreateRecord } from '../../screens/CreateRecord'
 import { ErrorScreen } from '../../screens/ErrorScreen'
@@ -22,6 +26,7 @@ import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
 import { MyDevices } from '../../screens/Settings/MyDevices'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
+import { VaultsV2 } from '../../screens/Settings/Vaults2'
 import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
 import { isV2 } from '../../utils/designVersion'
@@ -76,6 +81,16 @@ export const Navigation = ({ initialRouteName }) => (
       component={OnboardingV2Biometrics}
       options={noGestureNoAnimation}
     />
+    <Stack.Screen
+      name="AuthV2Pin"
+      component={AuthV2PinScreen}
+      options={noGesture}
+    />
+    <Stack.Screen
+      name="AuthV2MasterPassword"
+      component={AuthV2MasterPasswordScreen}
+      options={noGestureNoAnimation}
+    />
     <Stack.Screen name="Welcome" component={Welcome} options={noGesture} />
     <Stack.Screen
       name="MainTabNavigator"
@@ -96,6 +111,7 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="MultiSelectDelete" component={MultiSelectDelete} />
     <Stack.Screen name="MultiSelectMove" component={MultiSelectMove} />
     <Stack.Screen name="Feedback" component={Feedback} />
+    <Stack.Screen name="Vaults2" component={VaultsV2} />
     <Stack.Screen name="MyDevices" component={MyDevices} />
   </Stack.Navigator>
 )

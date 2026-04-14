@@ -13,8 +13,10 @@
     "lint": "eslint ./src",
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
-    "postinstall": "node scripts/build-plugins.cjs",
+    "postinstall": "node scripts/build-plugins.cjs && npm run barekit:link-ios-addons",
     "build-plugins": "node scripts/build-plugins.cjs",
+    "barekit:link-ios-addons": "node node_modules/react-native-bare-kit/ios/link.mjs",
+    "pods:install": "cd ios && pod install",
     "test": "jest",
     "bundle:android": "bare-pack -p android --linked --out bundles/app-android.bundle.js node_modules/@tetherto/pearpass-lib-vault-core/src/worklet/app.js",
     "bundle:ios": "bare-pack -p ios --linked --out bundles/app-ios.bundle.js node_modules/@tetherto/pearpass-lib-vault-core/src/worklet/app.js",
@@ -26,7 +28,7 @@
     "fdroid:patches:prebuild": "node scripts/fdroid/apply-patches.mjs prebuild",
     "fdroid:patches:build": "node scripts/fdroid/apply-patches.mjs build",
     "eas-build-pre-install": "node -v && npm -v && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
-    "eas-build-post-install": "npm run build-plugins && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
+    "eas-build-post-install": "npm run build-plugins && npm run barekit:link-ios-addons && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
