@@ -69,13 +69,13 @@ export const SettingsV2 = () => {
           {
             key: 'blind-peering',
             label: t`Blind Peering`,
-            screen: 'Syncing',
+            screen: 'BlindPeering',
             icon: HubFilled
           },
           {
             key: 'your-devices',
             label: t`Your Devices`,
-            screen: 'Vaults',
+            screen: 'MyDevices',
             icon: Devices
           }
         ]
@@ -126,7 +126,7 @@ export const SettingsV2 = () => {
           {
             key: 'report-a-problem',
             label: t`Report a problem`,
-            screen: 'About',
+            screen: 'Feedback',
             icon: BugReportFilled
           },
           {

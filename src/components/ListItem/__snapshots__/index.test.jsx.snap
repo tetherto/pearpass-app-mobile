@@ -44,11 +44,13 @@ exports[`ListItem renders correctly with provided vault data 1`] = `
       testID="vault-description"
     >
       <Text
+        accessibilityLabel="Vault Name"
         testID="vault-name"
       >
         Test Vault
       </Text>
       <Text
+        accessibilityLabel="Vault Date"
         testID="vault-date"
       >
         01/01/2023
