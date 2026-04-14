@@ -37,11 +37,9 @@ export const BottomSheetFolderSelectorContent = ({
 
   const handleSelect = (folderId) => {
     if (onSelect) {
-      const folderName = folderId === 'allFolder' ? '' : folderId
-
       onSelect({
         id: folderId,
-        name: folderName,
+        name: folderId,
         isFavorite: false
       })
     } else {
