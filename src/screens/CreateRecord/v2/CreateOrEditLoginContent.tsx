@@ -11,6 +11,7 @@ import {
 } from '@tetherto/pearpass-lib-vault'
 import {
   Button,
+  ContextMenu,
   InputField,
   MultiSlotInput,
   PasswordField,
@@ -23,7 +24,7 @@ import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { FormGroup } from '../../../components/FormGroup'
 
-import { BottomSheetFolderListContentV2 } from '../../../containers/BottomSheetFolderListContent/BottomSheetFolderListContentV2'
+import { BottomSheetFolderSelectorContent } from '../../../containers/BottomSheetFolderSelectorContent'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
@@ -272,15 +273,12 @@ export const CreateOrEditLoginContent = ({
     })
   }
 
-  const handleFolderSelect = (folder?: { name: string }) => {
+  const handleFolderSelect = (folder?: { name?: string }) => {
     if (!folder) {
       return
     }
 
-    setValue(
-      'folder',
-      folder.name === values.folder ? '' : folder.name
-    )
+    setValue('folder', folder.name === values.folder ? '' : (folder.name ?? ''))
   }
 
   const handleFileUpload = (file?: LoginAttachment | null) => {
@@ -450,9 +448,7 @@ export const CreateOrEditLoginContent = ({
 
         <MultiSlotInput
           actions={
-            <BottomSheetFolderListContentV2
-              selectedFolder={values.folder}
-              onFolderSelect={handleFolderSelect}
+            <ContextMenu
               trigger={
                 <Button
                   variant="tertiary"
@@ -461,13 +457,17 @@ export const CreateOrEditLoginContent = ({
                   {t`Add Another Folder`}
                 </Button>
               }
-            />
+            >
+              <BottomSheetFolderSelectorContent
+                selectedFolder={values.folder}
+                onSelect={handleFolderSelect}
+                includeSmartFolders={false}
+              />
+            </ContextMenu>
           }
           testID="folder-multi-slot-input"
         >
-          <BottomSheetFolderListContentV2
-            selectedFolder={values.folder}
-            onFolderSelect={handleFolderSelect}
+          <ContextMenu
             trigger={
               <SelectField
                 label={t`Folder`}
@@ -482,7 +482,13 @@ export const CreateOrEditLoginContent = ({
                 }
               />
             }
-          />
+          >
+            <BottomSheetFolderSelectorContent
+              selectedFolder={values.folder}
+              onSelect={handleFolderSelect}
+              includeSmartFolders={false}
+            />
+          </ContextMenu>
         </MultiSlotInput>
       </View>
 
