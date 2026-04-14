@@ -14,12 +14,20 @@ import { StyleSheet, View } from 'react-native'
 
 import { WifiPasswordQRCodeV2 } from '../../../components/WifiPasswordQRCode/WifiPasswordQRCodeV2'
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
-import { WifiPasswordRecord } from './types'
+import { CustomField, WifiPasswordRecord } from './types'
 import { toReadOnlyFieldProps } from './utils'
 
 interface WifiPasswordDetailsFormProps {
   initialRecord?: WifiPasswordRecord
   selectedFolder?: string
+}
+
+interface WifiPasswordDetailsFormValues {
+  title: string
+  password: string
+  note: string
+  customFields: CustomField[]
+  folder?: string
 }
 
 export const WifiPasswordDetailsForm = ({
@@ -30,7 +38,7 @@ export const WifiPasswordDetailsForm = ({
   const { theme } = useTheme()
   const { copyToClipboard } = useCopyToClipboard()
 
-  const initialValues = useMemo(
+  const initialValues = useMemo<WifiPasswordDetailsFormValues>(
     () => ({
       title: initialRecord?.data?.title ?? '',
       password: initialRecord?.data?.password ?? '',
@@ -41,17 +49,17 @@ export const WifiPasswordDetailsForm = ({
     [initialRecord, selectedFolder]
   )
 
-  const { register, setValues, values } = useForm({
-    initialValues: initialValues
+  const { register, setValues, values } = useForm<WifiPasswordDetailsFormValues>({
+    initialValues
   })
 
   useEffect(() => {
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const hasPassword = !!values?.password?.length
-  const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as unknown[])?.length
+  const hasPassword = !!values.password.length
+  const hasNote = !!values.note.length
+  const hasCustomFields = !!values.customFields.length
 
   return (
     <View style={styles.container}>
@@ -105,21 +113,19 @@ export const WifiPasswordDetailsForm = ({
 
             {hasCustomFields && (
               <MultiSlotInput testID="hidden-messages-multi-slot-input">
-                {(values.customFields as Array<{ type: string; note: string }>).map(
-                  (field, index) => (
-                    <PasswordField
-                      key={`${field.type}-${index}`}
-                      label={t`Hidden Message`}
-                      value={field.note ?? ''}
-                      placeholder={t`Enter Hidden Message`}
-                      readOnly
-                      copyable
-                      onCopy={copyToClipboard}
-                      isGrouped
-                      testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                    />
-                  )
-                )}
+                {values.customFields.map((field, index) => (
+                  <PasswordField
+                    key={`${field.type}-${index}`}
+                    label={t`Hidden Message`}
+                    value={field.note ?? ''}
+                    placeholder={t`Enter Hidden Message`}
+                    readOnly
+                    copyable
+                    onCopy={copyToClipboard}
+                    isGrouped
+                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                  />
+                ))}
               </MultiSlotInput>
             )}
           </View>

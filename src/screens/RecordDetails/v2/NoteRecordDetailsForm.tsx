@@ -18,7 +18,7 @@ import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { getMimeType } from '../../../utils/getMimeType'
 import { handleDownloadFile } from '../../../utils/handleDownloadFile'
-import { Attachment, NoteRecord } from './types'
+import { Attachment, CustomField, NoteRecord } from './types'
 
 type ImagePreviewNavigation = {
   navigate: (
@@ -30,13 +30,22 @@ type ImagePreviewNavigation = {
   ) => void
 }
 
+interface NoteRecordDetailsFormProps {
+  initialRecord?: NoteRecord
+  selectedFolder?: string
+}
+
+interface NoteRecordDetailsFormValues {
+  note: string
+  customFields: CustomField[]
+  folder?: string
+  attachments: Attachment[]
+}
+
 export const NoteRecordDetailsForm = ({
   initialRecord,
   selectedFolder
-}: {
-  initialRecord?: NoteRecord
-  selectedFolder?: string
-}) => {
+}: NoteRecordDetailsFormProps) => {
   const { t } = useLingui()
   const navigation = useNavigation() as ImagePreviewNavigation
   const { theme } = useTheme()
@@ -45,7 +54,7 @@ export const NoteRecordDetailsForm = ({
   }
   const { copyToClipboard } = useCopyToClipboard()
 
-  const initialValues = useMemo(
+  const initialValues = useMemo<NoteRecordDetailsFormValues>(
     () => ({
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
@@ -55,7 +64,7 @@ export const NoteRecordDetailsForm = ({
     [initialRecord, selectedFolder]
   )
 
-  const { setValues, values, setValue } = useForm({
+  const { setValues, values, setValue } = useForm<NoteRecordDetailsFormValues>({
     initialValues
   })
 
@@ -69,9 +78,9 @@ export const NoteRecordDetailsForm = ({
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const hasNote = !!values?.note?.length
-  const hasAttachments = !!values?.attachments?.length
-  const hasCustomFields = !!(values?.customFields as unknown[])?.length
+  const hasNote = !!values.note.length
+  const hasAttachments = !!values.attachments.length
+  const hasCustomFields = !!values.customFields.length
 
   const handleAttachmentPress = async (attachment: Attachment) => {
     if (getMimeType(attachment.name).startsWith('image/')) {
@@ -129,21 +138,19 @@ export const NoteRecordDetailsForm = ({
             </Text>
 
             <MultiSlotInput testID="comments-multi-slot-input">
-              {(values.customFields as Array<{ type: string; note: string }>).map(
-                (field, index) => (
-                  <InputField
-                    key={`${field.type}-${index}`}
-                    label={t`Comment`}
-                    value={field.note ?? ''}
-                    placeholder={t`Enter Comment`}
-                    readOnly
-                    copyable
-                    onCopy={copyToClipboard}
-                    isGrouped
-                    testID={`comments-multi-slot-input-slot-${index}`}
-                  />
-                )
-              )}
+              {values.customFields.map((field, index) => (
+                <InputField
+                  key={`${field.type}-${index}`}
+                  label={t`Comment`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Comment`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID={`comments-multi-slot-input-slot-${index}`}
+                />
+              ))}
             </MultiSlotInput>
           </View>
         )}
@@ -155,7 +162,7 @@ export const NoteRecordDetailsForm = ({
             </Text>
 
             <MultiSlotInput testID="attachments-multi-slot-input">
-              {(values.attachments as Attachment[]).map((attachment, index) => (
+              {values.attachments.map((attachment, index) => (
                 <AttachmentField
                   key={attachment?.id || attachment.name}
                   label={t`Attachment`}

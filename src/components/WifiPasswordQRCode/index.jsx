@@ -3,7 +3,7 @@ import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text as RNText, StyleSheet } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 
-import { useWifiPasswordQRCode } from './useWifiPasswordQRCode'
+import { useWifiPasswordQRCode } from '../../hooks/useWifiPasswordQRCode'
 
 /**
  * @param {{

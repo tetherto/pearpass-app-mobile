@@ -21,19 +21,28 @@ type AttachmentLike = {
   name?: string
 }
 
+const ATTACHMENT_FIELD_ITEM_TYPES = {
+  empty: 'empty',
+  placeholder: 'placeholder',
+  attachment: 'attachment'
+} as const
+
+type AttachmentFieldItemType =
+  (typeof ATTACHMENT_FIELD_ITEM_TYPES)[keyof typeof ATTACHMENT_FIELD_ITEM_TYPES]
+
 type AttachmentFieldItem<T extends AttachmentLike> =
   | {
       key: string
-      type: 'empty'
+      type: Extract<AttachmentFieldItemType, 'empty'>
     }
   | {
       key: string
-      type: 'placeholder'
+      type: Extract<AttachmentFieldItemType, 'placeholder'>
       placeholderId: number
     }
   | {
       key: string
-      type: 'attachment'
+      type: Extract<AttachmentFieldItemType, 'attachment'>
       attachment: T
       index: number
     }
@@ -76,11 +85,11 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
   const attachmentFieldItems = useMemo<AttachmentFieldItem<T>[]>(
     () => [
       ...(!attachments.length && !placeholderIds.length
-        ? [{ key: 'attachment-field-empty', type: 'empty' as const }]
+        ? [{ key: 'attachment-field-empty', type: ATTACHMENT_FIELD_ITEM_TYPES.empty }]
         : []),
       ...placeholderIds.map((placeholderId) => ({
         key: `attachment-field-empty-${placeholderId}`,
-        type: 'placeholder' as const,
+        type: ATTACHMENT_FIELD_ITEM_TYPES.placeholder,
         placeholderId
       })),
       ...attachments.map((attachment, index) => ({
@@ -88,7 +97,7 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
           String(attachment?.id ?? '') ||
           attachment.name ||
           `attachment-field-${index}`,
-        type: 'attachment' as const,
+        type: ATTACHMENT_FIELD_ITEM_TYPES.attachment,
         attachment,
         index
       }))
@@ -110,14 +119,14 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
         return
       }
 
-      if (activeUploadTarget.type === 'attachment') {
+      if (activeUploadTarget.type === ATTACHMENT_FIELD_ITEM_TYPES.attachment) {
         onReplace(activeUploadTarget.index, file)
         return
       }
 
       onAdd(file)
 
-      if (activeUploadTarget.type === 'placeholder') {
+      if (activeUploadTarget.type === ATTACHMENT_FIELD_ITEM_TYPES.placeholder) {
         removeAttachmentPlaceholder(activeUploadTarget.placeholderId)
       }
     },
@@ -125,7 +134,7 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
   )
 
   const renderAttachmentRightSlot = (item: AttachmentFieldItem<T>) => {
-    if (item.type !== 'attachment') {
+    if (item.type !== ATTACHMENT_FIELD_ITEM_TYPES.attachment) {
       return (
         <Button
           size="small"
@@ -164,16 +173,24 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
     <AttachmentField
       key={item.key}
       label={t`Attachment`}
-      value={item.type === 'attachment' ? item.attachment?.name ?? '' : undefined}
+      value={
+        item.type === ATTACHMENT_FIELD_ITEM_TYPES.attachment
+          ? item.attachment?.name ?? ''
+          : undefined
+      }
       placeholder={
-        item.type === 'attachment' ? undefined : t`Add File / Photos Here`
+        item.type === ATTACHMENT_FIELD_ITEM_TYPES.attachment
+          ? undefined
+          : t`Add File / Photos Here`
       }
       isGrouped
       testID={
-        item.type === 'attachment' ? `attachment-field-${item.index}` : item.key
+        item.type === ATTACHMENT_FIELD_ITEM_TYPES.attachment
+          ? `attachment-field-${item.index}`
+          : item.key
       }
       onClick={
-        item.type !== 'attachment' || isEditing
+        item.type !== ATTACHMENT_FIELD_ITEM_TYPES.attachment || isEditing
           ? () => openUploadSheet(item)
           : undefined
       }

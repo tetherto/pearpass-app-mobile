@@ -17,7 +17,7 @@ import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { getMimeType } from '../../../utils/getMimeType'
 import { handleDownloadFile } from '../../../utils/handleDownloadFile'
-import { Attachment, CreditCardRecord } from './types'
+import { Attachment, CreditCardRecord, CustomField } from './types'
 import { toReadOnlyFieldProps } from './utils'
 
 type ImagePreviewNavigation = {
@@ -30,13 +30,27 @@ type ImagePreviewNavigation = {
   ) => void
 }
 
+interface CreditCardRecordDetailsFormProps {
+  initialRecord?: CreditCardRecord
+  selectedFolder?: string
+}
+
+interface CreditCardRecordDetailsFormValues {
+  name: string
+  number: string
+  expireDate: string
+  securityCode: string
+  pinCode: string
+  note: string
+  customFields: CustomField[]
+  folder?: string
+  attachments: Attachment[]
+}
+
 export const CreditCardRecordDetailsForm = ({
   initialRecord,
   selectedFolder
-}: {
-  initialRecord?: CreditCardRecord
-  selectedFolder?: string
-}) => {
+}: CreditCardRecordDetailsFormProps) => {
   const { t } = useLingui()
   const navigation = useNavigation() as ImagePreviewNavigation
   const { setShouldBypassAutoLock } = useAutoLockContext() as {
@@ -44,7 +58,7 @@ export const CreditCardRecordDetailsForm = ({
   }
   const { copyToClipboard } = useCopyToClipboard()
 
-  const initialValues = useMemo(
+  const initialValues = useMemo<CreditCardRecordDetailsFormValues>(
     () => ({
       name: initialRecord?.data?.name ?? '',
       number: initialRecord?.data?.number ?? '',
@@ -59,9 +73,10 @@ export const CreditCardRecordDetailsForm = ({
     [initialRecord, selectedFolder]
   )
 
-  const { register, setValues, values, setValue } = useForm({
-    initialValues: initialValues
-  })
+  const { register, setValues, values, setValue } =
+    useForm<CreditCardRecordDetailsFormValues>({
+      initialValues
+    })
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -73,14 +88,14 @@ export const CreditCardRecordDetailsForm = ({
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const hasName = !!values?.name?.length
-  const hasNumber = !!values?.number?.length
-  const hasExpireDate = !!values?.expireDate?.length
-  const hasSecurityCode = !!values?.securityCode?.length
-  const hasPinCode = !!values?.pinCode?.length
-  const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as unknown[])?.length
-  const hasAttachments = !!values?.attachments?.length
+  const hasName = !!values.name.length
+  const hasNumber = !!values.number.length
+  const hasExpireDate = !!values.expireDate.length
+  const hasSecurityCode = !!values.securityCode.length
+  const hasPinCode = !!values.pinCode.length
+  const hasNote = !!values.note.length
+  const hasCustomFields = !!values.customFields.length
+  const hasAttachments = !!values.attachments.length
 
   const handleAttachmentPress = async (attachment: Attachment) => {
     if (getMimeType(attachment.name).startsWith('image/')) {
@@ -185,7 +200,7 @@ export const CreditCardRecordDetailsForm = ({
 
         {hasAttachments && (
           <MultiSlotInput testID="attachments-multi-slot-input">
-            {(values.attachments as Attachment[]).map((attachment, index) => (
+            {values.attachments.map((attachment, index) => (
               <AttachmentField
                 key={attachment?.id || attachment.name}
                 label={t`Attachment`}
@@ -217,21 +232,19 @@ export const CreditCardRecordDetailsForm = ({
 
         {hasCustomFields && (
           <MultiSlotInput testID="hidden-messages-multi-slot-input">
-            {(values.customFields as Array<{ type: string; note: string }>).map(
-              (field, index) => (
-                <PasswordField
-                  key={`${field.type}-${index}`}
-                  label={t`Hidden Message`}
-                  value={field.note ?? ''}
-                  placeholder={t`Enter Hidden Message`}
-                  readOnly
-                  copyable
-                  onCopy={copyToClipboard}
-                  isGrouped
-                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                />
-              )
-            )}
+            {values.customFields.map((field, index) => (
+              <PasswordField
+                key={`${field.type}-${index}`}
+                label={t`Hidden Message`}
+                value={field.note ?? ''}
+                placeholder={t`Enter Hidden Message`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              />
+            ))}
           </MultiSlotInput>
         )}
       </View>

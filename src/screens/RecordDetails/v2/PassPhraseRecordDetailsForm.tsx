@@ -11,12 +11,20 @@ import { StyleSheet, View } from 'react-native'
 
 import { PassPhraseV2 } from '../../../containers/PassPhrase/PassPhraseV2'
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
-import { PassPhraseRecord } from './types'
+import { CustomField, PassPhraseRecord } from './types'
 import { toReadOnlyFieldProps } from './utils'
 
 interface PassPhraseRecordDetailsFormProps {
   initialRecord?: PassPhraseRecord
   selectedFolder?: string
+}
+
+interface PassPhraseRecordDetailsFormValues {
+  title: string
+  passPhrase: string
+  note: string
+  customFields: CustomField[]
+  folder?: string
 }
 
 export const PassPhraseRecordDetailsForm = ({
@@ -26,7 +34,7 @@ export const PassPhraseRecordDetailsForm = ({
   const { t } = useLingui()
   const { copyToClipboard } = useCopyToClipboard()
 
-  const initialValues = useMemo(
+  const initialValues = useMemo<PassPhraseRecordDetailsFormValues>(
     () => ({
       title: initialRecord?.data?.title ?? '',
       passPhrase: initialRecord?.data?.passPhrase ?? '',
@@ -37,7 +45,7 @@ export const PassPhraseRecordDetailsForm = ({
     [initialRecord, selectedFolder]
   )
 
-  const { register, setValues, values } = useForm({
+  const { register, setValues, values } = useForm<PassPhraseRecordDetailsFormValues>({
     initialValues
   })
 
@@ -45,9 +53,9 @@ export const PassPhraseRecordDetailsForm = ({
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const hasPassPhrase = !!values?.passPhrase?.length
-  const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as unknown[])?.length
+  const hasPassPhrase = !!values.passPhrase.length
+  const hasNote = !!values.note.length
+  const hasCustomFields = !!values.customFields.length
 
   return (
     <View style={styles.container}>
@@ -71,21 +79,19 @@ export const PassPhraseRecordDetailsForm = ({
               />
             )}
 
-            {(values.customFields as Array<{ type: string; note: string }>).map(
-              (field, index) => (
-                <InputField
-                  key={`${field.type}-${index}`}
-                  label={t`Comment`}
-                  value={field.note ?? ''}
-                  placeholder={t`Enter Comment`}
-                  readOnly
-                  copyable
-                  onCopy={copyToClipboard}
-                  isGrouped
-                  testID={`comments-multi-slot-input-slot-${hasNote ? index + 1 : index}`}
-                />
-              )
-            )}
+            {values.customFields.map((field, index) => (
+              <InputField
+                key={`${field.type}-${index}`}
+                label={t`Comment`}
+                value={field.note ?? ''}
+                placeholder={t`Enter Comment`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID={`comments-multi-slot-input-slot-${hasNote ? index + 1 : index}`}
+              />
+            ))}
           </MultiSlotInput>
         )}
       </View>

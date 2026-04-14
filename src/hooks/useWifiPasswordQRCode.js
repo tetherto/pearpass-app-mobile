@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
 
-import { logger } from '../../utils/logger'
+import { logger } from '../utils/logger'
 
 export const generateWifiQRString = (
   ssid,

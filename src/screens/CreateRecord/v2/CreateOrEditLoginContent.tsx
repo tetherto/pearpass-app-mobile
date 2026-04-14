@@ -34,6 +34,25 @@ import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 import { logger } from '../../../utils/logger'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
 
+type LoginAttachment = {
+  base64?: string
+  id?: string | number
+  name: string
+}
+
+type UploadedLoginAttachment = LoginAttachment & {
+  base64: string
+}
+
+type WebsiteFormValue = {
+  website?: string
+}
+
+type HiddenMessageField = {
+  type: string
+  note: string
+}
+
 type LoginRecord = {
   data?: {
     title?: string
@@ -43,14 +62,14 @@ type LoginRecord = {
     otp?: { secret?: string }
     note?: string
     websites?: string[]
-    customFields?: unknown[]
+    customFields?: HiddenMessageField[]
     credential?: { id?: string }
     passkeyCreatedAt?: string
     passwordUpdatedAt?: string
   }
   folder?: string
   isFavorite?: boolean
-  attachments?: unknown[]
+  attachments?: LoginAttachment[]
 }
 
 interface Props {
@@ -65,6 +84,24 @@ type CreatePasswordItemNavigation = {
   ) => void
   goBack: () => void
 }
+
+type FormValues = {
+  title: string
+  username: string
+  password: string
+  otpSecret: string
+  note: string
+  websites: WebsiteFormValue[]
+  customFields: HiddenMessageField[]
+  folder?: string
+  attachments: LoginAttachment[]
+  credential: string
+  passkeyCreatedAt: string | null
+}
+
+const isUploadedLoginAttachment = (
+  attachment: LoginAttachment
+): attachment is UploadedLoginAttachment => typeof attachment.base64 === 'string'
 
 export function adaptRegister(reg: {
   value: string
@@ -124,7 +161,8 @@ export const CreateOrEditLoginContent = ({
     )
   })
 
-  const { register, handleSubmit, registerArray, values, setValue, errors } = useForm({
+  const { register, handleSubmit, registerArray, values, setValue, errors } =
+    useForm<FormValues>({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       username: initialRecord?.data?.username ?? '',
@@ -136,14 +174,14 @@ export const CreateOrEditLoginContent = ({
       note: initialRecord?.data?.note ?? '',
       websites: initialRecord?.data?.websites?.length
         ? initialRecord.data.websites.map((website) => ({ website }))
-        : [{ name: 'website' }],
+        : [{ website: '' }],
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? [],
       credential: initialRecord?.data?.credential?.id ?? '',
       passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
     },
-    validate: (values: Record<string, unknown>) => schema.validate(values)
+    validate: (formValues) => schema.validate(formValues)
   })
 
   useGetMultipleFiles({
@@ -161,17 +199,6 @@ export const CreateOrEditLoginContent = ({
     })
   }
 
-  type FormValues = {
-    title: string
-    username: string
-    password: string
-    otpSecret: string
-    note: string
-    websites: { website?: string }[]
-    customFields: unknown[]
-    folder: string
-    attachments: { base64: string; id?: string | number; name: string }[]
-  }
   const onSubmit = async (values: FormValues) => {
     if (isLoading) return
 
@@ -188,15 +215,19 @@ export const CreateOrEditLoginContent = ({
         password: values.password,
         note: values.note,
         otpInput,
-        websites: (values.websites as Array<{ website: string }>)
+        websites: values.websites
           .map((item) => {
-            if (!!item?.website?.trim().length) {
-              return addHttps(item.website)
+            const website = item.website?.trim()
+
+            if (website?.length) {
+              return addHttps(website)
             }
           })
-          .filter((website) => !!website?.trim().length),
+          .filter((website): website is string => !!website?.trim().length),
         customFields: values.customFields,
-        attachments: convertBase64FilesToUint8(values.attachments),
+        attachments: convertBase64FilesToUint8(
+          values.attachments.filter(isUploadedLoginAttachment)
+        ),
         passwordUpdatedAt: initialRecord?.data?.passwordUpdatedAt
       }
     }
@@ -252,7 +283,7 @@ export const CreateOrEditLoginContent = ({
     )
   }
 
-  const handleFileUpload = (file) => {
+  const handleFileUpload = (file?: LoginAttachment | null) => {
     if (!file) {
       return
     }
@@ -260,7 +291,10 @@ export const CreateOrEditLoginContent = ({
     setValue('attachments', [...values.attachments, file])
   }
 
-  const handleAttachmentReplace = (index, file) => {
+  const handleAttachmentReplace = (
+    index: number,
+    file?: LoginAttachment | null
+  ) => {
     if (!file) {
       return
     }
@@ -272,7 +306,7 @@ export const CreateOrEditLoginContent = ({
     setValue('attachments', updatedAttachments)
   }
 
-  const handleAttachmentDelete = (index) => {
+  const handleAttachmentDelete = (index: number) => {
     const updatedAttachments = values.attachments.filter(
       (_, idx) => idx !== index
     )
@@ -386,7 +420,7 @@ export const CreateOrEditLoginContent = ({
             <Button
               variant="tertiary"
               iconBefore={<Add />}
-              onClick={() => addItem({ name: 'website' })}
+              onClick={() => addItem({ website: '' })}
             >
               {t`Add Another Website`}
             </Button>
@@ -394,7 +428,7 @@ export const CreateOrEditLoginContent = ({
           errorMessage={(errors as Record<string, { error?: { website?: string } }[]>)?.websites?.find(Boolean)?.error?.website}
           testID="website-multi-slot-input"
         >
-          {(websitesList as Array<{ website?: string }>).map((w, index) => (
+          {websitesList.map((w, index) => (
             <InputField
               key={index}
               label={t`Website`}
@@ -483,8 +517,8 @@ export const CreateOrEditLoginContent = ({
           errorMessage={(errors as Record<string, { error?: { note?: string } }[]>)?.customFields?.find(Boolean)?.error?.note}
           testID="hidden-messages-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note: string }>).length
-            ? (values.customFields as Array<{ type: string; note: string }>).map((field, index) => (
+          {values.customFields.length
+            ? values.customFields.map((field, index) => (
               <PasswordField
                 key={index}
                 label={t`Hidden Message`}
@@ -494,7 +528,7 @@ export const CreateOrEditLoginContent = ({
                 isGrouped
                 testID={`hidden-messages-multi-slot-input-slot-${index}`}
                 rightSlot={
-                  (values.customFields as Array<{ type: string; note: string }>).length > 1 ? (
+                  values.customFields.length > 1 ? (
                     <Button
                       size='small'
                       variant="tertiary"

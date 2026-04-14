@@ -27,12 +27,24 @@ import { addHttps } from '../../../utils/addHttps'
 import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 import { getMimeType } from '../../../utils/getMimeType'
 import { handleDownloadFile } from '../../../utils/handleDownloadFile'
-import { Attachment, LoginRecord } from './types'
+import { Attachment, CustomField, LoginRecord } from './types'
 import { toReadOnlyFieldProps } from './utils'
 
 interface LoginRecordDetailsFormProps {
   initialRecord?: LoginRecord
   selectedFolder?: string
+}
+
+interface LoginRecordDetailsFormValues {
+  username: string
+  password: string
+  note: string
+  websites: string[]
+  customFields: CustomField[]
+  folder?: string
+  attachments: Attachment[]
+  credential: string
+  passkeyCreatedAt: string | Date | null
 }
 
 type ImagePreviewNavigation = {
@@ -58,7 +70,7 @@ export const LoginRecordDetailsForm = ({
   const { copyToClipboard } = useCopyToClipboard()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
 
-  const initialValues = useMemo(
+  const initialValues = useMemo<LoginRecordDetailsFormValues>(
     () => ({
       username: initialRecord?.data?.username ?? '',
       password: initialRecord?.data?.password ?? '',
@@ -73,9 +85,10 @@ export const LoginRecordDetailsForm = ({
     [initialRecord, selectedFolder]
   )
 
-  const { register, setValues, values, setValue } = useForm({
-    initialValues: initialValues
-  })
+  const { register, setValues, values, setValue } =
+    useForm<LoginRecordDetailsFormValues>({
+      initialValues
+    })
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -87,13 +100,13 @@ export const LoginRecordDetailsForm = ({
     setValues(initialValues)
   }, [initialValues, setValues])
 
-  const hasUsername = !!values?.username?.length
-  const hasPassword = !!values?.password?.length
-  const hasPasskey = !!values?.credential
-  const hasWebsites = !!(values?.websites as string[])?.length
-  const hasNote = !!values?.note?.length
-  const hasCustomFields = !!(values?.customFields as unknown[])?.length
-  const hasAttachments = !!values?.attachments?.length
+  const hasUsername = !!values.username.length
+  const hasPassword = !!values.password.length
+  const hasPasskey = !!values.credential
+  const hasWebsites = !!values.websites.length
+  const hasNote = !!values.note.length
+  const hasCustomFields = !!values.customFields.length
+  const hasAttachments = !!values.attachments.length
 
   const isPasswordSixMonthsOld = () => {
     const { passwordUpdatedAt } = initialRecord?.data || {}
@@ -167,7 +180,7 @@ export const LoginRecordDetailsForm = ({
 
         {hasWebsites && (
           <MultiSlotInput testID="website-multi-slot-input">
-            {(values.websites as string[]).map((website, index) => (
+            {values.websites.map((website, index) => (
               <InputField
                 key={`${website}-${index}`}
                 label={t`Website`}
@@ -217,7 +230,7 @@ export const LoginRecordDetailsForm = ({
 
         {hasAttachments && (
           <MultiSlotInput testID="attachments-multi-slot-input">
-            {(values.attachments as Attachment[]).map((attachment, index) => (
+            {values.attachments.map((attachment, index) => (
               <AttachmentField
                 key={attachment?.id || attachment.name}
                 label={t`Attachment`}
@@ -249,21 +262,19 @@ export const LoginRecordDetailsForm = ({
 
         {hasCustomFields && (
           <MultiSlotInput testID="hidden-messages-multi-slot-input">
-            {(values.customFields as Array<{ type: string; note: string }>).map(
-              (field, index) => (
-                <PasswordField
-                  key={`${field.type}-${index}`}
-                  label={t`Hidden Message`}
-                  value={field.note ?? ''}
-                  placeholder={t`Enter Hidden Message`}
-                  readOnly
-                  copyable
-                  onCopy={copyToClipboard}
-                  isGrouped
-                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                />
-              )
-            )}
+            {values.customFields.map((field, index) => (
+              <PasswordField
+                key={`${field.type}-${index}`}
+                label={t`Hidden Message`}
+                value={field.note ?? ''}
+                placeholder={t`Enter Hidden Message`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              />
+            ))}
           </MultiSlotInput>
         )}
       </View>

@@ -34,14 +34,17 @@ type BodyProps = {
   onClose?: () => void
 }
 
-type PickerAction = 'file' | 'media' | null
+enum PickerAction {
+  File = 'file',
+  Media = 'media'
+}
 
 const BottomSheetUploadFileBodyV2Content = ({
   onFileSelect,
   onClose
 }: BodyProps) => {
   const [isFileSizeWarning, setIsFileSizeWarning] = useState(false)
-  const [loadingAction, setLoadingAction] = useState<PickerAction>(null)
+  const [loadingAction, setLoadingAction] = useState<PickerAction | null>(null)
   const { t } = useLingui()
   const { theme } = useTheme()
 
@@ -50,7 +53,7 @@ const BottomSheetUploadFileBodyV2Content = ({
   }
 
   const launchPicker = (
-    action: Exclude<PickerAction, null>,
+    action: PickerAction,
     picker: () => Promise<void>
   ) => {
     setLoadingAction(action)
@@ -118,9 +121,9 @@ const BottomSheetUploadFileBodyV2Content = ({
             size="medium"
             fullWidth
             disabled={loadingAction !== null}
-            isLoading={loadingAction === 'file'}
+            isLoading={loadingAction === PickerAction.File}
             onClick={() =>
-              launchPicker('file', () =>
+              launchPicker(PickerAction.File, () =>
                 handleChooseFile(handleSelect, handleFileSizeWarning)
               )
             }
@@ -133,9 +136,9 @@ const BottomSheetUploadFileBodyV2Content = ({
             size="medium"
             fullWidth
             disabled={loadingAction !== null}
-            isLoading={loadingAction === 'media'}
+            isLoading={loadingAction === PickerAction.Media}
             onClick={() =>
-              launchPicker('media', () =>
+              launchPicker(PickerAction.Media, () =>
                 handleChooseMedia(handleSelect, handleFileSizeWarning)
               )
             }

@@ -32,13 +32,22 @@ type UploadedNoteAttachment = {
   name: string
 }
 
-type NoteAttachment = Partial<UploadedNoteAttachment>
+type NoteAttachment = {
+  base64?: string
+  id?: string | number
+  name: string
+}
+
+type NoteCustomField = {
+  type: string
+  note?: string
+}
 
 type NoteRecord = {
   data?: {
     title?: string
     note?: string
-    customFields?: Array<{ type: string; note?: string }>
+    customFields?: NoteCustomField[]
   }
   folder?: string
   isFavorite?: boolean
@@ -53,10 +62,14 @@ type Props = {
 type FormValues = {
   title: string
   note: string
-  customFields: Array<{ type: string; note?: string }>
+  customFields: NoteCustomField[]
   folder: string
   attachments: NoteAttachment[]
 }
+
+const isUploadedNoteAttachment = (
+  attachment: NoteAttachment
+): attachment is UploadedNoteAttachment => typeof attachment.base64 === 'string'
 
 export const CreateOrEditNoteContent = ({
   initialRecord,
@@ -94,7 +107,8 @@ export const CreateOrEditNoteContent = ({
     )
   })
 
-  const { handleSubmit, registerArray, values, setValue, errors } = useForm({
+  const { handleSubmit, registerArray, values, setValue, errors } =
+    useForm<FormValues>({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       note: initialRecord?.data?.note ?? '',
@@ -144,7 +158,7 @@ export const CreateOrEditNoteContent = ({
         note: formValues.note,
         customFields: formValues.customFields,
         attachments: convertBase64FilesToUint8(
-          formValues.attachments as UploadedNoteAttachment[]
+          formValues.attachments.filter(isUploadedNoteAttachment)
         )
       }
     }
@@ -267,7 +281,7 @@ export const CreateOrEditNoteContent = ({
           testID="comments-multi-slot-input"
         >
           {customFieldsList.length ? (
-            (customFieldsList as Array<{ type: string; note?: string }>).map(
+            customFieldsList.map(
               (field, index) => (
                 <InputField
                   key={`${field.type}-${index}`}

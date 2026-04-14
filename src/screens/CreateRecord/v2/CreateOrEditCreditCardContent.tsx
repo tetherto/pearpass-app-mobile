@@ -30,6 +30,21 @@ import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
 import { adaptRegister } from './CreateOrEditLoginContent'
 import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 
+type CreditCardAttachment = {
+  base64?: string
+  id?: string | number
+  name: string
+}
+
+type UploadedCreditCardAttachment = CreditCardAttachment & {
+  base64: string
+}
+
+type CreditCardCustomField = {
+  type: string
+  note: string
+}
+
 type CreditCardRecord = {
   data?: {
     title?: string
@@ -39,11 +54,11 @@ type CreditCardRecord = {
     securityCode?: string
     pinCode?: string
     note?: string
-    customFields?: unknown[]
+    customFields?: CreditCardCustomField[]
   }
   folder?: string
   isFavorite?: boolean
-  attachments?: unknown[]
+  attachments?: CreditCardAttachment[]
 }
 
 type Props = {
@@ -59,10 +74,14 @@ type FormValues = {
   securityCode: string
   pinCode: string
   note: string
-  customFields: unknown[]
+  customFields: CreditCardCustomField[]
   folder: string
-  attachments: { base64: string; id?: string | number; name: string }[]
+  attachments: CreditCardAttachment[]
 }
+
+const isUploadedCreditCardAttachment = (
+  attachment: CreditCardAttachment
+): attachment is UploadedCreditCardAttachment => typeof attachment.base64 === 'string'
 
 export const CreateOrEditCreditCardContent = ({
   initialRecord,
@@ -106,7 +125,7 @@ export const CreateOrEditCreditCardContent = ({
   })
 
   const { values, register, handleSubmit, setValue, registerArray, errors } =
-    useForm({
+    useForm<FormValues>({
       initialValues: {
         title: initialRecord?.data?.title ?? '',
         name: initialRecord?.data?.name ?? '',
@@ -119,8 +138,7 @@ export const CreateOrEditCreditCardContent = ({
         folder: selectedFolder ?? initialRecord?.folder,
         attachments: initialRecord?.attachments ?? []
       },
-      validate: (formValues: Record<string, unknown>) =>
-        schema.validate(formValues)
+      validate: (formValues) => schema.validate(formValues)
     })
 
   useGetMultipleFiles({
@@ -156,7 +174,9 @@ export const CreateOrEditCreditCardContent = ({
         pinCode: formValues.pinCode,
         note: formValues.note,
         customFields: formValues.customFields,
-        attachments: convertBase64FilesToUint8(formValues.attachments)
+        attachments: convertBase64FilesToUint8(
+          formValues.attachments.filter(isUploadedCreditCardAttachment)
+        )
       }
     }
 
@@ -213,11 +233,7 @@ export const CreateOrEditCreditCardContent = ({
     setValue('number', value)
   }
 
-  const handleFileUpload = (file: {
-    base64: string
-    id?: string | number
-    name: string
-  } | null) => {
+  const handleFileUpload = (file: CreditCardAttachment | null) => {
     if (!file) {
       return
     }
@@ -227,11 +243,7 @@ export const CreateOrEditCreditCardContent = ({
 
   const handleAttachmentReplace = (
     index: number,
-    file: {
-      base64: string
-      id?: string | number
-      name: string
-    } | null
+    file: CreditCardAttachment | null
   ) => {
     if (!file) {
       return
@@ -370,8 +382,8 @@ export const CreateOrEditCreditCardContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note: string }>).length
-            ? (values.customFields as Array<{ type: string; note: string }>).map(
+          {values.customFields.length
+            ? values.customFields.map(
               (field, index) => (
                 <PasswordField
                   key={index}
@@ -384,7 +396,7 @@ export const CreateOrEditCreditCardContent = ({
                   isGrouped
                   testID={`hidden-messages-multi-slot-input-slot-${index}`}
                   rightSlot={
-                    (values.customFields as Array<{ type: string; note: string }>).length > 1 ? (
+                    values.customFields.length > 1 ? (
                       <Button
                         size="small"
                         variant="tertiary"

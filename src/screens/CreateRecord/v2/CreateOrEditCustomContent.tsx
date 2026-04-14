@@ -29,12 +29,21 @@ type UploadedCustomAttachment = {
   name: string
 }
 
-type CustomAttachment = Partial<UploadedCustomAttachment>
+type CustomAttachment = {
+  base64?: string
+  id?: string | number
+  name: string
+}
+
+type CustomFieldValue = {
+  type: string
+  note?: string
+}
 
 type CustomContentRecord = {
   data?: {
     title?: string
-    customFields?: Array<{ type: string; note?: string }>
+    customFields?: CustomFieldValue[]
   }
   folder?: string
   isFavorite?: boolean
@@ -49,9 +58,13 @@ type Props = {
 type FormValues = {
   title: string
   folder: string
-  customFields: Array<{ type: string; note?: string }>
+  customFields: CustomFieldValue[]
   attachments: CustomAttachment[]
 }
+
+const isUploadedCustomAttachment = (
+  attachment: CustomAttachment
+): attachment is UploadedCustomAttachment => typeof attachment.base64 === 'string'
 
 export const CreateOrEditCustomContent = ({
   initialRecord,
@@ -97,15 +110,15 @@ export const CreateOrEditCustomContent = ({
     )
   })
 
-  const { handleSubmit, registerArray, values, setValue, errors } = useForm({
+  const { handleSubmit, registerArray, values, setValue, errors } =
+    useForm<FormValues>({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder ?? '',
       attachments: initialRecord?.attachments ?? []
     },
-    validate: (formValues: Record<string, unknown>) =>
-      schema.validate(formValues)
+    validate: (formValues) => schema.validate(formValues)
   })
 
   useGetMultipleFiles({
@@ -132,7 +145,7 @@ export const CreateOrEditCustomContent = ({
         title: formValues.title,
         customFields: formValues.customFields,
         attachments: convertBase64FilesToUint8(
-          formValues.attachments as UploadedCustomAttachment[]
+          formValues.attachments.filter(isUploadedCustomAttachment)
         )
       }
     }
@@ -247,8 +260,8 @@ export const CreateOrEditCustomContent = ({
           }
           testID="custom-fields-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note?: string }>).length
-            ? (values.customFields as Array<{ type: string; note?: string }>).map(
+          {values.customFields.length
+            ? values.customFields.map(
                 (field, index) => (
                   <InputField
                     key={`${field.type}-${index}`}
@@ -261,8 +274,7 @@ export const CreateOrEditCustomContent = ({
                     isGrouped
                     testID={`custom-fields-multi-slot-input-slot-${index}`}
                     rightSlot={
-                      (values.customFields as Array<{ type: string; note?: string }>)
-                        .length > 1 ? (
+                      values.customFields.length > 1 ? (
                         <Button
                           size="small"
                           variant="tertiary"
