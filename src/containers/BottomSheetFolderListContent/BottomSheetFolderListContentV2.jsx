@@ -7,7 +7,12 @@ import {
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { ContextMenu, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  ContextMenu,
+  rawTokens,
+  Text,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import {
   CheckIcon,
   FolderIcon,
@@ -20,8 +25,6 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { LogoLock } from '../../svgs/LogoLock'
-
-const ROW_ICON_SIZE = 24
 
 export const BottomSheetFolderListContentV2 = ({
   trigger,
@@ -44,13 +47,19 @@ export const BottomSheetFolderListContentV2 = ({
         name: folder.name,
         count: folder.records.filter((record) => !!record.data).length,
         icon: (
-          <FolderIcon size={ROW_ICON_SIZE} color={theme.colors.colorPrimary} />
+          <FolderIcon
+            width={24}
+            height={24}
+            color={theme.colors.colorPrimary}
+          />
         )
       })) ?? []
 
     const createNewItem = {
       name: t`Create new`,
-      icon: <PlusIcon size={ROW_ICON_SIZE} color={theme.colors.colorPrimary} />,
+      icon: (
+        <PlusIcon width={24} height={24} color={theme.colors.colorPrimary} />
+      ),
       isCreateNew: true
     }
 
@@ -69,7 +78,7 @@ export const BottomSheetFolderListContentV2 = ({
         name: t`Favorites`,
         id: 'favorite',
         count: folders?.favorites?.records.length || 0,
-        icon: <StarIcon size={ROW_ICON_SIZE} />
+        icon: <StarIcon width={24} height={24} />
       },
       ...customFolders,
       ...(AUTHENTICATOR_ENABLED
@@ -79,7 +88,8 @@ export const BottomSheetFolderListContentV2 = ({
               id: 'authenticator',
               icon: (
                 <LockIcon
-                  size={ROW_ICON_SIZE}
+                  width={24}
+                  height={24}
                   color={theme.colors.colorPrimary}
                 />
               ),
@@ -176,15 +186,15 @@ export const BottomSheetFolderListContentV2 = ({
 
 const styles = StyleSheet.create({
   sheetContent: {
-    paddingTop: 8
+    paddingTop: rawTokens.spacing8
   },
   list: {
     overflow: 'hidden'
   },
   row: {
     minHeight: 84,
-    paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingHorizontal: rawTokens.spacing20,
+    paddingVertical: rawTokens.spacing16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
@@ -193,7 +203,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 16
+    gap: rawTokens.spacing16
   },
   icon: {
     width: 28,
@@ -202,6 +212,6 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
-    gap: 2
+    gap: rawTokens.spacing2
   }
 })

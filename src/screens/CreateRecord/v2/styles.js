@@ -1,3 +1,4 @@
+import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 import styled from 'styled-components/native'
 
 export const Wrapper = styled.View`
@@ -18,6 +19,6 @@ export const ScrollView = styled.ScrollView.attrs({
 `
 
 export const FormWrapper = styled.View`
-  gap: 15px;
+  gap: ${rawTokens.spacing16}px;
   min-height: 100%;
 `

@@ -4,7 +4,6 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { isBefore, subtractDateUnits } from '@tetherto/pear-apps-utils-date'
-import { ErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   AlertMessage,
   AttachmentField,
@@ -12,6 +11,7 @@ import {
   InputField,
   MultiSlotInput,
   PasswordField,
+  rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
@@ -286,6 +286,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   topContent: {
-    gap: 8
+    gap: rawTokens.spacing8
   }
 })

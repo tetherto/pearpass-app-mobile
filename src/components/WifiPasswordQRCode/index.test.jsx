@@ -40,30 +40,6 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
-  const { Text: RNText } = require('react-native')
-
-  return {
-    Text: ({ children, ...props }) => <RNText {...props}>{children}</RNText>,
-    rawTokens: {
-      spacing8: 8,
-      spacing12: 12,
-      spacing20: 20,
-      spacing24: 24
-    },
-    useTheme: () => ({
-      theme: {
-        colors: {
-          colorBorderPrimary: '#212814',
-          colorSurfacePrimary: '#15180E',
-          colorSurfaceHover: '#212814',
-          colorTextSecondary: '#BDC3AC'
-        }
-      }
-    })
-  }
-})
-
 const { generateQRCodeSVG } = require('@tetherto/pear-apps-utils-qr')
 
 const { logger } = require('../../utils/logger')

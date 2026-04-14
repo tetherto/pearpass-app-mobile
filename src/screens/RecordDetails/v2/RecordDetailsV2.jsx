@@ -1,6 +1,11 @@
 import { useNavigation } from '@react-navigation/native'
 import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
-import { Button, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  Button,
+  rawTokens,
+  Text,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { Share as ShareIcon } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { RECORD_TYPES, useRecordById } from '@tetherto/pearpass-lib-vault'
 import { Share, StyleSheet, View } from 'react-native'
@@ -106,7 +111,7 @@ export const RecordDetailsV2 = ({ route }) => {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    padding: 16,
+    padding: rawTokens.spacing16,
     flexGrow: 1
   },
   hiddenFooter: {
@@ -115,19 +120,19 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4
+    gap: rawTokens.spacing4
   },
   headerIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
+    width: rawTokens.spacing24,
+    height: rawTokens.spacing24,
+    borderRadius: rawTokens.spacing6,
     alignItems: 'center',
     justifyContent: 'center'
   },
   headerTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: rawTokens.spacing8,
     minWidth: 0,
     flex: 1
   },

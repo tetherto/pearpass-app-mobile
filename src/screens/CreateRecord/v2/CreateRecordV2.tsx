@@ -1,4 +1,3 @@
-import styled from 'styled-components/native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 

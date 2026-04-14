@@ -13,8 +13,8 @@ import {
   UploadFileFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 
-import { BottomSheetAttachmentActionsContentV2 } from '../../../containers/BottomSheetAttachmentActionsContentV2/BottomSheetAttachmentActionsContentV2'
-import { BottomSheetUploadFileContentV2 } from '../../../containers/BottomSheetUploadFileContent/BottomSheetUploadFileContentV2'
+import { BottomSheetAttachmentActionsContentV2 } from '../../containers/BottomSheetAttachmentActionsContentV2/BottomSheetAttachmentActionsContentV2'
+import { BottomSheetUploadFileContentV2 } from '../../containers/BottomSheetUploadFileContent/BottomSheetUploadFileContentV2'
 
 type AttachmentLike = {
   id?: string | number

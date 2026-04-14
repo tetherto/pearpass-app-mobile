@@ -3,6 +3,7 @@ import {
   Button,
   ContextMenu,
   NavbarListItem,
+  rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
@@ -75,7 +76,7 @@ export const BottomSheetRecordActionsContentV2 = ({
           styles.sheetContent,
           {
             backgroundColor: theme.colors.colorSurfacePrimary,
-            paddingBottom: bottom + 12
+            paddingBottom: bottom + rawTokens.spacing12
           }
         ]}
       >
@@ -102,7 +103,7 @@ export const BottomSheetRecordActionsContentV2 = ({
 
 const styles = StyleSheet.create({
   sheetContent: {
-    paddingTop: 8
+    paddingTop: rawTokens.spacing8
   },
   list: {
     overflow: 'hidden'

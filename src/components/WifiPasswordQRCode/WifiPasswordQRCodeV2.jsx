@@ -42,10 +42,7 @@ export const WifiPasswordQRCodeV2 = ({
         }
       ]}
     >
-      <Text
-        variant="label"
-        color={theme.colors.colorTextSecondary}
-      >
+      <Text variant="label" color={theme.colors.colorTextSecondary}>
         {t`Scan QR Code to connect with the Wi-Fi`}
       </Text>
       <View

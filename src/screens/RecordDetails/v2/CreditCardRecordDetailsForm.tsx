@@ -7,7 +7,8 @@ import {
   AttachmentField,
   InputField,
   MultiSlotInput,
-  PasswordField
+  PasswordField,
+  rawTokens
 } from '@tetherto/pearpass-lib-ui-kit'
 import { StyleSheet, View } from 'react-native'
 
@@ -244,6 +245,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   topContent: {
-    gap: 8
+    gap: rawTokens.spacing8
   }
 })

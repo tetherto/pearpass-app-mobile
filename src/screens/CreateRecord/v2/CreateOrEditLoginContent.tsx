@@ -32,7 +32,7 @@ import { addHttps } from '../../../utils/addHttps'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 import { logger } from '../../../utils/logger'
-import { AttachmentFieldsV2 } from './AttachmentFieldsV2'
+import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
 
 type LoginRecord = {
   data?: {

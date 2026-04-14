@@ -25,7 +25,7 @@ type FormGroupChildProps = {
 
 export const FormGroup = ({
   title,
-  isCollapse = false,       // default value
+  isCollapse = false,
   children,
   onToggle,
   isOpened = true

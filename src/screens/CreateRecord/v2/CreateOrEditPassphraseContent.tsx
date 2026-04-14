@@ -4,10 +4,6 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { VALID_WORD_COUNTS } from '@tetherto/pearpass-lib-constants'
 import {
-  DeleteIcon,
-  PlusIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import {
   RECORD_TYPES,
   useCreateRecord,
   useRecords
@@ -28,6 +24,7 @@ import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHea
 import { ScreenLayout } from '../../../containers/ScreenLayout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { logger } from '../../../utils/logger'
+import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 
 type PassphraseRecord = {
   data?: {
@@ -228,7 +225,7 @@ export const CreateOrEditPassphraseContent = ({
             <Button
               size="small"
               variant="tertiary"
-              iconBefore={<PlusIcon />}
+              iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >
               {t`Add Another Note`}
@@ -255,7 +252,7 @@ export const CreateOrEditPassphraseContent = ({
                   variant="tertiary"
                   aria-label="Delete comment"
                   iconBefore={
-                    <DeleteIcon color={theme.colors.colorTextPrimary} />
+                    <TrashOutlined color={theme.colors.colorTextPrimary} />
                   }
                   onClick={() => setValue('note', '')}
                 />
@@ -281,7 +278,7 @@ export const CreateOrEditPassphraseContent = ({
                     variant="tertiary"
                     aria-label="Delete comment"
                     iconBefore={
-                      <DeleteIcon color={theme.colors.colorTextPrimary} />
+                      <TrashOutlined color={theme.colors.colorTextPrimary} />
                     }
                     onClick={() => removeCustomField(index)}
                   />

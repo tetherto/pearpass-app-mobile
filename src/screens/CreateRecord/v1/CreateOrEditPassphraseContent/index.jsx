@@ -183,6 +183,8 @@ export const CreateOrEditPassphraseContent = ({
                 onCreateCustom={(type) =>
                   addCustomField({ type: type, name: type })
                 }
+                testID="create-custom-field"
+                accessibilityLabel="Create custom field"
               />
             </FormGroup>
           </FormWrapper>

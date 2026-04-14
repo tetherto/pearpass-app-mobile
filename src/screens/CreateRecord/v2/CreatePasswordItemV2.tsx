@@ -10,7 +10,6 @@ import {
   generatePassphrase,
   generatePassword
 } from '@tetherto/pearpass-utils-password-generator'
-import { CopyIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   Button,
   PasswordIndicator,
@@ -28,6 +27,7 @@ import { Pressable, StyleSheet, View } from 'react-native'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { ScreenLayout } from '../../../containers/ScreenLayout'
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
+import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 
 const PASSWORD_OPTIONS = {
   password: 'password',
@@ -246,7 +246,7 @@ export const CreatePasswordItemV2 = ({
           iconBefore={
             onPasswordInsert
               ? undefined
-              : <CopyIcon color={theme.colors.colorOnPrimary} />
+              : <ContentCopy color={theme.colors.colorOnPrimary} />
           }
         >
           {onPasswordInsert ? t`Use Password` : t`Copy Password`}
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   },
   slider: {
     flex: 1,
-    height: 24
+    height: rawTokens.spacing24
   },
   settingRow: {
     paddingHorizontal: rawTokens.spacing12,

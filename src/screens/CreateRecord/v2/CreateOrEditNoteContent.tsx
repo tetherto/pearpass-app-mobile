@@ -8,7 +8,6 @@ import {
   InputField,
   MultiSlotInput,
   Text,
-  TextArea,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
@@ -25,7 +24,7 @@ import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
-import { AttachmentFieldsV2 } from './AttachmentFieldsV2'
+import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
 
 type UploadedNoteAttachment = {
   base64: string
@@ -225,7 +224,7 @@ export const CreateOrEditNoteContent = ({
           label={t`Title`}
           value={values.title}
           placeholder={t`Enter Title`}
-          onChangeText={(value) => setValue('title', value)}
+          onChange={(value) => setValue('title', value)}
           testID="title-field"
         />
       </View>
@@ -235,10 +234,10 @@ export const CreateOrEditNoteContent = ({
           {t`Details`}
         </Text>
 
-        <TextArea
-          label={t`Note`}
+        <InputField
+          label={t`Comment`}
           value={values.note}
-          placeholder={t`Enter Note`}
+          placeholder={t`Enter Comment`}
           onChange={(value) => setValue('note', value)}
           testID="note-field"
         />
@@ -275,7 +274,7 @@ export const CreateOrEditNoteContent = ({
                   label={t`Comment`}
                   value={field.note ?? ''}
                   placeholder={t`Enter Comment`}
-                  onChangeText={(value) =>
+                  onChange={(value) =>
                     setValue(`customFields[${index}].note`, value)
                   }
                   isGrouped

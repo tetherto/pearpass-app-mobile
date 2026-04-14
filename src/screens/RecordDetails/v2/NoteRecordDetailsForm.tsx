@@ -5,14 +5,12 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
   AttachmentField,
-  Button,
   InputField,
   MultiSlotInput,
   Text,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 
 import { useAutoLockContext } from '../../../context/AutoLockContext'
@@ -109,36 +107,18 @@ export const NoteRecordDetailsForm = ({
               {t`Details`}
             </Text>
 
-            <View
-              style={[
-                styles.noteCard,
-                {
-                  backgroundColor: theme.colors.colorSurfacePrimary,
-                  borderColor: theme.colors.colorBorderPrimary
-                }
-              ]}
-            >
-              <View
-                style={[
-                  styles.noteCardHeader,
-                  { borderBottomColor: theme.colors.colorBorderPrimary }
-                ]}
-              >
-                <Text variant="bodyEmphasized">{t`Comment`}</Text>
-
-                <Button
-                  size="small"
-                  variant="tertiary"
-                  aria-label="Copy note"
-                  iconBefore={
-                    <ContentCopy color={theme.colors.colorTextPrimary} />
-                  }
-                  onClick={() => copyToClipboard(values.note)}
-                />
-              </View>
-
-              <Text>{values.note}</Text>
-            </View>
+            <MultiSlotInput testID="comments-multi-slot-input">
+              <InputField
+                label={t`Comment`}
+                value={values.note}
+                placeholder={t`Enter Comment`}
+                readOnly
+                copyable
+                onCopy={copyToClipboard}
+                isGrouped
+                testID="comments-multi-slot-input-slot-0"
+              />
+            </MultiSlotInput>
           </View>
         )}
 
@@ -205,20 +185,5 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: rawTokens.spacing12
-  },
-  noteCard: {
-    borderWidth: 1,
-    borderRadius: rawTokens.spacing8,
-    overflow: 'hidden'
-  },
-  noteCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: rawTokens.spacing8,
-    borderBottomWidth: 1,
-    paddingLeft: rawTokens.spacing12,
-    paddingRight: rawTokens.spacing4,
-    paddingVertical: rawTokens.spacing4
-  },
+  }
 })

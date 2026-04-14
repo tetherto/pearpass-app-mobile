@@ -11,8 +11,8 @@ export const CreateRecordV1 = ({ route }) => {
 
   const folder =
     state?.folder === 'allFolder' ||
-      state?.folder === 'favorite' ||
-      state?.folder === 'authenticator'
+    state?.folder === 'favorite' ||
+    state?.folder === 'authenticator'
       ? undefined
       : state?.folder
 
