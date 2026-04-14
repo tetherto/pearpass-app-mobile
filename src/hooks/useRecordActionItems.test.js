@@ -40,6 +40,10 @@ jest.mock('@tetherto/pearpass-lib-vault', () => {
   }
 })
 
+jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+  useBottomSheetClose: () => jest.fn()
+}))
+
 jest.mock('./useCopyToClipboard', () => ({
   useCopyToClipboard: () => ({
     copyToClipboard: jest.fn()

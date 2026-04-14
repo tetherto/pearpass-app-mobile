@@ -87,8 +87,8 @@ export const OtpCodeField = ({
     </View>
   ) : null
 
+  // @ts-ignore - InputField is a JS component with partial JSDoc types
   return (
-    // @ts-ignore - InputField is a JS component with partial JSDoc types
     <InputField
       icon={LockIcon}
       label={t`Authenticator Token`}
