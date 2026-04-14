@@ -1,5 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { ImportItems } from 'src/screens/ImportItems'
 
+import {
+  AuthV2PinScreen,
+  AuthV2MasterPasswordScreen
+} from '../../screens/AuthV2'
 import { CreateFolder } from '../../screens/CreateFolder'
 import { CreateRecord } from '../../screens/CreateRecord'
 import { CreatePasswordItemV2 } from '../../screens/CreateRecord/v2/CreatePasswordItemV2'
@@ -8,6 +13,8 @@ import { ImagePreview } from '../../screens/ImagePreview'
 import { ImagePreviewV2 } from '../../screens/ImagePreview/ImagePreviewV2'
 import { ImportVault } from '../../screens/ImportVault'
 import { Intro } from '../../screens/Intro'
+import { MultiSelectDelete } from '../../screens/MultiSelectDelete'
+import { MultiSelectMove } from '../../screens/MultiSelectMove'
 import { Onboarding } from '../../screens/Onboarding'
 import {
   OnboardingV2Autofill,
@@ -21,6 +28,7 @@ import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
 import { MyDevices } from '../../screens/Settings/MyDevices'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
+import { VaultsV2 } from '../../screens/Settings/Vaults2'
 import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
 import { isV2 } from '../../utils/designVersion'
@@ -75,6 +83,16 @@ export const Navigation = ({ initialRouteName }) => (
       component={OnboardingV2Biometrics}
       options={noGestureNoAnimation}
     />
+    <Stack.Screen
+      name="AuthV2Pin"
+      component={AuthV2PinScreen}
+      options={noGesture}
+    />
+    <Stack.Screen
+      name="AuthV2MasterPassword"
+      component={AuthV2MasterPasswordScreen}
+      options={noGestureNoAnimation}
+    />
     <Stack.Screen name="Welcome" component={Welcome} options={noGesture} />
     <Stack.Screen
       name="MainTabNavigator"
@@ -93,7 +111,11 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="BlindPeering" component={BlindPeeringSectionV2} />
     <Stack.Screen name="ImportVault" component={ImportVault} />
     <Stack.Screen name="ShareVault" component={ShareVault} />
+    <Stack.Screen name="MultiSelectDelete" component={MultiSelectDelete} />
+    <Stack.Screen name="MultiSelectMove" component={MultiSelectMove} />
     <Stack.Screen name="Feedback" component={Feedback} />
+    <Stack.Screen name="ImportItems" component={ImportItems} />
+    <Stack.Screen name="Vaults2" component={VaultsV2} />
     <Stack.Screen name="MyDevices" component={MyDevices} />
   </Stack.Navigator>
 )

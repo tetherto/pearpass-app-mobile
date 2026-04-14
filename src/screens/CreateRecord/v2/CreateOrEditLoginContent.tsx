@@ -25,7 +25,7 @@ import { FormGroup } from '../../../components/FormGroup'
 
 import { BottomSheetFolderListContentV2 } from '../../../containers/BottomSheetFolderListContent/BottomSheetFolderListContentV2'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../../containers/ScreenLayout'
+import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { addHttps } from '../../../utils/addHttps'
@@ -314,14 +314,10 @@ export const CreateOrEditLoginContent = ({
   }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       style={{ flex: 1 }}
       contentStyle={styles.content}
-      containerStyle={{
-        flex: 1,
-        backgroundColor: theme.colors.colorBackground
-      }}
       header={
         <BackScreenHeader
           title={isEditing ? t`Edit Login Item` : t`New Login Item`}
@@ -560,7 +556,7 @@ export const CreateOrEditLoginContent = ({
           onDelete={handleAttachmentDelete}
         />
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 

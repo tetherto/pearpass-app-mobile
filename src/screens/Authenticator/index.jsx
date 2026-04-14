@@ -22,7 +22,7 @@ import { AvatarRecord } from '../../components/AvatarRecord'
 import { getTimerColor } from '../../components/OtpCodeField/utils'
 import { TimerCircle } from '../../components/TimerCircle'
 import { Header } from '../../containers/Header'
-import { ScreenLayout } from '../../containers/ScreenLayout'
+import { Layout } from '../../containers/Layout'
 import { CopyButton } from '../../libComponents/CopyButton'
 import { AuthenticatorIllustration } from '../../svgs/AuthenticatorIllustration'
 
@@ -138,7 +138,7 @@ export const Authenticator = () => {
     )
   }
 
-  const Wrapper = isV2() ? ScreenLayout : SafeAreaView
+  const Wrapper = isV2() ? Layout : SafeAreaView
   const wrapperProps = isV2()
     ? {
         header: (

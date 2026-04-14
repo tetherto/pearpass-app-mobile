@@ -21,7 +21,7 @@ import Toast from 'react-native-toast-message'
 
 import { PassPhraseV2 } from '../../../containers/PassPhrase/PassPhraseV2'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../../containers/ScreenLayout'
+import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { logger } from '../../../utils/logger'
 import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
@@ -162,14 +162,10 @@ export const CreateOrEditPassphraseContent = ({
   } = registerArray('customFields')
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       style={{ flex: 1 }}
       contentStyle={styles.content}
-      containerStyle={{
-        flex: 1,
-        backgroundColor: theme.colors.colorBackground
-      }}
       header={
         <BackScreenHeader
           title={
@@ -288,7 +284,7 @@ export const CreateOrEditPassphraseContent = ({
           )}
         </MultiSlotInput>
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 

@@ -1,14 +1,14 @@
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { CommonActions, useNavigation } from '@react-navigation/native'
-import { Button, rawTokens } from '@tetherto/pearpass-lib-ui-kit'
+import { Button } from '@tetherto/pearpass-lib-ui-kit'
 
+import { Layout } from '../../containers/Layout'
+import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { ImportPreviewStep } from './ImportPreviewStep'
 import { ImportScanStep } from './ImportScanStep'
 import { useImportVault } from './useImportVault'
-import { ScreenLayout } from '../../containers/ScreenLayout'
-import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 
 type Step = 'scan' | 'preview'
 
@@ -18,13 +18,8 @@ export const ImportVault = () => {
   const [step, setStep] = useState<Step>('scan')
   const [inviteCode, setInviteCode] = useState('')
 
-  const {
-    isLoading,
-    error,
-    pairedVault,
-    pairWithCode,
-    cancelPairing
-  } = useImportVault()
+  const { isLoading, error, pairedVault, pairWithCode, cancelPairing } =
+    useImportVault()
 
   const navigateToHome = useCallback(() => {
     navigation.dispatch(
@@ -91,11 +86,10 @@ export const ImportVault = () => {
     )
 
   return (
-    <ScreenLayout
+    <Layout
       header={<BackScreenHeader title={title} onBack={handleBack} />}
       footer={footer}
       scrollable
-      contentStyle={{ paddingTop: rawTokens.spacing16, paddingHorizontal: rawTokens.spacing16 }}
     >
       {step === 'scan' ? (
         <ImportScanStep
@@ -108,6 +102,6 @@ export const ImportVault = () => {
       ) : (
         <ImportPreviewStep vault={pairedVault} error={error} />
       )}
-    </ScreenLayout>
+    </Layout>
   )
 }

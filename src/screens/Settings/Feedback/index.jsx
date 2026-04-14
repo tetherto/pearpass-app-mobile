@@ -20,8 +20,8 @@ import {
 import { InfoFilled, Send } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { Platform, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
+import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
 
 import { version } from '../../../../package.json'
 import {
@@ -105,7 +105,7 @@ export const Feedback = () => {
     ? colors.colorTextDisabled
     : colors.colorOnPrimary
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       header={
         <BackScreenHeader
@@ -162,7 +162,7 @@ export const Feedback = () => {
           description={t`We'll use your email only to follow up with you. It won't be stored or used for anything else.`}
         />
       )}
-    </ScreenLayout>
+    </Layout>
   )
 }
 

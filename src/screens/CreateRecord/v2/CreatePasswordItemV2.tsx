@@ -25,9 +25,9 @@ import { css } from 'react-strict-dom'
 import { Pressable, StyleSheet, View } from 'react-native'
 
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../../containers/ScreenLayout'
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Layout } from 'src/containers/Layout'
 
 const PASSWORD_OPTIONS = {
   password: 'password',
@@ -229,7 +229,7 @@ export const CreatePasswordItemV2 = ({
   }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       contentStyle={styles.content}
       header={
@@ -461,7 +461,7 @@ export const CreatePasswordItemV2 = ({
           )}
         </View>
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 

@@ -6,9 +6,8 @@ import {
   useNavigation,
   useRoute
 } from '@react-navigation/native'
-import { Button, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Text, Title, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { FaceId, Fingerprint } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
@@ -32,6 +31,7 @@ export const BiometricsScreen = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const route = useRoute()
+  const { theme } = useTheme()
   const { enableBiometrics, isBiometricsSupported, isBiometricsEnabled } =
     useBiometricsAuthentication()
   const { data: vaultsData } = useVaults()
@@ -134,19 +134,23 @@ export const BiometricsScreen = () => {
             />
           </View>
 
-          <Title
-            style={styles.title}
-            data-testid="onboarding-v2-biometrics-title"
-          >
-            {title}
-          </Title>
+          <View style={styles.copyContainer}>
+            <View style={styles.titleContainer}>
+              <Title data-testid="onboarding-v2-biometrics-title">
+                {title}
+              </Title>
+            </View>
 
-          <Text
-            style={styles.description}
-            data-testid="onboarding-v2-biometrics-description"
-          >
-            {t`Use your fingerprint or face to securely unlock PearPass and confirm actions. It's faster than entering your Master Password and works only with your approval.`}
-          </Text>
+            <View style={styles.descriptionContainer}>
+              <Text
+                as="p"
+                color={theme.colors.colorTextSecondary}
+                data-testid="onboarding-v2-biometrics-description"
+              >
+                {t`Use your fingerprint or face to securely unlock PearPass and confirm actions. It's faster than entering your Master Password and works only with your approval.`}
+              </Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.buttonContainer}>
@@ -196,17 +200,15 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     width: '100%'
   },
-  title: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    color: colors.white.mode1,
-    textAlign: 'center',
+  copyContainer: {
+    alignItems: 'center'
+  },
+  titleContainer: {
     marginBottom: 14,
     marginTop: 16
   },
-  description: {
-    color: '#BDC3AC',
-    textAlign: 'center',
+  descriptionContainer: {
+    alignItems: 'center',
     marginBottom: 30
   }
 })

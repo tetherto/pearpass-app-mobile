@@ -1,57 +1,74 @@
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
 import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import {
+  ListItem,
+  Text,
+  Title,
+  rawTokens,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import {
+  KeyboardArrowRightOutlined,
+  LockOutlined,
+  Share,
+  Swap,
+  TrashOutlined,
+  VerifiedUser
+} from '@tetherto/pearpass-lib-ui-kit/icons'
+import { StyleSheet, View } from 'react-native'
 
-import { VAULT_ACTION } from '../../constants/vaultActions'
-import { ModifyVaultModalContent } from '../../containers/Modal/ModifyVaultModalContent'
-import { useBottomSheet } from '../../context/BottomSheetContext'
-import { useModal } from '../../context/ModalContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 
 /**
- *
  * @param {Object} props - Component props
- * @param {string} props.vaultId - The unique identifier of the vault
  * @param {string} props.vaultName - The current name of the vault
+ * @param {() => void} [props.onRename] - Callback when rename action is selected
+ * @param {() => void} [props.onPassword] - Callback when set password action is selected
+ * @param {() => void} [props.onMembers] - Callback when manage access action is selected
+ * @param {() => void} [props.onShare] - Callback when share action is selected
+ * @param {() => void} [props.onDelete] - Callback when delete action is selected
  * @returns {JSX.Element} Bottom sheet with vault modification options
- *
  */
-export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
+export const BottomSheetVaultAction = ({
+  vaultName,
+  onRename,
+  onPassword,
+  onMembers,
+  onShare,
+  onDelete
+}) => {
   const { t } = useLingui()
-  const { collapse } = useBottomSheet()
-  const { openModal } = useModal()
+  const { theme } = useTheme()
+  const collapse = useBottomSheetClose()
   const { hapticButtonPrimary } = useHapticFeedback()
 
-  const handleName = () => {
+  const handleAction = () => {
     hapticButtonPrimary()
     collapse()
-    openModal(
-      <ModifyVaultModalContent
-        vaultId={vaultId}
-        vaultName={vaultName}
-        action={VAULT_ACTION.NAME}
-      />
-    )
+  }
+
+  const handleName = () => {
+    handleAction()
+    onRename?.()
   }
 
   const handlePassword = () => {
-    hapticButtonPrimary()
-    collapse()
-    openModal(
-      <ModifyVaultModalContent
-        vaultId={vaultId}
-        vaultName={vaultName}
-        action={VAULT_ACTION.PASSWORD}
-      />
-    )
+    handleAction()
+    onPassword?.()
   }
 
   return (
     <>
       <View style={styles.header}>
-        <Text style={styles.title}>{t`What would you like to modify?`}</Text>
+        <Text variant="caption" color={theme.colors.colorPrimary}>
+          {t`Vault actions`}
+        </Text>
+        <Title as="h2">{vaultName}</Title>
+        <Text as="p" variant="label" color={theme.colors.colorTextSecondary}>
+          {t`Jump straight to the action you need without leaving the settings hub.`}
+        </Text>
       </View>
 
       <BottomSheetScrollView
@@ -59,14 +76,87 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleName}>
-            <Text style={styles.buttonText}>{t`Change vault name`}</Text>
-          </TouchableOpacity>
+          <ListItem
+            title={t`Rename Vault`}
+            subtitle={t`Update the identity shown across devices.`}
+            icon={<Swap color={theme.colors.colorTextPrimary} />}
+            rightElement={
+              <KeyboardArrowRightOutlined
+                color={theme.colors.colorTextSecondary}
+              />
+            }
+            platform="mobile"
+            showDivider={false}
+            onClick={handleName}
+          />
           {PROTECTED_VAULT_ENABLED && (
-            <TouchableOpacity style={styles.button} onPress={handlePassword}>
-              <Text style={styles.buttonText}>{t`Change vault password`}</Text>
-            </TouchableOpacity>
+            <ListItem
+              title={t`Set Vault Password`}
+              subtitle={t`Add or rotate the extra encryption layer.`}
+              icon={<LockOutlined color={theme.colors.colorTextPrimary} />}
+              rightElement={
+                <KeyboardArrowRightOutlined
+                  color={theme.colors.colorTextSecondary}
+                />
+              }
+              platform="mobile"
+              showDivider={false}
+              onClick={handlePassword}
+            />
           )}
+          <ListItem
+            title={t`Manage Access`}
+            subtitle={t`Review owner access and linked devices.`}
+            icon={<VerifiedUser color={theme.colors.colorTextPrimary} />}
+            rightElement={
+              <KeyboardArrowRightOutlined
+                color={theme.colors.colorTextSecondary}
+              />
+            }
+            platform="mobile"
+            showDivider={false}
+            onClick={() => {
+              handleAction()
+              onMembers?.()
+            }}
+          />
+          <ListItem
+            title={t`Share Personal Vault`}
+            subtitle={t`Open the QR code flow for pairing a trusted device.`}
+            icon={<Share color={theme.colors.colorTextPrimary} />}
+            rightElement={
+              <KeyboardArrowRightOutlined
+                color={theme.colors.colorTextSecondary}
+              />
+            }
+            platform="mobile"
+            showDivider={false}
+            onClick={() => {
+              handleAction()
+              onShare?.()
+            }}
+          />
+          <ListItem
+            title={t`Delete Vault`}
+            subtitle={t`Requires master password confirmation before removal.`}
+            icon={
+              <TrashOutlined
+                color={theme.colors.colorSurfaceDestructiveElevated}
+              />
+            }
+            rightElement={
+              <KeyboardArrowRightOutlined
+                color={theme.colors.colorSurfaceDestructiveElevated}
+              />
+            }
+            variant="destructive"
+            platform="mobile"
+            showDivider={false}
+            onClick={() => {
+              handleAction()
+              onDelete?.()
+            }}
+          />
         </View>
       </BottomSheetScrollView>
     </>
@@ -75,40 +165,20 @@ export const BottomSheetVaultAction = ({ vaultId, vaultName }) => {
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-    textAlign: 'center'
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: colors.white.mode1,
-    textAlign: 'center'
+    paddingHorizontal: rawTokens.spacing20,
+    paddingTop: rawTokens.spacing20,
+    paddingBottom: rawTokens.spacing8,
+    gap: rawTokens.spacing6
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: 20
+    paddingHorizontal: rawTokens.spacing20
   },
   scrollContent: {
-    paddingBottom: 40
+    paddingBottom: rawTokens.spacing20 * 2
   },
   buttonsContainer: {
-    marginTop: 20,
-    gap: 12
-  },
-  button: {
-    backgroundColor: colors.primary400.mode1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: colors.black.mode1,
-    fontSize: 16,
-    fontWeight: '600'
+    marginTop: 8,
+    gap: rawTokens.spacing12
   }
 })

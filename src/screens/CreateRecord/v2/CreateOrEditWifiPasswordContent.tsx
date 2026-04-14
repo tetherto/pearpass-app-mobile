@@ -21,7 +21,7 @@ import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../../containers/ScreenLayout'
+import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { logger } from '../../../utils/logger'
 
@@ -158,14 +158,10 @@ export const CreateOrEditWifiPasswordContent = ({
   }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       style={{ flex: 1 }}
       contentStyle={styles.content}
-      containerStyle={{
-        flex: 1,
-        backgroundColor: theme.colors.colorBackground
-      }}
       header={
         <BackScreenHeader
           title={isEditing ? t`Edit Wi-Fi Item` : t`New Wi-Fi Item`}
@@ -291,7 +287,7 @@ export const CreateOrEditWifiPasswordContent = ({
             )}
         </MultiSlotInput>
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 

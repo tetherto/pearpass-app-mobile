@@ -9,9 +9,9 @@ import { CreatePassword } from '../../containers/Auth/CreatePassword'
 import { EnterPassword } from '../../containers/Auth/EnterPassword'
 import { LoadVault } from '../../containers/Auth/LoadVault'
 import { LockedScreen } from '../../containers/Auth/LockedScreen'
-import { NewVault } from '../../containers/Auth/NewVault'
 import { SelectVaultType } from '../../containers/Auth/SelectVaultType'
 import { UnlockVault } from '../../containers/Auth/UnlockVault'
+import { VaultWizard } from '../../containers/Auth/VaultWizard'
 import { useBackHandler } from '../../hooks/useBackHandler'
 import { logger } from '../../utils/logger'
 
@@ -28,7 +28,7 @@ const getWelcomeScreenContent = (state, vaultId) => {
     case NAVIGATION_ROUTES.UNLOCK:
       return <UnlockVault vaultId={vaultId} />
     case NAVIGATION_ROUTES.CREDENTIALS:
-      return <NewVault />
+      return <VaultWizard />
     case NAVIGATION_ROUTES.SCREEN_LOCKED:
       return <LockedScreen />
     default:

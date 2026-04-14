@@ -30,8 +30,9 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 
+import { Layout } from '../../containers/Layout'
 import { ScreenHeader } from '../../containers/ScreenHeader'
-import { ScreenLayout } from '../../containers/ScreenLayout'
+import { isV2 } from '../../utils/designVersion'
 
 export const SettingsV2 = () => {
   const { t } = useLingui()
@@ -88,13 +89,13 @@ export const SettingsV2 = () => {
           {
             key: 'your-vaults',
             label: t`Your Vaults`,
-            screen: 'Vaults',
+            screen: isV2() ? 'Vaults2' : 'Vaults',
             icon: LayerFilled
           },
           {
             key: 'import-items',
             label: t`Import Items`,
-            screen: 'Vaults',
+            screen: 'ImportItems',
             icon: Login
           },
           {
@@ -163,12 +164,11 @@ export const SettingsV2 = () => {
   }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       style={{ flex: 1 }}
       contentStyle={styles.scrollContent}
       footerStyle={styles.hiddenFooter}
-      containerStyle={{ backgroundColor: theme.colors.colorBackground }}
       header={
         <ScreenHeader
           centerSlot={
@@ -272,16 +272,13 @@ export const SettingsV2 = () => {
           </Text>
         </View>
       )}
-    </ScreenLayout>
+    </Layout>
   )
 }
 
 const styles = StyleSheet.create({
   searchContainer: {
     flex: 1
-  },
-  scrollContent: {
-    padding: rawTokens.spacing16
   },
   sectionCard: {
     paddingBottom: rawTokens.spacing8,

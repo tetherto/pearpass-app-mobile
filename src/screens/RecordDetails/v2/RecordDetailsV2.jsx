@@ -15,7 +15,7 @@ import { HeaderContent } from './styles'
 import { RECORD_COLOR_BY_TYPE } from '../../../constants/recordColorByType'
 import { BottomSheetRecordActionsContentV2 } from '../../../containers/BottomSheetRecordActionsContent/BottomSheetRecordActionsContentV2'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../../containers/ScreenLayout'
+import { Layout } from '../../../containers/Layout'
 
 export const RecordDetailsV2 = ({ route }) => {
   const { recordId } = route.params
@@ -44,7 +44,7 @@ export const RecordDetailsV2 = ({ route }) => {
   }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       contentStyle={styles.scrollContent}
       footerStyle={styles.hiddenFooter}
@@ -105,7 +105,7 @@ export const RecordDetailsV2 = ({ route }) => {
       }
     >
       <RecordDetailsContent record={record} selectedFolder={record?.folder} />
-    </ScreenLayout>
+    </Layout>
   )
 }
 

@@ -4,6 +4,7 @@ import { Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
 
 import { getSharedDirectoryPath } from '../utils/AppGroupHelper.js'
+import { logger } from '../utils/logger'
 
 /**
  * @param {string} dirPath
@@ -16,6 +17,19 @@ const ensureDirectoryExist = async (dirPath) => {
   }
 }
 
+const withTimeout = (promise, ms, label) => {
+  let timeoutId
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${ms}ms`))
+    }, ms)
+  })
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId)
+  })
+}
+
 /**
  * @param {{
  *   debugMode?: boolean
@@ -23,7 +37,10 @@ const ensureDirectoryExist = async (dirPath) => {
  * @returns {Promise<PearpassVaultClient>}
  */
 export const createPearpassVaultClient = async ({ debugMode } = {}) => {
+  logger.log('[pearpass] init: createPearpassVaultClient start')
   const worklet = new Worklet()
+
+  logger.log('[pearpass] init: worklet created')
 
   const bundle = Platform.select({
     ios: require('../../bundles/app-ios.bundle.js'),
@@ -36,7 +53,11 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
 
   worklet.start('/worklet.bundle', bundle)
 
+  logger.log('[pearpass] init: worklet started')
+
   const sharedDirectory = await getSharedDirectoryPath()
+
+  logger.log('[pearpass] init: shared directory resolved')
 
   const path = sharedDirectory
     ? `file://${sharedDirectory}/pearpass`
@@ -44,16 +65,27 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
 
   await ensureDirectoryExist(path)
 
+  logger.log('[pearpass] init: storage path ensured')
+
   const client = new PearpassVaultClient(worklet.IPC, path, {
     debugMode: debugMode
   })
+
+  logger.log('[pearpass] init: client created')
 
   const jobStoragePath = sharedDirectory
     ? `file://${sharedDirectory}/pearpass_jobs`
     : `${FileSystem.documentDirectory}pearpass_jobs`
 
   await ensureDirectoryExist(jobStoragePath)
-  await client.setJobStoragePath(jobStoragePath)
+  logger.log('[pearpass] init: job storage path ensured')
+  await withTimeout(
+    client.setJobStoragePath(jobStoragePath),
+    30_000,
+    'setJobStoragePath'
+  )
+
+  logger.log('[pearpass] init: job storage path set')
 
   return client
 }

@@ -10,7 +10,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
   Close,
-  Edit,
+  EditOutlined,
   MoreVert,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
@@ -60,7 +60,7 @@ export const BottomSheetFileMoreActionsContentV2 = ({
           <NavbarListItem
             label="Rename"
             onClick={() => setState('renaming')}
-            icon={<Edit color={theme.colors.colorTextPrimary} />}
+            icon={<EditOutlined color={theme.colors.colorTextPrimary} />}
             showDivider
           />
           <NavbarListItem

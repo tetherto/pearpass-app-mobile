@@ -16,18 +16,22 @@ import {
   VaultProvider
 } from '@tetherto/pearpass-lib-vault'
 import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { App } from './app/App'
 import { AutoLockTouchCapture } from './components/AutoLockHandler'
 import { AutoLockProvider } from './context/AutoLockContext'
 import { BottomSheetProvider } from './context/BottomSheetContext'
+import { BottomSheetV2Provider } from './context/BottomSheetV2Context'
 import { HapticsProvider } from './context/HapticsContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
 import { SharedFilterProvider } from './context/SharedFilterContext'
 import { messages } from './locales/en/messages'
 import { isV2 } from './utils/designVersion'
+import { logger } from './utils/logger'
 import * as SplashScreen from './utils/SplashScreen'
 import { createPearpassVaultClient } from './worklet'
 
@@ -40,23 +44,46 @@ i18n.activate('en')
 
 export const Main = () => {
   const [isPearPassReady, setIsPearPassReady] = useState(false)
+  const [initError, setInitError] = useState(null)
 
   useEffect(() => {
     const init = async () => {
-      const vaultClient = await createPearpassVaultClient({
-        debugMode: process.env.NODE_ENV === 'development'
-      })
+      try {
+        const vaultClient = await createPearpassVaultClient({
+          debugMode: process.env.NODE_ENV === 'development'
+        })
 
-      setPearpassVaultClient(vaultClient)
-
-      setIsPearPassReady(true)
+        setPearpassVaultClient(vaultClient)
+        setIsPearPassReady(true)
+      } catch (error) {
+        logger.error('PearPass init failed:', error)
+        setInitError(error)
+        setIsPearPassReady(false)
+        SplashScreen.hideAsync()
+      }
     }
 
     init()
   }, [])
 
   if (!isPearPassReady) {
-    return null
+    return (
+      <UIKitProvider>
+        <StatusBar backgroundColor={colors.grey500.mode1} style="light" />
+        <GestureHandlerRootView style={styles.loadingScreen}>
+          {initError ? (
+            <>
+              <Text style={styles.errorTitle}>PearPass failed to start</Text>
+              <Text style={styles.errorMessage}>
+                {String(initError?.message || initError)}
+              </Text>
+            </>
+          ) : (
+            <Text style={styles.loadingText}>Initializing…</Text>
+          )}
+        </GestureHandlerRootView>
+      </UIKitProvider>
+    )
   }
 
   const BottomSheetWrapper = isV2() ? BottomSheetModalProvider : Fragment
@@ -69,24 +96,30 @@ export const Main = () => {
         <ThemeProvider>
           <HapticsProvider>
             <LoadingProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <BottomSheetWrapper>
-                  <VaultProvider>
-                    <SharedFilterProvider>
-                      <NavigationContainer>
-                        <AutoLockProvider>
-                          <AutoLockTouchCapture>
-                            <ModalProvider>
-                              <BottomSheetProvider>
-                                <App />
-                              </BottomSheetProvider>
-                            </ModalProvider>
-                          </AutoLockTouchCapture>
-                        </AutoLockProvider>
-                      </NavigationContainer>
-                    </SharedFilterProvider>
-                  </VaultProvider>
-                </BottomSheetWrapper>
+              <GestureHandlerRootView style={styles.appRoot}>
+                <SafeAreaProvider>
+                  <BottomSheetWrapper>
+                    <VaultProvider>
+                      <SharedFilterProvider>
+                        <NavigationContainer>
+                          <AutoLockProvider>
+                            <AutoLockTouchCapture>
+                              <ModalProvider>
+                                <BottomSheetProvider>
+                                  <BottomSheetV2Provider>
+                                    <BottomSheetWrapper>
+                                      <App />
+                                    </BottomSheetWrapper>
+                                  </BottomSheetV2Provider>
+                                </BottomSheetProvider>
+                              </ModalProvider>
+                            </AutoLockTouchCapture>
+                          </AutoLockProvider>
+                        </NavigationContainer>
+                      </SharedFilterProvider>
+                    </VaultProvider>
+                  </BottomSheetWrapper>
+                </SafeAreaProvider>
               </GestureHandlerRootView>
             </LoadingProvider>
           </HapticsProvider>
@@ -95,3 +128,38 @@ export const Main = () => {
     </UIKitProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  appRoot: {
+    flex: 1
+  },
+  loadingScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.grey500.mode1,
+    paddingHorizontal: 24
+  },
+  errorTitle: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 12,
+    textAlign: 'center'
+  },
+  errorMessage: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    fontSize: 12,
+    fontWeight: '500',
+    opacity: 0.8,
+    textAlign: 'center'
+  },
+  loadingText: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: '600'
+  }
+})

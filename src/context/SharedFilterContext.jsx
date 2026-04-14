@@ -1,11 +1,13 @@
 import { createContext, useContext, useState } from 'react'
 
+import { SORT_KEYS } from '../constants/sortOptions'
+
 const SharedFilterContext = createContext()
 
 export const INITIAL_STATE = {
   folder: 'allFolder',
   isFavorite: false,
-  sort: 'Recent'
+  sort: SORT_KEYS.LAST_UPDATED_NEWEST
 }
 
 /**

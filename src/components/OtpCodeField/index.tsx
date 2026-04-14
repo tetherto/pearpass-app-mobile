@@ -95,9 +95,6 @@ export const OtpCodeField = ({
       value={formattedCode}
       variant="outline"
       isDisabled
-      isSecure={false}
-      isColored={false}
-      isTransparent={false}
       isFirst={isFirst}
       isLast={isLast}
       belowInputContent={timerBar}

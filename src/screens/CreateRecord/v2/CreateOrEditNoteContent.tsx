@@ -19,7 +19,7 @@ import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from '../../../containers/ScreenLayout'
+import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
@@ -207,14 +207,10 @@ export const CreateOrEditNoteContent = ({
   }
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       style={{ flex: 1 }}
       contentStyle={styles.content}
-      containerStyle={{
-        flex: 1,
-        backgroundColor: theme.colors.colorBackground
-      }}
       header={
         <BackScreenHeader
           title={isEditing ? t`Edit Note Item` : t`New Note Item`}
@@ -329,7 +325,7 @@ export const CreateOrEditNoteContent = ({
           onDelete={handleAttachmentDelete}
         />
       </View>
-    </ScreenLayout>
+    </Layout>
   )
 }
 

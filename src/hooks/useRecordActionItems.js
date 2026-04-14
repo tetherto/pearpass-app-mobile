@@ -2,14 +2,13 @@ import { useCallback, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { useBottomSheetClose } from '@tetherto/pearpass-lib-ui-kit'
 import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
-import { BottomSheetFolderListContent } from '../containers/BottomSheetFolderListContent'
+import { SORT_KEYS } from '../constants/sortOptions'
 import { BottomSheetSortContent } from '../containers/BottomSheetSortContent'
-import { ConfirmModalContent } from '../containers/Modal/ConfirmModalContent'
 import { useBottomSheet } from '../context/BottomSheetContext'
-import { useModal } from '../context/ModalContext'
 import { useSharedFilter } from '../context/SharedFilterContext'
 
 /**
@@ -40,46 +39,25 @@ export const useRecordActionItems = ({
 } = {}) => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const { openModal, closeModal } = useModal()
-  const { collapse, expand } = useBottomSheet()
+  const collapse = useBottomSheetClose()
+  const { expand } = useBottomSheet()
   const { copyToClipboard } = useCopyToClipboard()
-  const { deleteRecords, updateFavoriteState, updateFolder } = useRecords({
-    onCompleted: () => {
-      closeModal()
-      collapse?.()
-      onDelete?.()
-    }
-  })
+  const { updateFavoriteState } = useRecords()
   const { setState } = useSharedFilter()
-
-  const handleDeleteConfirm = useCallback(async () => {
-    await deleteRecords([record?.id])
-  }, [record])
 
   const handleDelete = useCallback(() => {
     collapse?.()
-    openModal(
-      <ConfirmModalContent
-        title="Delete item"
-        text="Are you sure that you want to delete this item?"
-        secondaryAction={closeModal}
-        primaryAction={handleDeleteConfirm}
-      />
-    )
-  }, [ConfirmModalContent, handleDeleteConfirm])
+    navigation.navigate('MultiSelectDelete', {
+      selectedRecordIds: [record?.id],
+      selectedRecordObjects: [record],
+      onComplete: onDelete
+    })
+  }, [record, onDelete, collapse, navigation])
 
   const handleFavoriteToggle = useCallback(() => {
     updateFavoriteState([record?.id], !record?.isFavorite)
-
     collapse?.()
-  }, [record])
-
-  const handleFolderMoveSelect = useCallback(
-    async (folder) => {
-      await updateFolder([record?.id], folder.name)
-    },
-    [record]
-  )
+  }, [record, collapse, updateFavoriteState])
 
   const handleEdit = useCallback(() => {
     navigation.navigate('CreateRecord', {
@@ -87,34 +65,36 @@ export const useRecordActionItems = ({
       recordType: record.type,
       selectedFolder: record.folder
     })
-
     collapse?.()
-  }, [record])
+  }, [record, navigation, collapse])
 
   const handleMoveClick = useCallback(() => {
     collapse?.()
-
-    expand({
-      children: (
-        <BottomSheetFolderListContent onFolderSelect={handleFolderMoveSelect} />
-      ),
-      snapPoints: ['10%', '25%', '25%']
+    navigation.navigate('MultiSelectMove', {
+      selectedRecordIds: [record?.id],
+      selectedRecordObjects: [record]
     })
-  }, [])
+  }, [record, navigation, collapse])
 
-  const handleCopy = useCallback((value) => {
-    if (!value?.length) {
-      return
-    }
+  const handleCopy = useCallback(
+    (value) => {
+      if (!value?.length) {
+        return
+      }
 
-    copyToClipboard(value)
-    collapse?.()
-  }, [])
+      copyToClipboard(value)
+      collapse?.()
+    },
+    [copyToClipboard, collapse]
+  )
 
-  const handleSort = useCallback((sortOrder) => {
-    setState((prev) => ({ ...prev, sort: sortOrder }))
-    collapse?.()
-  }, [])
+  const handleSort = useCallback(
+    (sortOrder) => {
+      setState((prev) => ({ ...prev, sort: sortOrder }))
+      collapse?.()
+    },
+    [setState, collapse]
+  )
 
   const actionsByType = useMemo(
     () => ({
@@ -190,7 +170,7 @@ export const useRecordActionItems = ({
       {
         name: record?.isFavorite
           ? t`Remove from Favorites`
-          : t`Mark as favorite`,
+          : t`Add to Favorites`,
         type: 'favorite',
         click: handleFavoriteToggle
       },
@@ -229,28 +209,22 @@ export const useRecordActionItems = ({
   const recordSortActions = useMemo(
     () => [
       {
-        name: t`Recent`,
-        type: 'recent',
-        click: () => {
-          handleSort('Recent')
-        }
+        name: t`Last Updated (Newest first)`,
+        type: 'sort',
+        click: () => handleSort(SORT_KEYS.LAST_UPDATED_NEWEST)
       },
       {
-        name: t`Newest to oldest`,
+        name: t`Last Updated (Oldest first)`,
         type: 'sort',
-        click: () => {
-          handleSort('Newest to oldest')
-        }
+        click: () => handleSort(SORT_KEYS.LAST_UPDATED_OLDEST)
       },
       {
-        name: t`Oldest to newest`,
+        name: t`Title (A-Z)`,
         type: 'sort',
-        click: () => {
-          handleSort('Oldest to newest')
-        }
+        click: () => handleSort(SORT_KEYS.TITLE_AZ)
       }
     ],
-    []
+    [handleSort, t]
   )
 
   const filteredActions = useMemo(

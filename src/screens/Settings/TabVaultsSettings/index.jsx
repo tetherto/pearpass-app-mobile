@@ -1,6 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { PROTECTED_VAULT_ENABLED } from '@tetherto/pearpass-lib-constants'
 import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVault } from '@tetherto/pearpass-lib-vault'
@@ -9,25 +8,16 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { CardSingleSetting } from '../../../components/CardSingleSetting'
 import { ListItem } from '../../../components/ListItem'
-import { BottomSheetVaultAction } from '../../../containers/BottomSheetVaultAction'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { ButtonLittle } from '../../../libComponents'
 import { settingsStyles } from '../styles'
 
 export const VaultsManageSection = () => {
   const { t } = useLingui()
-  const { expand } = useBottomSheet()
+  const navigation = useNavigation()
   const { data: vault } = useVault()
 
   const handleVaultEditClick = (vaultId, vaultName) => {
-    const snapPoints = PROTECTED_VAULT_ENABLED ? ['30%', '90%'] : ['20%', '90%']
-    expand({
-      children: (
-        <BottomSheetVaultAction vaultId={vaultId} vaultName={vaultName} />
-      ),
-      snapPoints,
-      enableContentPanningGesture: false
-    })
+    navigation.navigate('VaultSettingsScreen', { vaultId, vaultName })
   }
 
   return (

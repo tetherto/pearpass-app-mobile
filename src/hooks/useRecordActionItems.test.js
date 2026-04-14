@@ -192,7 +192,7 @@ describe('useRecordActionItems', () => {
     const favoriteAction = nonFavoriteResult.current.actions.find(
       (action) => action.type === 'favorite'
     )
-    expect(favoriteAction.name).toBe('Mark as favorite')
+    expect(favoriteAction.name).toBe('Add to Favorites')
 
     const favoriteRecord = { ...mockRecord, isFavorite: true }
     const { result: favoriteResult } = renderHook(
@@ -263,9 +263,13 @@ describe('useRecordActionItems', () => {
     })
 
     expect(result.current.recordSortActions.length).toBe(3)
-    expect(result.current.recordSortActions[0].name).toBe('Recent')
-    expect(result.current.recordSortActions[1].name).toBe('Newest to oldest')
-    expect(result.current.recordSortActions[2].name).toBe('Oldest to newest')
+    expect(result.current.recordSortActions[0].name).toBe(
+      'Last Updated (Newest first)'
+    )
+    expect(result.current.recordSortActions[1].name).toBe(
+      'Last Updated (Oldest first)'
+    )
+    expect(result.current.recordSortActions[2].name).toBe('Title (A-Z)')
   })
 
   describe('WiFi Password Record Actions', () => {
@@ -326,7 +330,7 @@ describe('useRecordActionItems', () => {
       const favoriteAction = nonFavoriteResult.current.actions.find(
         (action) => action.type === 'favorite'
       )
-      expect(favoriteAction.name).toBe('Mark as favorite')
+      expect(favoriteAction.name).toBe('Add to Favorites')
 
       const favoriteWifiRecord = { ...wifiPasswordRecord, isFavorite: true }
       const { result: favoriteResult } = renderHook(

@@ -76,11 +76,7 @@ export const TabNavigatorV2 = () => {
         },
         tabBarActiveTintColor: theme.colors.colorTextPrimary,
         tabBarInactiveTintColor: theme.colors.colorTextSecondary,
-        tabBarLabel: ({ focused }) => {
-          const color = focused
-            ? theme.colors.colorTextPrimary
-            : theme.colors.colorTextSecondary
-
+        tabBarLabel: ({ color }) => {
           if (route.name === 'MainDrawerNavigator') {
             return (
               <View style={styles.vaultLabelContainer}>

@@ -1,36 +1,28 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
 import { isV2 } from 'src/utils/designVersion'
 
 import { Container, CurrentFolder, FolderName } from './styles'
+import { SORT_BY_TYPE } from '../../constants/sortOptions'
 import { Categories } from '../../containers/Categories'
+import { ContentHeader } from '../../containers/ContentHeader'
 import { EmptyCollectionView } from '../../containers/EmptyCollectionView'
+import { EmptyCollectionViewV2 } from '../../containers/EmptyCollectionViewV2'
 import { EmptyResultsView } from '../../containers/EmptyResultsView'
 import { Header } from '../../containers/Header'
 import { ItemList } from '../../containers/ItemList'
-import { ScreenLayout } from '../../containers/ScreenLayout'
+import { ItemListV2 } from '../../containers/ItemListV2'
+import { Layout } from '../../containers/Layout'
+import { MultiSelectBar } from '../../containers/MultiSelectBar'
 import {
   INITIAL_STATE,
   useSharedFilter
 } from '../../context/SharedFilterContext'
+import { useBackHandler } from '../../hooks/useBackHandler'
 import { useJobQueueProcessor } from '../../jobQueue'
-
-const SORT_BY_TYPE = {
-  Recent: {
-    key: 'updatedAt',
-    direction: 'desc'
-  },
-  'Newest to oldest': {
-    key: 'createdAt',
-    direction: 'desc'
-  },
-  'Oldest to newest': {
-    key: 'createdAt',
-    direction: 'asc'
-  }
-}
+import { groupRecordsByTimePeriod } from '../../utils/groupRecordsByTimePeriod'
 
 export const Home = () => {
   useJobQueueProcessor()
@@ -41,10 +33,18 @@ export const Home = () => {
   const [selectedRecords, setSelectedRecords] = useState([])
 
   const { state, setState } = useSharedFilter()
-
   const sort = useMemo(() => SORT_BY_TYPE[state.sort], [state.sort])
 
   const { data: vaultData } = useVault()
+
+  const handleExitMultiSelect = useCallback(() => {
+    setSelectedRecords([])
+    setIsMultiSelectOn(false)
+  }, [])
+
+  useBackHandler({
+    callback: isMultiSelectOn ? handleExitMultiSelect : undefined
+  })
 
   const selectedFolder =
     state?.folder !== 'allFolder' && state?.folder !== 'favorite'
@@ -83,47 +83,81 @@ export const Home = () => {
   useEffect(() => {
     if (vaultData?.id) {
       setSearchValue('')
-      setRecordType('all')
     }
   }, [selectedFolder, state.isFavorite])
 
-  const Wrapper = isV2() ? ScreenLayout : Container
+  const sections = useMemo(
+    () => (isV2() ? groupRecordsByTimePeriod(records, sort) : []),
+    [records, sort]
+  )
 
-  return (
-    <Wrapper
-      header={
-        isV2() ? (
-          <Header
-            setIsMultiSelectOn={setIsMultiSelectOn}
-            isMultiSelectOn={isMultiSelectOn}
-            setSearchValue={handleSearch}
+  if (isV2()) {
+    const headerProps = {
+      setIsMultiSelectOn,
+      isMultiSelectOn,
+      setSearchValue: handleSearch,
+      selectedRecords,
+      setSelectedRecords,
+      searchValue,
+      itemsFound: records?.length
+    }
+
+    return (
+      <Layout
+        header={<Header {...headerProps} />}
+        contentStyle={{ padding: 0 }}
+      >
+        <ContentHeader
+          isMultiSelectOn={isMultiSelectOn}
+          recordType={recordType}
+          onCategoryChange={handleRecordType}
+        />
+
+        {isMultiSelectOn && (
+          <MultiSelectBar
             selectedRecords={selectedRecords}
             setSelectedRecords={setSelectedRecords}
-            searchValue={searchValue}
-            itemsFound={records?.length}
+            setIsMultiSelectOn={setIsMultiSelectOn}
+            records={records}
           />
-        ) : undefined
-      }
-      hideFooter={isV2() ? true : undefined}
-    >
-      {!isV2() && (
-        <Header
-          setIsMultiSelectOn={setIsMultiSelectOn}
-          isMultiSelectOn={isMultiSelectOn}
-          setSearchValue={handleSearch}
-          selectedRecords={selectedRecords}
-          setSelectedRecords={setSelectedRecords}
-          searchValue={searchValue}
-          itemsFound={records?.length}
-        />
-      )}
+        )}
+
+        {!!records.length && (
+          <ItemListV2
+            sections={sections}
+            isMultiSelectOn={isMultiSelectOn}
+            selectedRecords={selectedRecords}
+            setSelectedRecords={setSelectedRecords}
+            setIsMultiSelectOn={setIsMultiSelectOn}
+          />
+        )}
+
+        {!records.length && !searchValue.length && <EmptyCollectionViewV2 />}
+
+        {!records.length && !!searchValue.length && <EmptyResultsView />}
+      </Layout>
+    )
+  }
+
+  const headerProps = {
+    setIsMultiSelectOn,
+    isMultiSelectOn,
+    setSearchValue: handleSearch,
+    selectedRecords,
+    setSelectedRecords,
+    searchValue,
+    itemsFound: records?.length
+  }
+
+  return (
+    <Container>
+      <Header {...headerProps} />
 
       <Categories setRecordType={handleRecordType} recordType={recordType} />
 
       {state?.folder && state?.folder !== 'allFolder' && (
         <CurrentFolder>
           <FolderIcon />
-
           <FolderName>{state?.folder}</FolderName>
         </CurrentFolder>
       )}
@@ -142,6 +176,6 @@ export const Home = () => {
       )}
 
       {!records.length && !!searchValue.length && <EmptyResultsView />}
-    </Wrapper>
+    </Container>
   )
 }

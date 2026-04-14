@@ -1,9 +1,8 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { Button, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
+import { Button, Text, Title, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { Dimensions, Platform, StyleSheet, View } from 'react-native'
+import { Dimensions, StyleSheet, View } from 'react-native'
 import Rive from 'rive-react-native'
 
 import { OnboardingLayout } from '../components/OnboardingLayout'
@@ -13,6 +12,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window')
 export const SyncScreen = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
 
   return (
     <OnboardingLayout>
@@ -27,16 +27,23 @@ export const SyncScreen = () => {
             />
           </View>
 
-          <Title style={styles.title} data-testid="onboarding-v2-sync-title">
-            {t`Sync without the cloud`}
-          </Title>
+          <View style={styles.copyContainer}>
+            <View style={styles.titleContainer}>
+              <Title data-testid="onboarding-v2-sync-title">
+                {t`Sync without the cloud`}
+              </Title>
+            </View>
 
-          <Text
-            style={styles.description}
-            data-testid="onboarding-v2-sync-description"
-          >
-            {t`Your devices connect directly to each other using peer-to-peer technology.\n\nNo cloud. No copies. No middlemen.`}
-          </Text>
+            <View style={styles.descriptionContainer}>
+              <Text
+                as="p"
+                color={theme.colors.colorTextSecondary}
+                data-testid="onboarding-v2-sync-description"
+              >
+                {t`Your devices connect directly to each other using peer-to-peer technology.\n\nNo cloud. No copies. No middlemen.`}
+              </Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.buttonContainer}>
@@ -80,18 +87,15 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     width: '100%'
   },
-  title: {
-    fontFamily:
-      Platform.OS === 'android' ? 'humble-nostalgia' : 'Humble Nostalgia',
-    color: colors.white.mode1,
-    textAlign: 'center',
+  copyContainer: {
+    alignItems: 'center'
+  },
+  titleContainer: {
     marginTop: 48,
     marginBottom: 14
   },
-  description: {
-    color: colors.white.mode1,
-    textAlign: 'center',
-    lineHeight: 18,
+  descriptionContainer: {
+    alignItems: 'center',
     marginBottom: 30
   }
 })
