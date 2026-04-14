@@ -1,0 +1,99 @@
+import { useLingui } from '@lingui/react/macro'
+import { useNavigation } from '@react-navigation/native'
+import type { NavigationProp } from '@react-navigation/native'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { useCreateFolder, useFolders } from '@tetherto/pearpass-lib-vault'
+import Toast from 'react-native-toast-message'
+
+import { Button, InputField, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { View } from 'react-native'
+import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
+import { styles } from './CreateFolderV2Styles'
+import { ScreenLayout } from 'src/containers/ScreenLayout'
+
+export const CreateFolderV2 = ({ route }) => {
+  const { onGoBack, initialValues } = route.params ?? {}
+
+  const { t } = useLingui()
+  const { theme } = useTheme()
+  const navigation = useNavigation<NavigationProp<Record<string, undefined>>>()
+
+  const { renameFolder } = useFolders()
+
+  const { createFolder } = useCreateFolder({
+    onCompleted: (folder) => {
+      navigation.goBack()
+
+      if (onGoBack) {
+        onGoBack(folder)
+      }
+    },
+    onError: (error) => {
+      if (error === 'folder_name_exists') {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`ERROR: Folder with this name already exists`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
+      }
+    }
+  })
+
+  const schema = Validator.object({
+    title: Validator.string().required(t`Title is required`)
+  })
+
+  const { register, handleSubmit } = useForm({
+    initialValues: {
+      title: initialValues?.title ?? ''
+    },
+    validate: (values) => schema.validate(values)
+  })
+
+  const onSubmit = (values) => {
+    if (initialValues) {
+      renameFolder(initialValues.title, values.title)
+      navigation.goBack()
+    } else {
+      createFolder(values.title)
+    }
+  }
+
+  const { onChange: onChangeTitleText, ...titleField } = register('title')
+
+  return (
+    <ScreenLayout
+      scrollable
+      contentStyle={styles.surfaceContent}
+      header={
+        <BackScreenHeader
+          title={initialValues ? t`Rename Folder` : t`Create New Folder`}
+          onBack={() => {
+            onGoBack
+              ? navigation.goBack()
+              : navigation.navigate('MainTabNavigator')
+          }}
+        />
+      }
+      footer={
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          disabled={!titleField.value.trim()}
+        >
+          {initialValues ? t`Save` : t`Create New Folder`}
+        </Button>
+      }
+    >
+      <InputField
+        label={t`Folder Name`}
+        placeholder={t`Enter name`}
+        testID="create-folder-title-input"
+        accessibilityLabel="create-folder-title-input"
+        onChangeText={onChangeTitleText}
+        {...titleField}
+      />
+    </ScreenLayout>
+  )
+}

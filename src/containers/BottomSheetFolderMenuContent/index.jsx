@@ -42,9 +42,12 @@ export const BottomSheetFolderMenuContent = ({ folderName }) => {
               text="Are you sure that you want to Reset all stored data?"
               secondaryAction={closeModal}
               primaryAction={() => {
-                deleteFolder(folderName)
-                closeModal()
-                collapse()
+                navigation.navigate('DeleteFolder', {
+                  folderName
+                })
+                // deleteFolder(folderName)
+                // closeModal()
+                // collapse()
               }}
             />
           )
