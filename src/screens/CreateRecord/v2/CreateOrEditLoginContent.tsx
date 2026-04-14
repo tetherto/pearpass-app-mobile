@@ -461,7 +461,7 @@ export const CreateOrEditLoginContent = ({
               <BottomSheetFolderSelectorContent
                 selectedFolder={values.folder}
                 onSelect={handleFolderSelect}
-                includeSmartFolders={false}
+                includeAllFolders={false}
               />
             </ContextMenu>
           }
@@ -486,7 +486,7 @@ export const CreateOrEditLoginContent = ({
             <BottomSheetFolderSelectorContent
               selectedFolder={values.folder}
               onSelect={handleFolderSelect}
-              includeSmartFolders={false}
+              includeAllFolders={false}
             />
           </ContextMenu>
         </MultiSlotInput>

@@ -20,7 +20,7 @@ import { Layout } from '../Layout'
 export const BottomSheetFolderSelectorContent = ({
   selectedFolder,
   onSelect,
-  includeSmartFolders = true
+  includeAllFolders = true
 }) => {
   const { t } = useLingui()
   const navigation = useNavigation()
@@ -76,7 +76,7 @@ export const BottomSheetFolderSelectorContent = ({
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={<SheetHeader title={t`Folders`} onClose={collapse} />}
     >
-      {includeSmartFolders && (
+      {includeAllFolders && (
         <NavbarListItem
           icon={<FolderCopy color={theme.colors.colorTextPrimary} />}
           iconSize={16}
