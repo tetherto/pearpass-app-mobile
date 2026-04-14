@@ -86,11 +86,6 @@ run_prebuild() {
   perl -0777 -i -pe "s/def reactNativeAndroidDir = new File\\([\\s\\S]*?\\n\\)\\n\\n//g" android/build.gradle
   perl -0777 -i -pe "s/\\n\\s*maven \\{\\n\\s*\\/\\/ All of React Native[^\\n]*\\n\\s*url\\(reactNativeAndroidDir\\)\\n\\s*\\}\\n/\\n/g" android/build.gradle
   perl -i -ne "print unless /credentials-play-services-auth|play-services-auth|googleid|play-services-fido|firebase-messaging/" android/app/build.gradle
-  rm -f android/app/debug.keystore
-  # Produce unsigned APKs — F-Droid signs with its own key
-  sed -i.bak 's/signingConfig signingConfigs.debug/signingConfig null/' android/app/build.gradle && rm -f android/app/build.gradle.bak
-  # Remove the now-unused signingConfigs block referencing the deleted keystore
-  perl -0777 -i -pe 's/\s*signingConfigs\s*\{\s*debug\s*\{[^}]*\}\s*\}//' android/app/build.gradle
 }
 
 ensure_java_home() {
@@ -156,6 +151,10 @@ run_build() {
 
   cd android
   perl -i -ne "print unless /credentials-play-services-auth|play-services-auth|googleid|play-services-fido|firebase-messaging|play-services-mlkit|barcode-scanning|play-services-base|play-services-basement|play-services-tasks/" app/build.gradle
+  # Produce unsigned APKs — F-Droid signs with its own key
+  rm -f app/debug.keystore
+  sed -i.bak 's/signingConfig signingConfigs.debug/signingConfig null/' app/build.gradle && rm -f app/build.gradle.bak
+  perl -0777 -i -pe 's/\s*signingConfigs\s*\{\s*debug\s*\{[^}]*\}\s*\}//' app/build.gradle
   find . ../node_modules -name '*.gradle' -type f -exec perl -i -ne "print unless /firebase-messaging|com\\.google\\.firebase\\.messaging/" {} +
   find . ../node_modules -name '*.gradle.kts' -type f -exec perl -i -ne "print unless /firebase-messaging|com\\.google\\.firebase\\.messaging/" {} +
   rm -f app/google-services.json
