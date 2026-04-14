@@ -259,7 +259,15 @@ export const ModifyVaultModalContent = ({
             errorMessage={newPasswordField.error}
           />
 
-          <View style={styles.strengthCard}>
+          <View
+            style={[
+              styles.strengthCard,
+              {
+                backgroundColor: theme.colors.colorSurfacePrimary,
+                borderColor: theme.colors.colorBorderPrimary
+              }
+            ]}
+          >
             <View style={styles.strengthHeader}>
               <Text variant="caption" color={theme.colors.colorTextSecondary}>
                 {t`Strength`}
@@ -268,7 +276,12 @@ export const ModifyVaultModalContent = ({
                 {strengthTextLabel}
               </Text>
             </View>
-            <View style={styles.strengthTrack}>
+            <View
+              style={[
+                styles.strengthTrack,
+                { backgroundColor: theme.colors.colorBorderPrimary }
+              ]}
+            >
               <View
                 style={[
                   styles.strengthFill,
@@ -291,8 +304,17 @@ export const ModifyVaultModalContent = ({
                   key={rule.key}
                   style={[
                     styles.ruleChip,
+                    {
+                      backgroundColor: theme.colors.colorSurfacePrimary,
+                      borderColor: theme.colors.colorBorderPrimary
+                    },
                     passwordStrengthMeta.result?.rules?.[rule.key] &&
-                      styles.ruleChipActive
+                      styles.ruleChipActive,
+                    passwordStrengthMeta.result?.rules?.[rule.key] && {
+                      backgroundColor:
+                        theme.colors.colorSurfaceElevatedOnInteraction,
+                      borderColor: theme.colors.colorPrimary
+                    }
                   ]}
                 >
                   <Text
@@ -331,9 +353,7 @@ const styles = StyleSheet.create({
     gap: rawTokens.spacing8,
     borderRadius: 18,
     padding: 14,
-    backgroundColor: '#0F130A',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)'
+    borderWidth: 1
   },
   strengthHeader: {
     flexDirection: 'row',
@@ -343,7 +363,6 @@ const styles = StyleSheet.create({
   strengthTrack: {
     height: 8,
     borderRadius: 999,
-    backgroundColor: '#202614',
     overflow: 'hidden'
   },
   strengthFill: {
@@ -359,12 +378,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 7,
-    backgroundColor: '#090B07',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)'
+    borderWidth: 1
   },
-  ruleChipActive: {
-    backgroundColor: 'rgba(163,230,53,0.12)',
-    borderColor: 'rgba(163,230,53,0.24)'
-  }
+  ruleChipActive: {}
 })
