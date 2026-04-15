@@ -18,8 +18,8 @@ interface BottomSheetFolderMenuContentV2Props {
   folderName: string
   onBack: () => void
   onClose: () => void
-  onRename?: (folderName: string) => void
-  onDelete?: (folderName: string) => void
+  onRename: (folderName: string) => void
+  onDelete: (folderName: string) => void
 }
 
 export const BottomSheetFolderMenuContentV2 = ({

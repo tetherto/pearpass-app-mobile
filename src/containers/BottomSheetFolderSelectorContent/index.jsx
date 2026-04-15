@@ -131,29 +131,28 @@ export const BottomSheetFolderSelectorContent = ({
         />
       )}
 
-      {customFolders.map((folder) => {
-        const count =
-          folder.records?.filter((record) => !!record.data).length ?? 0
-        const isSelected = activeFolder === folder.name
+      {customFolders.map(({ name: folderName, records }) => {
+        const count = records?.filter((record) => !!record.data).length ?? 0
+        const isSelected = activeFolder === folderName
 
         return (
           <NavbarListItem
-            key={folder.name}
+            key={folderName}
             icon={<Folder color={theme.colors.colorTextPrimary} />}
             iconSize={16}
-            label={folder.name}
+            label={folderName}
             count={count}
             selected={isSelected}
             platform="mobile"
             showDivider
-            onClick={() => handleSelect(folder.name)}
+            onClick={() => handleSelect(folderName)}
             additionalItems={
               <Button
                 variant="tertiary"
                 size="small"
                 aria-label={t`Folder actions`}
                 iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
-                onClick={() => setMenuFolderName(folder.name)}
+                onClick={() => setMenuFolderName(folderName)}
               />
             }
           />

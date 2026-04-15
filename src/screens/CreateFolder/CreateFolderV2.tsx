@@ -12,6 +12,8 @@ import { useSharedFilter } from 'src/context/SharedFilterContext'
 import { Layout } from 'src/containers/Layout'
 import { styles } from './CreateFolderV2Styles'
 
+const FOLDER_NAME_EXISTS_ERROR = 'folder_name_exists'
+
 export const CreateFolderV2 = ({ route }) => {
   const { onGoBack, initialValues } = route.params ?? {}
 
@@ -50,7 +52,7 @@ export const CreateFolderV2 = ({ route }) => {
       }
     },
     onError: (error) => {
-      if (error === 'folder_name_exists') {
+      if (error === FOLDER_NAME_EXISTS_ERROR) {
         Toast.show({
           type: 'baseToast',
           text1: t`ERROR: Folder with this name already exists`,
