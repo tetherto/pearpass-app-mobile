@@ -29,7 +29,7 @@ npm install --save-dev wdio-ctrf-json-reporter slack-ctrf
 3. Click **"Add to Slack"**
 4. Choose the channel where you want to receive test notifications
 5. Click **"Add Incoming Webhooks integration"**
-6. Copy the **Webhook URL**
+6. Copy the **Webhook URL** Slack shows for the integration (keep it only in `.env` or CI secrets — do not commit it). The URL format is documented in Slack’s Incoming Webhooks guide.
 
 ## Step 3: Configure Environment Variables
 
@@ -40,7 +40,7 @@ Add the following to your `.env` file:
 # SLACK NOTIFICATIONS
 ################################
 ENABLE_SLACK=true
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+SLACK_WEBHOOK_URL=
 ```
 
 ### Parameters:
@@ -148,8 +148,7 @@ cross-env ENABLE_SLACK=false npm run test:all
    ```
 
 2. **Verify Webhook URL**:
-   - Ensure `SLACK_WEBHOOK_URL` is set correctly
-   - URL should start with `https://hooks.slack.com/services/`
+   - Ensure `SLACK_WEBHOOK_URL` is set correctly (value comes only from Slack Incoming Webhooks — paste into `.env`, never into tracked files)
    - Check for typos or extra spaces
 
 3. **Check Console Logs**:

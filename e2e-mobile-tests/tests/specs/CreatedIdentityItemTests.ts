@@ -75,5 +75,14 @@ describe('Created Identity Flow - User can interact with Created Identity Item p
 
     it('[PAS-XXX] User can verify that all elements on Created Identity Item page are visible', async () => {
         const { createdIdentityItem } = Pages;
-        
-        
+
+        await createdIdentityItem.verifyBackButtonIdentityItemPageVisible();
+        await createdIdentityItem.verifyFavoriteButtonUncheckedIdentityItemPageVisible();
+        await createdIdentityItem.verifyEditButtonIdentityItemPageAllElementsVisible();
+        await createdIdentityItem.verifyThreeDotsButtonIdentityItemPageVisible();
+        await createdIdentityItem.verifyAvatarImageIdentityItemPageVisible();
+        await createdIdentityItem.verifyTitleIdentityItemPageVisible();
+        await createdIdentityItem.verifyFullNameFieldIdentityItemPageAllElementsVisible();
+        await createdIdentityItem.verifyEmailFieldIdentityItemPageAllElementsVisible();
+    });
+});

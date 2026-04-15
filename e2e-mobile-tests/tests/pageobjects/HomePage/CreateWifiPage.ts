@@ -63,6 +63,11 @@ export class CreateWifiPage extends BasePage {
     return this.self;
   }
 
+  async tapNewNoteField(): Promise<this> {
+    await this.newNoteField.click();
+    return this.self;
+  }
+
   async tapNewNoteFieldDeleteButton(): Promise<this> {
     await this.newNoteFieldDeleteButton.click();
     return this.self;

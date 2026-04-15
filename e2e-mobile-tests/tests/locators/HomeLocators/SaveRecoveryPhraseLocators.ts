@@ -73,8 +73,6 @@ const saveRecoveryPhraseLocators = {
     twelfthPastedRecoveryPhraseNumber: '//android.widget.TextView[@text="#12"]',
     twelfthPastedRecoveryPhraseText: '//android.widget.TextView[@text="qweq"]',
 
-
-
     typeField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[4]',
     typeFieldText: '//android.widget.TextView[@text="Type"]',
     twelveWordsRadioButton: '~12 words',
@@ -90,8 +88,8 @@ const saveRecoveryPhraseLocators = {
     twentyFourWordsRadioButtonUnchosen: '//android.view.ViewGroup[@content-desc="24 words"]/android.view.ViewGroup',
 
     randomWordsToggleText: '//android.widget.TextView[@text="+1 random word"]',
-    randomWordsToggleOn: '//android.widget.Switch/android.view.ViewGroup',
-    randomWordsToggleOff: '//android.widget.Switch/android.view.ViewGroup',
+    randomWordsToggleOn: '~Add one random word toggle on',
+    randomWordsToggleOff: '~Add one random word toggle off',
 
 /* =====================================================
         NOTE FIELD
@@ -100,16 +98,25 @@ const saveRecoveryPhraseLocators = {
     noteFieldIcon: '//android.view.ViewGroup[@content-desc="Note field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     noteFieldTitle: '//android.widget.TextView[@text=" Comment "]',
     noteFieldInput: '~Note input field',
+    noteFieldContextMenuThreeDots: '~More options',
+    selectAllMenuItem: '//android.widget.TextView[@text="Select all"]',
+    copyMenuItem: '//android.widget.TextView[@text="Copy"]',
 /* =====================================================
         CUSTOM FIELD
 ===================================================== */
-    customField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]',
+    customField: '~Create custom field',
     createCustomFieldButton: '~Create Custom',
-    customFieldIcon: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
-    customFieldTitle: '//android.widget.TextView[@text="Create Custom"]',
-    customFieldIcon2: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
+    customFieldIcon: '~Create custom field plus icon',
+    customFieldTitle: '~Create custom field text',
+    customFieldIcon2: '~Expand create custom field button',
 
-    customFieldsIcon3: '//android.view.ViewGroup[@content-desc="Note"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    customFieldsText2: '//android.widget.TextView[@text="Note"]',
+    customFieldsIcon3: '//android.view.ViewGroup[@content-desc="Comment"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    customFieldsText2: '//android.widget.TextView[@text="Comment"]',
+
+    newNoteField: '//android.view.ViewGroup[@content-desc="New comment input field"]',
+    newNoteFieldIcon: '//android.view.ViewGroup[@content-desc="New comment input field"]/com.horcrux.svg.SvgView',
+    newNoteFieldTitle: '(//android.widget.TextView[@text=" Comment "])[2]',
+    newNoteFieldInput: '//android.widget.EditText[@content-desc="New comment input field"]',
+    newNoteFieldDeleteButton: '~Delete new comment field button',
 }
 export default saveRecoveryPhraseLocators;

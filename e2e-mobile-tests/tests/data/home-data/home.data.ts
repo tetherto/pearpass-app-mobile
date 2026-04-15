@@ -141,7 +141,7 @@ export const NOTE_CREATED_ON_HOME_PAGE = {
   ===================================================== */
 
 export const CUSTOM_ELEMENT_CREATED_ON_HOME_PAGE = {
-  text: 'Custom title for test',
+  text: 'Test Custom Title',
 } as const;
 
 /* =====================================================
@@ -235,14 +235,17 @@ export const IMPORTED_ITEMS = {
   protonPassCsvIdentity: {
     iconText: 'PI',
     identityText: 'prot identity',
+    protonPassCsvIdentityText2: 'Personal',
   },
   protonPassCsvNote: {
     iconText: 'PN',
     noteText: 'prot note',
+    protonPassCsvNoteText2: 'Personal',
   },
   protonPassCsvLogin: {
-    iconText: 'PL',
+    protonPassCsvLoginText2: 'Personal',
     loginText: 'prot login',
+
   },
   protonPassJsonIdentity: {
     iconText: 'PI',
@@ -255,6 +258,7 @@ export const IMPORTED_ITEMS = {
   protonPassJsonLogin: {
     iconText: 'PL',
     loginText: 'prot login',
+    protonPassJsonLoginText2: 'Personal',
   },
   unencryptedFileCsvHecht: {
     iconText: 'HT',

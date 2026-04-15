@@ -1,6 +1,7 @@
 // slack-stats.js
 const axios = require('axios');
 
+// Minimal Slack notifier for test stats (manual / demo)
 async function sendSlackStats() {
   const PLATFORM = process.env.PLATFORM || 'Android';
   const RUN_TARGET = process.env.RUN_TARGET || 'local_emulator';
@@ -11,6 +12,7 @@ async function sendSlackStats() {
     return;
   }
   
+  // Stub counts (override per --suite)
   const args = process.argv;
   let suiteName = 'signup';
   let totalTests = 33;
@@ -22,6 +24,7 @@ async function sendSlackStats() {
     suiteName = args[suiteIndex + 1];
   }
   
+  // Per-suite defaults
   switch(suiteName) {
     case 'onboarding':
       totalTests = 5;
@@ -47,12 +50,6 @@ async function sendSlackStats() {
     case 'fullFlow':
       totalTests = 38;
       passedTests = 38;
-      failedTests = 0;
-      break;
-    case 'home':
-    case 'homeOnly':
-      totalTests = 0;
-      passedTests = 0;
       failedTests = 0;
       break;
   }
@@ -85,6 +82,7 @@ async function sendSlackStats() {
   }
 }
 
+// Run when executed as main module
 if (require.main === module) {
   sendSlackStats();
 }

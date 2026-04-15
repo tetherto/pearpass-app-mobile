@@ -12,7 +12,7 @@ export const CREATE_NOTES_TITLE_FIELD = {
   ===================================================== */
 
 export const CREATE_NOTES_WRITE_NOTE_FIELD = {
-  placeholder: 'Write a note...',
+  placeholder: 'Write a comment...',
 } as const;
 
 /* =====================================================
@@ -46,7 +46,16 @@ export const CREATE_NOTES_CUSTOM_FIELD = {
   ===================================================== */
 
 export const CREATE_NOTES_NEW_ELEMENT_IN_CUSTOM_FIELD = {
-  text: 'Note',
+  text: 'Comment',
+} as const;
+
+/* =====================================================
+        CREATE NOTES PAGE - NEW NOTE FIELD
+  ===================================================== */
+
+export const CREATE_NOTES_NEW_NOTE_FIELD = {
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
 } as const;
 
 /* =====================================================
@@ -56,4 +65,5 @@ export const CREATE_NOTES_NEW_ELEMENT_IN_CUSTOM_FIELD = {
 export const CREATE_NOTES_ENTERED_FIELDS = {
   title: 'Test Note Title',
   writeNote: 'Test note content',
+  newNote: 'Test new note content',
 } as const;

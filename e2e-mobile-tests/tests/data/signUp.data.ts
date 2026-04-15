@@ -69,6 +69,37 @@ export const ENTER_PASSWORD_SCREEN = {
 } as const;
 
 /* =====================================================
+        USE FINGERPRINT (ENTER MASTER PASSWORD)
+  ===================================================== */
+
+export const USE_FINGERPRINT = {
+  label: 'Use Fingerprint',
+} as const;
+
+/* =====================================================
+        ANDROID SYSTEM BIOMETRICS POPUP (after "Use Fingerprint")
+  ===================================================== */
+
+export const BIOMETRICS_AUTHENTICATION_POPUP = {
+  appText: 'PearPass',
+  title: 'Authenticate to enable biometric login',
+  /** Matches accessibility `~Fingerprint sensor` */
+  indicatorContentDesc: 'Fingerprint sensor',
+  cancelButtonText: 'Cancel',
+} as const;
+
+/* =====================================================
+        ENABLE BIOMETRIC AUTHENTICATION POPUP
+  ===================================================== */
+
+export const ENABLE_BIOMETRIC_AUTHENTICATION_POPUP = {
+  title: 'Enable biometric authentication',
+  description: 'Your device supports biometric authentication. Do you want to enable biometric authentication for easier and more secure sign-in?',
+  dismissButtonText: 'Dismiss',
+  enableButtonText: 'Enable',
+} as const;
+
+/* =====================================================
         SELECT VAULT TYPE SCREEN DATA
   ===================================================== */
 
@@ -129,11 +160,10 @@ export const VALIDATION_ERRORS = {
   passwordMissingUppercase: 'Password must contain at least one uppercase letter',
   passwordMissingNumber: 'Password must contain at least one number',
   passwordMissingSpecial: 'Password must contain at least one special character',
-  incorrectPassword: 'Incorrect password. You have',
-  incorrectPassword4Attempts: 'Incorrect password. You have 4 attempts before the app locks for 5 minutes.',
-  incorrectPassword3Attempts: 'Incorrect password. You have 3 attempts before the app locks for 5 minutes.',
-  incorrectPassword2Attempts: 'Incorrect password. You have 2 attempts before the app locks for 5 minutes.',
-  incorrectPassword1Attempt: 'Incorrect password. You have 1 attempt before the app locks for 5 minutes.',
+  incorrectPassword4Attempts: ' Incorrect password. You have 4 attempts before the app locks for 5 minutes. ',
+  incorrectPassword3Attempts: ' Incorrect password. You have 3 attempts before the app locks for 5 minutes. ',
+  incorrectPassword2Attempts: ' Incorrect password. You have 2 attempts before the app locks for 5 minutes. ',
+  incorrectPassword1Attempt: ' Incorrect password. You have 1 attempts before the app locks for 5 minutes. ',
 
 
 } as const;

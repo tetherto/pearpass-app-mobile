@@ -15,6 +15,7 @@ import CreatedCreditCardsItemPage from '@pages/CreatedCreditCardsItemPage';
 import CreatedWiFiItemPage from '@pages/CreatedWiFiItemPage';
 import CreatedIdentityItemPage from '@pages/CreatedIdentityItemPage';
 
+
 class PageFactory {
   static get onboarding() {
     return new OnboardingPage();

@@ -2,9 +2,9 @@ const createIdentityLocators = {
 /* =====================================================
         TITLE FIELD
 ===================================================== */
-    titleField: '~ Title ',
+    titleField: '~Title field',
     titleFieldTitle: '//android.widget.TextView[@text=" Title "]',
-    titleFieldInput: '//android.widget.EditText[@text="No title"]',
+    titleFieldInput: '~Title input field',
 /* =====================================================
         PERSONAL INFORMATION
 ===================================================== */
@@ -13,24 +13,24 @@ const createIdentityLocators = {
 /* =====================================================
         FULL NAME FIELD
 ===================================================== */
-    fullNameField: '~ Full name ',
-    fullNameFieldIcon: '//android.view.ViewGroup[@content-desc=" Full name "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    fullNameField: '~Full name field',
+    fullNameFieldIcon: '//android.view.ViewGroup[@content-desc="Full name field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     fullNameFieldTitle: '//android.widget.TextView[@text=" Full name "]',
-    fullNameFieldInput: '//android.widget.EditText[@text="John Smith"]',
+    fullNameFieldInput: '~Full name input field',
 /* =====================================================
         EMAIL FIELD
 ===================================================== */
-    emailField: '~ Email ',
-    emailFieldIcon: '//android.view.ViewGroup[@content-desc=" Email "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    emailField: '~Email field',
+    emailFieldIcon: '//android.view.ViewGroup[@content-desc="Email field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     emailFieldTitle: '//android.widget.TextView[@text=" Email "]',
-    emailFieldInput: '//android.widget.EditText[@text="Insert email"]',
+    emailFieldInput: '~Email input field',
 /* =====================================================
         PHONE NUMBER FIELD
 ===================================================== */
-    phoneNumberField: '~ Phone number ',
-    phoneNumberFieldIcon: '//android.view.ViewGroup[@content-desc=" Phone number "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    phoneNumberField: '~Phone number field',
+    phoneNumberFieldIcon: '//android.view.ViewGroup[@content-desc="Phone number field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     phoneNumberFieldTitle: '//android.widget.TextView[@text=" Phone number "]',
-    phoneNumberFieldInput: '//android.widget.EditText[@text="Insert phone number"]',
+    phoneNumberFieldInput: '~Phone number input field',
 /* =====================================================
         DETAIL OF ADDRESS
 ===================================================== */
@@ -39,38 +39,33 @@ const createIdentityLocators = {
 /* =====================================================
         ADDRESS FIELD
 ===================================================== */
-    addressField: '~ Address ',
-    addressFieldIcon: '//android.view.ViewGroup[@content-desc="Address"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    addressFieldTitle: '//android.widget.TextView[@text="Address"]',
-    addressFieldInput: '//android.widget.EditText[@text="Insert address"]',
+    addressField: '~Address field',
+    addressFieldTitle: '//android.widget.TextView[@text=" Address "]',
+    addressFieldInput: '~Address input field',
 /* =====================================================
         ZIP FIELD
 ===================================================== */
-    zipField: '~ ZIP ',
-    zipFieldIcon: '//android.view.ViewGroup[@content-desc="ZIP"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    zipFieldTitle: '//android.widget.TextView[@text="ZIP"]',
-    zipFieldInput: '//android.widget.EditText[@text="Insert ZIP"]',
+    zipField: '~ZIP field',
+    zipFieldTitle: '//android.widget.TextView[@text=" ZIP "]',
+    zipFieldInput: '~ZIP input field',
 /* =====================================================
         CITY FIELD
 ===================================================== */
-    cityField: '~ City ',
-    cityFieldIcon: '//android.view.ViewGroup[@content-desc="City"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    cityFieldTitle: '//android.widget.TextView[@text="City"]',
-    cityFieldInput: '//android.widget.EditText[@text="Insert city"]',
+    cityField: '~City field',
+    cityFieldTitle: '//android.widget.TextView[@text=" City "]',
+    cityFieldInput: '~City input field',
 /* =====================================================
         REGION FIELD
 ===================================================== */    
-    regionField: '~ Region ',
-    regionFieldIcon: '//android.view.ViewGroup[@content-desc="Region"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    regionFieldTitle: '//android.widget.TextView[@text="Region"]',
-    regionFieldInput: '//android.widget.EditText[@text="Insert region"]',
+    regionField: '~Region field',
+    regionFieldTitle: '//android.widget.TextView[@text=" Region "]',
+    regionFieldInput: '~Region input field',
 /* =====================================================
         COUNTRY FIELD
 ===================================================== */
-    countryField: '~ Country ',
-    countryFieldIcon: '//android.view.ViewGroup[@content-desc="Country"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    countryFieldTitle: '//android.widget.TextView[@text="Country"]',
-    countryFieldInput: '//android.widget.EditText[@text="Insert country"]',
+    countryField: '~Country field',
+    countryFieldTitle: '//android.widget.TextView[@text=" Country "]',
+    countryFieldInput: '~Country input field',
 /* =====================================================
         PASSPORT FIELD
 ===================================================== */
@@ -79,67 +74,67 @@ const createIdentityLocators = {
 /* =====================================================
         PASSPORT FULL NAME FIELD
 ===================================================== */
-    passportFullNameField: '~ Full name ',
-    passportFullNameFieldIcon: '//android.view.ViewGroup[@content-desc=" Full name "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportFullNameField: '~Passport full name input field',
+    passportFullNameFieldIcon: '//android.view.ViewGroup[@content-desc="Passport full name field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportFullNameFieldTitle: '//android.widget.TextView[@text=" Full name "]',
-    passportFullNameFieldInput: '//android.widget.EditText[@text="John Smith"]',
+    passportFullNameFieldInput: '~Passport full name input field',
 /* =====================================================
         PASSPORT NUMBER FIELD
 ===================================================== */
-    passportNumberField: '~ Passport number ',
-    passportNumberFieldIcon: '//android.view.ViewGroup[@content-desc=" Passport number "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportNumberField: '~Passport number field',
+    passportNumberFieldIcon: '//android.view.ViewGroup[@content-desc="Passport number field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportNumberFieldTitle: '//android.widget.TextView[@text=" Passport number "]',
-    passportNumberFieldInput: '//android.widget.EditText[@text="Insert numbers"]',
+    passportNumberFieldInput: '~Passport number input field',
 /* =====================================================
         PASSPORT ISSUING COUNTRY FIELD
 ===================================================== */
-    passportIssuingCountryField: '~ Issuing country ',
-    passportIssuingCountryFieldIcon: '//android.view.ViewGroup[@content-desc=" Issuing country "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportIssuingCountryField: '~Passport issuing country field',
+    passportIssuingCountryFieldIcon: '//android.view.ViewGroup[@content-desc="Passport issuing country field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportIssuingCountryFieldTitle: '//android.widget.TextView[@text=" Issuing country "]',
-    passportIssuingCountryFieldInput: '//android.widget.EditText[@text="Insert country"]',
+    passportIssuingCountryFieldInput: '~Passport issuing country input field',
 /* =====================================================    
         PASSPORT DATE OF ISSUE FIELD    
 ===================================================== */
-    passportDateOfIssueField: '~ Date of issue ',
-    passportDateOfIssueFieldIcon: '//android.view.ViewGroup[@content-desc=" Date of issue "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportDateOfIssueField: '~Passport date of issue field',
+    passportDateOfIssueFieldIcon: '//android.view.ViewGroup[@content-desc="Passport date of issue field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportDateOfIssueFieldTitle: '//android.widget.TextView[@text=" Date of issue "]',
-    passportDateOfIssueFieldInput: '(//android.widget.EditText[@text="DD.MM.YYYY"])[1]',
+    passportDateOfIssueFieldInput: '~Passport date of issue input field',
 /* =====================================================
         PASSPORT EXPIRY DATE FIELD
 ===================================================== */
-    passportExpiryDateField: '~ Expiry date ',
-    passportExpiryDateFieldIcon: '//android.view.ViewGroup[@content-desc=" Expiry date "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportExpiryDateField: '~Passport expiry date field',
+    passportExpiryDateFieldIcon: '//android.view.ViewGroup[@content-desc="Passport expiry date field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportExpiryDateFieldTitle: '//android.widget.TextView[@text=" Expiry date "]',
-    passportExpiryDateFieldInput: '(//android.widget.EditText[@text="DD.MM.YYYY"])[2]',
+    passportExpiryDateFieldInput: '~Passport expiry date input field',
 /* =====================================================
         PASSPORT NATIONALITY FIELD
 ===================================================== */
-    passportNationalityField: '~ Nationality ',
-    passportNationalityFieldIcon: '//android.view.ViewGroup[@content-desc=" Nationality "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportNationalityField: '~Passport nationality field',
+    passportNationalityFieldIcon: '//android.view.ViewGroup[@content-desc="Passport nationality field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportNationalityFieldTitle: '//android.widget.TextView[@text=" Nationality "]',
-    passportNationalityFieldInput: '//android.widget.EditText[@text="Insert your nationality"]',
+    passportNationalityFieldInput: '~Passport nationality input field',
 /* =====================================================
         PASSPORT DATE OF BIRTH FIELD
 ===================================================== */
-    passportDateOfBirthField: '~ Date of birth ',
-    passportDateOfBirthFieldIcon: '//android.view.ViewGroup[@content-desc=" Date of birth "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportDateOfBirthField: '~Passport date of birth field',
+    passportDateOfBirthFieldIcon: '//android.view.ViewGroup[@content-desc="Passport date of birth field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportDateOfBirthFieldTitle: '//android.widget.TextView[@text=" Date of birth "]',
-    passportDateOfBirthFieldInput: '(//android.widget.EditText[@text="DD.MM.YYYY"])[3]',
+    passportDateOfBirthFieldInput: '~Passport date of birth input field',
 /* =====================================================
         PASSPORT GENDER FIELD
 ===================================================== */
-    passportGenderField: '~ Gender ',
-    passportGenderFieldIcon: '//android.view.ViewGroup[@content-desc=" Gender "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    passportGenderField: '~Passport gender field',
+    passportGenderFieldIcon: '//android.view.ViewGroup[@content-desc="Passport gender field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportGenderFieldTitle: '//android.widget.TextView[@text=" Gender "]',
-    passportGenderFieldInput: '//android.widget.EditText[@text="M/F"]',
+    passportGenderFieldInput: '~Passport gender input field',
 /* =====================================================
         PASSPORT PICTURE FIELD
 ===================================================== */
-    passportPictureField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[7]',
+    passportPictureField: '~Passport picture field',
     passportPictureFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     passportPictureFieldTitle: '//android.widget.TextView[@text="Passport picture"]',
-    passportPicturePlusButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]',
-    passportPicturePlusButtonIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]/com.horcrux.svg.SvgView',
+    passportPicturePlusButton: '~Add passport picture button',
+    passportPicturePlusButtonIcon: '//android.view.ViewGroup[@content-desc="Add passport picture button"]/com.horcrux.svg.SvgView',
 /* =====================================================
         IDENTITY CARD FIELD
 ===================================================== */
@@ -148,39 +143,39 @@ const createIdentityLocators = {
 /* =====================================================
         ID NUMBER FIELD
 ===================================================== */
-    identityCardNumberField: '~ ID number ',
-    identityCardNumberFieldIcon: '//android.view.ViewGroup[@content-desc=" ID number "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    identityCardNumberField: '~ID number field',
+    identityCardNumberFieldIcon: '//android.view.ViewGroup[@content-desc="ID number field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     identityCardNumberFieldTitle: '//android.widget.TextView[@text=" ID number "]',
-    identityCardNumberFieldInput: '//android.widget.EditText[@text="123456789"]',
+    identityCardNumberFieldInput: '~ID number input field',
 /* =====================================================
         CREATION DATE FIELD
 ===================================================== */
-    identityCardCreationDateField: '~ Creation date ',
-    identityCardCreationDateFieldIcon: '//android.view.ViewGroup[@content-desc=" Creation date "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    identityCardCreationDateField: '~Identity card creation date field',
+    identityCardCreationDateFieldIcon: '//android.view.ViewGroup[@content-desc="Identity card creation date field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     identityCardCreationDateFieldTitle: '//android.widget.TextView[@text=" Creation date "]',
-    identityCardCreationDateFieldInput: '(//android.widget.EditText[@text="DD.MM.YYYY"])[1]',
+    identityCardCreationDateFieldInput: '~Identity card creation date input field',
 /* =====================================================
         EXPIRY DATE FIELD
 ===================================================== */
-    identityCardExpiryDateField: '~ Expiry date ',
-    identityCardExpiryDateFieldIcon: '//android.view.ViewGroup[@content-desc=" Expiry date "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    identityCardExpiryDateField: '~Identity card expiry date field',
+    identityCardExpiryDateFieldIcon: '//android.view.ViewGroup[@content-desc="Identity card expiry date field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     identityCardExpiryDateFieldTitle: '//android.widget.TextView[@text=" Expiry date "]',
-    identityCardExpiryDateFieldInput: '(//android.widget.EditText[@text="DD.MM.YYYY"])[2]',
+    identityCardExpiryDateFieldInput: '~Identity card expiry date input field',
 /* =====================================================    
         ISSUING COUNTRY FIELD
 ===================================================== */
-    identityCardIssuingCountryField: '~ Issuing country ',
-    identityCardIssuingCountryFieldIcon: '//android.view.ViewGroup[@content-desc=" Issuing country "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    identityCardIssuingCountryField: '~Identity card issuing country field',
+    identityCardIssuingCountryFieldIcon: '//android.view.ViewGroup[@content-desc="Identity card issuing country field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     identityCardIssuingCountryFieldTitle: '//android.widget.TextView[@text=" Issuing country "]',
-    identityCardIssuingCountryFieldInput: '//android.widget.EditText[@text="Insert country"]',
+    identityCardIssuingCountryFieldInput: '~Identity card issuing country input field',
 /* =====================================================
         ID CARD PICTURE FIELD
 ===================================================== */
-    identityCardPictureField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[7]',
-    identityCardPictureFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
+    identityCardPictureField: '~Id card picture field',
+    identityCardPictureFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     identityCardPictureFieldTitle: '//android.widget.TextView[@text="ID card picture"]',
-    identityCardPicturePlusButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[5]',
-    identityCardPicturePlusButtonIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[5]/com.horcrux.svg.SvgView',
+    identityCardPicturePlusButton: '~Add id card picture button',
+    identityCardPicturePlusButtonIcon: '//android.view.ViewGroup[@content-desc="Add id card picture button"]/com.horcrux.svg.SvgView',
 /* =====================================================
         DRIVING LICENSE FIELD
 ===================================================== */
@@ -189,77 +184,83 @@ const createIdentityLocators = {
 /* =====================================================
         DRIVING LICENSE ID NUMBER FIELD
 ===================================================== */
-    drivingLicenseIdNumberField: '~ ID number ',
-    drivingLicenseIdNumberFieldIcon: '//android.view.ViewGroup[@content-desc=" ID number "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    drivingLicenseIdNumberField: '~Driving license ID number field',
+    drivingLicenseIdNumberFieldIcon: '//android.view.ViewGroup[@content-desc="Driving license ID number field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     drivingLicenseIdNumberFieldTitle: '//android.widget.TextView[@text=" ID number "]',
-    drivingLicenseIdNumberFieldInput: '//android.widget.EditText[@text="123456789"]',
+    drivingLicenseIdNumberFieldInput: '~Driving license ID number input field',
 /* =====================================================
         DRIVING LICENSE CREATION DATE FIELD
 ===================================================== */
-    drivingLicenseCreationDateField: '~ Creation date ',
-    drivingLicenseCreationDateFieldIcon: '//android.view.ViewGroup[@content-desc=" Creation date "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    drivingLicenseCreationDateField: '~Driving license creation date field',
+    drivingLicenseCreationDateFieldIcon: '//android.view.ViewGroup[@content-desc="Driving license creation date field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     drivingLicenseCreationDateFieldTitle: '//android.widget.TextView[@text=" Creation date "]',
-    drivingLicenseCreationDateFieldInput: '(//android.widget.EditText[@text="DD.MM.YYYY"])[1]', 
+    drivingLicenseCreationDateFieldInput: '~Driving license creation date input field', 
 /* =====================================================
         DRIVING LICENSE EXPIRY DATE FIELD
 ===================================================== */
-    drivingLicenseExpiryDateField: '~ Expiry date ',
-    drivingLicenseExpiryDateFieldIcon: '//android.view.ViewGroup[@content-desc=" Expiry date "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    drivingLicenseExpiryDateField: '~Driving license expiry date field',
+    drivingLicenseExpiryDateFieldIcon: '//android.view.ViewGroup[@content-desc="Driving license expiry date field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     drivingLicenseExpiryDateFieldTitle: '//android.widget.TextView[@text=" Expiry date "]',
-    drivingLicenseExpiryDateFieldInput: '(//android.widget.EditText[@text="DD.MM.YYYY"])[2]',
+    drivingLicenseExpiryDateFieldInput: '~Driving license expiry date input field',
 /* =====================================================
         DRIVING LICENSE ISSUING COUNTRY FIELD
 ===================================================== */
-    drivingLicenseIssuingCountryField: '~ Issuing country ',
-    drivingLicenseIssuingCountryFieldIcon: '//android.view.ViewGroup[@content-desc=" Issuing country "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    drivingLicenseIssuingCountryField: '~Driving license issuing country field',
+    drivingLicenseIssuingCountryFieldIcon: '//android.view.ViewGroup[@content-desc="Driving license issuing country field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     drivingLicenseIssuingCountryFieldTitle: '//android.widget.TextView[@text=" Issuing country "]',
-    drivingLicenseIssuingCountryFieldInput: '//android.widget.EditText[@text="Insert country"]',
+    drivingLicenseIssuingCountryFieldInput: '~Driving license issuing country input field',
 /* =====================================================
         DRIVING LICENSE PICTURE FIELD
 ===================================================== */
-    drivingLicensePictureField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]',
-    drivingLicensePictureFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
+    drivingLicensePictureField: '~Driving license picture field',
+    drivingLicensePictureFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     drivingLicensePictureFieldTitle: '//android.widget.TextView[@text="Driving license picture"]',
-    drivingLicensePicturePlusButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[9]',
-    drivingLicensePicturePlusButtonIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[9]/com.horcrux.svg.SvgView',
+    drivingLicensePicturePlusButton: '~Add driving license picture button',
+    drivingLicensePicturePlusButtonIcon: '//android.view.ViewGroup[@content-desc="Add driving license picture button"]/com.horcrux.svg.SvgView',
 /* =====================================================
         FILE FIELD
 ===================================================== */
-    fileField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[7]',
-    fileFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
+    fileField: '~Add file field',
+    fileFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     fileFieldTitle: '//android.widget.TextView[@text="File"]',
-    fileFieldText: '//android.view.ViewGroup[@content-desc="Add file"]',
-    addFileButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[9]',
-    addFileButtonIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[9]/com.horcrux.svg.SvgView',
+    fileFieldText: '//android.widget.TextView[@content-desc="Add file text"]',
+    addFileButton: '~Add file button',
+    addFileButtonIcon: '//android.view.ViewGroup[@content-desc="Add file button"]/com.horcrux.svg.SvgView',
 
-    newFileField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[10]',
-    newFileFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView[3]/com.horcrux.svg.GroupView',
+    newFileField: '~New added file field',
+    newFileFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
     newFileFieldTitle: '(//android.widget.TextView[@text="File"])[2]',
-    newFileFieldText: '//android.widget.TextView[@text="owners-manual.pdf"]',
-    newFileFieldDeleteButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[12]/com.horcrux.svg.SvgView',
+    newFileFieldText: '//android.widget.TextView[@content-desc="New added file text"]',
+    newFileFieldDeleteButton: '~Delete file button',
 
-    sharedFilePopupTitle: '//android.widget.TextView[@resource-id="android:id/content_preview_filename"]',
+    sharedFilePopupTitle: '//android.widget.TextView[@resource-id="com.android.intentresolver:id/headline"]',
     quickShareButtonPopup: '//android.widget.Button[@resource-id="android:id/chooser_nearby_button"]',
     sharedFilePopupText: '//android.widget.TextView[@resource-id="android:id/chooser_row_text_option"]',
 
+    downloadsButton: '//android.widget.ListView[@resource-id="com.google.android.documentsui:id/roots_list"]/android.widget.LinearLayout[4]',
 /* =====================================================
         NOTE FIELD
 ===================================================== */
-    noteField: '~Note',
-    noteFieldIcon: '//android.view.ViewGroup[@content-desc=" Note "]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    noteFieldTitle: '//android.widget.TextView[@text=" Note "]',
-    noteFieldInput: '//android.widget.EditText[@text="Note"]',
+    noteField: '~Note field',
+    noteFieldIcon: '//android.view.ViewGroup[@content-desc="Note field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    noteFieldTitle: '//android.widget.TextView[@text=" Comment "]',
+    noteFieldInput: '~Note input field',
 /* =====================================================
         CUSTOM FIELD
 ===================================================== */
-    customField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[11]',
-    customFieldIcon: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
-    customFieldTitle: '//android.widget.TextView[@text="Create Custom"]',  
-    customFieldIcon2: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
-    createNoteButton: '~Note',
-    createNoteButtonIcon: '//android.view.ViewGroup[@content-desc="Note"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-    createNoteButtonText: '//android.widget.TextView[@text="Note"]',
+    customField: '~Create custom field',
+    customFieldIcon: '~Create custom field plus icon',
+    customFieldTitle: '~Create custom field text',  
+    customFieldIcon2: '//android.view.ViewGroup[@content-desc="Expand create custom field button"]/com.horcrux.svg.SvgView[2]',
+    createNoteButton: '~Comment',
+    createNoteButtonIcon: '//android.view.ViewGroup[@content-desc="Comment"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
+    createNoteButtonText: '//android.widget.TextView[@text="Comment"]',
 
+    newNoteField: '//android.view.ViewGroup[@content-desc="New comment input field"]',
+    newNoteFieldIcon: '//android.view.ViewGroup[@content-desc="New comment input field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+    newNoteFieldTitle: '//android.widget.TextView[@text=" Comment "]',
+    newNoteFieldInput: '//android.widget.EditText[@content-desc="New comment input field"]',
+    newNoteFieldDeleteButton: '~Delete new comment field button',
 
 /* =====================================================
         UPLOAD PICTURE POPUP
@@ -268,7 +269,7 @@ const createIdentityLocators = {
     whileUsingAppButton: '//android.widget.Button[@resource-id="com.android.permissioncontroller:id/permission_allow_foreground_only_button"]',
 
 
-    uploadPicturePopup: '//android.widget.LinearLayout[@resource-id="com.android.permissioncontroller:id/grant_dialog"]',
+    uploadPicturePopup: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]',
     uploadPicturePopupIcon: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     uploadPicturePopupTitle: '//android.widget.TextView[@text="Upload picture"]',
     previewPicture: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]/android.view.ViewGroup[1]/android.widget.LinearLayout',
@@ -278,26 +279,28 @@ const createIdentityLocators = {
     chooseFromLibraryButton: '~Choose from Library',
     chooseFromLibraryButtonText: '//android.widget.TextView[@text="Choose from Library"]',
 
-    passportPictureInAlbum: '(//android.widget.ImageView[@resource-id="com.google.android.providers.media.module:id/icon_thumbnail"])[1]',
-    pasportPictureInPassportPictureField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[6]/android.view.ViewGroup',
+    passportPictureInAlbum: '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View[5]/android.view.View[3]/android.view.View[2]/android.view.View',
+    pasportPictureInPassportPictureField: '//android.widget.ImageView',
 
-    identityCardPictureInAlbum: '(//android.widget.ImageView[@resource-id="com.google.android.providers.media.module:id/icon_thumbnail"])[2]',
-    identityCardPictureInIdentityCardPictureField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[11]/android.view.ViewGroup',
+    identityCardPictureInAlbum: '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View[5]/android.view.View[2]/android.view.View[2]/android.view.View',
+    identityCardPictureInIdentityCardPictureField: '//android.widget.ImageView',
 
-    drivingLicensePictureInAlbum: '(//android.widget.ImageView[@resource-id="com.google.android.providers.media.module:id/icon_thumbnail"])[3]',
-    drivingLicensePictureInDrivingLicensePictureField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[9]/android.view.ViewGroup',
+    drivingLicensePictureInAlbum: '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View[5]/android.view.View[4]/android.view.View[2]/android.view.View',
+    drivingLicensePictureInDrivingLicensePictureField: '//android.widget.ImageView',
 /* =====================================================
         PASSPORT PICTURE PREVIEW PAGE
 ===================================================== */
     passportPicturePreviewPage: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]',
     passportPicturePreviewPageBackButton: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]',
     passportPicturePreviewPageBackButtonIcon: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
-    passportPicturePreviewPageTitle: '//android.widget.TextView[@text="1000000064.jpg"]',
     passportPicturePreviewPageShareButton: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]',
     passportPicturePreviewPageShareButtonIcon: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
     passportPicturePreviewPageDeleteButton: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[4]',
     passportPicturePreviewPageDeleteButtonIcon: '//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[4]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
     passportPicturePreviewPageImage: '//android.widget.ImageView',
+
+    identityCardPicturePreviewPageTitle: '//android.widget.TextView[@text="1000000034.jpg"]',
+    drivingLicensePicturePreviewPageTitle: '//android.widget.TextView[@text="1000000033.jpg"]',
    
     sharedPageTitle: '//android.widget.TextView[@resource-id="android:id/chooser_row_text_option"]',
     quickShareButton: '//android.widget.Button[@resource-id="android:id/chooser_nearby_button"]',

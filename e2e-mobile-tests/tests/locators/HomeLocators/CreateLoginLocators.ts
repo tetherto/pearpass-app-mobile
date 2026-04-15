@@ -9,14 +9,15 @@ const createLoginLocators = {
     noFolderButtonPopup: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]/android.widget.ScrollView',
 
 
-    testFolderButton: '~TestFolder',
-    testFolderButtonIcon: '//android.view.ViewGroup[@content-desc="TestFolder"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
-    testFolderButtonText: '//android.widget.TextView[@text="TestFolder"]',
-    testFolderButtonIcon2: '//android.view.ViewGroup[@content-desc="TestFolder"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
+    testFolderButton: '~Test Folder',
+    testingFolderButton: '~Testing Folder',
+    testFolderButtonIcon: '//android.view.ViewGroup[@content-desc="Test Folder"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
+    testFolderButtonText: '//android.widget.TextView[@text="Test Folder"]',
+    testFolderButtonIcon2: '//android.view.ViewGroup[@content-desc="Test Folder"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
     testFolderPopup: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup',
-    testFolderPopupTestFolderButton: '~TestFolder, 0 items',
-    testFolderPopupIcon: '//android.view.ViewGroup[@content-desc="TestFolder, 0 items"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
-    testFolderPopupTitle: '(//android.widget.TextView[@text="TestFolder"])[1]',
+    testFolderPopupTestFolderButton: '~Test Folder, 0 items',
+    testFolderPopupIcon: '//android.view.ViewGroup[@content-desc="Test Folder, 0 items"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
+    testFolderPopupTitle: '(//android.widget.TextView[@text="Test Folder"])[1]',
     testFolderPopupText: '//android.widget.TextView[@text="0 items"]',
     testFolderPopupCheckedIcon: '//com.horcrux.svg.SvgView[@resource-id="sidebar-folder-undefined-active"]/com.horcrux.svg.GroupView',
 
@@ -148,7 +149,7 @@ const createLoginLocators = {
     newFileFieldDeleteButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[12]/com.horcrux.svg.SvgView',
 
     newFileFieldButton: '~owners-manual.pdf',
-    sharedFilePopupTitle: '//android.widget.TextView[@resource-id="android:id/content_preview_filename"]',
+    sharedFilePopupTitle: '//android.widget.TextView[@resource-id="com.android.intentresolver:id/content_preview_filename"]',
 /* =====================================================
         NOTE FIELD
 ===================================================== */
