@@ -23,7 +23,7 @@ export const PinSlots = ({
 
   useEffect(() => {
     inputRefs.forEach((ref) => {
-      ;(ref.current as any)?.setNativeProps?.({
+      ref.current?.setNativeProps?.({
         showSoftInputOnFocus: false,
         style: { textAlign: 'center', marginTop: -8, marginBottom: 8 }
       })
@@ -32,7 +32,7 @@ export const PinSlots = ({
 
   useEffect(() => {
     const activeIndex = pin.length < pinLength ? pin.length : pinLength - 1
-    ;(inputRefs[activeIndex]?.current as any)?.focus()
+    inputRefs[activeIndex]?.current?.focus()
   }, [pin])
 
   return (
@@ -46,7 +46,7 @@ export const PinSlots = ({
               label=""
               value={isFilled ? '\u2022' : ''}
               placeholder="0"
-              inputRef={inputRefs[index] as any}
+              inputRef={inputRefs[index] as RefObject<HTMLInputElement | null>}
               testID={`${testIDPrefix}-${index}`}
             />
           </View>

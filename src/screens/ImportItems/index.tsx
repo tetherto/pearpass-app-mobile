@@ -161,7 +161,7 @@ export const ImportItems = () => {
   const { theme } = useTheme()
   const { setShouldBypassAutoLock } = useAutoLockContext() as {
     setShouldBypassAutoLock: (value: boolean) => void
-    [key: string]: any
+    [key: string]: unknown
   }
   const { createRecord } = useCreateRecord()
   const { hapticButtonSecondary } = useHapticFeedback()
@@ -211,14 +211,15 @@ export const ImportItems = () => {
       setSelectedFileInfo({ ...fileInfo, size: fileInfo.size ?? 0 })
       setFiles([
         {
-          file: null as any,
+          file: null as unknown as File,
           name: fileInfo.filename,
           size: fileInfo.size ?? 0,
           type: fileInfo.fileType
         }
       ])
-    } catch (error: any) {
-      const isFileError = error.message?.includes('File too large')
+    } catch (error: unknown) {
+      const isFileError =
+        error instanceof Error && error.message.includes('File too large')
       Toast.show({
         type: 'baseToast',
         text1: isFileError ? error.message : t`File selection failed!`,
@@ -241,8 +242,8 @@ export const ImportItems = () => {
     fileType: string
     password: string | null
   }) => {
-    let result: any[] = []
-    let dataToProcess: any = fileContent
+    let result: unknown[] = []
+    let dataToProcess: unknown = fileContent
     let resolvedType = type
 
     try {
@@ -301,15 +302,17 @@ export const ImportItems = () => {
       }
 
       await importRecords(result)
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw new Error(
-        error.message || 'Failed to parse file. Please ensure it is valid.'
+        error instanceof Error
+          ? error.message
+          : 'Failed to parse file. Please ensure it is valid.'
       )
     }
   }
 
   const importRecords = useCallback(
-    async (result: any[]) => {
+    async (result: unknown[]) => {
       if (result.length === 0) {
         Toast.show({
           type: 'baseToast',
@@ -336,7 +339,7 @@ export const ImportItems = () => {
 
       for (let i = 0; i < totalRecords; i += BATCH_SIZE) {
         const batch = result.slice(i, i + BATCH_SIZE)
-        await Promise.all(batch.map((record: any) => createRecord(record)))
+        await Promise.all(batch.map((record: unknown) => createRecord(record)))
         importedCount += batch.length
         const progress = Math.round((importedCount / totalRecords) * 100)
         Toast.show({
@@ -370,7 +373,7 @@ export const ImportItems = () => {
         password
       })
       navigation.goBack()
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (state === 'inputPassword') {
         setErrors({
           password:
@@ -381,7 +384,10 @@ export const ImportItems = () => {
       } else {
         Toast.show({
           type: 'baseToast',
-          text1: error.message || t`Import failed. Please try again.`,
+          text1:
+            error instanceof Error
+              ? error.message
+              : t`Import failed. Please try again.`,
           position: 'bottom',
           bottomOffset: 100
         })
@@ -551,10 +557,10 @@ export const ImportItems = () => {
             <View style={{ gap: rawTokens.spacing12 }}>
               <PasswordField
                 label={t`File password`}
-                placeholderText={t`Enter file password`}
+                placeholder={t`Enter file password`}
                 value={passwordField.value}
-                onChangeText={passwordField.onChange}
-                errorMessage={passwordField.error}
+                onChange={passwordField.onChange}
+                error={passwordField.error ?? undefined}
               />
               <Text color={theme.colors.colorTextSecondary} variant="caption">
                 {t`The Uploaded File is encrypted, put the Password file to continue`}

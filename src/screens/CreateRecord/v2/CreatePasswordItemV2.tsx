@@ -112,17 +112,16 @@ type CreatePasswordItemV2Props = {
   }
 }
 
-export const CreatePasswordItemV2 = ({
-  route
-}: CreatePasswordItemV2Props) => {
-  const navigation = useNavigation<any>()
+export const CreatePasswordItemV2 = ({ route }: CreatePasswordItemV2Props) => {
+  const navigation = useNavigation()
   const { t } = useLingui()
   const { theme } = useTheme()
   const { copyToClipboard } = useCopyToClipboard()
   const onPasswordInsert = route?.params?.onPasswordInsert
 
-  const [selectedOption, setSelectedOption] =
-    useState<PasswordOption>(PASSWORD_OPTIONS.password)
+  const [selectedOption, setSelectedOption] = useState<PasswordOption>(
+    PASSWORD_OPTIONS.password
+  )
   const [selectedRules, setSelectedRules] = useState<{
     password: PasswordRules
     passphrase: PassphraseRules
@@ -244,9 +243,9 @@ export const CreatePasswordItemV2 = ({
           fullWidth
           onClick={handlePrimaryAction}
           iconBefore={
-            onPasswordInsert
-              ? undefined
-              : <ContentCopy color={theme.colors.colorOnPrimary} />
+            onPasswordInsert ? undefined : (
+              <ContentCopy color={theme.colors.colorOnPrimary} />
+            )
           }
         >
           {onPasswordInsert ? t`Use Password` : t`Copy Password`}
@@ -354,29 +353,31 @@ export const CreatePasswordItemV2 = ({
 
             <View style={styles.slider}>
               <Slider
-              minimumValue={
-                selectedOption === PASSWORD_OPTIONS.passphrase ? 6 : 4
-              }
-              maximumValue={
-                selectedOption === PASSWORD_OPTIONS.passphrase ? 36 : 32
-              }
-              step={1}
-              value={
-                selectedOption === PASSWORD_OPTIONS.passphrase
-                  ? selectedRules.passphrase.words
-                  : selectedRules.password.characters
-              }
-              minimumTrackTintColor={theme.colors.colorPrimary}
-              maximumTrackTintColor={theme.colors.colorSurfaceElevatedOnInteraction}
-              thumbTintColor={theme.colors.colorPrimary}
-              onValueChange={(value) => {
-                if (selectedOption === PASSWORD_OPTIONS.passphrase) {
-                  handlePassphraseRuleChange('words', value)
-                  return
+                minimumValue={
+                  selectedOption === PASSWORD_OPTIONS.passphrase ? 6 : 4
                 }
+                maximumValue={
+                  selectedOption === PASSWORD_OPTIONS.passphrase ? 36 : 32
+                }
+                step={1}
+                value={
+                  selectedOption === PASSWORD_OPTIONS.passphrase
+                    ? selectedRules.passphrase.words
+                    : selectedRules.password.characters
+                }
+                minimumTrackTintColor={theme.colors.colorPrimary}
+                maximumTrackTintColor={
+                  theme.colors.colorSurfaceElevatedOnInteraction
+                }
+                thumbTintColor={theme.colors.colorPrimary}
+                onValueChange={(value) => {
+                  if (selectedOption === PASSWORD_OPTIONS.passphrase) {
+                    handlePassphraseRuleChange('words', value)
+                    return
+                  }
 
-                handlePasswordRuleChange('characters', value)
-              }}
+                  handlePasswordRuleChange('characters', value)
+                }}
               />
             </View>
           </View>
