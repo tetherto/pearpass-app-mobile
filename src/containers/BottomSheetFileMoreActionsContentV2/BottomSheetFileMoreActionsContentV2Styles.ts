@@ -19,8 +19,5 @@ export const styles = StyleSheet.create({
   },
   content: {
     gap: rawTokens.spacing16
-  },
-  headerText: {
-    fontWeight: '600'
   }
 })
