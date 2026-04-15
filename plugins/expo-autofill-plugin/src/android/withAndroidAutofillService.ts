@@ -75,7 +75,7 @@ preBuild.dependsOn copyAutofillBundle
         const sodiumDeps = `
     // Lazysodium for job queue encryption (crypto_secretbox / XSalsa20-Poly1305)
     implementation "com.goterl:lazysodium-android:5.1.0@aar"
-    implementation "net.java.dev.jna:jna:5.14.0@aar"`;
+    implementation "net.java.dev.jna:jna:5.16.0@aar"`;
         cfg.modResults.contents =
           cfg.modResults.contents.slice(0, insertIndex) +
           sodiumDeps +
@@ -95,6 +95,17 @@ android {
       cfg.modResults.contents += packagingBlock;
     }
 
+    return cfg;
+  });
+
+  // Reference the autofill ProGuard file (written by withDangerousMod below)
+  config = withAppBuildGradle(config, (cfg) => {
+    if (!cfg.modResults.contents.includes('proguard-autofill.pro')) {
+      cfg.modResults.contents = cfg.modResults.contents.replace(
+        /proguardFiles\s+getDefaultProguardFile\([^)]+\)/,
+        `$&, "proguard-autofill.pro"`
+      );
+    }
     return cfg;
   });
 
@@ -195,6 +206,13 @@ android {
         await fs.promises.copyFile(bundleSrc, bundleDest);
       }
     }
+
+    // Write ProGuard keep rule using the actual package name
+    const proguardFile = path.join(androidDir, 'app/proguard-autofill.pro');
+    await fs.promises.writeFile(
+      proguardFile,
+      `-keep class ${packageName}.autofill.** { *; }\n`
+    );
 
     return cfg;
   }]);

@@ -27,9 +27,11 @@ export const useRouteHelper = () => {
   // on cold start we don't have a route.params, cold start === ENTER_MASTER_PASSWORD
   const isMasterPasswordScreen = useCallback(
     (route) =>
-      route?.name === 'Welcome' &&
-      (route?.params?.state === NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD ||
-        !route?.params),
+      route?.name === 'AuthV2Pin' ||
+      route?.name === 'AuthV2MasterPassword' ||
+      (route?.name === 'Welcome' &&
+        (route?.params?.state === NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD ||
+          !route?.params)),
     []
   )
 

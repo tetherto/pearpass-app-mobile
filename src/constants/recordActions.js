@@ -7,7 +7,7 @@ import {
   MultiSelectionIcon,
   StarIcon,
   TimeIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 export const RECORD_ACTION_ICON_BY_TYPE = {
   copy: CopyIcon,

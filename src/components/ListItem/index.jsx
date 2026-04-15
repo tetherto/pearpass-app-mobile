@@ -1,12 +1,12 @@
-import { formatDate } from 'pear-apps-utils-date'
+import { formatDate } from '@tetherto/pear-apps-utils-date'
 import {
   BrushIcon,
   CheckIcon,
   DeleteIcon,
   LockCircleIcon,
   ShareIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator } from 'react-native'
 
 import {
@@ -31,6 +31,10 @@ import {
  *  isLoading?: boolean
  *  testID?: string
  *  accessibilityLabel?: string
+ *  nameTestID?: string
+ *  nameAccessibilityLabel?: string
+ *  dateTestID?: string
+ *  dateAccessibilityLabel?: string
  * }} props
  */
 export const ListItem = ({
@@ -44,6 +48,10 @@ export const ListItem = ({
   isLoading = false,
   testID,
   accessibilityLabel,
+  nameTestID,
+  nameAccessibilityLabel,
+  dateTestID,
+  dateAccessibilityLabel,
   ...restProps
 }) => (
   <ListItemContainer
@@ -65,9 +73,19 @@ export const ListItem = ({
       )}
 
       <ListItemDescription>
-        <ListItemName>{name}</ListItemName>
+        <ListItemName
+          testID={nameTestID}
+          accessibilityLabel={nameAccessibilityLabel}
+        >
+          {name}
+        </ListItemName>
         {!!date && (
-          <ListItemDate>{formatDate(date, 'dd-mm-yyyy', '/')}</ListItemDate>
+          <ListItemDate
+            testID={dateTestID}
+            accessibilityLabel={dateAccessibilityLabel}
+          >
+            {formatDate(date, 'dd-mm-yyyy', '/')}
+          </ListItemDate>
         )}
       </ListItemDescription>
     </ListItemInfo>

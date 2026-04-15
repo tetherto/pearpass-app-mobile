@@ -1,18 +1,17 @@
 import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { useUserData } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { PasswordField } from '@tetherto/pearpass-lib-ui-kit'
+import { useUserData } from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
   stringToBuffer
-} from 'pearpass-lib-vault/src/utils/buffer'
-import { validatePasswordChange } from 'pearpass-utils-password-check'
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
+import { validatePasswordChange } from '@tetherto/pearpass-utils-password-check'
 
-import { InputLabel, InputWrapper } from './styles'
 import { useModal } from '../../../context/ModalContext'
-import { InputPasswordPearPass } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
 
@@ -46,6 +45,13 @@ export const ModifyMasterVaultModalContent = ({ onPasswordChange }) => {
     initialValues: { currentPassword: '', newPassword: '', repeatPassword: '' },
     validate: (values) => schema.validate(values)
   })
+
+  const { onChange: onCurrentPasswordChange, ...currentPasswordField } =
+    register('currentPassword')
+  const { onChange: onNewPasswordChange, ...newPasswordField } =
+    register('newPassword')
+  const { onChange: onRepeatPasswordChange, ...repeatPasswordField } =
+    register('repeatPassword')
 
   const onSubmit = async (values) => {
     const { currentPassword, newPassword, repeatPassword } = values
@@ -103,35 +109,32 @@ export const ModifyMasterVaultModalContent = ({ onPasswordChange }) => {
       primaryAction={handleSubmit(onSubmit)}
       isLoading={isLoading}
     >
-      <InputWrapper>
-        <InputLabel>{t`Insert old password`}</InputLabel>
-        <InputPasswordPearPass
-          isPassword
-          {...register('currentPassword')}
-          testID="insert-old-password-input"
-          accessibilityLabel={t`Insert old password`}
-        />
-      </InputWrapper>
+      <PasswordField
+        label={t`Insert old password`}
+        value={currentPasswordField.value || ''}
+        onChangeText={onCurrentPasswordChange}
+        variant={currentPasswordField.error ? 'error' : 'default'}
+        errorMessage={currentPasswordField.error}
+        testID="insert-old-password-input"
+      />
 
-      <InputWrapper>
-        <InputLabel>{t`Create new password`}</InputLabel>
-        <InputPasswordPearPass
-          isPassword
-          {...register('newPassword')}
-          testID="create-new-password-input"
-          accessibilityLabel={t`Create new password`}
-        />
-      </InputWrapper>
+      <PasswordField
+        label={t`Create new password`}
+        value={newPasswordField.value || ''}
+        onChangeText={onNewPasswordChange}
+        variant={newPasswordField.error ? 'error' : 'default'}
+        errorMessage={newPasswordField.error}
+        testID="create-new-password-input"
+      />
 
-      <InputWrapper>
-        <InputLabel>{t`Repeat new password`}</InputLabel>
-        <InputPasswordPearPass
-          isPassword
-          {...register('repeatPassword')}
-          testID="repeat-new-password-input"
-          accessibilityLabel={t`Repeat new password`}
-        />
-      </InputWrapper>
+      <PasswordField
+        label={t`Repeat new password`}
+        value={repeatPasswordField.value || ''}
+        onChangeText={onRepeatPasswordChange}
+        variant={repeatPasswordField.error ? 'error' : 'default'}
+        errorMessage={repeatPasswordField.error}
+        testID="repeat-new-password-input"
+      />
     </ModifyVaultsModaContentWrapper>
   )
 }

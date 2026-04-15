@@ -8,6 +8,11 @@ describe('getMimeType', () => {
     expect(getMimeType('photo.gif')).toBe('image/gif')
     expect(getMimeType('photo.webp')).toBe('image/webp')
     expect(getMimeType('photo.bmp')).toBe('image/bmp')
+    expect(getMimeType('photo.svg')).toBe('image/svg+xml')
+    expect(getMimeType('photo.heic')).toBe('image/heic')
+    expect(getMimeType('photo.heif')).toBe('image/heif')
+    expect(getMimeType('photo.tif')).toBe('image/tiff')
+    expect(getMimeType('photo.tiff')).toBe('image/tiff')
   })
 
   it('should return correct MIME type for document extensions', () => {

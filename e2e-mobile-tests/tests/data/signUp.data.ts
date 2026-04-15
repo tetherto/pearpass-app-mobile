@@ -160,10 +160,11 @@ export const VALIDATION_ERRORS = {
   passwordMissingUppercase: 'Password must contain at least one uppercase letter',
   passwordMissingNumber: 'Password must contain at least one number',
   passwordMissingSpecial: 'Password must contain at least one special character',
-  incorrectPassword4Attempts: ' Incorrect password. You have 4 attempts before the app locks for 5 minutes. ',
-  incorrectPassword3Attempts: ' Incorrect password. You have 3 attempts before the app locks for 5 minutes. ',
-  incorrectPassword2Attempts: ' Incorrect password. You have 2 attempts before the app locks for 5 minutes. ',
-  incorrectPassword1Attempt: ' Incorrect password. You have 1 attempts before the app locks for 5 minutes. ',
+  incorrectPassword: 'Incorrect password. You have',
+  incorrectPassword4Attempts: 'Incorrect password. You have 4 attempts before the app will be temporarily locked.',
+  incorrectPassword3Attempts: 'Incorrect password. You have 3 attempts before the app will be temporarily locked.',
+  incorrectPassword2Attempts: 'Incorrect password. You have 2 attempts before the app will be temporarily locked.',
+  incorrectPassword1Attempt: 'Incorrect password. You have 1 attempt before the app will be temporarily locked.',
 
 
 } as const;

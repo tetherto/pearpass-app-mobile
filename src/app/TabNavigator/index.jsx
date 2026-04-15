@@ -3,19 +3,21 @@ import {
   HomeIcon,
   PlusIcon,
   SettingsIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { isV2 } from 'src/utils/designVersion'
 
 import { BottomSheetRecordCreateContent } from '../../containers/BottomSheetRecordCreateContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 import { DrawerNavigator } from '../DrawerNavigator'
 import { SettingsNavigator } from '../SettingsNavigator'
+import { TabNavigatorV2 } from './TabNavigatorV2'
 
 const Tab = createBottomTabNavigator()
 
-export const TabNavigator = () => {
+const TabNavigatorV1 = () => {
   const { expand } = useBottomSheet()
   const { hapticButtonPrimary } = useHapticFeedback()
 
@@ -110,6 +112,14 @@ export const TabNavigator = () => {
       />
     </Tab.Navigator>
   )
+}
+
+export const TabNavigator = () => {
+  if (isV2()) {
+    return <TabNavigatorV2 />
+  }
+
+  return <TabNavigatorV1 />
 }
 
 const styles = StyleSheet.create({

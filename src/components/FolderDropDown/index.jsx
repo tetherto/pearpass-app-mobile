@@ -2,7 +2,7 @@ import { useLingui } from '@lingui/react/macro'
 import {
   ArrowDownIcon,
   FolderIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import { FolderSelectorWrapper, FolderTitle } from './styles'
 

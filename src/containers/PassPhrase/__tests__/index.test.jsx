@@ -1,8 +1,8 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native'
-import { PASSPHRASE_WORD_COUNTS } from 'pearpass-lib-constants'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { PASSPHRASE_WORD_COUNTS } from '@tetherto/pearpass-lib-constants'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import Toast from 'react-native-toast-message'
 
 import { PassPhrase } from '../'
@@ -28,7 +28,7 @@ jest.mock('../../../hooks/usePasteFromClipboard', () => ({
 }))
 
 // Mock the icons
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   CopyIcon: () => 'CopyIcon',
   PassPhraseIcon: () => 'PassPhraseIcon',
   PasteFromClipboardIcon: () => 'PasteFromClipboardIcon',

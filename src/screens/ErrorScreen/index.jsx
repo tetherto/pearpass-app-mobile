@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { StyleSheet, Text, View } from 'react-native'
 
 export const ErrorScreen = () => (

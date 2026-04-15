@@ -1,11 +1,11 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { shareAsync } from 'expo-sharing'
 import {
   BackIcon,
   DeleteIcon,
   ShareIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { shareAsync } from 'expo-sharing'
 import { View, Share, Text, Image, StyleSheet } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { useTheme } from 'styled-components/native'

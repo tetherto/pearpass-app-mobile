@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { QrCodeIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { usePair, useVault } from 'pearpass-lib-vault'
+import { QrCodeIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
 import {
   ActivityIndicator,
   Platform,

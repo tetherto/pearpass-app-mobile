@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { getMasterEncryption } from '@tetherto/pearpass-lib-vault'
 import * as LocalAuthentication from 'expo-local-authentication'
 import * as SecureStore from 'expo-secure-store'
-import { getMasterEncryption } from 'pearpass-lib-vault'
 
 import { IOS_APP_GROUP_ID } from '../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'

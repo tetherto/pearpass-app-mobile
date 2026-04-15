@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useVault, useVaults } from 'pearpass-lib-vault'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { View, ScrollView, Text, StyleSheet } from 'react-native'
 
 import { ListItem } from '../../components/ListItem'

@@ -2,7 +2,7 @@ import { render, fireEvent } from '@testing-library/react-native'
 
 import { ListItem } from './index'
 
-jest.mock('pear-apps-utils-date', () => ({
+jest.mock('@tetherto/pear-apps-utils-date', () => ({
   formatDate: jest.fn().mockReturnValue('01/01/2023')
 }))
 
@@ -20,12 +20,12 @@ jest.mock('./styles', () => {
       <View testID="vault-description" {...props} />
     ),
     ListItemName: (props) => (
-      <Text testID="vault-name" {...props}>
+      <Text testID={props.testID || 'vault-name'} {...props}>
         {props.children}
       </Text>
     ),
     ListItemDate: (props) => (
-      <Text testID="vault-date" {...props}>
+      <Text testID={props.testID || 'vault-date'} {...props}>
         {props.children}
       </Text>
     ),
@@ -36,7 +36,7 @@ jest.mock('./styles', () => {
   }
 })
 
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   BrushIcon: () => 'BrushIcon',
   CheckIcon: () => 'CheckIcon',
   DeleteIcon: () => 'DeleteIcon',
@@ -44,7 +44,7 @@ jest.mock('pearpass-lib-ui-react-native-components', () => ({
   ShareIcon: () => 'ShareIcon'
 }))
 
-jest.mock('pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
   colors: {
     primary400: { mode1: '#000000' },
     black: { mode1: '#000000' },
@@ -59,7 +59,11 @@ describe('ListItem', () => {
     onEditClick: () => {},
     onDeleteClick: () => {},
     onShareClick: () => {},
-    onPress: jest.fn()
+    onPress: jest.fn(),
+    nameTestID: 'vault-name',
+    nameAccessibilityLabel: 'Vault Name',
+    dateTestID: 'vault-date',
+    dateAccessibilityLabel: 'Vault Date'
   }
 
   it('renders correctly with provided vault data', () => {

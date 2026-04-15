@@ -1,15 +1,16 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, waitFor } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { WifiPasswordQRCode } from './index'
+import { WifiPasswordQRCodeV2 } from './WifiPasswordQRCodeV2'
 import messages from '../../locales/en/messages'
 
 i18n.load('en', messages)
 i18n.activate('en')
 
-jest.mock('pear-apps-utils-qr', () => ({
+jest.mock('@tetherto/pear-apps-utils-qr', () => ({
   generateQRCodeSVG: jest.fn()
 }))
 
@@ -39,7 +40,7 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-const { generateQRCodeSVG } = require('pear-apps-utils-qr')
+const { generateQRCodeSVG } = require('@tetherto/pear-apps-utils-qr')
 
 const { logger } = require('../../utils/logger')
 
@@ -58,6 +59,15 @@ describe('WifiPasswordQRCode', () => {
       <I18nProvider i18n={i18n}>
         <ThemeProvider>
           <WifiPasswordQRCode {...defaultProps} {...props} />
+        </ThemeProvider>
+      </I18nProvider>
+    )
+
+  const renderV2Component = (props = {}) =>
+    render(
+      <I18nProvider i18n={i18n}>
+        <ThemeProvider>
+          <WifiPasswordQRCodeV2 {...defaultProps} {...props} />
         </ThemeProvider>
       </I18nProvider>
     )
@@ -353,6 +363,32 @@ describe('WifiPasswordQRCode', () => {
 
       await waitFor(() => {
         expect(toJSON()).toMatchSnapshot()
+      })
+    })
+  })
+
+  describe('WifiPasswordQRCodeV2', () => {
+    it('renders the v2 title text', async () => {
+      const mockSvgString = '<svg>mock-qr-code</svg>'
+      generateQRCodeSVG.mockResolvedValue(mockSvgString)
+
+      const { getByText } = renderV2Component()
+
+      await waitFor(() => {
+        expect(getByText('Scan QR Code to connect with the Wi-Fi')).toBeTruthy()
+      })
+    })
+
+    it('renders the v2 QR code with updated dimensions', async () => {
+      const mockSvgString = '<svg>mock-qr-code</svg>'
+      generateQRCodeSVG.mockResolvedValue(mockSvgString)
+
+      const { getByTestId } = renderV2Component()
+
+      await waitFor(() => {
+        const svgElement = getByTestId('svg-xml')
+        expect(svgElement.props.style.width).toBe(188)
+        expect(svgElement.props.style.height).toBe(188)
       })
     })
   })

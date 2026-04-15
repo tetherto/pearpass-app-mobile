@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { renderHook } from '@testing-library/react-native'
-import { RECORD_TYPES } from 'pearpass-lib-vault'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
 import { useRecordActionItems } from './useRecordActionItems'
 import messages from '../locales/en/messages'
@@ -19,7 +19,7 @@ jest.mock('@react-navigation/native', () => ({
   })
 }))
 
-jest.mock('pearpass-lib-vault', () => {
+jest.mock('@tetherto/pearpass-lib-vault', () => {
   const deleteRecordsMock = jest.fn(() => Promise.resolve())
 
   return {
@@ -39,6 +39,10 @@ jest.mock('pearpass-lib-vault', () => {
     })
   }
 })
+
+jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+  useBottomSheetClose: () => jest.fn()
+}))
 
 jest.mock('./useCopyToClipboard', () => ({
   useCopyToClipboard: () => ({
@@ -192,7 +196,7 @@ describe('useRecordActionItems', () => {
     const favoriteAction = nonFavoriteResult.current.actions.find(
       (action) => action.type === 'favorite'
     )
-    expect(favoriteAction.name).toBe('Mark as favorite')
+    expect(favoriteAction.name).toBe('Add to Favorites')
 
     const favoriteRecord = { ...mockRecord, isFavorite: true }
     const { result: favoriteResult } = renderHook(
@@ -263,9 +267,13 @@ describe('useRecordActionItems', () => {
     })
 
     expect(result.current.recordSortActions.length).toBe(3)
-    expect(result.current.recordSortActions[0].name).toBe('Recent')
-    expect(result.current.recordSortActions[1].name).toBe('Newest to oldest')
-    expect(result.current.recordSortActions[2].name).toBe('Oldest to newest')
+    expect(result.current.recordSortActions[0].name).toBe(
+      'Last Updated (Newest first)'
+    )
+    expect(result.current.recordSortActions[1].name).toBe(
+      'Last Updated (Oldest first)'
+    )
+    expect(result.current.recordSortActions[2].name).toBe('Title (A-Z)')
   })
 
   describe('WiFi Password Record Actions', () => {
@@ -326,7 +334,7 @@ describe('useRecordActionItems', () => {
       const favoriteAction = nonFavoriteResult.current.actions.find(
         (action) => action.type === 'favorite'
       )
-      expect(favoriteAction.name).toBe('Mark as favorite')
+      expect(favoriteAction.name).toBe('Add to Favorites')
 
       const favoriteWifiRecord = { ...wifiPasswordRecord, isFavorite: true }
       const { result: favoriteResult } = renderHook(

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useCountDown } from 'pear-apps-lib-ui-react-hooks'
-import { generateQRCodeSVG } from 'pear-apps-utils-qr'
-import { CopyIcon, TimeIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useInvite } from 'pearpass-lib-vault'
+import { useCountDown } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
+import {
+  CopyIcon,
+  TimeIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useInvite } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 

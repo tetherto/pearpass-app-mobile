@@ -2,8 +2,8 @@ import { useLingui } from '@lingui/react/macro'
 import {
   CheckIcon,
   KebabMenuIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import {
   FolderContainer,

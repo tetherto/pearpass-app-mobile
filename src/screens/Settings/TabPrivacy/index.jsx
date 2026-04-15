@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { BackIcon } from 'pearpass-lib-ui-react-native-components'
+import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 

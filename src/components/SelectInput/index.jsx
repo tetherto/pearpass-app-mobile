@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   ArrowDownIcon,
   ArrowUpIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
 
 import {
   Dropdown,

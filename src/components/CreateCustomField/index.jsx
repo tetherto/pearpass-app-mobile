@@ -6,7 +6,8 @@ import {
   ArrowUpIcon,
   PlusIcon,
   CommonFileIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { View } from 'react-native'
 
 import { ArrowIconWrapper, DropDown, Label, LabelText, Wrapper } from './styles'
 import { ButtonFilter } from '../../libComponents'
@@ -66,10 +67,30 @@ export const CreateCustomField = ({
 
   return (
     <Wrapper testID={testID} accessibilityLabel={accessibilityLabel}>
-      <Label onPress={() => setIsOpen(!isOpen)}>
-        <PlusIcon size="21" />
+      <Label
+        onPress={() => setIsOpen(!isOpen)}
+        testID={
+          isOpen
+            ? 'сollapse-create-custom-field-button'
+            : 'expand-create-custom-field-button'
+        }
+        accessibilityLabel={
+          isOpen
+            ? 'Сollapse create custom field button'
+            : 'Expand create custom field button'
+        }
+      >
+        <View
+          testID="create-custom-field-plus-icon"
+          accessibilityLabel="Create custom field plus icon"
+        >
+          <PlusIcon size="21" />
+        </View>
 
-        <LabelText>{t`Create Custom`}</LabelText>
+        <LabelText
+          testID="create-custom-field-text"
+          accessibilityLabel="Create custom field text"
+        >{t`Create Custom`}</LabelText>
 
         <ArrowIconWrapper>
           {isOpen ? <ArrowUpIcon size="21" /> : <ArrowDownIcon size="21" />}
@@ -79,14 +100,21 @@ export const CreateCustomField = ({
       {isOpen && (
         <DropDown>
           {options.map((option) => (
-            <ButtonFilter
+            <View
               key={option.type}
-              variant="secondary"
-              startIcon={option.icon}
-              onPress={() => handleSelect(option.type)}
+              testID="add-new-comment-field"
+              accessibilityLabel="Add new comment field"
             >
-              {option.name}
-            </ButtonFilter>
+              <ButtonFilter
+                variant="secondary"
+                startIcon={option.icon}
+                onPress={() => handleSelect(option.type)}
+                testID="add-new-comment-button"
+                accessibilityLabel="Add new comment button"
+              >
+                {option.name}
+              </ButtonFilter>
+            </View>
           ))}
         </DropDown>
       )}

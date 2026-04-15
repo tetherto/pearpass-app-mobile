@@ -5,8 +5,8 @@ import { useLingui } from '@lingui/react/macro'
 import {
   ArrowLeftIcon,
   YellowErrorIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { PairAnotherDeviceContent } from './PairAnotherDeviceContent'

@@ -2,7 +2,7 @@ import { Buffer } from 'buffer'
 
 import { useCallback, useEffect, useRef } from 'react'
 
-import { vaultGetFile } from 'pearpass-lib-vault'
+import { vaultGetFile } from '@tetherto/pearpass-lib-vault'
 
 import { useLoadingContext } from '../context/LoadingContext'
 import { areFilesEqual } from '../utils/areFilesEqual'
@@ -14,7 +14,7 @@ import { logger } from '../utils/logger'
  * @param {string[]} param0.fieldNames
  * @param {Function} param0.updateValues
  * @param {Object} param0.initialRecord
- * @param {Object} param0.currentValues - Optional: current form values to merge with loaded files
+ * @param {Object} [param0.currentValues] - Optional: current form values to merge with loaded files
  * @returns {{ refetch: () => Promise<void> }} Object with refetch function
  */
 export const useGetMultipleFiles = ({

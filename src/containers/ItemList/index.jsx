@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
-import { KebabMenuIcon } from 'pearpass-lib-ui-react-native-components'
-import { formatOtpCode } from 'pearpass-lib-vault'
+import { KebabMenuIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { formatOtpCode } from '@tetherto/pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 
 import { styles } from './styles'
@@ -50,8 +50,6 @@ export const ItemList = ({
       extraData={selectedRecords}
       renderItem={({ item: record }) => {
         const isSelected = isRecordSelected(record.id)
-        const websiteDomain =
-          record.type === 'login' ? record?.data?.websites?.[0] : null
         return (
           <TouchableOpacity
             style={[styles.item, isSelected && styles.itemSelected]}
@@ -59,11 +57,7 @@ export const ItemList = ({
             accessible={false}
           >
             <View style={styles.itemRow}>
-              <AvatarRecord
-                websiteDomain={websiteDomain}
-                isSelected={isSelected}
-                record={record}
-              />
+              <AvatarRecord isSelected={isSelected} record={record} />
 
               <View style={styles.itemTextContainer}>
                 <Text

@@ -23,7 +23,7 @@ import { logger } from '../utils/logger'
  */
 
 const HapticsContext = createContext({
-  isHapticsEnabled: true,
+  isHapticsEnabled: false,
   setIsHapticsEnabled: () => {},
   triggerImpact: () => {},
   triggerSelection: () => {},
@@ -31,25 +31,11 @@ const HapticsContext = createContext({
 })
 
 export const HapticsProvider = ({ children }) => {
-  const [isHapticsEnabled, setIsHapticsEnabledState] = useState(true)
+  const [isHapticsEnabled, setIsHapticsEnabledState] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    const loadSavedPreference = async () => {
-      try {
-        const savedValue = await SecureStore.getItemAsync(
-          SECURE_STORAGE_KEYS.HAPTICS_ENABLED
-        )
-        if (savedValue !== null) {
-          setIsHapticsEnabledState(savedValue === 'true')
-        }
-      } catch (error) {
-        logger.error('Error loading haptics preference:', error)
-      } finally {
-        setIsLoaded(true)
-      }
-    }
-    loadSavedPreference()
+    setIsLoaded(true)
   }, [])
 
   const setIsHapticsEnabled = useCallback(async (enabled) => {

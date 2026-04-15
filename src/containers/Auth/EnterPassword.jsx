@@ -2,14 +2,14 @@ import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useForm } from 'pear-apps-lib-ui-react-hooks'
-import { Validator } from 'pear-apps-utils-validator'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useUserData, useVaults } from 'pearpass-lib-vault'
+import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
+import { Validator } from '@tetherto/pear-apps-utils-validator'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useUserData, useVaults } from '@tetherto/pearpass-lib-vault'
 import {
   clearBuffer,
   stringToBuffer
-} from 'pearpass-lib-vault/src/utils/buffer'
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
 import {
   ActivityIndicator,
   ScrollView,
@@ -73,7 +73,7 @@ export const EnterPassword = () => {
         password:
           typeof error === 'string'
             ? error
-            : t`Incorrect password. You have ${status?.remainingAttempts} attempts before the app locks for 5 minutes.`
+            : t`Incorrect password. You have ${status?.remainingAttempts} ${status?.remainingAttempts === 1 ? t`attempt` : t`attempts`} before the app will be temporarily locked.`
       })
       setIsLoading(false)
     } finally {

@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
-import { PASSPHRASE_TYPE_OPTIONS } from 'pearpass-lib-constants'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { PASSPHRASE_TYPE_OPTIONS } from '@tetherto/pearpass-lib-constants'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet } from 'react-native'
 
 import { AppSwitch } from '../../components/AppSwitch/AppSwitch'
@@ -49,6 +49,10 @@ export const PassPhraseSettings = ({
           value={withRandomWord}
           onChange={(value) => setWithRandomWord(value)}
           disabled={isDisabled}
+          testIDOn="add-one-random-word-toggle-on"
+          testIDOff="add-one-random-word-toggle-off"
+          accessibilityLabelOn="Add one random word toggle on"
+          accessibilityLabelOff="Add one random word toggle off"
         />
       </View>
     </View>

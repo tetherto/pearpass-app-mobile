@@ -22,6 +22,7 @@ Expected: generated `android/app/build.gradle` does not contain a `productFlavor
 ### F-Droid Android prebuild
 
 ```bash
+npm run fdroid:patches:prebuild
 PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --no-install
 ```
 
@@ -40,15 +41,21 @@ npm run bundle-bare
 ```
 
 ```bash
+npm run fdroid:patches:prebuild
+PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --no-install
+npm run fdroid:patches:build
+
 cd android
 ANDROID_HOME=$HOME/Library/Android/sdk \
   GRADLE_USER_HOME=/tmp/pearpass-gradle-home \
-  ./gradlew :app:assembleFdroidRelease --no-daemon -Dorg.gradle.vfs.watch=false
+  ./gradlew :app:assembleFdroidRelease --no-daemon -Dorg.gradle.vfs.watch=false \
+    -Ppearpass.enableAbiSplits=true \
+    -Ppearpass.abis=arm64-v8a,armeabi-v7a
 ```
 
-Expected output path (Gradle default):
+Expected output path (ABI split):
 
-- `android/app/build/outputs/apk/fdroid/release/app-fdroid-release.apk`
+- `android/app/build/outputs/apk/fdroid/release/app-fdroid-*-release.apk`
 
 ## Feature differences (current)
 

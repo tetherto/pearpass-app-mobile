@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 
-import { ErrorIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
+import { ErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import {
   Platform,
   StyleSheet,
@@ -35,10 +35,10 @@ import { HighlightString } from '../HighlightString'
  *  onClick?: () => void,
  *  onInputLayout?: (event: any) => void,
  *  type?: 'numeric' | 'default',
- *  isSecure: boolean,
- *  isColored: boolean,
+ *  isSecure?: boolean,
+ *  isColored?: boolean,
  *  variant?: 'default' | 'outline',
- *  isTransparent: boolean,
+ *  isTransparent?: boolean,
  *  belowInputContent?: React.ReactNode,
  *  shouldDisplayCustomPlaceholder?: boolean
  *  testID?: string
@@ -170,7 +170,7 @@ export const InputField = ({
 
         <View style={styles.inputContainer}>
           {isDisabled ? (
-            <ScrollView horizontal>
+            <ScrollView horizontal nestedScrollEnabled>
               <View style={styles.scrollableTextContainer}>
                 <Text
                   style={[
@@ -259,7 +259,7 @@ export const InputField = ({
     </View>
   )
 
-  if (isDisabled && onClick) {
+  if (isDisabled) {
     return (
       <View
         style={getWrapperStyle()}

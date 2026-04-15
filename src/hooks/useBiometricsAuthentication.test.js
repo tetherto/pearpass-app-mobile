@@ -1,9 +1,9 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
+import { getMasterEncryption } from '@tetherto/pearpass-lib-vault'
 import * as LocalAuthentication from 'expo-local-authentication'
 import * as SecureStore from 'expo-secure-store'
-import { getMasterEncryption } from 'pearpass-lib-vault'
 
 import { useBiometricsAuthentication } from './useBiometricsAuthentication'
 import { IOS_APP_GROUP_ID } from '../constants/iosAppGroup'
@@ -31,7 +31,7 @@ jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(),
   deleteItemAsync: jest.fn()
 }))
-jest.mock('pearpass-lib-vault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
   getMasterEncryption: jest.fn()
 }))
 jest.mock('../utils/logger', () => ({

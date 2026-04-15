@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Trans, useLingui } from '@lingui/react/macro'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   Animated,
   Dimensions,

@@ -4,12 +4,12 @@ import { useRef, useState } from 'react'
 
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { CameraView } from 'expo-camera'
-import * as ImagePicker from 'expo-image-picker'
 import {
   CommonFileIcon,
   DeleteIcon
-} from 'pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { CameraView } from 'expo-camera'
+import * as ImagePicker from 'expo-image-picker'
 import { Image } from 'react-native'
 
 import {

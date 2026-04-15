@@ -6,13 +6,13 @@ import { useNavigation } from '@react-navigation/native'
 import {
   sendGoogleFormFeedback,
   sendSlackFeedback
-} from 'pear-apps-lib-feedback'
-import { PRIVACY_POLICY, TERMS_OF_USE } from 'pearpass-lib-constants'
+} from '@tetherto/pear-apps-lib-feedback'
+import { PRIVACY_POLICY, TERMS_OF_USE } from '@tetherto/pearpass-lib-constants'
 import {
   BackIcon,
   OutsideLinkIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   Linking,
   Platform,
@@ -132,7 +132,13 @@ export const About = () => {
             </Text>
             <View style={styles.versionRow}>
               <Text style={styles.versionLabel}>{t`App version`}</Text>
-              <Text style={styles.versionValue}>{version}</Text>
+              <Text
+                style={styles.versionValue}
+                testID="app-version"
+                accessibilityLabel="App Version"
+              >
+                {version}
+              </Text>
             </View>
             <TouchableOpacity onPress={() => Linking.openURL(TERMS_OF_USE)}>
               <Text style={styles.link}>{t`Terms of use`}</Text>

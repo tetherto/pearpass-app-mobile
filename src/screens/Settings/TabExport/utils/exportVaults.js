@@ -1,5 +1,8 @@
-import { parseDataToCsvText, parseDataToJson } from 'pearpass-lib-data-export'
-import { encryptExportData } from 'pearpass-lib-vault'
+import {
+  parseDataToCsvText,
+  parseDataToJson
+} from '@tetherto/pearpass-lib-data-export'
+import { encryptExportData } from '@tetherto/pearpass-lib-vault'
 
 import { downloadFile } from './downloadFile'
 import { downloadZip } from './downloadZip'

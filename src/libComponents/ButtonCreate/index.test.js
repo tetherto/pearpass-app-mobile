@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import { ArrowDownIcon } from 'pearpass-lib-ui-react-native-components'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ArrowDownIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { ButtonCreate } from './index'
 

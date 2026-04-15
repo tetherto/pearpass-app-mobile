@@ -11,7 +11,7 @@ import messages from '../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
-jest.mock('pearpass-lib-constants', () => ({
+jest.mock('@tetherto/pearpass-lib-constants', () => ({
   CLIPBOARD_CLEAR_TIMEOUT: 30000
 }))
 
@@ -28,11 +28,11 @@ jest.mock('react-native-toast-message', () => ({
   show: jest.fn()
 }))
 
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   CopyIcon: jest.fn(() => null)
 }))
 
-jest.mock('pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
   colors: {
     black: {
       mode1: '#000000'

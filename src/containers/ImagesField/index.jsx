@@ -2,9 +2,12 @@ import { useMemo, useCallback, memo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import {
+  ImageIcon,
+  PlusIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import { Camera } from 'expo-camera'
-import { ImageIcon, PlusIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider'
 import { Alert, Pressable, Linking } from 'react-native'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -28,8 +31,23 @@ import { useAutoLockContext } from '../../context/AutoLockContext'
  * @param {Array<Object>} [props.pictures=[]]
  * @param {function} [props.onAdd]
  * @param {function} [props.onRemove]
+ * @param {function} [props.onRename]
+ * @param {string} [props.testID]
+ * @param {string} [props.accessibilityLabel]
+ * @param {string} [props.addButtonTestID]
+ * @param {string} [props.addButtonAccessibilityLabel]
  */
-const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
+const ImagesFieldComponent = ({
+  title,
+  pictures = [],
+  onAdd,
+  onRemove,
+  onRename,
+  testID,
+  accessibilityLabel,
+  addButtonTestID,
+  addButtonAccessibilityLabel
+}) => {
   const { expand } = useBottomSheet()
   const navigation = useNavigation()
   const { t } = useLingui()
@@ -54,10 +72,11 @@ const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
       navigation.navigate('ImagePreview', {
         imageUri: uri,
         imageName: name,
-        onDelete: onRemove ? () => onRemove(index) : undefined
+        onDelete: onRemove ? () => onRemove(index) : undefined,
+        onRename: onRename ? (newName) => onRename(index, newName) : undefined
       })
     },
-    [navigation, onRemove]
+    [navigation, onRemove, onRename]
   )
 
   const handleAddClick = useCallback(async () => {
@@ -108,7 +127,7 @@ const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
   }, [expand, onAdd, t])
 
   return (
-    <Container>
+    <Container testID={testID} accessibilityLabel={accessibilityLabel}>
       <Header>
         <ImageIcon />
         <Title>{title}</Title>
@@ -127,7 +146,11 @@ const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
         ))}
 
         {onAdd && (
-          <AddContainer onPress={handleAddClick}>
+          <AddContainer
+            onPress={handleAddClick}
+            testID={addButtonTestID}
+            accessibilityLabel={addButtonAccessibilityLabel}
+          >
             <PlusIcon color={colors.primary400.mode1} />
           </AddContainer>
         )}

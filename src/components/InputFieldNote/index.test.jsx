@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from 'pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { InputFieldNote } from './index'
 import messages from '../../locales/en/messages'
@@ -15,7 +15,7 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-jest.mock('pearpass-lib-ui-react-native-components', () => ({
+jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
   CommonFileIcon: () => 'CommonFileIcon'
 }))
 

@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 import { useNavigation } from '@react-navigation/native'
-import { closeAllInstances, useUserData, useVaults } from 'pearpass-lib-vault'
-import { AppState } from 'react-native'
+import {
+  closeAllInstances,
+  useUserData,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
+import { AppState, Keyboard } from 'react-native'
 
 import { useRouteHelper } from './useRouteHelper'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
@@ -13,7 +17,9 @@ import {
   getLastActivityAt,
   setLastActivityAt
 } from '../../../utils/autoLockStorage'
+import { isV2 } from '../../../utils/designVersion'
 import { clearAllFileCache } from '../../../utils/filesCache'
+import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 
 /**
  * Hook responsible for monitoring user inactivity and handling auto-lock logic.
@@ -23,6 +29,7 @@ export const useAutoLockWatcher = () => {
   const lastActivityRef = useRef(Date.now())
   const lockInProgressRef = useRef(false)
   const appStateRef = useRef(AppState.currentState)
+  const keyboardVisibleRef = useRef(false)
   const { getCurrentRoute, isMasterPasswordScreen } = useRouteHelper()
   const { collapse } = useBottomSheet()
   const { closeModal } = useModal()
@@ -76,15 +83,25 @@ export const useAutoLockWatcher = () => {
     closeAllInstances()
     clearAllFileCache()
 
-    navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'Welcome',
-          params: { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD }
-        }
-      ]
-    })
+    if (isV2()) {
+      const routeName = unsupportedFeaturesEnabled()
+        ? 'AuthV2Pin'
+        : 'AuthV2MasterPassword'
+      navigation.reset({
+        index: 0,
+        routes: [{ name: routeName }]
+      })
+    } else {
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Welcome',
+            params: { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD }
+          }
+        ]
+      })
+    }
 
     resetState()
   }, [
@@ -115,6 +132,11 @@ export const useAutoLockWatcher = () => {
       }
 
       if (isMasterPasswordScreen(currentRoute) || lockInProgressRef.current) {
+        clearAutoLockTimer()
+        return
+      }
+
+      if (keyboardVisibleRef.current) {
         clearAutoLockTimer()
         return
       }
@@ -174,6 +196,31 @@ export const useAutoLockWatcher = () => {
     resetFromNow()
   }, [resetAutoLockTimer, isAutoLockActive, clearAutoLockTimer])
 
+  useEffect(() => {
+    if (!isAutoLockActive) return
+
+    const onShow = () => {
+      keyboardVisibleRef.current = true
+      clearAutoLockTimer()
+    }
+
+    const onHide = () => {
+      keyboardVisibleRef.current = false
+      const now = Date.now()
+      lastActivityRef.current = now
+      setLastActivityAt(now)
+      resetAutoLockTimer(now)
+    }
+
+    const showSub = Keyboard.addListener('keyboardDidShow', onShow)
+    const hideSub = Keyboard.addListener('keyboardDidHide', onHide)
+
+    return () => {
+      showSub.remove()
+      hideSub.remove()
+    }
+  }, [isAutoLockActive, clearAutoLockTimer, resetAutoLockTimer])
+
   /**
    * Background → foreground handling
    */
@@ -185,6 +232,8 @@ export const useAutoLockWatcher = () => {
       appStateRef.current = nextState
 
       if (nextState === 'active' && prev !== 'active') {
+        keyboardVisibleRef.current = false
+
         const stored = await getLastActivityAt()
         const lastActivity = stored ?? Date.now()
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { OtpRefreshProvider } from 'pearpass-lib-vault'
+import { OtpRefreshProvider } from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
 import { Navigation } from '../Navigation'
@@ -18,7 +18,7 @@ export const App = () => {
   const { needsUpdate } = useVersionCheck()
   const hasOpenedUpdateModal = useRef(false)
 
-  useFirstLaunchCleanUp()
+  const isFirstLaunchCleanupReady = useFirstLaunchCleanUp()
 
   useEffect(() => {
     if (needsUpdate && !hasOpenedUpdateModal.current) {
@@ -29,7 +29,7 @@ export const App = () => {
 
   const { initialRouteName, isLoading } = useRedirect()
 
-  if (isLoading) {
+  if (isLoading || !isFirstLaunchCleanupReady) {
     return null
   }
 

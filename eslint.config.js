@@ -1,5 +1,5 @@
+import { eslintConfig } from '@tetherto/tether-dev-docs'
 import eslintConfigExpo from 'eslint-config-expo'
-import { eslintConfig } from 'tether-dev-docs'
 
 export default [
   {

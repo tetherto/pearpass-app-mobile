@@ -1,9 +1,10 @@
 import { createDrawerNavigator } from '@react-navigation/drawer'
-import { AUTHENTICATOR_ENABLED } from 'pearpass-lib-constants'
+import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 
 import { DrawerContent } from '../../containers/DrawerContent'
 import { Authenticator } from '../../screens/Authenticator'
 import { Home } from '../../screens/Home'
+import { isV2 } from '../../utils/designVersion'
 
 const Drawer = createDrawerNavigator()
 
@@ -26,7 +27,7 @@ export const DrawerNavigator = () => (
         headerShown: false
       }}
     />
-    {AUTHENTICATOR_ENABLED && (
+    {AUTHENTICATOR_ENABLED && !isV2() && (
       <Drawer.Screen
         name="Authenticator"
         component={Authenticator}

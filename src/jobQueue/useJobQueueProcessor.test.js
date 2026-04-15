@@ -12,7 +12,7 @@ jest.mock('react-redux', () => ({
   useSelector: jest.fn()
 }))
 
-jest.mock('pearpass-lib-vault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
   useCreateRecord: jest.fn(() => ({
     createRecord: jest.fn()
   })),
@@ -21,7 +21,7 @@ jest.mock('pearpass-lib-vault', () => ({
   }))
 }))
 
-jest.mock('pearpass-lib-vault/src/instances', () => ({
+jest.mock('@tetherto/pearpass-lib-vault/src/instances', () => ({
   pearpassVaultClient: {
     activeVaultGet: jest.fn(),
     readJobQueue: jest.fn(),
@@ -29,7 +29,7 @@ jest.mock('pearpass-lib-vault/src/instances', () => ({
   }
 }))
 
-jest.mock('pearpass-lib-vault/src/selectors/selectVault', () => ({
+jest.mock('@tetherto/pearpass-lib-vault/src/selectors/selectVault', () => ({
   selectVault: jest.fn()
 }))
 

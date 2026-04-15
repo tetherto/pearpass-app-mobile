@@ -2,9 +2,9 @@ import { useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { BackIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { useVault } from 'pearpass-lib-vault'
+import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useVault } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -31,6 +31,14 @@ const getDeviceDisplayName = (deviceName) => {
     return t`Android`
   }
 
+  return deviceName
+}
+
+const getDeviceTypeKey = (deviceName) => {
+  if (!deviceName) return 'Unknown'
+  const lowerName = deviceName.toLowerCase()
+  if (lowerName.startsWith('ios')) return 'iOS'
+  if (lowerName.startsWith('android')) return 'Android'
   return deviceName
 }
 
@@ -76,6 +84,12 @@ export const Vaults = () => {
                     key={device.name + index}
                     name={getDeviceDisplayName(device?.name)}
                     date={device.createdAt}
+                    testID={`${getDeviceTypeKey(device?.name)} Linked Device`}
+                    accessibilityLabel={`${getDeviceTypeKey(device?.name)} Linked Device`}
+                    nameTestID="linked-device-name"
+                    nameAccessibilityLabel="Linked Device Name"
+                    dateTestID="linked-device-date"
+                    dateAccessibilityLabel="Linked Device Date"
                   />
                 ))}
               </View>

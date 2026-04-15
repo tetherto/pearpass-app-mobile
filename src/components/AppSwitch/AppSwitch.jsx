@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { Pressable, StyleSheet } from 'react-native'
 import Animated, {
   interpolate,

@@ -1,7 +1,10 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { SaveIcon, XIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import {
+  SaveIcon,
+  XIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator, Keyboard, View } from 'react-native'
 
 import { BottomSheetFolderListContent } from '../../containers/BottomSheetFolderListContent'

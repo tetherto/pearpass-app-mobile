@@ -2,14 +2,14 @@ import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { CameraView } from 'expo-camera'
-import * as Clipboard from 'expo-clipboard'
 import {
   PasteFromClipboardIcon,
   QrCodeIcon
-} from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
-import { usePair, useVault } from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
+import { CameraView } from 'expo-camera'
+import * as Clipboard from 'expo-clipboard'
 import {
   ActivityIndicator,
   Platform,

@@ -2,22 +2,27 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { PlusIcon, SaveIcon } from 'pearpass-lib-ui-react-native-components'
-import { colors } from 'pearpass-lib-ui-theme-provider/native'
+import {
+  PlusIcon,
+  SaveIcon
+} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   formatOtpCode,
   groupOtpRecords,
   isExpiring,
   useRecords
-} from 'pearpass-lib-vault'
+} from '@tetherto/pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { isV2 } from 'src/utils/designVersion'
 
 import { styles } from './styles'
 import { AvatarRecord } from '../../components/AvatarRecord'
 import { getTimerColor } from '../../components/OtpCodeField/utils'
 import { TimerCircle } from '../../components/TimerCircle'
 import { Header } from '../../containers/Header'
+import { Layout } from '../../containers/Layout'
 import { CopyButton } from '../../libComponents/CopyButton'
 import { AuthenticatorIllustration } from '../../svgs/AuthenticatorIllustration'
 
@@ -112,15 +117,13 @@ export const Authenticator = () => {
     // Record item
     const { record } = item
     const code = record.otpPublic?.currentCode ?? null
-    const websiteDomain =
-      record.type === 'login' ? record?.data?.websites?.[0] : null
 
     return (
       <TouchableOpacity
         style={styles.recordItem}
         onPress={() => handleRecordPress(record)}
       >
-        <AvatarRecord websiteDomain={websiteDomain} record={record} />
+        <AvatarRecord record={record} />
         <View style={styles.recordTextContainer}>
           <Text style={styles.recordTitle} numberOfLines={1}>
             {record.data?.title}
@@ -135,17 +138,37 @@ export const Authenticator = () => {
     )
   }
 
+  const Wrapper = isV2() ? Layout : SafeAreaView
+  const wrapperProps = isV2()
+    ? {
+        header: (
+          <Header
+            setSearchValue={setSearchValue}
+            searchValue={searchValue}
+            itemsFound={otpRecords.length}
+            setIsMultiSelectOn={() => {}}
+            isMultiSelectOn={false}
+            setSelectedRecords={() => {}}
+            selectedRecords={[]}
+          />
+        ),
+        hideFooter: true
+      }
+    : { style: styles.container }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        setSearchValue={setSearchValue}
-        searchValue={searchValue}
-        itemsFound={otpRecords.length}
-        setIsMultiSelectOn={() => {}}
-        isMultiSelectOn={false}
-        setSelectedRecords={() => {}}
-        selectedRecords={[]}
-      />
+    <Wrapper {...wrapperProps}>
+      {!isV2() && (
+        <Header
+          setSearchValue={setSearchValue}
+          searchValue={searchValue}
+          itemsFound={otpRecords.length}
+          setIsMultiSelectOn={() => {}}
+          isMultiSelectOn={false}
+          setSelectedRecords={() => {}}
+          selectedRecords={[]}
+        />
+      )}
 
       {otpRecords.length === 0 ? (
         <View style={styles.emptyStateContainer}>
@@ -188,6 +211,6 @@ export const Authenticator = () => {
           renderItem={renderItem}
         />
       )}
-    </SafeAreaView>
+    </Wrapper>
   )
 }
