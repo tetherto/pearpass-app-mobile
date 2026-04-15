@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useNavigation } from '@react-navigation/native'
+import { useFolders } from '@tetherto/pearpass-lib-vault'
 
 import { MenuActionItem } from '../../components/MenuActionItem'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -15,7 +16,7 @@ import { ConfirmModalContent } from '../Modal/ConfirmModalContent'
  */
 export const BottomSheetFolderMenuContent = ({ folderName }) => {
   const navigation = useNavigation()
-  // const { deleteFolder } = useFolders()
+  const { deleteFolder } = useFolders()
   const { collapse } = useBottomSheet()
   const { closeModal, openModal } = useModal()
 
@@ -41,12 +42,9 @@ export const BottomSheetFolderMenuContent = ({ folderName }) => {
               text="Are you sure that you want to Reset all stored data?"
               secondaryAction={closeModal}
               primaryAction={() => {
-                navigation.navigate('DeleteFolder', {
-                  folderName
-                })
-                // deleteFolder(folderName)
-                // closeModal()
-                // collapse()
+                deleteFolder(folderName)
+                closeModal()
+                collapse()
               }}
             />
           )

@@ -5,8 +5,6 @@ import { useNavigation } from '@react-navigation/native'
 import {
   Button,
   NavbarListItem,
-  Text,
-  rawTokens,
   useBottomSheetClose,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
@@ -17,7 +15,6 @@ import {
   MoreVert
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
-import { Pressable, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useSharedFilter } from '../../context/SharedFilterContext'
@@ -140,53 +137,26 @@ export const BottomSheetFolderSelectorContent = ({
         const isSelected = activeFolder === folder.name
 
         return (
-          <View
+          <NavbarListItem
             key={folder.name}
-            style={[
-              styles.row,
-              {
-                backgroundColor: isSelected
-                  ? theme.colors.colorSurfaceHover
-                  : theme.colors.colorSurfacePrimary,
-                borderBottomColor: theme.colors.colorBorderSecondary
-              }
-            ]}
-          >
-            <Pressable
-              style={styles.rowMain}
-              onPress={() => handleSelect(folder.name)}
-            >
-              <View style={styles.rowLabelWrap}>
-                <Folder
-                  color={theme.colors.colorTextPrimary}
-                  width={16}
-                  height={16}
-                />
-                <Text
-                  style={[
-                    styles.rowLabel,
-                    { color: theme.colors.colorTextPrimary }
-                  ]}
-                >
-                  {folder.name}
-                </Text>
-              </View>
-
-              <Text
-                style={[styles.count, { color: theme.colors.colorTextPrimary }]}
-              >
-                {count}
-              </Text>
-            </Pressable>
-
-            <Button
-              variant="tertiary"
-              size="small"
-              aria-label={t`Folder actions`}
-              iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
-              onClick={() => setMenuFolderName(folder.name)}
-            />
-          </View>
+            icon={<Folder color={theme.colors.colorTextPrimary} />}
+            iconSize={16}
+            label={folder.name}
+            count={count}
+            selected={isSelected}
+            platform="mobile"
+            showDivider
+            onClick={() => handleSelect(folder.name)}
+            additionalItems={
+              <Button
+                variant="tertiary"
+                size="small"
+                aria-label={t`Folder actions`}
+                iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
+                onClick={() => setMenuFolderName(folder.name)}
+              />
+            }
+          />
         )
       })}
 
@@ -201,40 +171,3 @@ export const BottomSheetFolderSelectorContent = ({
     </Layout>
   )
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    paddingLeft: rawTokens.spacing12,
-    paddingRight: rawTokens.spacing8
-  },
-  rowMain: {
-    flex: 1,
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: rawTokens.spacing12,
-    paddingRight: rawTokens.spacing8
-  },
-  rowLabelWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: rawTokens.spacing12,
-    flex: 1,
-    minWidth: 0
-  },
-  rowLabel: {
-    flexShrink: 1,
-    fontSize: rawTokens.fontSize14,
-    fontWeight: rawTokens.weightMedium
-  },
-  count: {
-    minWidth: rawTokens.spacing16,
-    fontSize: rawTokens.fontSize14,
-    fontWeight: rawTokens.weightMedium,
-    textAlign: 'right'
-  }
-})
