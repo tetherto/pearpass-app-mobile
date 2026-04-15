@@ -18,7 +18,10 @@ export const styles = StyleSheet.create({
     paddingTop: rawTokens.spacing16
   },
   footerText: {
+    flexDirection: 'row',
+    width: '100%',
     textAlign: 'center',
+    justifyContent: 'center',
     paddingBottom: rawTokens.spacing16
   },
   passwordContainer: {

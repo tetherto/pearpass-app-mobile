@@ -22,7 +22,7 @@ import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 
-import { Numpad } from '../../components/Numpad'
+import { BiometricType, Numpad } from '../../components/Numpad'
 import { PinSlots } from '../../components/PinSlots'
 import { IOS_APP_GROUP_ID } from '../../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../../constants/secureStorageKeys'
@@ -38,6 +38,8 @@ import { Layout } from '../Layout'
 import { styles } from './styles'
 
 const PIN_LENGTH = 6
+
+type InputMode = 'pin' | 'password'
 
 interface BottomSheetReauthContentProps {
   onConfirm: (data?: { encryptionData?: object }) => Promise<void>
@@ -56,7 +58,7 @@ export const BottomSheetReauthContent = ({
   const { logIn } = useUserData()
   const { initVaults } = useVaults()
 
-  const [mode, setMode] = useState<'pin' | 'password'>('pin')
+  const [mode, setMode] = useState<InputMode>('pin')
   const [pin, setPin] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -74,7 +76,11 @@ export const BottomSheetReauthContent = ({
     isBiometricAvailable && getIsFingerprintSupported(biometricTypes)
 
   const biometricType =
-    isFaceID && !isFingerprint ? 'face' : isFingerprint ? 'fingerprint' : null
+    isFaceID && !isFingerprint
+      ? BiometricType.Face
+      : isFingerprint
+        ? BiometricType.Fingerprint
+        : null
 
   const handleBiometricAuth = useCallback(async () => {
     if (isLoading) return
@@ -214,15 +220,17 @@ export const BottomSheetReauthContent = ({
             />
           </View>
 
-          <Text style={styles.footerText as any}>
-            {t`Forgot PIN?`}{' '}
-            <Link
-              onClick={() => setMode('password')}
-              data-testid="reauth-master-password-link"
-            >
-              {t`Proceed with Master Password`}
-            </Link>
-          </Text>
+          <View style={styles.footerText}>
+            <Text>
+              {t`Forgot PIN?`}{' '}
+              <Link
+                onClick={() => setMode('password')}
+                data-testid="reauth-master-password-link"
+              >
+                {t`Proceed with Master Password`}
+              </Link>
+            </Text>
+          </View>
         </View>
       ) : (
         <View style={styles.content}>

@@ -8,19 +8,29 @@ import { Pressable, View } from 'react-native'
 
 import { styles } from './styles'
 
+export enum BiometricType {
+  Face = 'face',
+  Fingerprint = 'fingerprint'
+}
+
+enum NumpadKey {
+  Biometric = 'biometric',
+  Backspace = 'backspace'
+}
+
 interface NumpadProps {
   onDigitPress: (digit: string) => void
   onBackspacePress: () => void
   onBiometricPress?: () => void
-  biometricType?: 'face' | 'fingerprint' | null
+  biometricType?: BiometricType | null
   testIDPrefix?: string
 }
 
-const ROWS: (number | string)[][] = [
+const ROWS: (number | NumpadKey)[][] = [
   [1, 2, 3],
   [4, 5, 6],
   [7, 8, 9],
-  ['biometric', 0, 'backspace']
+  [NumpadKey.Biometric, 0, NumpadKey.Backspace]
 ]
 
 export const Numpad = ({
@@ -38,18 +48,18 @@ export const Numpad = ({
       {ROWS.map((row, rowIndex) => (
         <View key={rowIndex} style={styles.row}>
           {row.map((item) => {
-            if (item === 'biometric') {
+            if (item === NumpadKey.Biometric) {
               if (!biometricType) {
-                return <View key="biometric" style={styles.button} />
+                return <View key={NumpadKey.Biometric} style={styles.button} />
               }
               return (
                 <Pressable
-                  key="biometric"
+                  key={NumpadKey.Biometric}
                   style={styles.button}
                   onPress={onBiometricPress}
                   testID={`${testIDPrefix}-biometric-button`}
                 >
-                  {biometricType === 'face' ? (
+                  {biometricType === BiometricType.Face ? (
                     <FaceId color={iconColor} />
                   ) : (
                     <Fingerprint color={iconColor} />
@@ -58,10 +68,10 @@ export const Numpad = ({
               )
             }
 
-            if (item === 'backspace') {
+            if (item === NumpadKey.Backspace) {
               return (
                 <Pressable
-                  key="backspace"
+                  key={NumpadKey.Backspace}
                   style={styles.button}
                   onPress={onBackspacePress}
                   testID={`${testIDPrefix}-backspace-button`}

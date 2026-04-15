@@ -90,22 +90,24 @@ export const ExportItems = () => {
   }, [])
 
   useEffect(() => {
+    const { password, passwordConfirm } = values
+
     if (
       isPasswordProtected &&
-      values.password &&
-      values.passwordConfirm &&
-      values.password !== values.passwordConfirm
+      password &&
+      passwordConfirm &&
+      password !== passwordConfirm
     ) {
       setErrors({ passwordConfirm: t`Passwords do not match` })
     } else if (
       isPasswordProtected &&
-      values.password &&
-      values.passwordConfirm &&
-      values.password === values.passwordConfirm
+      password &&
+      passwordConfirm &&
+      password === passwordConfirm
     ) {
       setErrors({})
     }
-  }, [values.password, values.passwordConfirm, isPasswordProtected])
+  }, [values, isPasswordProtected])
 
   const fetchUnprotectedVault = async (vaultId: string) => {
     const vault = await getVaultById(vaultId)
@@ -114,7 +116,10 @@ export const ExportItems = () => {
   }
 
   const handleSubmitExport = useCallback(
-    async (vaultsToExport: any[], encryptionPassword: string | null = null) => {
+    async (
+      vaultsToExport: unknown[],
+      encryptionPassword: string | null = null
+    ) => {
       try {
         let isSuccess = false
 
@@ -145,12 +150,13 @@ export const ExportItems = () => {
             bottomOffset: 100
           })
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         Toast.show({
           type: 'error',
           text1: t`Export failed`,
           text2:
-            error.message || t`An error occurred while exporting your data`,
+            (error instanceof Error && error.message) ||
+            t`An error occurred while exporting your data`,
           position: 'bottom',
           bottomOffset: 100
         })
@@ -170,11 +176,13 @@ export const ExportItems = () => {
 
       const encryptionPassword = isPasswordProtected ? values.password : null
       await handleSubmitExport([vaultData], encryptionPassword)
-    } catch (error: any) {
+    } catch (error: unknown) {
       Toast.show({
         type: 'error',
         text1: t`Export failed`,
-        text2: error.message || t`An error occurred while exporting your data`,
+        text2:
+          (error instanceof Error && error.message) ||
+          t`An error occurred while exporting your data`,
         position: 'bottom',
         bottomOffset: 100
       })
