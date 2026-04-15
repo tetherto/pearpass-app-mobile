@@ -100,6 +100,7 @@ export class CreateCreditCardsPage extends BasePage {
 
   async tapShowSecurityCodeIconButton(): Promise<this> {
     await this.showSecurityCodeIconButton.click();
+    await this.showSecurityCodeIconButton.click();
     return this.self;
   }
 
@@ -109,6 +110,7 @@ export class CreateCreditCardsPage extends BasePage {
   }
 
   async tapShowPinCodeIconButton(): Promise<this> {
+    await this.showPinCodeIconButton.click();
     await this.showPinCodeIconButton.click();
     return this.self;
   }

@@ -14,7 +14,7 @@ describe('Sidebar - Elements & Navigation', () => {
     await restartAndNavigateToHome();
   });
 
-  it('[433, 434] User should see Sidebar page with all elements', async () => {
+  it('[PAS-433, PAS-434] User should see Sidebar page with all elements', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -22,7 +22,7 @@ describe('Sidebar - Elements & Navigation', () => {
     await sidebar.verifyAllElements();
   });
 
-  it('[3017] User should see All Folders selected by default', async () => {
+  it('[PAS-3017] User should see All Folders selected by default', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -30,7 +30,7 @@ describe('Sidebar - Elements & Navigation', () => {
     await sidebar.verifyAllFoldersSelected();
   });
 
-  it('[3018] User can tap on Favorites and see favorite folder on HomePage', async () => {
+  it('[PAS-3018] User can tap on Favorites and see favorite folder on HomePage', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -39,7 +39,7 @@ describe('Sidebar - Elements & Navigation', () => {
     await home.verifyFavoriteFolder();
   });
 
-  it('[3019] User should see Favorites selected in Sidebar after tapping on it', async () => {
+  it('[PAS-3019] User should see Favorites selected in Sidebar after tapping on it', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -60,7 +60,7 @@ describe('Sidebar - Create New Folder Page', () => {
     await restartAndNavigateToHome();
   });
 
-  it('[437, 2488] User can open and close Create new folder page', async () => {
+  it('[PAS-437, PAS-2488] User can open and close Create new folder page', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -71,7 +71,7 @@ describe('Sidebar - Create New Folder Page', () => {
     await home.waitForHomePageLoaded();
   });
 
-  it('[2487] User can see validation warning when trying to create folder without title', async () => {
+  it('[PAS-2487] User can see validation warning when trying to create folder without title', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -83,7 +83,7 @@ describe('Sidebar - Create New Folder Page', () => {
     await sidebar.tapCreateNewFolderPageCloseButton();
   });
 
-  it('[3020] User can enter folder title in Create new folder page', async () => {
+  it('[PAS-3020] User can enter folder title in Create new folder page', async () => {
     const { sidebar, home } = Pages;
     const folderTitle = 'Test Folder';
 
@@ -109,7 +109,7 @@ describe('Sidebar - Add Device Popup', () => {
     await restartAndNavigateToHome();
   });
 
-  it('[1665] User can tap on Add Device button and see Add Device popup with all elements', async () => {
+  it('[PAS-1665] User can tap on Add Device button and see Add Device popup with all elements', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -122,7 +122,7 @@ describe('Sidebar - Add Device Popup', () => {
     await home.waitForHomePageLoaded();
   });
 
-  it('[1666, 1667] User can switch between Share this Vault and Import Vault tabs', async () => {
+  it('[PAS-1666, PAS-1667] User can switch between Share this Vault and Import Vault tabs', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -140,7 +140,7 @@ describe('Sidebar - Add Device Popup', () => {
     await home.waitForHomePageLoaded();
   });
 
-  it('[3021] User can see warning message in Add Device popup', async () => {
+  it('[PAS-3021] User can see warning message in Add Device popup', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -151,7 +151,7 @@ describe('Sidebar - Add Device Popup', () => {
     await home.waitForHomePageLoaded();
   });
 
-  it('[3022] User can see QR code and vault key in Add Device popup', async () => {
+  it('[PAS-3022] User can see QR code and vault key in Add Device popup', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -177,7 +177,7 @@ describe('Sidebar - Folder Management', () => {
     await restartAndNavigateToHome();
   });
 
-  it('[871, 2486] User can create new folder', async () => {
+  it('[PAS-871, PAS-2486] User can create new folder', async () => {
     const { sidebar, home } = Pages;
     const folderTitle = 'Test Folder';
 
@@ -204,7 +204,7 @@ describe('Sidebar - Folder Management', () => {
     await sidebar.tapDeleteFolderPopupConfirmButton();
   });
 
-  it('[438, 2489, 2490, 2491] User can rename folder', async () => {
+  it('[PAS-438, PAS-2489, PAS-2490, PAS-2491] User can rename folder', async () => {
     const { sidebar, home } = Pages;
     const originalTitle = 'Test Folder';
     const newTitle = 'Test Folder1';
@@ -242,7 +242,7 @@ describe('Sidebar - Folder Management', () => {
     await sidebar.tapDeleteFolderPopupConfirmButton();
   });
 
-  it('[2493, 2495] User can delete folder', async () => {
+  it('[PAS-2493, PAS-2495] User can delete folder', async () => {
     const { sidebar, home } = Pages;
     const folderTitle = 'Test Folder';
 
@@ -264,7 +264,7 @@ describe('Sidebar - Folder Management', () => {
     await sidebar.verifyTestFolder1NotDisplayed();
   });
 
-  it('[2494] Cancel button does not delete folder', async () => {
+  it('[PAS-2494] Cancel button does not delete folder', async () => {
     const { sidebar, home } = Pages;
     const folderTitle = 'Test Folder';
 
@@ -295,7 +295,7 @@ describe('Sidebar - Folder Management', () => {
     await sidebar.tapDeleteFolderPopupConfirmButton();
   });
 
-  it('[440] User can scroll list of folders', async () => {
+  it('[PAS-440] User can scroll list of folders', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -329,7 +329,7 @@ describe('Sidebar - Folder Management', () => {
   });
 
 
-  it('[1649] Folders are displayed in alphabetical order', async () => {
+  it('[PAS-1649] Folders are displayed in alphabetical order', async () => {
     const { sidebar, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -365,7 +365,7 @@ describe('Sidebar - Folder Management', () => {
 
 describe('Sidebar - Choose Vault', () => {
   
-  it('[3023] User can create new vault (Kazik) from sidebar', async () => {
+  it('[PAS-3023] User can create new vault (Kazik) from sidebar', async () => {
     await restartAndNavigateToHome();
     
     const { home, signUp, sidebar } = Pages;
@@ -390,7 +390,7 @@ describe('Sidebar - Choose Vault', () => {
     await home.verifyHomeLogoLockVisible();
   });
 
-  it('[402, 1463] User can see and choose vault in Sidebar', async () => {
+  it('[PAS-402, PAS-1463] User can see and choose vault in Sidebar', async () => {
     await restartAndNavigateToHomeWithVault('Kazik');
     
     const { sidebar, home } = Pages;
@@ -419,7 +419,7 @@ describe('Sidebar - Close Vault & Logout', () => {
     await restartAndNavigateToHome();
   });
 
-  it('[212] User can tap on Close Vault button and navigate to Enter Master Password page', async () => {
+  it('[PAS-212] User can tap on Close Vault button and navigate to Enter Master Password page', async () => {
     const { sidebar, signUp, home } = Pages;
 
     await home.tapHomeLogoLock();
@@ -430,7 +430,7 @@ describe('Sidebar - Close Vault & Logout', () => {
     expect(enterPasswordTitleText).toBe(ENTER_PASSWORD_SCREEN.title);
   });
 
-  it('[1643] User is logged out when closing the app', async () => {
+  it('[PAS-1643] User is logged out when closing the app', async () => {
     const { home, signUp } = Pages;
 
     await home.closeApp();

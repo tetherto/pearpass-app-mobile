@@ -2,6 +2,9 @@ import BasePage from '@pages/BasePage';
 import signUpLocators from '@locators/SignUpLocators';
 import { CREATE_PASSWORD_SCREEN, ENTER_PASSWORD_SCREEN, USE_FINGERPRINT, BIOMETRICS_AUTHENTICATION_POPUP, ENABLE_BIOMETRIC_AUTHENTICATION_POPUP, SELECT_VAULT_TYPE_SCREEN, NEW_VAULT_SCREEN, LOAD_VAULT_SCREEN, VALIDATION_ERRORS } from '@data/signUp.data';
 
+/** Same default as other `waitForDisplayed({ timeout: 10000 })` calls on this page object. */
+const VALIDATION_MESSAGE_WAIT_MS = 10000;
+
 // Use global expect from expect-webdriverio for text comparison
 declare const expect: any;
 
@@ -377,18 +380,36 @@ class SignUpPage extends BasePage {
     field: 'enterPassword' | 'enterConfirmPassword' | 'newVaultName' | 'enterMasterPassword' = 'enterPassword'
   ): Promise<this> {
     const expectedText = VALIDATION_ERRORS[errorType];
-    let errorElement;
+    let errorElement: ReturnType<SignUpPage['$']>;
+
+    const waitForValidationMessage = async (
+      el: ReturnType<SignUpPage['$']>,
+      label: string
+    ): Promise<void> => {
+      const timeoutMsg = `[${errorType}] [${field}] ${label}: validation message not visible within ${VALIDATION_MESSAGE_WAIT_MS}ms`;
+      try {
+        await el.waitForDisplayed({ timeout: VALIDATION_MESSAGE_WAIT_MS, timeoutMsg });
+      } catch {
+        throw new Error(
+          `Validation error "${errorType}" (${field}) — ${label}: element not displayed within ${VALIDATION_MESSAGE_WAIT_MS}ms`
+        );
+      }
+    };
 
     switch (errorType) {
       case 'passwordRequired':
         if (field === 'enterPassword') {
           errorElement = this.enterPasswordPasswordIsRequiredWarning;
+          await waitForValidationMessage(errorElement, 'enterPasswordPasswordIsRequiredWarning');
         } else if (field === 'enterConfirmPassword') {
           errorElement = this.confirmPasswordPasswordIsRequiredWarning;
+          await waitForValidationMessage(errorElement, 'confirmPasswordPasswordIsRequiredWarning');
         } else if (field === 'enterMasterPassword') {
           errorElement = this.enterPasswordMasterPasswordRequiredWarning;
+          await waitForValidationMessage(errorElement, 'enterPasswordMasterPasswordRequiredWarning');
         } else if (field === 'newVaultName') {
           errorElement = this.newVaultNameRequiredWarning;
+          await waitForValidationMessage(errorElement, 'newVaultNameRequiredWarning');
         } else {
           throw new Error(`passwordRequired error is not applicable for field: ${field}`);
         }
@@ -397,6 +418,7 @@ class SignUpPage extends BasePage {
       case 'passwordTooShort':
         if (field === 'enterPassword') {
           errorElement = this.enterPasswordPasswordMustBeAtLeast8CharactersLongWarning;
+          await waitForValidationMessage(errorElement, 'passwordMustBeAtLeast8CharactersLong');
         } else {
           throw new Error(`passwordTooShort error is not applicable for field: ${field}`);
         }
@@ -405,6 +427,7 @@ class SignUpPage extends BasePage {
       case 'passwordMissingUppercase':
         if (field === 'enterPassword') {
           errorElement = this.enterPasswordPasswordMustContainAtLeastOneUppercaseLetterWarning;
+          await waitForValidationMessage(errorElement, 'passwordMustContainUppercase');
         } else {
           throw new Error(`passwordMissingUppercase error is not applicable for field: ${field}`);
         }
@@ -413,6 +436,7 @@ class SignUpPage extends BasePage {
       case 'passwordMissingLowercase':
         if (field === 'enterPassword') {
           errorElement = this.enterPasswordPasswordMustContainAtLeastOneLowercaseLetterWarning;
+          await waitForValidationMessage(errorElement, 'passwordMustContainLowercase');
         } else {
           throw new Error(`passwordMissingLowercase error is not applicable for field: ${field}`);
         }
@@ -421,6 +445,7 @@ class SignUpPage extends BasePage {
       case 'passwordMissingNumber':
         if (field === 'enterPassword') {
           errorElement = this.enterPasswordPasswordMustContainAtLeastOneNumberWarning;
+          await waitForValidationMessage(errorElement, 'passwordMustContainNumber');
         } else {
           throw new Error(`passwordMissingNumber error is not applicable for field: ${field}`);
         }
@@ -429,6 +454,7 @@ class SignUpPage extends BasePage {
       case 'passwordMissingSpecial':
         if (field === 'enterPassword') {
           errorElement = this.enterPasswordPasswordMustContainAtLeastOneSpecialCharacterWarning;
+          await waitForValidationMessage(errorElement, 'passwordMustContainSpecialCharacter');
         } else {
           throw new Error(`passwordMissingSpecial error is not applicable for field: ${field}`);
         }
@@ -437,22 +463,16 @@ class SignUpPage extends BasePage {
       case 'nameRequired':
         if (field === 'newVaultName') {
           errorElement = this.newVaultNameRequiredWarning;
+          await waitForValidationMessage(errorElement, 'newVaultNameRequired');
         } else {
           throw new Error(`nameRequired error is only applicable for newVaultName field`);
-        }
-        break;
-
-      case 'incorrectPassword':
-        if (field === 'enterMasterPassword') {
-          errorElement = this.enterPasswordIncorrectPasswordWarning;
-        } else {
-          throw new Error(`incorrectPassword error is only applicable for enterMasterPassword field`);
         }
         break;
 
       case 'incorrectPassword4Attempts':
         if (field === 'enterMasterPassword') {
           errorElement = this.enterPasswordIncorrectPassword4AttemptsWarning;
+          await waitForValidationMessage(errorElement, 'incorrectPassword4Attempts');
         } else {
           throw new Error(`incorrectPassword4Attempts error is only applicable for enterMasterPassword field`);
         }
@@ -461,6 +481,7 @@ class SignUpPage extends BasePage {
       case 'incorrectPassword3Attempts':
         if (field === 'enterMasterPassword') {
           errorElement = this.enterPasswordIncorrectPassword3AttemptsWarning;
+          await waitForValidationMessage(errorElement, 'incorrectPassword3Attempts');
         } else {
           throw new Error(`incorrectPassword3Attempts error is only applicable for enterMasterPassword field`);
         }
@@ -469,6 +490,7 @@ class SignUpPage extends BasePage {
       case 'incorrectPassword2Attempts':
         if (field === 'enterMasterPassword') {
           errorElement = this.enterPasswordIncorrectPassword2AttemptsWarning;
+          await waitForValidationMessage(errorElement, 'incorrectPassword2Attempts');
         } else {
           throw new Error(`incorrectPassword2Attempts error is only applicable for enterMasterPassword field`);
         }
@@ -477,6 +499,7 @@ class SignUpPage extends BasePage {
       case 'incorrectPassword1Attempt':
         if (field === 'enterMasterPassword') {
           errorElement = this.enterPasswordIncorrectPassword1AttemptWarning;
+          await waitForValidationMessage(errorElement, 'incorrectPassword1Attempt');
         } else {
           throw new Error(`incorrectPassword1Attempt error is only applicable for enterMasterPassword field`);
         }
@@ -485,6 +508,7 @@ class SignUpPage extends BasePage {
       case 'invalidPassword':
         if (field === 'enterMasterPassword') {
           errorElement = this.enterPasswordInvalidPasswordWarning;
+          await waitForValidationMessage(errorElement, 'invalidPassword');
         } else {
           throw new Error(`invalidPassword error is only applicable for enterMasterPassword field`);
         }
@@ -492,31 +516,15 @@ class SignUpPage extends BasePage {
 
       case 'passwordsDoNotMatch':
         errorElement = this.confirmPasswordPasswordsDoNotMatchWarning;
+        await waitForValidationMessage(errorElement, 'passwordsDoNotMatch');
         break;
 
       default:
         throw new Error(`Unknown validation error type: ${errorType}`);
     }
 
-    // Wait for error element to appear and verify it's displayed
-    try {
-      await errorElement.waitForDisplayed({ timeout: 10000 });
-    } catch {
-      throw new Error(`Validation error "${errorType}" should be displayed (timeout waiting for element)`);
-    }
-
-    if (errorType === 'incorrectPassword') {
-      const actualText = await errorElement.getText();
-      const containsExpected = actualText.includes(expectedText);
-      if (!containsExpected) {
-        throw new Error(
-          `Validation error text should contain "${expectedText}", but got "${actualText}"`
-        );
-      }
-    } else {
-      const errorText = await errorElement.getText();
-      expect(errorText).toBe(` ${expectedText} `);
-    }
+    const errorText = await errorElement.getText();
+    expect(errorText).toBe(` ${expectedText} `);
 
     return this.self;
   }

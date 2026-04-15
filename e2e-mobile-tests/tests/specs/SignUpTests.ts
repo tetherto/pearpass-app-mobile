@@ -26,14 +26,14 @@ describe('Sign Up Flow - Create Master Password', () => {
 
   describe('Screen Elements', () => {
     
-    it('[3001] User should see Create Master Password screen with all elements', async () => {
+    it('[PAS-3001] User should see Create Master Password screen with all elements', async () => {
       const signUp = getSignUp();
       await signUp.verifyCreatePasswordScreenContent();
       await signUp.verifyPasswordInputsVisible();
       await signUp.verifyRequirementsVisible();
     });
 
-    it('[3002] User sees warning message about password recovery', async () => {
+    it('[PAS-3002] User sees warning message about password recovery', async () => {
       const signUp = getSignUp();
       await signUp.createPasswordWarning.waitForDisplayed({ timeout: 10000 });
       await signUp.verifyCreatePasswordWarningText();
@@ -42,13 +42,13 @@ describe('Sign Up Flow - Create Master Password', () => {
 
   describe('Terms Checkbox', () => {
     
-    it('[930] User should see Continue button disabled when terms are not accepted', async () => {
+    it('[PAS-930] User should see Continue button disabled when terms are not accepted', async () => {
       const signUp = getSignUp();
       await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
       await signUp.verifyContinueButtonDisabled();
     });
 
-    it('[3003] User should see Continue button enabled after accepting terms', async () => {
+    it('[PAS-3003] User should see Continue button enabled after accepting terms', async () => {
       const signUp = getSignUp();
       await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
       await signUp.acceptTerms();
@@ -56,7 +56,7 @@ describe('Sign Up Flow - Create Master Password', () => {
       await signUp.verifyContinueButtonEnabled();
     });
 
-    it('[3004] User can toggle terms checkbox on and off', async () => {
+    it('[PAS-3004] User can toggle terms checkbox on and off', async () => {
       const signUp = getSignUp();
       await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
       
@@ -67,7 +67,7 @@ describe('Sign Up Flow - Create Master Password', () => {
       await signUp.verifyContinueButtonDisabled();
     });
 
-    it('[933] User can tap on Terms of Use link', async () => {
+    it('[PAS-933] User can tap on Terms of Use link', async () => {
       const signUp = getSignUp();
       await signUp.createPasswordTermsLink.waitForDisplayed({ timeout: 10000 });
       await signUp.tapTermsLink();
@@ -81,7 +81,7 @@ describe('Sign Up Flow - Create Master Password', () => {
 
   describe('Password Input', () => {
     
-    it('[3005] User can enter password in both input fields', async () => {
+    it('[PAS-3005] User can enter password in both input fields', async () => {
       const signUp = getSignUp();
       const password = TEST_PASSWORDS.valid.standard;
       
@@ -99,7 +99,7 @@ describe('Sign Up Flow - Create Master Password', () => {
 
   describe('Password Visibility Toggle', () => {
     
-    it('[3006] User can toggle password visibility to see password instead of dots', async () => {
+    it('[PAS-3006] User can toggle password visibility to see password instead of dots', async () => {
       const signUp = getSignUp();
       const password = TEST_PASSWORDS.valid.standard;
 
@@ -109,7 +109,7 @@ describe('Sign Up Flow - Create Master Password', () => {
       await signUp.verifyPasswordValueAfterToggle(password);
     });
 
-    it('[3007] User can toggle confirm password visibility to see password instead of dots', async () => {
+    it('[PAS-3007] User can toggle confirm password visibility to see password instead of dots', async () => {
       const signUp = getSignUp();
       const password = TEST_PASSWORDS.valid.standard;
       
@@ -119,7 +119,7 @@ describe('Sign Up Flow - Create Master Password', () => {
       await signUp.verifyConfirmPasswordValueAfterToggle(password);
     });
 
-    it('[3008] User can toggle password visibility for both fields independently', async () => {
+    it('[PAS-3008] User can toggle password visibility for both fields independently', async () => {
       const signUp = getSignUp();
       const { standard: password, masked, maskedConfirm } = TEST_PASSWORDS.valid;
       
@@ -147,7 +147,7 @@ describe('Sign Up Flow - Create Master Password', () => {
 
   describe('Password Mismatch and Empty Fields', () => {
     
-    it('[2239] User cannot complete flow with mismatched passwords', async () => {
+    it('[PAS-2239] User cannot complete flow with mismatched passwords', async () => {
       const signUp = getSignUp();
 
       await signUp.enterPassword(TEST_PASSWORDS.valid.standard);
@@ -157,7 +157,7 @@ describe('Sign Up Flow - Create Master Password', () => {
       await signUp.verifyPasswordMismatchWarningVisible();
     });
 
-    it('[2240] User cannot complete flow with both password fields empty', async () => {
+    it('[PAS-2240] User cannot complete flow with both password fields empty', async () => {
       const signUp = getSignUp();
 
       await signUp.acceptTerms();
@@ -166,7 +166,7 @@ describe('Sign Up Flow - Create Master Password', () => {
       await signUp.verifyValidationError('passwordRequired', 'enterConfirmPassword');
     });
 
-    it('[2241] User cannot complete flow with empty Enter password field', async () => {
+    it('[PAS-2241] User cannot complete flow with empty Enter password field', async () => {
       const signUp = getSignUp();
       
       await signUp.enterConfirmPassword(TEST_PASSWORDS.valid.standard);
@@ -175,7 +175,7 @@ describe('Sign Up Flow - Create Master Password', () => {
       await signUp.verifyValidationError('passwordRequired', 'enterPassword');
     });
 
-    it('[2242] User cannot complete flow with empty Confirm password field', async () => {
+    it('[PAS-2242] User cannot complete flow with empty Confirm password field', async () => {
       const signUp = getSignUp();
       
       await signUp.enterPassword(TEST_PASSWORDS.valid.standard);
@@ -187,11 +187,11 @@ describe('Sign Up Flow - Create Master Password', () => {
 
   describe('Complete Flow', () => {
     
-    it('[2244, 204, 928, 929, 935] User can complete password creation flow', async () => {
+    it('[PAS-2244, PAS-204, PAS-928, PAS-929, PAS-935] User can complete password creation flow', async () => {
       await completePasswordCreationFlow(TEST_PASSWORDS.valid.standard);
     });
 
-    it('[209] User can enable biometrics authentication', async () => {
+    it('[PAS-209] User can enable biometrics authentication', async () => {
       const signUp = getSignUp();
 
       await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
@@ -223,7 +223,7 @@ describe('Sign Up Flow - Enter Master Password', () => {
 
   describe('Screen Elements', () => {
     
-    it('[3012] User should see Enter Master Password screen with all elements', async () => {
+    it('[PAS-3012] User should see Enter Master Password screen with all elements', async () => {
       const signUp = getSignUp();
       await signUp.verifyEnterPasswordScreenContent();
       await signUp.verifyEnterPasswordInputVisible();
@@ -231,7 +231,7 @@ describe('Sign Up Flow - Enter Master Password', () => {
       await signUp.verifyEnterPasswordWarningIconVisible();
     });
 
-    it('[3013] User should see placeholder text in password input field', async () => {
+    it('[PAS-3013] User should see placeholder text in password input field', async () => {
       const signUp = getSignUp();
       const placeholderText = await signUp.enterPasswordInput.getText();
       expect(placeholderText).toBe(ENTER_PASSWORD_SCREEN.placeholder);
@@ -240,7 +240,7 @@ describe('Sign Up Flow - Enter Master Password', () => {
 
   describe('Password Entry', () => {
     
-    it('[3014] User can enter master password in input field', async () => {
+    it('[PAS-3014] User can enter master password in input field', async () => {
       const signUp = getSignUp();
       
       await signUp.enterMasterPassword(testPassword);
@@ -249,7 +249,7 @@ describe('Sign Up Flow - Enter Master Password', () => {
       expect(enterPasswordText).toBe(testPassword);
     });
 
-    it('[3015] User can toggle password visibility to see password', async () => {
+    it('[PAS-3015] User can toggle password visibility to see password', async () => {
       const signUp = getSignUp();
       
       await signUp.enterMasterPassword(testPassword);
@@ -265,7 +265,7 @@ describe('Sign Up Flow - Enter Master Password', () => {
 
   describe('Password Validation', () => {
     
-    it('[1256] User cannot proceed with incorrect password', async () => {
+    it('[PAS-1256] Each incorrect password entry is counted as one attempt', async () => {
       const signUp = getSignUp();
       
       await signUp.enterMasterPassword(TEST_PASSWORDS.valid.complex);
@@ -273,7 +273,7 @@ describe('Sign Up Flow - Enter Master Password', () => {
       await signUp.verifyValidationError('incorrectPassword4Attempts', 'enterMasterPassword');
     });
 
-    it('[206, 207, 932] User can login with correct master password', async () => {
+    it('[PAS-206, PAS-207, PAS-932] User can login with correct master password', async () => {
       const signUp = getSignUp();
       
       await signUp.enterMasterPassword(testPassword);
@@ -295,19 +295,19 @@ describe('Sign Up Flow - Create New Vault', () => {
     await restartAndNavigateToNewVaultScreen(testPassword);
   });
 
-  it('[215] User should see New Vault screen with all elements', async () => {
+  it('[PAS-215] User should see New Vault screen with all elements', async () => {
     const signUp = getSignUp();
     await signUp.verifyNewVaultScreenContent();
   });
 
-  it('[3016] User can navigate back from New Vault to Select Vaults', async () => {
+  it('[PAS-3016] User can navigate back from New Vault to Select Vaults', async () => {
     const signUp = getSignUp();
     
     await signUp.tapNewVaultSelectVaults();
     await signUp.waitForSelectVaultTypeScreen();
   });
 
-  it('[219] User can create a new vault and navigate to Home', async () => {
+  it('[PAS-219] User can create a new vault and navigate to Home', async () => {
     const signUp = getSignUp();
     const vaultName = 'Valeron';
     

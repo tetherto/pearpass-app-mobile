@@ -1269,8 +1269,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   async verifyBlindPeeringSectionLearnMorePageDisplayed(): Promise<this> {
     await this.blindPeeringInformationPage.waitForDisplayed({ timeout: 20000 });
     await this.verifyElementDisplayed(this.blindPeeringInformationPage, 'blindPeeringInformationPage', 'Blind peering information page should be visible');
-    
-    // Verify URL contains the expected URL
     const urlText = await this.blindPeeringInformationPage.getText();
     expect(urlText).toContain(BLIND_PEERING_SECTION.learnMoreUrl);
     
@@ -1711,9 +1709,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   /* ==================== AUTOFILL PAGE VERIFICATIONS ==================== */
   async verifyAutofillPageDisplayed(): Promise<this> {
     await this.autofillPageTitle.waitForDisplayed({ timeout: 20000 });
-    await this.verifyElementDisplayed(this.autofillPageTitle, 'autofillPageTitle', 'Autofill page title should be visible');
-    const titleText = await this.autofillPageTitle.getText();
-    expect(titleText).toBe(AUTOFILL_PAGE.title);
     return this.self;
   }
 

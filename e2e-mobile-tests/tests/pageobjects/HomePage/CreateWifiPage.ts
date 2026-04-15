@@ -50,6 +50,7 @@ export class CreateWifiPage extends BasePage {
 
   async tapShowPasswordIconButton(): Promise<this> {
     await this.showPasswordIcon.click();
+    await this.showPasswordIcon.click();
     return this.self;
   }
 

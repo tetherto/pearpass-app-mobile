@@ -6,6 +6,14 @@ const QASE_API_BASE = 'https://api.qase.io/v1';
 const NEW_CASES_SECTION_NAME = 'New test cases';
 const RESULTS_FILE = path.join(process.cwd(), '.qase-results.json');
 
+/** Remove leading case id from title for Qase (e.g. `[203]`, `[PAS-203]`, `[PAS-1, PAS-2]`). */
+function stripCaseIdPrefixFromTitle(title: string): string {
+  return title
+    .replace(/^\[PAS-XXX\]\s*/i, '')
+    .replace(/^\[(?:PAS-\d+|\d+)(?:\s*,\s*(?:PAS-\d+|\d+))*\]\s*/, '')
+    .trim();
+}
+
 interface QasePlanCase {
   case_id: number;
   assignee?: number;
@@ -44,6 +52,8 @@ function getConfig() {
     apiToken: process.env.QASE_API_TOKEN || '',
     projectCode: process.env.QASE_PROJECT_CODE || 'PAS',
     planId: Number(process.env.QASE_TESTOPS_PLAN_ID || process.env.QASE_PLAN_ID || '0'),
+    /** Repository suite (folder) id from Qase URL, e.g. .../project/PAS?suite=25 */
+    suiteId: Number(process.env.QASE_SUITE_ID || '0'),
     runId: Number(process.env.QASE_RUN_ID || '0'),
     enabled: process.env.ENABLE_QASE === 'true',
     syncEnabled: process.env.QASE_SYNC !== 'false',
@@ -94,6 +104,68 @@ export async function fetchPlanCases(): Promise<number[]> {
   }
 }
 
+/**
+ * Load case IDs from a repository suite (folder), e.g. suite=25 in
+ * https://app.qase.io/project/PAS?suite=25
+ * Uses GET /case with suite_id + pagination.
+ */
+export async function fetchSuiteCases(suiteId: number): Promise<number[]> {
+  const config = getConfig();
+  if (!config.enabled || suiteId <= 0) {
+    return [];
+  }
+
+  const api = createApiClient();
+  const caseIds: number[] = [];
+  let offset = 0;
+  const limit = 100;
+
+  try {
+    console.log(`📋 Fetching cases from QASE repository suite ID: ${suiteId}`);
+
+    while (true) {
+      const response = await api.get(`/case/${config.projectCode}`, {
+        params: {
+          suite_id: suiteId,
+          limit,
+          offset,
+        },
+      });
+
+      const entities = response.data?.result?.entities;
+      if (!response.data?.status || !Array.isArray(entities)) {
+        console.warn('⚠️ Unexpected response format from QASE case list API');
+        break;
+      }
+
+      for (const entity of entities) {
+        const num = entity.case_id ?? entity.id;
+        if (typeof num === 'number' && num > 0) {
+          caseIds.push(num);
+        }
+      }
+
+      const total = response.data?.result?.total ?? 0;
+      const count = entities.length;
+      offset += count;
+
+      if (count < limit || offset >= total || count === 0) {
+        break;
+      }
+    }
+
+    state.qaseCaseIds = new Set(caseIds);
+    console.log(
+      `   Found ${caseIds.length} cases in suite ${suiteId}: [${caseIds.slice(0, 10).join(', ')}${caseIds.length > 10 ? '...' : ''}]`
+    );
+
+    return caseIds;
+  } catch (error: any) {
+    console.error('❌ Failed to fetch QASE suite cases:', error.response?.data || error.message);
+    return [];
+  }
+}
+
 export function parseAutomationCases(specsDir: string): Map<number, string> {
   const cases = new Map<number, string>();
   const casesWithoutId: string[] = [];
@@ -138,6 +210,12 @@ export function parseAutomationCases(specsDir: string): Map<number, string> {
 export async function getOrCreateSection(): Promise<number | null> {
   const config = getConfig();
   if (!config.enabled) return null;
+
+  if (config.suiteId > 0) {
+    state.sectionId = config.suiteId;
+    console.log(`📁 Using QASE repository suite ID ${config.suiteId} for new cases (from QASE_SUITE_ID)`);
+    return config.suiteId;
+  }
   
   const api = createApiClient();
   
@@ -184,10 +262,7 @@ export async function createCase(title: string, sectionId: number): Promise<numb
   const api = createApiClient();
   
   try {
-    const cleanTitle = title
-      .replace(/^\[PAS-XXX\]\s*/, '')
-      .replace(/^\[\d+\]\s*/, '')
-      .trim();
+    const cleanTitle = stripCaseIdPrefixFromTitle(title);
     
     const response = await api.post(`/case/${config.projectCode}`, {
       title: cleanTitle,
@@ -343,7 +418,7 @@ export async function sendAdHocResult(
   const api = createApiClient();
   
   try {
-    const cleanTitle = title.replace(/^\[PAS-XXX\]\s*/, '').replace(/^\[\d+\]\s*/, '');
+    const cleanTitle = stripCaseIdPrefixFromTitle(title);
     
     const payload: any = {
       case: { title: cleanTitle },
@@ -492,19 +567,22 @@ export function recordTestResult(
 }
 
 export function extractCaseId(testTitle: string): number | null {
-  const match = testTitle.match(/^\[(\d+)/);
-  return match ? parseInt(match[1], 10) : null;
+  const ids = extractAllCaseIds(testTitle);
+  return ids.length > 0 ? ids[0] : null;
 }
 
+/** Supports `[123]`, `[PAS-123]`, and comma-separated lists. */
 export function extractAllCaseIds(testTitle: string): number[] {
   const match = testTitle.match(/^\[([^\]]+)\]/);
   if (!match) return [];
-  
+
   const idsString = match[1];
-  const ids = idsString.split(/[,\s]+/)
-    .map(s => parseInt(s.trim(), 10))
+  const ids = idsString
+    .split(/[,\s]+/)
+    .map(s => s.trim().replace(/^PAS-/i, ''))
+    .map(s => parseInt(s, 10))
     .filter(n => !isNaN(n) && n > 0);
-  
+
   return ids;
 }
 
@@ -526,6 +604,7 @@ export async function initSync(specsDir: string): Promise<void> {
   console.log(`QASE_API_TOKEN: ${config.apiToken ? '***SET***' : 'NOT SET'}`);
   console.log(`QASE_PROJECT_CODE: ${config.projectCode}`);
   console.log(`QASE_TESTOPS_PLAN_ID: ${config.planId}`);
+  console.log(`QASE_SUITE_ID: ${config.suiteId || '(not set)'}`);
   console.log(`config.enabled: ${config.enabled}`);
   console.log(`config.syncEnabled: ${config.syncEnabled}`);
   console.log('======================================\n');
@@ -545,14 +624,18 @@ export async function initSync(specsDir: string): Promise<void> {
     return;
   }
   
-  if (config.planId === 0) {
-    console.warn('⚠️ QASE_TESTOPS_PLAN_ID is not set. Cannot fetch plan cases.');
+  if (config.suiteId === 0 && config.planId === 0) {
+    console.warn('⚠️ Neither QASE_SUITE_ID nor QASE_TESTOPS_PLAN_ID is set. Cannot fetch Qase case scope.');
   }
-  
+
   console.log('\n🔄 Initializing QASE sync...');
   
   try {
-    await fetchPlanCases();
+    if (config.suiteId > 0) {
+      await fetchSuiteCases(config.suiteId);
+    } else {
+      await fetchPlanCases();
+    }
     parseAutomationCases(specsDir);
   } catch (error: any) {
     console.error('❌ Error during QASE sync init:', error.message);
@@ -754,5 +837,6 @@ export default {
   extractAllCaseIds,
   getState,
   fetchPlanCases,
+  fetchSuiteCases,
   parseAutomationCases,
 };

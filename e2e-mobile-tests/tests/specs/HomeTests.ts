@@ -26,18 +26,18 @@ describe('Home Flow - General Tab', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3067] User can tap on Home tab and appear on Home page', async () => {
+  it('[PAS-3067] User can tap on Home tab and appear on Home page', async () => {
     const { home } = Pages;
     await home.tapBottomNavHomeTab();
     await home.waitForHomePageLoaded();
   });
 
-  it('[3068] Verify that search field with all elements is displayed on Home page', async () => {
+  it('[PAS-3068] Verify that search field with all elements is displayed on Home page', async () => {
     const { home } = Pages;
     await home.verifySearchFieldWithAllElementsVisible();
   });
 
-  it('[368] Verify that categories (filters) with all elements are displayed on Home page', async () => {
+  it('[PAS-368] Verify that categories (filters) with all elements are displayed on Home page', async () => {
     const { home } = Pages;
     await home.verifyAllCategoriesVisible();
     await home.verifyLoginsCategoryVisible();
@@ -49,49 +49,49 @@ describe('Home Flow - General Tab', () => {
     await home.verifyCustomCategoryVisible();
   });
 
-  it('[369] User can tap on Logins category and see Create a login button', async () => {
+  it('[PAS-369] User can tap on Logins category and see Create a login button', async () => {
     const { home } = Pages;
     await home.tapLoginsCategory();
     await home.verifyCreateLoginButtonVisible();
   });
 
-  it('[371] User can tap on Credit cards category and see Create a credit card button', async () => {
+  it('[PAS-371] User can tap on Credit cards category and see Create a credit card button', async () => {
     const { home } = Pages;
     await home.tapCreditCardsCategory();
     await home.verifyCreateCreditCardButtonVisible();
   });
 
-  it('[372] User can tap on Wifi category and see Create a wifi button', async () => {
+  it('[PAS-372] User can tap on Wifi category and see Create a wifi button', async () => {
     const { home } = Pages;
     await home.tapWifiCategory();
     await home.verifyCreateWifiPasswordButtonVisible();
   });
 
-  it('[373] User can tap on Recovery phrase category and see Save a recovery phrase button', async () => {
+  it('[PAS-373] User can tap on Recovery phrase category and see Save a recovery phrase button', async () => {
     const { home } = Pages;
     await home.tapRecoveryPhraseCategory();
     await home.verifySaveRecoveryPhraseButtonVisible();
   });
 
-  it('[370] User can tap on Identities category and see Create an identity button', async () => {
+  it('[PAS-370] User can tap on Identities category and see Create an identity button', async () => {
     const { home } = Pages;
     await home.tapIdentitiesCategory();
     await home.verifyCreateIdentityButtonVisible();
   });
 
-  it('[374] User can tap on Notes category and see Create a note button', async () => {
+  it('[PAS-374] User can tap on Notes category and see Create a note button', async () => {
     const { home } = Pages;
     await home.tapNotesCategory();
     await home.verifyCreateNoteButtonVisible();
   });
 
-  it('[375] User can tap on Custom category and see Create a custom element button', async () => {
+  it('[PAS-375] User can tap on Custom category and see Create a custom element button', async () => {
     const { home } = Pages;
     await home.tapCustomCategory();
     await home.verifyCreateCustomElementButtonVisible();
   });
 
-  it('[376] User can tap on All category and see all items buttons', async () => {
+  it('[PAS-376] User can tap on All category and see all items buttons', async () => {
     const { home } = Pages;
     await home.tapAllCategory();
     await home.verifyEmptyCollectionTextVisible();
@@ -115,7 +115,7 @@ describe('Home Flow - Create item button', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3069] User can tap on Create item button and see Create item popup with all elements', async () => {
+  it('[PAS-3069] User can tap on Create item button and see Create item popup with all elements', async () => {
     const { home } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -129,7 +129,7 @@ describe('Home Flow - Create item button', () => {
     await home.verifyPasswordFieldVisible();
   });
 
-  it('[384] User can tap on Login field and see Create a login page', async () => {
+  it('[PAS-384] User can tap on Login field and see Create a login page', async () => {
     const { home, createLogin } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -137,7 +137,7 @@ describe('Home Flow - Create item button', () => {
     await createLogin.waitForCreateLoginPageLoaded();
   });
 
-  it('[386] User can tap on Credit card field and see Create a credit card page', async () => {
+  it('[PAS-386] User can tap on Credit card field and see Create a credit card page', async () => {
     const { home, createCreditCards } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -145,7 +145,7 @@ describe('Home Flow - Create item button', () => {
     await createCreditCards.waitForCreateCreditCardPageLoaded();
   });
 
-  it('[387] User can tap on Wifi field and see Create a wifi page', async () => {
+  it('[PAS-387] User can tap on Wifi field and see Create a wifi page', async () => {
     const { home, createWifi } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -153,7 +153,7 @@ describe('Home Flow - Create item button', () => {
     await createWifi.waitForCreateWifiPageLoaded();
   });
 
-  it('[388] User can tap on Recovery phrase field and see Save a recovery phrase page', async () => {
+  it('[PAS-388] User can tap on Recovery phrase field and see Save a recovery phrase page', async () => {
     const { home, saveRecoveryPhrase } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -161,7 +161,7 @@ describe('Home Flow - Create item button', () => {
     await saveRecoveryPhrase.waitForCreateRecoveryPhrasePageLoaded();
   });
 
-  it('[385] User can tap on Identities field and see Create an identity page', async () => {
+  it('[PAS-385] User can tap on Identities field and see Create an identity page', async () => {
     const { home, createIdentity } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -169,7 +169,7 @@ describe('Home Flow - Create item button', () => {
     await createIdentity.waitForCreateIdentityPageLoaded();
   });
 
-  it('[389] User can tap on Notes field and see Create a notes page', async () => {
+  it('[PAS-389] User can tap on Notes field and see Create a notes page', async () => {
     const { home, createNotes } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -177,7 +177,7 @@ describe('Home Flow - Create item button', () => {
     await createNotes.waitForCreateNotesPageLoaded();
   });
 
-  it('[390] User can tap on Custom field and see Create a custom element page', async () => {
+  it('[PAS-390] User can tap on Custom field and see Create a custom element page', async () => {
     const { home, createCustomElement } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -185,7 +185,7 @@ describe('Home Flow - Create item button', () => {
     await createCustomElement.waitForCreateCustomElementPageLoaded();
   });
 
-  it('[391] User can tap on Password field and see Generate password popup', async () => {
+  it('[PAS-391] User can tap on Password field and see Generate password popup', async () => {
     const { home, createLogin } = Pages;
     await home.tapCreateItemButton();
     await home.waitForCreateItemPopupVisible();
@@ -204,7 +204,7 @@ describe('Home Flow - Create a login flow', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3070] User can tap on Create Login button and see Create a login page with all elements', async () => {
+  it('[PAS-3070] User can tap on Create Login button and see Create a login page with all elements', async () => {
     const { home, createLogin } = Pages;
     await home.tapCreateLoginButton();
     await createLogin.waitForCreateLoginPageLoaded();
@@ -220,14 +220,14 @@ describe('Home Flow - Create a login flow', () => {
         await createLogin.verifyCloseButtonVisible();
     });
 
-    it('[252] User can tap on No folder button and create new folder', async () => {
+    it('[PAS-252] User can tap on No folder button and create new folder', async () => {
         const { createLogin, sidebar } = Pages;
 
         await createFolderThroughNoFolderDropdown(createLogin, sidebar, 'Test Folder');
         await assertTestFolderSelectedInFolderPopup(createLogin);
     });
 
-    it('[3071] User can tap on Test folder button and unselect test folder', async () => {
+    it('[PAS-3071] User can tap on Test folder button and unselect test folder', async () => {
         const { createLogin, home } = Pages;
 
         await createLogin.tapTestFolderButton();
@@ -238,7 +238,7 @@ describe('Home Flow - Create a login flow', () => {
         await home.waitForHomePageLoaded();
     });
 
-    it('[3072] Verify that TestFolder was created at Sidebar Page', async () => {
+    it('[PAS-3072] Verify that TestFolder was created at Sidebar Page', async () => {
         const { sidebar, home, createLogin } = Pages;
     
         await home.tapHomeLogoLock();
@@ -249,51 +249,48 @@ describe('Home Flow - Create a login flow', () => {
         await createLogin.waitForCreateLoginPageLoaded();
     });
 
-    it('[3073] Verify that if User not filled all fields and tap on Save button warning message is displayed', async () => {
+    it('[PAS-3073] Verify that if User not filled all fields and tap on Save button warning message is displayed', async () => {
         const { createLogin } = Pages;
         
         await createLogin.tapSaveButton();
         await createLogin.verifySaveButtonWarningMessageVisible();
     });
 
-    it('[949] It is possible to close the screen by tapping on the "Cross" icon', async () => {
+    it('[PAS-949] It is possible to close the screen by tapping on the "Cross" icon', async () => {
         const { createLogin, home } = Pages;
 
         await closeCreateFormToHome(createLogin, home);
     });
 
-    it('[3074] User can tap on Title field and enter title', async () => {
+    it('[PAS-3074] User can tap on Title field and enter title', async () => {
         const { createLogin, home } = Pages;
 
         await home.tapCreateLoginButton();  
         await createLogin.waitForCreateLoginPageLoaded();
         await createLogin.tapTitleField();
         await createLogin.enterTextInFields('title');
-        await createLogin.hideKeyboard();
         await createLogin.verifyEnteredTextInFields('title');
     });
 
-    it('[3075] User can tap on Email or username field and enter email or username', async () => {
+    it('[PAS-3075] User can tap on Email or username field and enter email or username', async () => {
         const { createLogin } = Pages;
 
         await createLogin.tapEmailOrUsernameField();
         await createLogin.enterTextInFields('emailOrUsername');
-        await createLogin.hideKeyboard();
         await createLogin.verifyEnteredTextInFields('emailOrUsername');
     });
 
-    it('[250, 1166] User can tap on Password field and enter password', async () => {
+    it('[PAS-250, PAS-1166] User can tap on Password field and enter password', async () => {
         const { createLogin } = Pages;
         
         await createLogin.tapPasswordField();
         await createLogin.tapShowPasswordIconButton();
         await createLogin.enterTextInFields('password');
-        await createLogin.hideKeyboard();
         await createLogin.tapShowPasswordIconButton();
         await createLogin.verifyEnteredTextInFields('password');
     });
     
-    it('[3076] User can tap on Website field and enter website', async () => {
+    it('[PAS-3076] User can tap on Website field and enter website', async () => {
         const { createLogin } = Pages;
         
         await createLogin.tapWebsiteField();
@@ -301,7 +298,7 @@ describe('Home Flow - Create a login flow', () => {
         await createLogin.verifyEnteredTextInFields('website');
     });
 
-    it('[946] User can tap on "Add new website field button" and see Add new website field', async () => {
+    it('[PAS-946] User can tap on "Add new website field button" and see Add new website field', async () => {
         const { createLogin } = Pages;
         
         await createLogin.tapAddNewWebsiteFieldButton();
@@ -309,14 +306,14 @@ describe('Home Flow - Create a login flow', () => {
         await createLogin.verifyAddNewWebsiteFieldVisible();
     });
 
-    it('[947] User can delete last website field', async () => {
+    it('[PAS-947] User can delete last website field', async () => {
         const { createLogin } = Pages;
         
         await createLogin.tapDeleteLastWebsiteFieldButton();
         await createLogin.verifyNewWebsiteFieldNotVisible();
     });
     
-    it('[3077] User can add file to File field', async () => {
+    it('[PAS-3077] User can add file to File field', async () => {
         const { createLogin, settings } = Pages;
 
         await openAddFilePopupAndTapChooseFile(createLogin, () => createLogin.tapAddFileButton());
@@ -325,7 +322,7 @@ describe('Home Flow - Create a login flow', () => {
         await createLogin.verifyNewFileFieldWithAllElementsVisible();
     });
 
-    it('[3130] User can open last added file', async () => {
+    it('[PAS-3130] User can open last added file', async () => {
         const { createLogin } = Pages;
 
         await createLogin.tapNewFileFieldButton();
@@ -333,23 +330,22 @@ describe('Home Flow - Create a login flow', () => {
         await createLogin.pressBack();
     });
 
-    it('[3078] User can delete last added file', async () => {
+    it('[PAS-3078] User can delete last added file', async () => {
         const { createLogin } = Pages;
 
         await createLogin.tapNewFileFieldDeleteButton();
         await createLogin.verifyNewFileFieldNotVisible();
     });
     
-    it('[3079] User can tap on Note field and enter note', async () => {
+    it('[PAS-3079] User can tap on Note field and enter note', async () => {
         const { createLogin } = Pages;
 
         await createLogin.tapNoteField();
         await createLogin.enterTextInFields('note');
-        await createLogin.hideKeyboard();
         await createLogin.verifyEnteredTextInFields('note');
     });
 
-    it('[3080] User can tap on Custom field and see Create a custom element field with all elements', async () => {
+    it('[PAS-3080] User can tap on Custom field and see Create a custom element field with all elements', async () => {
         const { createLogin } = Pages;
 
         await createLogin.tapShowCustomFieldButton();
@@ -357,21 +353,21 @@ describe('Home Flow - Create a login flow', () => {
         await createLogin.verifyAllElementsInShowCustomFieldPopupVisible();
     });
 
-    it('[3081] User can add one more Note field', async () => {
+    it('[PAS-3081] User can add one more Note field', async () => {
         const { createLogin } = Pages;
 
         await createLogin.tapNewNoteFieldButton();
         await createLogin.verifyNewNoteFieldVisibleWithAllElements();
     });
 
-    it('[3082] User can delete last added note field', async () => {
+    it('[PAS-3082] User can delete last added note field', async () => {
         const { createLogin } = Pages;
 
         await createLogin.tapNewNoteFieldDeleteButton();
         await createLogin.verifyNewNoteFieldNotVisible();
     });
 
-    it('[237, 257] User can tap on Save button and verify that login was created', async () => {
+    it('[PAS-237, PAS-257] User can tap on Save button and verify that login was created', async () => {
         const { createLogin, home } = Pages;
 
         await createLogin.tapSaveButton();
@@ -389,7 +385,7 @@ describe('Home Flow - Create a credit card flow', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[860] User can tap on Create Credit Card button and see Create a credit card page with all elements', async () => {
+  it('[PAS-860] User can tap on Create Credit Card button and see Create a credit card page with all elements', async () => {
     const { home, createCreditCards, createLogin } = Pages;
     await home.tapCreditCardsCategoryButton();
         await home.verifyCreateCreditCardButtonVisible();
@@ -411,7 +407,7 @@ describe('Home Flow - Create a credit card flow', () => {
         await createLogin.verifyCloseButtonVisible();
     });
 
-    it('[1028] It is possible to close the screen by clicking on the "Cross" icon', async () => {
+    it('[PAS-1028] It is possible to close the screen by clicking on the "Cross" icon', async () => {
         const { home, createLogin, createCreditCards } = Pages;
 
         await createLogin.tapCloseButton();
@@ -422,14 +418,14 @@ describe('Home Flow - Create a credit card flow', () => {
         await createCreditCards.waitForCreateCreditCardPageLoaded();
     });
 
-    it('[278] User can tap on No folder button and create new folder', async () => {
+    it('[PAS-278] User can tap on No folder button and create new folder', async () => {
         const { createLogin, sidebar } = Pages;
 
         await createFolderThroughNoFolderDropdown(createLogin, sidebar, 'Test Folder');
         await assertTestFolderSelectedInFolderPopup(createLogin);
     });
 
-    it('[3083] User can tap on Test folder button and unselect test folder at Create a credit card page', async () => {
+    it('[PAS-3083] User can tap on Test folder button and unselect test folder at Create a credit card page', async () => {
         const { createLogin, home } = Pages;
 
         await createLogin.tapTestFolderButton();
@@ -440,7 +436,7 @@ describe('Home Flow - Create a credit card flow', () => {
         await home.waitForHomePageLoaded();
     });
 
-    it('[3084] Verify that TestFolder was created at Sidebar Page after creating credit card at Create a credit card page', async () => {
+    it('[PAS-3084] Verify that TestFolder was created at Sidebar Page after creating credit card at Create a credit card page', async () => {
         const { sidebar, home, createCreditCards } = Pages;
 
         await home.tapHomeLogoLock();
@@ -453,63 +449,57 @@ describe('Home Flow - Create a credit card flow', () => {
         await createCreditCards.waitForCreateCreditCardPageLoaded();
     });
 
-    it('[3074] User can tap on Title field and enter title', async () => {
+    it('[PAS-3074] User can tap on Title field and enter title', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.tapTitleField();
         await createCreditCards.enterTextInFields('title');
-        await createCreditCards.hideKeyboard();
         await createCreditCards.verifyEnteredTextInFields('title');
     });
 
-    it('[3085] User can tap on Name on card field and enter name on card', async () => {
+    it('[PAS-3085] User can tap on Name on card field and enter name on card', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.tapNameOnCardField();
         await createCreditCards.enterTextInFields('nameOnCard');
-        await createCreditCards.hideKeyboard();
         await createCreditCards.verifyEnteredTextInFields('nameOnCard');
     });
 
-    it('[3086] User can tap on Number on card field and enter number on card', async () => {
+    it('[PAS-3086] User can tap on Number on card field and enter number on card', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.tapNumberOnCardField();
         await createCreditCards.enterTextInFields('numberOnCard');
-        await createCreditCards.hideKeyboard();
         await createCreditCards.verifyEnteredTextInFields('numberOnCard');
     });
 
-    it('[3087] User can tap on Expiry date field and enter expiry date', async () => {
+    it('[PAS-3087] User can tap on Expiry date field and enter expiry date', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.tapExpiryDateField();
         await createCreditCards.enterTextInFields('expiryDate');
-        await createCreditCards.hideKeyboard();
         await createCreditCards.verifyEnteredTextInFields('expiryDate');
     });
 
-    it('[3088] User can tap on Security code field and enter security code', async () => {
+    it('[PAS-3088] User can tap on Security code field and enter security code', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.tapSecurityCodeField();
         await createCreditCards.enterTextInFields('securityCode');
-        await createCreditCards.hideKeyboard();
         await createCreditCards.tapShowSecurityCodeIconButton();
         await createCreditCards.verifyEnteredTextInFields('securityCode');
     });
 
-    it('[277] User can tap on Pin code field and enter pin code', async () => {
+    it('[PAS-277] User can tap on Pin code field and enter pin code', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.tapPinCodeField();
         await createCreditCards.enterTextInFields('pinCode');
-        await createCreditCards.hideKeyboard();
         await createCreditCards.tapShowPinCodeIconButton();
         await createCreditCards.verifyEnteredTextInFields('pinCode');
     });
 
-    it('[1024] User can tap on File field and add file', async () => {
+    it('[PAS-1024] User can tap on File field and add file', async () => {
         const { createCreditCards, settings, createLogin } = Pages;
         
         await createCreditCards.swipeToUp();
@@ -521,7 +511,7 @@ describe('Home Flow - Create a credit card flow', () => {
         await createCreditCards.verifyNewFileFieldWithAllElementsVisible();
     });
 
-    it('[3078] User can delete last added file', async () => {
+    it('[PAS-3078] User can delete last added file', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.swipeToUp();
@@ -529,7 +519,7 @@ describe('Home Flow - Create a credit card flow', () => {
         await createCreditCards.verifyNewFileFieldNotVisible();
     });
 
-    it('[1209] User can not add large file to File field', async () => {
+    it('[PAS-1209] User can not add large file to File field', async () => {
         const { createCreditCards, settings, createLogin } = Pages;
         
         await createCreditCards.swipeToUp();
@@ -539,7 +529,7 @@ describe('Home Flow - Create a credit card flow', () => {
         await createCreditCards.verifyWarningMessageVisible();
     });
 
-    it('[1024] User can tap on File field and add file again', async () => {
+    it('[PAS-1024] User can tap on File field and add file again', async () => {
         const { createCreditCards, settings, createLogin } = Pages;
         
         await createLogin.tapChooseFileButton();
@@ -550,16 +540,15 @@ describe('Home Flow - Create a credit card flow', () => {
         await createCreditCards.verifyNewFileFieldWithAllElementsVisible();
     });
 
-    it('[3079] User can tap on Note field and enter note', async () => {
+    it('[PAS-3079] User can tap on Note field and enter note', async () => {
         const { createCreditCards } = Pages;
         
         await createCreditCards.tapNoteField();
         await createCreditCards.enterTextInFields('note');
-        await createCreditCards.hideKeyboard();
         await createCreditCards.verifyEnteredTextInFields('note');
     });
 
-    it('[3080] User can tap on Custom field and see Create a custom element field with all elements', async () => {
+    it('[PAS-3080] User can tap on Custom field and see Create a custom element field with all elements', async () => {
         const { createCreditCards } = Pages;
         await createCreditCards.swipeToUp();
         await createCreditCards.tapShowCustomFieldButton();
@@ -567,7 +556,7 @@ describe('Home Flow - Create a credit card flow', () => {
         await createCreditCards.verifyAllElementsInShowCustomFieldPopupVisible();
     });
 
-    it('[273] User can tap on Save button and verify that credit card was created', async () => {
+    it('[PAS-273] User can tap on Save button and verify that credit card was created', async () => {
         const { createLogin, home } = Pages;
 
         await createLogin.tapSaveButton();
@@ -585,7 +574,7 @@ describe('Home Flow - Create a Wifi password flow', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3089] User can tap on Create Wifi Password button and see Create a wifi password page with all elements', async () => {
+  it('[PAS-3089] User can tap on Create Wifi Password button and see Create a wifi password page with all elements', async () => {
     const { home, createWifi, createLogin } = Pages;
     await home.tapWifiCategory();
         await home.verifyCreateWifiPasswordButtonVisible();
@@ -600,7 +589,7 @@ describe('Home Flow - Create a Wifi password flow', () => {
         await createLogin.verifyCloseButtonVisible();
     });
 
-    it('[1045] It is possible to close the screen by tapping on the "Cross" icon', async () => {
+    it('[PAS-1045] It is possible to close the screen by tapping on the "Cross" icon', async () => {
         const { home, createLogin, createWifi } = Pages;
 
         await createLogin.tapCloseButton();
@@ -611,14 +600,14 @@ describe('Home Flow - Create a Wifi password flow', () => {
         await createWifi.waitForCreateWifiPageLoaded();
     });
 
-    it('[292] User can tap on No folder button and create new folder', async () => {
+    it('[PAS-292] User can tap on No folder button and create new folder', async () => {
         const { createLogin, sidebar } = Pages;
 
         await createFolderThroughNoFolderDropdown(createLogin, sidebar, 'Test Folder');
         await assertTestFolderSelectedInFolderPopup(createLogin);
     });
 
-    it('[3090] User can tap on Test folder button and unselect test folder at Create a wifi password page', async () => {
+    it('[PAS-3090] User can tap on Test folder button and unselect test folder at Create a wifi password page', async () => {
         const { createLogin, home } = Pages;
 
         await createLogin.tapTestFolderButton();
@@ -629,7 +618,7 @@ describe('Home Flow - Create a Wifi password flow', () => {
         await home.waitForHomePageLoaded();
     });
 
-    it('[3091] Verify that TestFolder was created at Sidebar Page after creating at Create a wifi password page', async () => {
+    it('[PAS-3091] Verify that TestFolder was created at Sidebar Page after creating at Create a wifi password page', async () => {
         const { sidebar, home, createWifi } = Pages;
 
         await home.tapHomeLogoLock();
@@ -641,7 +630,7 @@ describe('Home Flow - Create a Wifi password flow', () => {
         await createWifi.waitForCreateWifiPageLoaded();
     });
 
-    it('[3092] User can tap on Wifi name field and enter wifi name', async () => {
+    it('[PAS-3092] User can tap on Wifi name field and enter wifi name', async () => {
         const { createWifi } = Pages;
 
         await createWifi.tapWifiNameField();
@@ -649,47 +638,44 @@ describe('Home Flow - Create a Wifi password flow', () => {
         await createWifi.verifyEnteredTextInFields('wifiName');
     });
 
-    it('[291] User can tap on Wifi password field and enter wifi password', async () => {
+    it('[PAS-291] User can tap on Wifi password field and enter wifi password', async () => {
         const { createWifi } = Pages;
         
         await createWifi.tapWifiPasswordField();
         await createWifi.enterTextInFields('wifiPassword');
-        await createWifi.hideKeyboard();
         await createWifi.tapShowPasswordIconButton();
         await createWifi.verifyEnteredTextInFields('wifiPassword');
     });
 
-    it('[3079] User can tap on Note field and enter note', async () => {
+    it('[PAS-3079] User can tap on Note field and enter note', async () => {
         const { createWifi } = Pages;
         
         await createWifi.tapNoteField();
         await createWifi.enterTextInFields('note');
-        await createWifi.hideKeyboard();
         await createWifi.verifyEnteredTextInFields('note');
     });
 
-    it('[3080] User can tap on Custom field and see Create a custom element field with all elements', async () => {
+    it('[PAS-3080] User can tap on Custom field and see Create a custom element field with all elements', async () => {
         const { createWifi } = Pages;
         await createWifi.tapShowCustomFieldButton();
         await createWifi.verifyAllElementsInShowCustomFieldPopupVisible();
     });
 
-    it('[1042] User can add one more Note field and add note', async () => {
+    it('[PAS-1042] User can add one more Note field and add note', async () => {
         const { createWifi } = Pages;
         await createWifi.addNewNoteFieldButton();
         await createWifi.verifyNewNoteFieldVisibleWithAllElements();
         await createWifi.enterTextInFields('newNote');
-        await createWifi.hideKeyboard();
         await createWifi.verifyEnteredTextInFields('newNote');
     });
 
-    it('[3082] User can delete last added note field', async () => {
+    it('[PAS-3082] User can delete last added note field', async () => {
         const { createWifi } = Pages;
         await createWifi.tapNewNoteFieldDeleteButton();
         await createWifi.verifyNewNoteFieldNotVisible();
     });
 
-    it('[287] User can tap on Save button and verify that login was created', async () => {
+    it('[PAS-287] User can tap on Save button and verify that login was created', async () => {
         const { createLogin, home } = Pages;
         await createLogin.tapSaveButton();
         await home.verifyWifiCreatedOnHomePageVisible();
@@ -706,7 +692,7 @@ describe('Home Flow - Create a recovery phrase flow', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3093] User can tap on Create Recovery Phrase button and see Create a recovery phrase page with all elements', async () => {
+  it('[PAS-3093] User can tap on Create Recovery Phrase button and see Create a recovery phrase page with all elements', async () => {
     const { home, saveRecoveryPhrase, createLogin } = Pages;
     await home.tapRecoveryPhraseCategory();
         await home.verifySaveRecoveryPhraseButtonVisible();
@@ -721,7 +707,7 @@ describe('Home Flow - Create a recovery phrase flow', () => {
         await createLogin.verifyNoFolderButtonVisible();
     });
 
-    it('[1053] It is possible to close the screen by clicking on the "Cross" icon', async () => {
+    it('[PAS-1053] It is possible to close the screen by clicking on the "Cross" icon', async () => {
         const { home, createLogin, saveRecoveryPhrase } = Pages;
         await createLogin.tapCloseButton();
         await home.waitForHomePageLoaded();
@@ -730,14 +716,14 @@ describe('Home Flow - Create a recovery phrase flow', () => {
         await saveRecoveryPhrase.waitForCreateRecoveryPhrasePageLoaded();
     });
 
-    it('[306] User can tap on No folder button and create new folder at Create a recovery phrase page', async () => {
+    it('[PAS-306] User can tap on No folder button and create new folder at Create a recovery phrase page', async () => {
         const { createLogin, sidebar } = Pages;
 
         await createFolderThroughNoFolderDropdown(createLogin, sidebar, 'Test Folder');
         await assertTestFolderSelectedInFolderPopup(createLogin);
     });
 
-    it('[3094] User can tap on Test folder button and unselect test folder at Create a recovery phrase page', async () => {
+    it('[PAS-3094] User can tap on Test folder button and unselect test folder at Create a recovery phrase page', async () => {
         const { createLogin, home } = Pages;
 
         await createLogin.tapTestFolderButton();
@@ -748,7 +734,7 @@ describe('Home Flow - Create a recovery phrase flow', () => {
         await home.waitForHomePageLoaded();
     });
 
-    it('[3095] Verify that TestFolder was created at Sidebar Page after creating at Create a recovery phrase page', async () => {
+    it('[PAS-3095] Verify that TestFolder was created at Sidebar Page after creating at Create a recovery phrase page', async () => {
         const { sidebar, home, saveRecoveryPhrase } = Pages;
 
         await home.tapHomeLogoLock();
@@ -760,44 +746,42 @@ describe('Home Flow - Create a recovery phrase flow', () => {
         await saveRecoveryPhrase.waitForCreateRecoveryPhrasePageLoaded();
     });
 
-    it('[3096] User can tap on Application name field and enter application name', async () => {
+    it('[PAS-3096] User can tap on Application name field and enter application name', async () => {
         const { saveRecoveryPhrase } = Pages;
         await saveRecoveryPhrase.tapApplicationNameField();
         await saveRecoveryPhrase.enterTextInFields('applicationName');
-        await saveRecoveryPhrase.hideKeyboard();
         await saveRecoveryPhrase.verifyEnteredTextInFields('applicationName');
     });
 
-    it('[3097] User can tap on Paste from clipboard button and verify that warning message is visible', async () => {
+    it('[PAS-3097] User can tap on Paste from clipboard button and verify that warning message is visible', async () => {
         const { saveRecoveryPhrase } = Pages;
         await saveRecoveryPhrase.tapPasteFromClipboardButton();
         await saveRecoveryPhrase.verifyPasteFromClipboardWarningMessageVisible();
     });
 
-    it('[3098] User can tap on Note field and enter note at Create a recovery phrase page', async () => {
+    it('[PAS-3098] User can tap on Note field and enter note at Create a recovery phrase page', async () => {
         const { saveRecoveryPhrase } = Pages;
         await saveRecoveryPhrase.tapNoteField();
         await saveRecoveryPhrase.enterTextInFields('note');
-        await saveRecoveryPhrase.hideKeyboard();
         await saveRecoveryPhrase.verifyEnteredTextInFields('note');
         await saveRecoveryPhrase.copyNoteFieldContentToClipboard();
     });
 
-    it('[3099] Verify that 12 words radio button is chosen by default and random words toggle is off', async () => {
+    it('[PAS-3099] Verify that 12 words radio button is chosen by default and random words toggle is off', async () => {
         const { saveRecoveryPhrase } = Pages;
         await saveRecoveryPhrase.verifyTwelveWordsRadioButtonChosen();
         await saveRecoveryPhrase.verifyTwentyFourWordsRadioButtonUnchosen();
         await saveRecoveryPhrase.verifyRandomWordsToggleOff();
     });
 
-    it('[3100] User can tap on Paste from clipboard button and verify that recovery phrase is pasted', async () => {
+    it('[PAS-3100] User can tap on Paste from clipboard button and verify that recovery phrase is pasted', async () => {
         const { saveRecoveryPhrase } = Pages;
 
         await saveRecoveryPhrase.tapPasteFromClipboardButton();
         await saveRecoveryPhrase.verifyRecoveryPhrasePastedToastMessageVisible();
     });
 
-    it('[866, 303] Verify that all pasted recovery phrases are visible and correct', async () => {
+    it('[PAS-866, PAS-303] Verify that all pasted recovery phrases are visible and correct', async () => {
         const { saveRecoveryPhrase } = Pages;
 
         await saveRecoveryPhrase.verifyFirstPastedRecoveryPhraseVisible();
@@ -814,7 +798,7 @@ describe('Home Flow - Create a recovery phrase flow', () => {
         await saveRecoveryPhrase.verifyTwelfthPastedRecoveryPhraseVisible();
     });
 
-    it('[1050] User can add one more Note field and add note', async () => {
+    it('[PAS-1050] User can add one more Note field and add note', async () => {
         const { saveRecoveryPhrase } = Pages;
 
         await saveRecoveryPhrase.swipeToUp();
@@ -822,11 +806,10 @@ describe('Home Flow - Create a recovery phrase flow', () => {
         await saveRecoveryPhrase.addNewNoteFieldButton();
         await saveRecoveryPhrase.verifyNewNoteFieldVisibleWithAllElements();
         await saveRecoveryPhrase.enterTextInFields('newNote');
-        await saveRecoveryPhrase.hideKeyboard();
         await saveRecoveryPhrase.verifyEnteredTextInFields('newNote');
     });
 
-    it('[3082] User can delete last added note field', async () => {
+    it('[PAS-3082] User can delete last added note field', async () => {
         const { saveRecoveryPhrase } = Pages;
 
         await saveRecoveryPhrase.swipeToUp();
@@ -834,7 +817,7 @@ describe('Home Flow - Create a recovery phrase flow', () => {
         await saveRecoveryPhrase.verifyNewNoteFieldNotVisible();
     });
 
-    it('[301] User can tap on Save button and verify that recovery phrase was saved', async () => {
+    it('[PAS-301] User can tap on Save button and verify that recovery phrase was saved', async () => {
         const { home, createLogin } = Pages;
 
         await createLogin.tapSaveButton();
@@ -852,7 +835,7 @@ describe('Home Flow - Create notes flow', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3101] User can tap on Create Notes button and see Create a notes page with all elements', async () => {
+  it('[PAS-3101] User can tap on Create Notes button and see Create a notes page with all elements', async () => {
     const { home, createNotes, createLogin } = Pages;
     await home.tapNotesCategory();
         await home.verifyCreateNoteButtonVisible();
@@ -867,7 +850,7 @@ describe('Home Flow - Create notes flow', () => {
         await createLogin.verifyNoFolderButtonVisible();
     });
 
-    it('[1062] User can tap on Close button and verify that create notes page is not visible', async () => {
+    it('[PAS-1062] User can tap on Close button and verify that create notes page is not visible', async () => {
         const { home, createLogin, createNotes } = Pages;
 
         await createLogin.tapCloseButton();
@@ -878,32 +861,30 @@ describe('Home Flow - Create notes flow', () => {
         await createNotes.waitForCreateNotesPageLoaded();
     });
 
-    it('[322] Item is moved to the folder selected in "Folder" dropdown', async () => {
+    it('[PAS-322] Item is moved to the folder selected in "Folder" dropdown', async () => {
         const { createLogin, sidebar } = Pages;
 
         await createFolderThroughNoFolderDropdown(createLogin, sidebar, 'Test Folder');
         await assertTestFolderSelectedInFolderPopup(createLogin);
     });
 
-    it('[3074] User can tap on Title field and enter title', async () => {
+    it('[PAS-3074] User can tap on Title field and enter title', async () => {
         const { createNotes } = Pages;
 
         await createNotes.tapTitleField();
         await createNotes.enterTextInFields('title');
-        await createNotes.hideKeyboard();
         await createNotes.verifyEnteredTextInFields('title');
     });
 
-    it('[3102] User can tap on Write note field and enter write note at Create a notes page', async () => {
+    it('[PAS-3102] User can tap on Write note field and enter write note at Create a notes page', async () => {
         const { createNotes } = Pages;
 
         await createNotes.tapWriteNoteField();
         await createNotes.enterTextInFields('writeNote');
-        await createNotes.hideKeyboard();
         await createNotes.verifyEnteredTextInFields('writeNote');
     });
 
-    it('[3103] User can tap on Add file button and add file at Create a notes page', async () => {
+    it('[PAS-3103] User can tap on Add file button and add file at Create a notes page', async () => {
         const { createNotes, createLogin, settings } = Pages;
 
         await openAddFilePopupAndTapChooseFile(createLogin, () => createNotes.tapAddFileButton());
@@ -912,7 +893,7 @@ describe('Home Flow - Create notes flow', () => {
         await createNotes.verifyNewFileFieldWithAllElementsVisible();
     });
 
-    it('[3081] User can add one more Note field', async () => {
+    it('[PAS-3081] User can add one more Note field', async () => {
         const { createNotes } = Pages;
 
         await createNotes.tapCustomField();
@@ -921,13 +902,13 @@ describe('Home Flow - Create notes flow', () => {
         await createNotes.verifyNewNoteFieldVisibleWithAllElements();
     });
 
-    it('[3082] User can delete last added note field', async () => {
+    it('[PAS-3082] User can delete last added note field', async () => {
         const { createNotes } = Pages;
         await createNotes.tapNewNoteFieldDeleteButton();
         await createNotes.verifyNewNoteFieldNotVisible();
     });
 
-    it('[318] User can tap on Save button and verify that note was created', async () => {
+    it('[PAS-318] User can tap on Save button and verify that note was created', async () => {
         const { home, createLogin } = Pages;
 
         await createLogin.tapSaveButton();
@@ -945,7 +926,7 @@ describe('Home Flow - Create a custom element flow', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3104] User can tap on Create Custom Element button and see Create a custom element page with all elements', async () => {
+  it('[PAS-3104] User can tap on Create Custom Element button and see Create a custom element page with all elements', async () => {
     const { home, createCustomElement, createLogin } = Pages;
     await home.tapCustomCategory();
         await home.verifyCreateCustomElementButtonVisible();
@@ -959,22 +940,21 @@ describe('Home Flow - Create a custom element flow', () => {
         await createLogin.verifyNoFolderButtonVisible();
     });
 
-    it('[336] Item is moved to the folder selected in "Folder" dropdown', async () => {
+    it('[PAS-336] Item is moved to the folder selected in "Folder" dropdown', async () => {
         const { createLogin, sidebar } = Pages;
 
         await createFolderThroughNoFolderDropdown(createLogin, sidebar, 'Test Folder');
         await assertFolderChipVisibleOnCreateForm(createLogin, 'test');
     });
 
-    it('[3105] User can tap on Title field and enter title at Create a custom element page', async () => {
+    it('[PAS-3105] User can tap on Title field and enter title at Create a custom element page', async () => {
         const { createCustomElement } = Pages;
         await createCustomElement.tapTitleField();
         await createCustomElement.enterTextInFields('title');
-        await createCustomElement.hideKeyboard();
         await createCustomElement.verifyEnteredTextInFields('title');
     });
 
-    it('[3106] User can tap on File field and add file at Create a custom element page', async () => {
+    it('[PAS-3106] User can tap on File field and add file at Create a custom element page', async () => {
         const { createCustomElement, createLogin, settings } = Pages;
         await openAddFilePopupAndTapChooseFile(createLogin, () => createCustomElement.tapAddFileButton());
         await systemPickerNavigateToDownloadsViaSettings(settings);
@@ -982,7 +962,7 @@ describe('Home Flow - Create a custom element flow', () => {
         await createCustomElement.verifyNewFileFieldWithAllElementsVisible();
     });
 
-    it('[3081] User can add one more Note field', async () => {
+    it('[PAS-3081] User can add one more Note field', async () => {
         const { createCustomElement } = Pages;
 
         await createCustomElement.tapCreateCustomFieldButton();
@@ -991,13 +971,13 @@ describe('Home Flow - Create a custom element flow', () => {
         await createCustomElement.verifyNewNoteFieldVisibleWithAllElements();
     });
 
-    it('[3082] User can delete last added note field', async () => {
+    it('[PAS-3082] User can delete last added note field', async () => {
         const { createCustomElement } = Pages;
         await createCustomElement.tapNewNoteFieldDeleteButton();
         await createCustomElement.verifyNewNoteFieldNotVisible();
     });
 
-    it('[332] User can tap on Save button and verify that custom element was created', async () => {
+    it('[PAS-332] User can tap on Save button and verify that custom element was created', async () => {
         const { home, createLogin } = Pages;
 
         await createLogin.tapSaveButton();
@@ -1015,7 +995,7 @@ describe('Home Flow - Create an identity flow', () => {
     await restartAndNavigateToHomeWithVault(VAULT_NAME, DEFAULT_PASSWORD);
   });
 
-  it('[3107] User can tap on Create Identity button and see Create an identity page with all elements', async () => {
+  it('[PAS-3107] User can tap on Create Identity button and see Create an identity page with all elements', async () => {
     const { home, createIdentity, createLogin } = Pages;
     await home.tapIdentitiesCategory();
         await home.verifyCreateIdentityButtonVisible();
@@ -1032,7 +1012,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createLogin.verifyNoFolderButtonVisible();
     });
 
-    it('[1022] User can tap on Close button and verify that create notes page is not visible', async () => {
+    it('[PAS-1022] User can tap on Close button and verify that create notes page is not visible', async () => {
         const { home, createLogin, createIdentity } = Pages;
 
         await createLogin.tapCloseButton();
@@ -1044,23 +1024,22 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.showOrHideFields('hide', 'detailOfAddress');
     });
 
-    it('[264] Item is moved to the folder selected in "Folder" dropdown at Create an identity page', async () => {
+    it('[PAS-264] Item is moved to the folder selected in "Folder" dropdown at Create an identity page', async () => {
         const { createLogin, sidebar } = Pages;
 
         await createFolderThroughNoFolderDropdown(createLogin, sidebar, 'Test Folder');
         await assertFolderChipVisibleOnCreateForm(createLogin, 'test');
     });
 
-    it('[3108] User can tap on Title field and enter title at Create an identity page', async () => {
+    it('[PAS-3108] User can tap on Title field and enter title at Create an identity page', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.tapTitleField();
         await createIdentity.enterTextInFields('title');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('title');
     });
 
-    it('[3109] User can show and hide Personal information field', async () => {
+    it('[PAS-3109] User can show and hide Personal information field', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.showOrHideFields('show', 'personalInformation');
@@ -1069,7 +1048,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyFullNameFieldInPersonalInformationFieldNotVisible();
     });
 
-    it('[3110] User can tap on Personal information field and see Personal information field with all elements', async () => {
+    it('[PAS-3110] User can tap on Personal information field and see Personal information field with all elements', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.showOrHideFields('show', 'personalInformation');
@@ -1078,22 +1057,19 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyAllElementsInPhoneNumberFieldInPersonalInformationFieldVisible();
     });
 
-    it('[3111] User can fill all fields in Personal information field and then hide it', async () => {
+    it('[PAS-3111] User can fill all fields in Personal information field and then hide it', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.enterTextInFields('fullName');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('fullName');
         await createIdentity.enterTextInFields('email');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('email');
         await createIdentity.enterTextInFields('phoneNumber');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('phoneNumber');
         await createIdentity.showOrHideFields('hide', 'personalInformation');
     });
 
-    it('[3112] User can show and hide Detail of address field', async () => {
+    it('[PAS-3112] User can show and hide Detail of address field', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.showOrHideFields('show', 'detailOfAddress');
@@ -1102,7 +1078,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyAddressFieldNotVisible();
     });
 
-    it('[3113] User can tap on Detail of address field and see Detail of address field with all elements', async () => {
+    it('[PAS-3113] User can tap on Detail of address field and see Detail of address field with all elements', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.showOrHideFields('show', 'detailOfAddress');
@@ -1113,28 +1089,23 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyAllElementsInCountryFieldInDetailOfAddressFieldVisible();
     });
 
-    it('[3114] User can fill all fields in Detail of address field and then hide it', async () => {
+    it('[PAS-3114] User can fill all fields in Detail of address field and then hide it', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.enterTextInFields('address');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('address');
         await createIdentity.enterTextInFields('zip');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('zip');
         await createIdentity.enterTextInFields('city');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('city');
         await createIdentity.enterTextInFields('region');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('region');
         await createIdentity.enterTextInFields('country');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('country');
         await createIdentity.showOrHideFields('hide', 'detailOfAddress');
     });
 
-    it('[3115] User can show and hide Passport field', async () => {
+    it('[PAS-3115] User can show and hide Passport field', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.showOrHideFields('show', 'passport');
@@ -1143,7 +1114,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyPassportFullNameFieldNotVisible();
     });
 
-    it('[3116] User can tap on Passport field and see Passport field with all elements at Create an identity page', async () => {
+    it('[PAS-3116] User can tap on Passport field and see Passport field with all elements at Create an identity page', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.showOrHideFields('show', 'passport');
@@ -1162,37 +1133,29 @@ describe('Home Flow - Create an identity flow', () => {
 
     });
 
-    it('[3117] User can fill all fields in Passport field at Create an identity page', async () => {
+    it('[PAS-3117] User can fill all fields in Passport field at Create an identity page', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.enterTextInFields('passportFullName');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportFullName');
         await createIdentity.enterTextInFields('passportNumber');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportNumber');
         await createIdentity.enterTextInFields('passportIssuingCountry');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportIssuingCountry');
         await createIdentity.enterTextInFields('passportDateOfIssue');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportDateOfIssue');
         await createIdentity.enterTextInFields('passportExpiryDate');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportExpiryDate');
         await createIdentity.enterTextInFields('passportNationality');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportNationality');
         await createIdentity.swipeToUp();
         await createIdentity.enterTextInFields('passportDateOfBirth');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportDateOfBirth');
         await createIdentity.enterTextInFields('passportGender');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('passportGender');
     });
 
-    it('[3118] User can add passport picture', async () => {
+    it('[PAS-3118] User can add passport picture', async () => {
         const { createIdentity } = Pages;
         await browser.pause(1000);
         await createIdentity.tapPassportPicturePlusButton();
@@ -1209,7 +1172,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyPassportPictureInPassportPictureFieldVisible();
     });
 
-    it('[3119] User can tap on Passport picture in passport picture field and verify that picture is visible', async () => {
+    it('[PAS-3119] User can tap on Passport picture in passport picture field and verify that picture is visible', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.tapPassportPictureInPassportPictureField();
@@ -1219,7 +1182,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.showOrHideFields('hide', 'passport');
     });
 
-    it('[3120] User can show and hide Identity card field', async () => {
+    it('[PAS-3120] User can show and hide Identity card field', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.showOrHideFields('show', 'identityCard');
@@ -1228,7 +1191,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyIdentityCardIdNumberFieldNotVisible();
     });
 
-    it('[3121] User can tap on Identity card field and see Identity card field with all elements', async () => {
+    it('[PAS-3121] User can tap on Identity card field and see Identity card field with all elements', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.showOrHideFields('show', 'identityCard');
@@ -1239,24 +1202,20 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyAllElementsInIdentityCardPictureFieldInIdentityCardFieldVisible();
     });
 
-    it('[3122] User can fill all fields in Identity card field', async () => {
+    it('[PAS-3122] User can fill all fields in Identity card field', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.enterTextInFields('identityCardNumber');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('identityCardNumber');
         await createIdentity.enterTextInFields('identityCardCreationDate');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('identityCardCreationDate');
         await createIdentity.enterTextInFields('identityCardExpiryDate');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('identityCardExpiryDate');
         await createIdentity.enterTextInFields('identityCardIssuingCountry');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('identityCardIssuingCountry');
     });
 
-    it('[3123] User can add identity card picture', async () => {
+    it('[PAS-3123] User can add identity card picture', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.tapIdentityCardPicturePlusButton();
@@ -1268,7 +1227,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyIdentityCardPictureInIdentityCardPictureFieldVisible();
     });
 
-    it('[3124] User can tap on Identity card picture in identity card picture field and verify that picture is visible', async () => {
+    it('[PAS-3124] User can tap on Identity card picture in identity card picture field and verify that picture is visible', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.tapIdentityCardPictureInIdentityCardPictureField();
@@ -1277,7 +1236,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.showOrHideFields('hide', 'identityCard');
     });
 
-    it('[3125] User can show and hide Driving license field', async () => {
+    it('[PAS-3125] User can show and hide Driving license field', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.showOrHideFields('show', 'drivingLicense');
@@ -1286,7 +1245,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyDrivingLicenseIdNumberFieldNotVisible();
     });
 
-    it('[3126] User can tap on Driving license field and see Driving license field with all elements', async () => {
+    it('[PAS-3126] User can tap on Driving license field and see Driving license field with all elements', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.showOrHideFields('show', 'drivingLicense');
@@ -1298,24 +1257,20 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyAllElementsInDrivingLicensePictureFieldInDrivingLicenseFieldVisible();
     });
 
-    it('[3127] User can fill all fields in Driving license field', async () => {
+    it('[PAS-3127] User can fill all fields in Driving license field', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.enterTextInFields('drivingLicenseIdNumber');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('drivingLicenseIdNumber');
         await createIdentity.enterTextInFields('drivingLicenseCreationDate');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('drivingLicenseCreationDate');
         await createIdentity.enterTextInFields('drivingLicenseExpiryDate');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('drivingLicenseExpiryDate');
         await createIdentity.enterTextInFields('drivingLicenseIssuingCountry');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('drivingLicenseIssuingCountry');
     });
 
-    it('[3128] User can add driving license picture', async () => {
+    it('[PAS-3128] User can add driving license picture', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.tapDrivingLicensePicturePlusButton();
@@ -1327,7 +1282,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyDrivingLicensePictureInDrivingLicensePictureFieldVisible();
     });
 
-    it('[3129] User can tap on Driving license picture in driving license picture field and verify that picture is visible', async () => {
+    it('[PAS-3129] User can tap on Driving license picture in driving license picture field and verify that picture is visible', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.tapDrivingLicensePictureInDrivingLicensePictureField();
@@ -1336,7 +1291,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.showOrHideFields('hide', 'drivingLicense');
     });
 
-    it('[3077] User can add file to File field', async () => {
+    it('[PAS-3077] User can add file to File field', async () => {
         const { createIdentity, settings, createLogin } = Pages;
         
         await createIdentity.verifyFileFieldVisible();
@@ -1347,7 +1302,7 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyNewFileFieldWithAllElementsVisible();
     });
 
-    it('[3130] User can open last added file', async () => {
+    it('[PAS-3130] User can open last added file', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.tapNewFileFieldButton();
@@ -1356,22 +1311,21 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.pressBack();
     });
 
-    it('[3131] User can verify Note field with all elements', async () => {
+    it('[PAS-3131] User can verify Note field with all elements', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.verifyNoteFieldVisible();
         await createIdentity.verifyAllElementsInNoteFieldVisible();
     });
 
-    it('[3132] User can add note to Note field', async () => {
+    it('[PAS-3132] User can add note to Note field', async () => {
         const { createIdentity } = Pages;
         
         await createIdentity.enterTextInFields('note');
-        await createIdentity.hideKeyboard();
         await createIdentity.verifyEnteredTextInFields('note');
     });
 
-    it('[3081] User can add one more Note field', async () => {
+    it('[PAS-3081] User can add one more Note field', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.tapCreateCustomFieldButton();
@@ -1380,14 +1334,14 @@ describe('Home Flow - Create an identity flow', () => {
         await createIdentity.verifyNewNoteFieldVisibleWithAllElements();
     });
 
-    it('[3082] User can delete last added note field', async () => {
+    it('[PAS-3082] User can delete last added note field', async () => {
         const { createIdentity } = Pages;
 
         await createIdentity.tapNewNoteFieldDeleteButton();
         await createIdentity.verifyNewNoteFieldNotVisible();
     });
 
-    it('[260] User can tap on Save button and verify that Identity was created', async () => {
+    it('[PAS-260] User can tap on Save button and verify that Identity was created', async () => {
         const { home, createLogin } = Pages;
 
         await createLogin.tapSaveButton();

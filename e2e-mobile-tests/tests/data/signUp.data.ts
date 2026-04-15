@@ -166,5 +166,4 @@ export const VALIDATION_ERRORS = {
   incorrectPassword2Attempts: 'Incorrect password. You have 2 attempts before the app will be temporarily locked.',
   incorrectPassword1Attempt: 'Incorrect password. You have 1 attempt before the app will be temporarily locked.',
 
-
 } as const;

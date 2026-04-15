@@ -19,17 +19,17 @@ describe('Settings - Main Page Navigation', () => {
     await restartAndNavigateToSettings();
   });
 
-  it('[3024] User can tap on Settings tab and appear on Settings page', async () => {
+  it('[PAS-3024] User can tap on Settings tab and appear on Settings page', async () => {
     const { settings } = Pages;
     await settings.verifySettingsPageTitle();
   });
 
-  it('[3025] User should see Settings page with all elements', async () => {
+  it('[PAS-3025] User should see Settings page with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyAllElements();
   });
 
-  it('[3026] User can tap on Security button and appear on Security page', async () => {
+  it('[PAS-3026] User can tap on Security button and appear on Security page', async () => {
     const { settings } = Pages;
     await settings.tapSecurityButton();
     await settings.verifySecurityPageDisplayed();
@@ -37,7 +37,7 @@ describe('Settings - Main Page Navigation', () => {
     await settings.verifySettingsPageTitle();
   });
 
-  it('[3027] User can tap on Syncing button and appear on Syncing page', async () => {
+  it('[PAS-3027] User can tap on Syncing button and appear on Syncing page', async () => {
     const { settings } = Pages;
     await settings.tapSyncingButton();
     await settings.verifySyncingPageDisplayed();
@@ -45,7 +45,7 @@ describe('Settings - Main Page Navigation', () => {
     await settings.verifySettingsPageTitle();
   });
 
-  it('[3028] User can tap on Autofill button and appear on Autofill page', async () => {
+  it('[PAS-3028] User can tap on Autofill button and appear on Autofill page', async () => {
     const { settings } = Pages;
     await settings.tapAutofillButton();
     await settings.verifyAutofillPageDisplayed();
@@ -53,7 +53,7 @@ describe('Settings - Main Page Navigation', () => {
     await settings.verifySettingsPageTitle();
   });
 
-  it('[3029] User can tap on Vault button and appear on Vault page', async () => {
+  it('[PAS-3029] User can tap on Vault button and appear on Vault page', async () => {
     const { settings } = Pages;
     await settings.tapVaultButton();
     await settings.verifyVaultPageDisplayed();
@@ -61,7 +61,7 @@ describe('Settings - Main Page Navigation', () => {
     await settings.verifySettingsPageTitle();
   });
 
-  it('[3030] User can tap on Appearance button and appear on Appearance page', async () => {
+  it('[PAS-3030] User can tap on Appearance button and appear on Appearance page', async () => {
     const { settings } = Pages;
     await settings.tapAppearanceButton();
     await settings.verifyAppearancePageDisplayed();
@@ -69,7 +69,7 @@ describe('Settings - Main Page Navigation', () => {
     await settings.verifySettingsPageTitle();
   });
 
-  it('[3031] User can tap on About button and appear on About page', async () => {
+  it('[PAS-3031] User can tap on About button and appear on About page', async () => {
     const { settings } = Pages;
     await settings.tapAboutButton();
     await settings.verifyAboutPageDisplayed();
@@ -86,13 +86,13 @@ describe('Settings - Security Page Elements', () => {
     await restartAndNavigateToSecurityPage();
   });
 
-  it('[3032] User can verify Security page with all elements', async () => {
+  it('[PAS-3032] User can verify Security page with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyMasterPasswordSectionWithAllElements();
     await settings.verifyPearPassFunctionsSectionWithAllElements();
   });
 
-  it('[3033] User can tap on Master Vault edit icon and see Modify master password popup', async () => {
+  it('[PAS-3033] User can tap on Master Vault edit icon and see Modify master password popup', async () => {
     const { settings } = Pages;
     await settings.tapMasterVaultFieldEditIcon();
     await settings.verifyModifyMasterPasswordPopUp();
@@ -119,7 +119,7 @@ describe('Settings - Security - Master Password Validation', () => {
     }
   });
 
-  it('[3034] User can see warning messages if all fields are empty and tap on continue button', async () => {
+  it('[PAS-3034] User can see warning messages if all fields are empty and tap on continue button', async () => {
     const { settings } = Pages;
     await settings.tapModifyMasterPasswordPopUpSaveButton();
     await settings.verifyOldPasswordInvalidPasswordWarning();
@@ -127,7 +127,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await settings.verifyRepeatNewPasswordIsRequiredWarning();
   });
 
-  it('[442] User can see warning if old password is invalid', async () => {
+  it('[PAS-442] User can see warning if old password is invalid', async () => {
     const { settings } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.invalid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.valid.complex);
@@ -136,7 +136,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await settings.verifyOldPasswordInvalidPasswordWarning();
   });
 
-  it('[443] User can see warning if new password is invalid format', async () => {
+  it('[PAS-443] User can see warning if new password is invalid format', async () => {
     const { settings } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.invalid.standard);
@@ -145,7 +145,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await settings.verifyCreateNewPasswordWarningAll();
   });
 
-  it('[3035] User can see warning if new password is same as old password', async () => {
+  it('[PAS-3035] User can see warning if new password is same as old password', async () => {
     const { settings } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.valid.standard);
@@ -154,7 +154,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await settings.verifyNewPasswordDifferentFromOldPasswordWarning();
   });
 
-  it('[2622] It is impossible to change password when there are less than 8 characters', async () => {
+  it('[PAS-2622] It is impossible to change password when there are less than 8 characters', async () => {
     const { settings, signUp } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.tooShort.sevenChars);
@@ -163,7 +163,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await signUp.verifyValidationError('passwordTooShort');
   });
 
-  it('[2623] It is impossible to change password when there is no uppercase', async () => {
+  it('[PAS-2623] It is impossible to change password when there is no uppercase', async () => {
     const { settings, signUp } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.missingUppercase);
@@ -172,7 +172,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await signUp.verifyValidationError('passwordMissingUppercase');
   });
 
-  it('[2624] It is impossible to change password when there is no lowercase', async () => {
+  it('[PAS-2624] It is impossible to change password when there is no lowercase', async () => {
     const { settings, signUp } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.missingLowercase);
@@ -181,7 +181,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await signUp.verifyValidationError('passwordMissingLowercase');
   });
 
-  it('[2625] It is impossible to change password when there is no special character', async () => {
+  it('[PAS-2625] It is impossible to change password when there is no special character', async () => {
     const { settings, signUp } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.missingSpecial);
@@ -190,7 +190,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await signUp.verifyValidationError('passwordMissingSpecial');
   });
 
-  it('[2626] It is impossible to change password when there is no digit', async () => {
+  it('[PAS-2626] It is impossible to change password when there is no digit', async () => {
     const { settings, signUp } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.missingNumber);
@@ -199,7 +199,7 @@ describe('Settings - Security - Master Password Validation', () => {
     await signUp.verifyValidationError('passwordMissingNumber');
   });
 
-  it('[2627] It is impossible to change password when entering different passwords in each field', async () => {
+  it('[PAS-2627] It is impossible to change password when entering different passwords in each field', async () => {
     const { settings, signUp } = Pages;
     await settings.enterOldPassword(TEST_PASSWORDS.valid.standard);
     await settings.enterCreateNewPassword(TEST_PASSWORDS.valid.complex);
@@ -220,7 +220,7 @@ describe('Settings - Security - Change Password Flow', () => {
     await restartAndNavigateToSecurityPage(OLD_PASSWORD);
   });
 
-  it('[441, 2621] User can change password of master vault', async () => {
+  it('[PAS-441, PAS-2621] User can change password of master vault', async () => {
     const { settings } = Pages;
 
     await settings.tapMasterVaultFieldEditIcon();
@@ -248,7 +248,7 @@ describe('Settings - Security - Change Password Flow', () => {
     await settings.verifyContinueUsingBiometricsAccessPopupDisplayed();
   });
 
-  it('[1438] User can see biometrics popup and tap on enable button', async () => {
+  it('[PAS-1438] User can see biometrics popup and tap on enable button', async () => {
     const { settings } = Pages;
     
     await settings.verifyContinueUsingBiometricsAccessPopupAllElementsDisplayed();
@@ -257,13 +257,13 @@ describe('Settings - Security - Change Password Flow', () => {
     await settings.verifyContinueUsingBiometricsAccessPopupNotDisplayed();
   });
 
-  it('[1436] User can apply fingerprint authentication', async () => {
+  it('[PAS-1436] User can apply fingerprint authentication', async () => {
     const { settings } = Pages;
     await settings.useBiometricsAuthentication();
     await settings.useBiometricsAuthentication();
   });
 
-  it('[1098] User logs in the App by entering changed master password', async () => {
+  it('[PAS-1098] User logs in the App by entering changed master password', async () => {
     const { settings, home, sidebar, signUp } = Pages;
 
     await home.tapBottomNavHomeTab();
@@ -281,7 +281,7 @@ describe('Settings - Security - Change Password Flow', () => {
     await settings.verifySettingsPageTitle();
   });
 
-  it('[1315] User logs in after changing password and trying biometrics', async () => {
+  it('[PAS-1315] User logs in after changing password and trying biometrics', async () => {
     const { home, sidebar, signUp } = Pages;
 
     await home.tapBottomNavHomeTab();
@@ -308,7 +308,7 @@ describe('Settings - Security - Toggles', () => {
     await restartAndNavigateToSecurityPage(CURRENT_PASSWORD);
   });
 
-  it('[410, 411] User can turn on and turn off Reminders toggle', async () => {
+  it('[PAS-410, PAS-411] User can turn on and turn off Reminders toggle', async () => {
     const { settings } = Pages;
     await settings.tapRemindersToggleOn();
     await settings.verifyRemindersToggleOffDisplayed();
@@ -316,7 +316,7 @@ describe('Settings - Security - Toggles', () => {
     await settings.verifyRemindersToggleOnDisplayed();
   });
 
-  it('[414, 415] User can turn on and turn off Copy to Clipboard toggle', async () => {
+  it('[PAS-414, PAS-415] User can turn on and turn off Copy to Clipboard toggle', async () => {
     const { settings } = Pages;
     await settings.tapCopyToClipboardToggleOn();
     await settings.verifyCopyToClipboardToggleOffDisplayed();
@@ -324,7 +324,7 @@ describe('Settings - Security - Toggles', () => {
     await settings.verifyCopyToClipboardToggleOnDisplayed();
   });
 
-  it('[470, 471] User can turn on and turn off Unlock with biometrics toggle', async () => {
+  it('[PAS-470, PAS-471] User can turn on and turn off Unlock with biometrics toggle', async () => {
     const { settings } = Pages;
     await settings.verifyUnlockWithBiometricsToggleOnDisplayed();
     await settings.tapUnlockWithBiometricsToggleOn();
@@ -342,12 +342,12 @@ describe('Settings - Security - Auto-logout', () => {
     await restartAndNavigateToSecurityPage(CURRENT_PASSWORD);
   });
 
-  it('[3036] Verify that information icon about Auto Logout is displayed', async () => {
+  it('[PAS-3036] Verify that information icon about Auto Logout is displayed', async () => {
     const { settings } = Pages;
     await settings.verifyAutoLogoutInformationIconDisplayed();
   });
 
-  it('[3037] User can tap on Auto Logout information icon and see popup', async () => {
+  it('[PAS-3037] User can tap on Auto Logout information icon and see popup', async () => {
     const { settings } = Pages;
     await settings.tapAutoLogInInformationIcon();
     await settings.verifyAutoLogoutTimeoutPopupDisplayed();
@@ -355,20 +355,20 @@ describe('Settings - Security - Auto-logout', () => {
     await settings.tapRandomlyOnScreen();
   });
 
-  it('[1444] User can select Auto Logout timeout options', async () => {
+  it('[PAS-1444] User can select Auto Logout timeout options', async () => {
     const { settings } = Pages;
     await settings.tapAutoLogoutTimeoutField();
     await settings.verifyAutoLogoutTimeoutFieldDropdownDisplayed();
     await settings.verifyThirtySecondsRadioButtonSelected();
   });
 
-  it('[1450] User can switch between Auto Logout timeout options', async () => {
+  it('[PAS-1450] User can switch between Auto Logout timeout options', async () => {
     const { settings } = Pages;
     await settings.tapNeverRadioButton();
     await settings.verifyNeverDisplayedInAutoLogoutTimeoutField();
   });
 
-  it('[1447] Verify all Auto Logout timeout options are displayed', async () => {
+  it('[PAS-1447] Verify all Auto Logout timeout options are displayed', async () => {
     const { settings } = Pages;
     await settings.tapAutoLogoutTimeoutFieldNever();
     await settings.verifyAutoLogoutTimeoutFieldDropdownDisplayed();
@@ -393,21 +393,20 @@ describe('Settings - Syncing - Blind Peers', () => {
     await restartAndNavigateToSyncingPage(CURRENT_PASSWORD);
   });
 
-  it('[3038] User can verify Syncing page with all elements', async () => {
+  it('[PAS-3038] User can verify Syncing page with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyBlindPeeringSectionWithAllElements();
   });
 
-  it('[1466] User can tap on Blind Peering information icon and see popup', async () => {
+  it('[PAS-1466] User can tap on Blind Peering information icon and see popup', async () => {
     const { settings } = Pages;
     await settings.tapBlindPeeringSectionInformationIcon();
     await settings.verifyBlindPeeringSectionInformationPopupDisplayed();
   });
 
-  it('[1465] User can tap on Learn more button and see learn more page', async () => {
+  it('[PAS-1465] User can tap on Learn more button and see learn more page', async () => {
     const { sidebar, settings } = Pages;
     await settings.tapBlindPeeringSectionLearnMoreButton();
-    await browser.pause(5000);
     await settings.verifyBlindPeeringSectionLearnMorePageDisplayed();
     await sidebar.pressBack();
     await settings.verifyBlindPeeringSectionInformationPopupDisplayed();
@@ -415,7 +414,7 @@ describe('Settings - Syncing - Blind Peers', () => {
     await browser.pause(1000);
   });
 
-  it('[1451] User can tap on Blind Peering toggle and see Choose Blind Peer popup', async () => {
+  it('[PAS-1451] User can tap on Blind Peering toggle and see Choose Blind Peer popup', async () => {
     const { settings } = Pages;
     await settings.tapBlindPeeringSectionToggle();
     await settings.verifyChooseYourBlindPeerPopupDisplayed();
@@ -424,10 +423,10 @@ describe('Settings - Syncing - Blind Peers', () => {
     await settings.verifyChooseYourBlindPeerPopupNotDisplayed();
   });
 
-  it('[1452] User can switch between Automatic and Manual Blind Peers', async () => {
+  it('[PAS-1452] User can switch between Automatic and Manual Blind Peers', async () => {
     const { settings } = Pages;
     await settings.tapBlindPeeringSectionToggle();
-    await settings.verifyAutomaticBlindPeersRadioButtonSelected();
+    await settings.verifyChooseYourBlindPeerPopupDisplayed();
     await settings.tapManualBlindPeersRadioButton();
     await settings.verifyManualBlindPeersRadioButtonSelected();
     await settings.verifyAutomaticBlindPeersRadioButtonUnselected();
@@ -435,7 +434,7 @@ describe('Settings - Syncing - Blind Peers', () => {
     await settings.verifyChooseYourBlindPeerPopupNotDisplayed();
   });
 
-  it('[1455] User can choose Automatic Blind Peers', async () => {
+  it('[PAS-1455] User can choose Automatic Blind Peers', async () => {
     const { settings } = Pages;
     await settings.tapBlindPeeringSectionToggle();
     await settings.verifyChooseYourBlindPeerPopupDisplayed();
@@ -444,19 +443,19 @@ describe('Settings - Syncing - Blind Peers', () => {
     await settings.verifyAutomaticBlindPeersToastDisplayed();
   });
 
-  it('[3039] User can verify Automatic Blind Peers status is Active', async () => {
+  it('[PAS-3039] User can verify Automatic Blind Peers status is Active', async () => {
     const { settings } = Pages;
     await settings.verifyAllNewElementsInYourBlindPeersSection();
   });
 
-  it('[3040] User can tap on Edit Blind Peers button and see popup', async () => {
+  it('[PAS-3040] User can tap on Edit Blind Peers button and see popup', async () => {
     const { settings } = Pages;
     await settings.tapEditBlindPeersButton();
     await settings.verifyChooseYourBlindPeerPopupDisplayed();
     await settings.tapChooseYourBlindPeerPopupCancelButton();
   });
 
-  it('[3041] User can choose Manual Blind Peers', async () => {
+  it('[PAS-3041] User can choose Manual Blind Peers', async () => {
     const { settings } = Pages;
     await settings.tapEditBlindPeersButton();
     await settings.verifyChooseYourBlindPeerPopupDisplayed();
@@ -465,31 +464,31 @@ describe('Settings - Syncing - Blind Peers', () => {
     await settings.verifyManualBlindPeersPopupDisplayed();
   });
 
-  it('[3042] Verify that Manual Blind Peers popup has all elements', async () => {
+  it('[PAS-3042] Verify that Manual Blind Peers popup has all elements', async () => {
     const { settings } = Pages;
     await settings.verifyManualBlindPeersPopupElements();
   });
 
-  it('[1456] User can add one more code field for blind peer', async () => {
+  it('[PAS-1456] User can add one more code field for blind peer', async () => {
     const { settings } = Pages;
     await settings.tapAddPeerButton();
     await settings.verifyTwoBlinPeersElementsDisplayed();
   });
 
-  it('[1454] User can remove one code for blind peer', async () => {
+  it('[PAS-1454] User can remove one code for blind peer', async () => {
     const { settings } = Pages;
     await settings.tapRemovePeerButton();
     await settings.verifyTwoBlinPeersElementsIsNotDisplayed();
   });
 
-  it('[3043] User can see error for invalid blind peer code', async () => {
+  it('[PAS-3043] User can see error for invalid blind peer code', async () => {
     const { settings } = Pages;
     await settings.enterCodeForBlindPeer(TEST_PASSWORDS.blindPeerCodeInvalid);
     await settings.tapManualBlindPeersPopupConfirmButton();
     await settings.verifyInvalidCodeForBlindPeerWarningMessageDisplayed();
   });
 
-  it('[1453] User can add valid code for blind peer', async () => {
+  it('[PAS-1453] User can add valid code for blind peer', async () => {
     const { settings } = Pages;
     await settings.tapBlindPeeringSectionToggle();
     await settings.tapManualBlindPeersRadioButton();
@@ -501,7 +500,7 @@ describe('Settings - Syncing - Blind Peers', () => {
     await settings.verifySuccessToastForManualBlindPeersDisplayed();
   });
 
-  it('[3044] User can verify Manual Blind Peers status is Active', async () => {
+  it('[PAS-3044] User can verify Manual Blind Peers status is Active', async () => {
     const { settings } = Pages;
     await settings.verifyAllNewManualBlindPeersElementsInYourBlindPeersSection();
   });
@@ -520,12 +519,12 @@ describe('Settings - Autofill Page', () => {
     await settings.verifyAutofillPageDisplayed();
   });
 
-  it('[3045] User can verify Autofill page with all elements', async () => {
+  it('[PAS-3045] User can verify Autofill page with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyAutofillPageWithAllElements();
   });
 
-  it('[412] User can set PearPass as default autofill provider', async () => {
+  it('[PAS-412] User can set PearPass as default autofill provider', async () => {
     const { settings } = Pages;
     await settings.tapSetAsDefaultButton();
     await settings.verifyPearPassAppRadioButtonDisplayed();
@@ -536,9 +535,10 @@ describe('Settings - Autofill Page', () => {
     await settings.verifyNewElementsInAutofillSection();
   });
 
-  it('[3046] User can tap on Manage autofill settings link', async () => {
+  it('[PAS-3046] User can tap on Manage autofill settings link', async () => {
     const { settings } = Pages;
     await settings.tapAutoFillNewLinkManageAutofillSettings();
+    await settings.verifyAutofillPageDisplayed();
     await settings.tapAutoFIllServicesBackButton();
   });
 });
@@ -553,12 +553,12 @@ describe('Settings - Vault Page', () => {
     await restartAndNavigateToVaultPage(CURRENT_PASSWORD);
   });
 
-  it('[2389] User can verify Vault page with Your Vault section', async () => {
+  it('[PAS-2389] User can verify Vault page with Your Vault section', async () => {
     const { settings } = Pages;
     await settings.verifyYourVaultSectionWithAllElements();
   });
 
-  it('[3047] User can tap on Manage Vaults edit icon and see Change Vault Name popup', async () => {
+  it('[PAS-3047] User can tap on Manage Vaults edit icon and see Change Vault Name popup', async () => {
     const { settings } = Pages;
     await settings.tapManageVaultsSectionItemEditIcon();
     await settings.verifyChangeVaultNamePopup();
@@ -570,7 +570,7 @@ describe('Settings - Vault Page', () => {
     await settings.verifyChangeVaultNamePopupWindowNotDisplayed();
   });
 
-  it('[1104] User can change name of vault', async () => {
+  it('[PAS-1104] User can change name of vault', async () => {
     const { settings } = Pages;
     const newVaultName = 'Ibrahim';
 
@@ -584,7 +584,7 @@ describe('Settings - Vault Page', () => {
     await settings.verifyChangeVaultNamePopupWindowNotDisplayed();
   });
 
-  it('[3048] Check that name of vault is changed everywhere', async () => {
+  it('[PAS-3048] Check that name of vault is changed everywhere', async () => {
     const { settings, home, sidebar, signUp } = Pages;
     const newVaultName = 'Ibrahim';
 
@@ -608,24 +608,24 @@ describe('Settings - Vault Page', () => {
     await settings.tapVaultButton();
   });
 
-  it('[1467] User can verify Linked Devices section', async () => {
+  it('[PAS-1467] User can verify Linked Devices section', async () => {
     const { settings } = Pages;
     await settings.verifyLinkedDevicesSectionWithAllElements();
   });
 
-  it('[1468] User can tap on Add device button and see popup', async () => {
+  it('[PAS-1468] User can tap on Add device button and see popup', async () => {
     const { settings, sidebar } = Pages;
     await settings.tapAddDeviceButton();
     await sidebar.verifyAddDevicePopupFull();
   });
 
-  it('[1470] Import vault tab is opened when tapping it', async () => {
+  it('[PAS-1470] Import vault tab is opened when tapping it', async () => {
     const { sidebar } = Pages;
     await sidebar.tapAddDevicePopupImportVaultTab();
     await sidebar.verifyAddDevicePopupImportVaultTab();
   });
 
-  it('[1469] Share this Vault tab is opened when tapping it', async () => {
+  it('[PAS-1469] Share this Vault tab is opened when tapping it', async () => {
     const { sidebar } = Pages;
     await sidebar.tapAddDevicePopupShareVaultTab();
     await sidebar.verifyAddDevicePopupShareVaultTab();
@@ -643,12 +643,12 @@ describe('Settings - Vault - Export', () => {
     await restartAndNavigateToVaultPage(CURRENT_PASSWORD);
   });
 
-  it('[3049] Verify that json radio button is selected by default', async () => {
+  it('[PAS-3049] Verify that json radio button is selected by default', async () => {
     const { settings } = Pages;
     await settings.verifyJSONRadioButtonSelected();
   });
 
-  it('[3050] User can switch between CSV and JSON file format', async () => {
+  it('[PAS-3050] User can switch between CSV and JSON file format', async () => {
     const { settings } = Pages;
     await settings.tapCSVRadioButton();
     await settings.verifyCSVRadioButtonSelected();
@@ -658,7 +658,7 @@ describe('Settings - Vault - Export', () => {
     await settings.verifyCSVRadioButtonUnselected();
   });
 
-  it('[2394] User can tap Export button and see Export Vaults popup', async () => {
+  it('[PAS-2394] User can tap Export button and see Export Vaults popup', async () => {
     const { settings } = Pages;
     await settings.tapExportButton();
     await settings.verifyExportVaultsPopupDisplayed();
@@ -667,7 +667,7 @@ describe('Settings - Vault - Export', () => {
     await settings.verifyExportVaultsPopupNotDisplayed();
   });
 
-  it('[3051] Verify Export button in popup is not clickable by default', async () => {
+  it('[PAS-3051] Verify Export button in popup is not clickable by default', async () => {
     const { settings } = Pages;
     await settings.tapExportButton();
     await settings.verifyExportVaultsPopupExportButtonNotClickable();
@@ -675,7 +675,7 @@ describe('Settings - Vault - Export', () => {
     await settings.verifyExportVaultsPopupNotDisplayed();
   });
 
-  it('[3052] Verify Export button is clickable after entering Master password', async () => {
+  it('[PAS-3052] Verify Export button is clickable after entering Master password', async () => {
     const { settings } = Pages;
     await settings.tapExportButton();
     await settings.enterMasterPassword(TEST_PASSWORDS.valid.standard);
@@ -683,7 +683,7 @@ describe('Settings - Vault - Export', () => {
     await settings.tapExportVaultsPopupCancelButton();
   });
 
-  it('[1250] User can see warning for invalid Master password', async () => {
+  it('[PAS-1250] User can see warning for invalid Master password', async () => {
     const { settings } = Pages;
     await settings.tapExportButton();
     await settings.enterMasterPassword(TEST_PASSWORDS.invalid.standard);
@@ -696,7 +696,7 @@ describe('Settings - Vault - Export', () => {
     await settings.tapExportVaultsPopupCancelButton();
   });
 
-  it('[458, 1249, 2393] User can export vaults in JSON format', async () => {
+  it('[PAS-458, PAS-1249, PAS-2393] User can export vaults in JSON format', async () => {
     const { settings, sidebar } = Pages;
     await settings.tapExportButton();
     await settings.enterMasterPassword(CURRENT_PASSWORD);
@@ -710,7 +710,7 @@ describe('Settings - Vault - Export', () => {
     await browser.pause(5000);
   });
 
-  it('[455, 1235] User can export vaults in CSV format', async () => {
+  it('[PAS-455, PAS-1235] User can export vaults in CSV format', async () => {
     const { settings, signUp } = Pages;
     await settings.tapCSVRadioButton();
     await settings.verifyCSVRadioButtonSelected();
@@ -740,58 +740,58 @@ describe('Settings - Vault - Import', () => {
     await settings.swipeToUp();
   });
 
-  it('[3053] User can verify Vault page with Import section', async () => {
+  it('[PAS-3053] User can verify Vault page with Import section', async () => {
     const { settings } = Pages;
     await settings.verifyImportSection();
   });
 
-  it('[3054] Verify OnePassword button with all elements', async () => {
+  it('[PAS-3054] Verify OnePassword button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyOnePasswordButtonWithAllElements();
   });
 
-  it('[3055] Verify Bitwarden button with all elements', async () => {
+  it('[PAS-3055] Verify Bitwarden button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyBitwardenButtonWithAllElements();
   });
 
-  it('[3056] Verify KeePass button with all elements', async () => {
+  it('[PAS-3056] Verify KeePass button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyKeePassButtonWithAllElements();
   });
 
-  it('[3057] Verify KeePassXC button with all elements', async () => {
+  it('[PAS-3057] Verify KeePassXC button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyKeePassXCButtonWithAllElements();
   });
 
-  it('[3058] Verify LastPass button with all elements', async () => {
+  it('[PAS-3058] Verify LastPass button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyLastPassButtonWithAllElements();
   });
 
-  it('[3059] Verify NordPass button with all elements', async () => {
+  it('[PAS-3059] Verify NordPass button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyNordPassButtonWithAllElements();
   });
 
-  it('[3060] Verify ProtonPass button with all elements', async () => {
+  it('[PAS-3060] Verify ProtonPass button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyProtonPassButtonWithAllElements();
   });
 
-  it('[3061] Verify Encrypted file button with all elements', async () => {
+  it('[PAS-3061] Verify Encrypted file button with all elements', async () => {
     const { settings } = Pages;
     await settings.swipeToUp();
     await settings.verifyEncryptedFileButtonWithAllElements();
   });
 
-  it('[3062] Verify Unencrypted file button with all elements', async () => {
+  it('[PAS-3062] Verify Unencrypted file button with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyUnencryptedFileButtonWithAllElements();
   });
 
-  it('[461] It is possible to import 1Password .csv vault', async () => {
+  it('[PAS-461] It is possible to import 1Password .csv vault', async () => {
     const { settings, home } = Pages;
     await settings.tapOnePasswordButton();
     await settings.verifyImportVaultPopupWithDropTextDisplayed('onePassword');
@@ -809,7 +809,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[462] It is possible to import Bitwarden .csv vault', async () => {
+  it('[PAS-462] It is possible to import Bitwarden .csv vault', async () => {
     const { settings, home } = Pages;
     await settings.tapBitwardenButton();
     await settings.verifyImportVaultPopupWithDropTextDisplayed('bitwarden');
@@ -826,7 +826,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[463] It is possible to import Bitwarden .json vault', async () => {
+  it('[PAS-463] It is possible to import Bitwarden .json vault', async () => {
     const { settings, home } = Pages;
 
     await settings.tapBitwardenButton();
@@ -847,7 +847,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[464] It is possible to import LastPass .csv vault', async () => {
+  it('[PAS-464] It is possible to import LastPass .csv vault', async () => {
     const { settings, home } = Pages;
 
     await settings.tapLastPassButton();
@@ -866,7 +866,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[465] It is possible to import NordPass .csv vault', async () => {
+  it('[PAS-465] It is possible to import NordPass .csv vault', async () => {
     const { settings, home } = Pages;
 
     await settings.tapNordPassButton();
@@ -884,7 +884,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[466] It is possible to import Proton Pass .csv vault', async () => {
+  it('[PAS-466] It is possible to import Proton Pass .csv vault', async () => {
     const { settings, home } = Pages;
 
     await settings.tapProtonPassButton();
@@ -903,7 +903,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[3063] It is possible to import Proton Pass .json vault', async () => {
+  it('[PAS-3063] It is possible to import Proton Pass .json vault', async () => {
     const { settings, home } = Pages;
 
     await settings.tapProtonPassButton();
@@ -922,7 +922,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[2414] It is possible to import Unencrypted file .csv vault', async () => {
+  it('[PAS-2414] It is possible to import Unencrypted file .csv vault', async () => {
     const { settings, home } = Pages;
 
     await settings.tapUnencryptedFileButton();
@@ -940,7 +940,7 @@ describe('Settings - Vault - Import', () => {
     await home.tapBottomNavSettingsTab();
   });
 
-  it('[2415] It is possible to import Unencrypted file .json vault', async () => {
+  it('[PAS-2415] It is possible to import Unencrypted file .json vault', async () => {
     const { settings, home } = Pages;
 
     await settings.tapUnencryptedFileButton();
@@ -970,12 +970,12 @@ describe('Settings - Appearance Page', () => {
     await settings.verifyAppearancePageDisplayed();
   });
 
-  it('[3064] User can verify Appearance page with all elements', async () => {
+  it('[PAS-3064] User can verify Appearance page with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyLanguageSectionWithAllElements();
   });
 
-  it('[407] User can open language dropdown and see language menu', async () => {
+  it('[PAS-407] User can open language dropdown and see language menu', async () => {
     const { settings } = Pages;
     await settings.tapLanguageDropdown();
     await settings.verifyLanguageDropdownMenu();
@@ -993,12 +993,12 @@ describe('Settings - About Page', () => {
     await restartAndNavigateToAboutPage(CURRENT_PASSWORD);
   });
 
-  it('[3065] User can verify About page with all elements', async () => {
+  it('[PAS-3065] User can verify About page with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyReportProblemSectionWithAllElements();
   });
 
-  it('[408] User can send feedback in Report a problem section', async () => {
+  it('[PAS-408] User can send feedback in Report a problem section', async () => {
     const { settings } = Pages;
     const testMessage = 'Testing message';
     await settings.verifyIssueInputFieldPlaceholder();
@@ -1009,19 +1009,19 @@ describe('Settings - About Page', () => {
     await settings.verifyFeedbackSentToast();
   });
 
-  it('[1435] Nothing happens when tapping Send with empty field', async () => {
+  it('[PAS-1435] Nothing happens when tapping Send with empty field', async () => {
     const { settings } = Pages;
     await settings.verifyIssueInputFieldPlaceholder();
     await settings.tapSendButton();
     await settings.verifyAboutPageDisplayed();
   });
 
-  it('[3066] User can verify Version section with all elements', async () => {
+  it('[PAS-3066] User can verify Version section with all elements', async () => {
     const { settings } = Pages;
     await settings.verifyPearPassVersionSectionWithAllElements();
   });
 
-  it('[453] User can tap on Terms of use link and verify page', async () => {
+  it('[PAS-453] User can tap on Terms of use link and verify page', async () => {
     const { settings } = Pages;
     await settings.tapTermsOfUseLink();
     await settings.acceptCookiesIfPresent();
@@ -1029,14 +1029,14 @@ describe('Settings - About Page', () => {
     await settings.pressBack();
   });
 
-  it('[454] User can tap on Privacy statement link and verify page', async () => {
+  it('[PAS-454] User can tap on Privacy statement link and verify page', async () => {
     const { settings } = Pages;
     await settings.tapPrivacyStatementLink();
     await settings.verifyPrivacyStatementPage();
     await settings.pressBack();
   });
 
-  it('[1432] User can tap on Visit our website link and verify page', async () => {
+  it('[PAS-1432] User can tap on Visit our website link and verify page', async () => {
     const { settings } = Pages;
     await settings.tapVisitOurWebsiteLink();
     await settings.verifyVisitOurWebsitePage();
