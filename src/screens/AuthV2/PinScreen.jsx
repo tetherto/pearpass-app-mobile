@@ -1,26 +1,17 @@
-import { useState, useCallback, useEffect, useRef, createRef } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import {
-  InputField,
-  Text,
-  Title,
-  useTheme,
-  Link
-} from '@tetherto/pearpass-lib-ui-kit'
-import {
-  Backspace,
-  FaceId,
-  Fingerprint
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Text, Title, useTheme, Link } from '@tetherto/pearpass-lib-ui-kit'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVaults } from '@tetherto/pearpass-lib-vault'
 import * as SecureStore from 'expo-secure-store'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { useAutoSelectVault } from './hooks/useAutoSelectVault'
+import { Numpad } from '../../components/Numpad'
+import { PinSlots } from '../../components/PinSlots'
 import { IOS_APP_GROUP_ID } from '../../constants/iosAppGroup'
 import { SECURE_STORAGE_KEYS } from '../../constants/secureStorageKeys'
 import { useBiometricsAuthentication } from '../../hooks/useBiometricsAuthentication'
@@ -46,9 +37,6 @@ export const PinScreen = () => {
 
   const [pin, setPin] = useState('')
   const [isAuthenticating, setIsAuthenticating] = useState(false)
-  const inputRefs = useRef(
-    Array.from({ length: PIN_LENGTH }, () => createRef())
-  ).current
 
   const { isBiometricsEnabled, isBiometricsSupported, biometricTypes } =
     useBiometricsAuthentication()
@@ -118,20 +106,6 @@ export const PinScreen = () => {
     }
   }, [isBiometricAvailable])
 
-  useEffect(() => {
-    inputRefs.forEach((ref) => {
-      ref.current?.setNativeProps?.({
-        showSoftInputOnFocus: false,
-        style: { textAlign: 'center', marginTop: -8, marginBottom: 8 }
-      })
-    })
-  }, [])
-
-  useEffect(() => {
-    const activeIndex = pin.length < PIN_LENGTH ? pin.length : PIN_LENGTH - 1
-    inputRefs[activeIndex]?.current?.focus()
-  }, [pin])
-
   const handlePadPress = useCallback(
     (digit) => {
       if (pin.length >= PIN_LENGTH) return
@@ -146,95 +120,12 @@ export const PinScreen = () => {
     setPin((prev) => prev.slice(0, -1))
   }, [hapticButtonSecondary])
 
+  const biometricType =
+    isFaceID && !isFingerprint ? 'face' : isFingerprint ? 'fingerprint' : null
+
   const handleMasterPassword = useCallback(() => {
     navigation.navigate('AuthV2MasterPassword')
   }, [navigation])
-
-  const renderPinSlots = () => (
-    <View style={styles.pinSlotsContainer}>
-      {Array.from({ length: PIN_LENGTH }).map((_, index) => {
-        const isFilled = index < pin.length
-
-        return (
-          <View key={index} style={styles.pinSlotWrapper}>
-            <InputField
-              label=""
-              value={isFilled ? '\u2022' : ''}
-              placeholder="0"
-              inputRef={inputRefs[index]}
-              testID={`pin-slot-${index}`}
-            />
-          </View>
-        )
-      })}
-    </View>
-  )
-
-  const renderNumpad = () => {
-    const rows = [
-      [1, 2, 3],
-      [4, 5, 6],
-      [7, 8, 9],
-      ['biometric', 0, 'backspace']
-    ]
-
-    return (
-      <View style={styles.numpadContainer}>
-        {rows.map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.numpadRow}>
-            {row.map((item) => {
-              if (item === 'biometric') {
-                if (!isBiometricAvailable) {
-                  return <View key="biometric" style={styles.numpadButton} />
-                }
-                return (
-                  <Pressable
-                    key="biometric"
-                    style={styles.numpadButton}
-                    onPress={handleBiometricAuth}
-                    testID="pin-biometric-button"
-                  >
-                    {isFaceID && !isFingerprint ? (
-                      <FaceId color={colors.white.mode1} />
-                    ) : (
-                      <Fingerprint color={colors.white.mode1} />
-                    )}
-                  </Pressable>
-                )
-              }
-
-              if (item === 'backspace') {
-                return (
-                  <Pressable
-                    key="backspace"
-                    style={styles.numpadButton}
-                    onPress={handleBackspace}
-                    testID="pin-backspace-button"
-                  >
-                    <Backspace color={colors.white.mode1} />
-                  </Pressable>
-                )
-              }
-
-              return (
-                <Pressable
-                  key={item}
-                  style={({ pressed }) => [
-                    styles.numpadButton,
-                    pressed && styles.numpadButtonPressed
-                  ]}
-                  onPress={() => handlePadPress(String(item))}
-                  testID={`pin-pad-${item}`}
-                >
-                  <Title>{item}</Title>
-                </Pressable>
-              )
-            })}
-          </View>
-        ))}
-      </View>
-    )
-  }
 
   return (
     <OnboardingLayout topGradient>
@@ -247,11 +138,18 @@ export const PinScreen = () => {
             </Text>
           </View>
 
-          {renderPinSlots()}
+          <PinSlots pin={pin} pinLength={PIN_LENGTH} />
         </View>
 
         <View style={styles.footer}>
-          {renderNumpad()}
+          <Numpad
+            onDigitPress={handlePadPress}
+            onBackspacePress={handleBackspace}
+            onBiometricPress={
+              isBiometricAvailable ? handleBiometricAuth : undefined
+            }
+            biometricType={isBiometricAvailable ? biometricType : null}
+          />
 
           <Text style={styles.masterPasswordText}>
             {t`Forgot PIN?`}{' '}
@@ -285,37 +183,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12
   },
-  pinSlotsContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    width: '100%'
-  },
-  pinSlotWrapper: {
-    flex: 1
-  },
   footer: {
     paddingHorizontal: 16,
     paddingBottom: 24,
     paddingTop: 16,
     gap: 48
-  },
-  numpadContainer: {
-    gap: 10
-  },
-  numpadRow: {
-    flexDirection: 'row',
-    gap: 10
-  },
-  numpadButton: {
-    flex: 1,
-    height: 55,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    overflow: 'hidden'
-  },
-  numpadButtonPressed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)'
   },
   masterPasswordLink: {
     alignItems: 'center'

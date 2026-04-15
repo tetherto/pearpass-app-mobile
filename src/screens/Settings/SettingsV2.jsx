@@ -101,7 +101,7 @@ export const SettingsV2 = () => {
           {
             key: 'export-items',
             label: t`Export Items`,
-            screen: 'Vaults',
+            screen: 'ExportItems',
             icon: Logout
           }
         ]
