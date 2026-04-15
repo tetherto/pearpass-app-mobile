@@ -8,6 +8,7 @@ import { UNSUPPORTED } from '@tetherto/pearpass-lib-constants'
 
 import { Button, Radio } from '@tetherto/pearpass-lib-ui-kit'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
+import { useSharedFilter } from 'src/context/SharedFilterContext'
 import { Layout } from 'src/containers/Layout'
 import { styles } from './DeleteFolderv2Styles'
 
@@ -19,6 +20,7 @@ export const DeleteFolderV2 = ({ route }) => {
   const { t } = useLingui()
   const { deleteFolder } = useFolders()
   const navigation = useNavigation<NavigationProp<Record<string, undefined>>>()
+  const { state, setState } = useSharedFilter()
 
   const handleBack = () => {
     if (navigation.canGoBack()) {
@@ -50,6 +52,16 @@ export const DeleteFolderV2 = ({ route }) => {
 
   const isDeleteFolderOnlySelected = UNSUPPORTED && selected === 'deleteFolder'
 
+  const handleDelete = () => {
+    deleteFolder(folderName)
+
+    if (state?.folder === folderName) {
+      setState((prev) => ({ ...prev, folder: 'allFolder', isFavorite: false }))
+    }
+
+    navigation.goBack()
+  }
+
   return (
     <Layout
       scrollable
@@ -57,22 +69,11 @@ export const DeleteFolderV2 = ({ route }) => {
       header={<BackScreenHeader title={t`Delete Folder`} onBack={handleBack} />}
       footer={
         isDeleteFolderOnlySelected ? (
-          <Button
-            onClick={() => {
-              deleteFolder(folderName)
-              navigation.goBack()
-            }}
-          >
+          <Button onClick={handleDelete}>
             {t`Delete Folder`}
           </Button>
         ) : (
-          <Button
-            variant="destructive"
-            onClick={() => {
-              deleteFolder(folderName)
-              navigation.goBack()
-            }}
-          >
+          <Button variant="destructive" onClick={handleDelete}>
             {t`Delete folders and items`}
           </Button>
         )

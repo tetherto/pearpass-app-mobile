@@ -8,6 +8,7 @@ import Toast from 'react-native-toast-message'
 
 import { Button, InputField } from '@tetherto/pearpass-lib-ui-kit'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
+import { useSharedFilter } from 'src/context/SharedFilterContext'
 import { Layout } from 'src/containers/Layout'
 import { styles } from './CreateFolderV2Styles'
 
@@ -16,8 +17,8 @@ export const CreateFolderV2 = ({ route }) => {
 
   const { t } = useLingui()
   const navigation = useNavigation<NavigationProp<Record<string, undefined>>>()
-
   const { renameFolder } = useFolders()
+  const { state, setState } = useSharedFilter()
 
   const handleBack = () => {
     if (navigation.canGoBack()) {
@@ -28,6 +29,18 @@ export const CreateFolderV2 = ({ route }) => {
     navigation.navigate('MainTabNavigator')
   }
 
+  const schema = Validator.object({
+    title: Validator.string().required(t`Title is required`)
+  })
+
+  const { register, handleSubmit } = useForm({
+    initialValues: {
+      title: initialValues?.title ?? ''
+    },
+    validate: (values) => schema.validate(values)
+  })
+
+  const { onChange: onChangeTitleText, ...titleField } = register('title')
   const { createFolder } = useCreateFolder({
     onCompleted: (folder) => {
       navigation.goBack()
@@ -48,27 +61,19 @@ export const CreateFolderV2 = ({ route }) => {
     }
   })
 
-  const schema = Validator.object({
-    title: Validator.string().required(t`Title is required`)
-  })
-
-  const { register, handleSubmit } = useForm({
-    initialValues: {
-      title: initialValues?.title ?? ''
-    },
-    validate: (values) => schema.validate(values)
-  })
-
   const onSubmit = (values) => {
     if (initialValues) {
       renameFolder(initialValues.title, values.title)
+
+      if (state?.folder === initialValues.title) {
+        setState((prev) => ({ ...prev, folder: values.title }))
+      }
+
       navigation.goBack()
     } else {
       createFolder(values.title)
     }
   }
-
-  const { onChange: onChangeTitleText, ...titleField } = register('title')
 
   return (
     <Layout
