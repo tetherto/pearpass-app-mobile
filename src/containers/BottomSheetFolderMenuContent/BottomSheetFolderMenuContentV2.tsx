@@ -1,72 +1,113 @@
-import type { NavigationProp } from '@react-navigation/native'
-import { useNavigation } from '@react-navigation/native'
+import { useLingui } from '@lingui/react/macro'
 import {
   Button,
-  ContextMenu,
   NavbarListItem,
+  Text,
+  rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Edit,
-  MoreVert,
+  ArrowBackOutined,
+  Close,
+  EditOutlined,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
-// const imageRegex = /\.(jpe?g|png|gif|webp|bmp|svg|heic|heif|tiff?)$/i
+import { StyleSheet, View } from 'react-native'
 
 interface BottomSheetFolderMenuContentV2Props {
   folderName: string
+  onBack: () => void
+  onClose: () => void
+  onRename?: (folderName: string) => void
+  onDelete?: (folderName: string) => void
 }
 
 export const BottomSheetFolderMenuContentV2 = ({
-  folderName
+  folderName,
+  onBack,
+  onClose,
+  onRename,
+  onDelete
 }: BottomSheetFolderMenuContentV2Props) => {
+  const { t } = useLingui()
   const { theme } = useTheme()
-  const { bottom } = useSafeAreaInsets()
-
-  const navigation =
-    useNavigation<NavigationProp<Record<string, object | undefined>>>()
-
   return (
-    <ContextMenu
-      trigger={
+    <View
+      style={[
+        styles.content,
+        {
+          backgroundColor: theme.colors.colorSurfacePrimary
+        }
+      ]}
+    >
+      <View style={styles.header}>
         <Button
           variant="tertiary"
           size="medium"
-          aria-label="More options"
-          iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
+          aria-label={t`Back`}
+          iconBefore={<ArrowBackOutined color={theme.colors.colorTextPrimary} />}
+          onClick={onBack}
         />
-      }
-    >
-      <View style={{ paddingBottom: bottom }}>
-        <NavbarListItem
-          label="Rename"
-          onClick={() =>
-            navigation.navigate('CreateFolder', {
-              initialValues: { title: folderName }
-            })
-          }
-          icon={<Edit color={theme.colors.colorTextPrimary} />}
-          showDivider
-        />
-        <NavbarListItem
-          label="Delete"
-          variant="destructive"
-          onClick={() => {
-            navigation.navigate('DeleteFolder', {
-              folderName
-            })
-          }}
-          icon={
-            <TrashOutlined
-              color={theme.colors.colorSurfaceDestructiveElevated}
-            />
-          }
-          showDivider
+
+        <View style={styles.title}>
+          <Text variant="bodyEmphasized">
+            {folderName}
+          </Text>
+        </View>
+
+        <Button
+          variant="tertiary"
+          size="medium"
+          aria-label={t`Close`}
+          iconBefore={<Close color={theme.colors.colorTextPrimary} />}
+          onClick={onClose}
         />
       </View>
-    </ContextMenu>
+
+      <View
+        style={[
+          styles.divider,
+          { backgroundColor: theme.colors.colorBorderPrimary }
+        ]}
+      />
+
+      <NavbarListItem
+        platform="mobile"
+        label={t`Rename`}
+        onClick={() => onRename?.(folderName)}
+        icon={<EditOutlined color={theme.colors.colorTextPrimary} />}
+        showDivider
+      />
+      <NavbarListItem
+        platform="mobile"
+        label={t`Delete Folder`}
+        variant="destructive"
+        onClick={() => onDelete?.(folderName)}
+        icon={
+          <TrashOutlined color={theme.colors.colorSurfaceDestructiveElevated} />
+        }
+      />
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  content: {
+    overflow: 'hidden'
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: rawTokens.spacing8,
+    paddingVertical: rawTokens.spacing8,
+    gap: rawTokens.spacing8
+  },
+  title: {
+    flex: 1,
+    alignItems: 'center'
+  },
+  divider: {
+    height: 1,
+    marginHorizontal: rawTokens.spacing16
+  }
+})

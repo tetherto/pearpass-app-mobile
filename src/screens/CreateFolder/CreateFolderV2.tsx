@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message'
 
 import { Button, InputField } from '@tetherto/pearpass-lib-ui-kit'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
-import { ScreenLayout } from 'src/containers/ScreenLayout'
+import { Layout } from 'src/containers/Layout'
 import { styles } from './CreateFolderV2Styles'
 
 export const CreateFolderV2 = ({ route }) => {
@@ -18,6 +18,15 @@ export const CreateFolderV2 = ({ route }) => {
   const navigation = useNavigation<NavigationProp<Record<string, undefined>>>()
 
   const { renameFolder } = useFolders()
+
+  const handleBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack()
+      return
+    }
+
+    navigation.navigate('MainTabNavigator')
+  }
 
   const { createFolder } = useCreateFolder({
     onCompleted: (folder) => {
@@ -62,17 +71,13 @@ export const CreateFolderV2 = ({ route }) => {
   const { onChange: onChangeTitleText, ...titleField } = register('title')
 
   return (
-    <ScreenLayout
+    <Layout
       scrollable
       contentStyle={styles.surfaceContent}
       header={
         <BackScreenHeader
           title={initialValues ? t`Rename Folder` : t`Create New Folder`}
-          onBack={() => {
-            onGoBack
-              ? navigation.goBack()
-              : navigation.navigate('MainTabNavigator')
-          }}
+          onBack={handleBack}
         />
       }
       footer={
@@ -88,10 +93,9 @@ export const CreateFolderV2 = ({ route }) => {
         label={t`Folder Name`}
         placeholder={t`Enter name`}
         testID="create-folder-title-input"
-        accessibilityLabel="create-folder-title-input"
         onChangeText={onChangeTitleText}
         {...titleField}
       />
-    </ScreenLayout>
+    </Layout>
   )
 }
