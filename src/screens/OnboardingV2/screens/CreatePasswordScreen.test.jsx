@@ -37,7 +37,15 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
       <RN.Text testID={dataTestId} style={style}>
         {children}
       </RN.Text>
-    )
+    ),
+    Link: ({ children, onClick, 'data-testid': dataTestId }) => (
+      <RN.Pressable testID={dataTestId} onPress={onClick}>
+        <RN.Text>{children}</RN.Text>
+      </RN.Pressable>
+    ),
+    useTheme: () => ({
+      theme: { colors: {} }
+    })
   }
 })
 
