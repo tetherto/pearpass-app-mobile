@@ -11,6 +11,7 @@ import {
 } from '@tetherto/pearpass-lib-constants'
 import {
   Button,
+  InputField,
   MultiSlotInput,
   Radio,
   PageHeader,
@@ -18,6 +19,7 @@ import {
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
+import { Add, Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
@@ -187,7 +189,6 @@ export const BlindPeeringSectionV2 = () => {
 
   const isManual = peerMode === PERSONAL
   const styles = getStyles(theme)
-  const peerValues = blindPeersList.map((item) => item.blindPeer ?? '')
 
   const handleChangeItem = (index, text) => {
     const updated = blindPeersList.map((item, i) =>
@@ -254,14 +255,39 @@ export const BlindPeeringSectionV2 = () => {
 
             {isManual && (
               <MultiSlotInput
-                label={t`Blind Peer`}
-                values={peerValues}
-                onAdd={addPeerRow}
-                onRemove={removeItem}
-                onChangeItem={handleChangeItem}
-                placeholder={t`Enter Peer Code`}
-                maxSlots={BLIND_PEERS_LIMIT}
-              />
+                actions={
+                  blindPeersList.length < BLIND_PEERS_LIMIT ? (
+                    <Button
+                      variant="tertiary"
+                      iconBefore={<Add />}
+                      onClick={addPeerRow}
+                    >
+                      {t`Add Peer`}
+                    </Button>
+                  ) : null
+                }
+              >
+                {blindPeersList.map((item, index) => (
+                  <InputField
+                    key={index}
+                    label={t`Blind Peer`}
+                    value={item.blindPeer ?? ''}
+                    placeholder={t`Enter Peer Code`}
+                    onChange={(e) => handleChangeItem(index, e.target.value)}
+                    rightSlot={
+                      blindPeersList.length > 1 ? (
+                        <Button
+                          variant="tertiary"
+                          size="small"
+                          iconBefore={<Close />}
+                          onClick={() => removeItem(index)}
+                          aria-label={t`Remove peer`}
+                        />
+                      ) : null
+                    }
+                  />
+                ))}
+              </MultiSlotInput>
             )}
           </View>
         )}
@@ -273,6 +299,7 @@ export const BlindPeeringSectionV2 = () => {
 const getStyles = (theme) =>
   StyleSheet.create({
     content: {
+      paddingTop: rawTokens.spacing24,
       gap: rawTokens.spacing20,
       flexGrow: 1
     },

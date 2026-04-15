@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const c = require\\('/Users/denislupookov/pearpass-app-mobile-tether/node_modules/@tetherto/pearpass-lib-ui-theme-provider/native/index.js'\\); console.log\\(Object.keys\\(c.colors\\).filter\\(k => k.startsWith\\('grey'\\)\\)\\)\")",
+      "Bash(node -e \"const { colors } = require\\('./node_modules/@tetherto/pearpass-lib-ui-theme-provider/native'\\); console.log\\('primary100:', colors.primary100?.mode1\\); console.log\\('grey500:', colors.grey500?.mode1\\)\")",
+      "Bash(grep -v \"test\\\\|index.jsx$\")",
+      "Bash(grep -v \"V2\\\\|test\\\\|index.jsx$\")",
+      "Bash(grep -l \"from '@tetherto/pearpass-lib-ui-kit'\" /Users/denislupookov/pearpass-app-mobile-tether/src/containers/BottomSheet*/index.jsx /Users/denislupookov/pearpass-app-mobile-tether/src/containers/BottomSheet*/*.jsx)",
+      "Bash(grep -v \"test\\\\|index.jsx$\\\\|StepIdentity.jsx$\")",
+      "Bash(grep -v \"^$\")",
+      "Bash(grep -E \"\\\\.\\(jsx|tsx|js|ts\\)$\")"
+    ]
+  }
+}

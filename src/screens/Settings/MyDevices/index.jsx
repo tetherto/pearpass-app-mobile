@@ -204,6 +204,7 @@ const getStyles = (theme) =>
   StyleSheet.create({
     content: {
       padding: rawTokens.spacing16,
+      paddingTop: rawTokens.spacing24,
       gap: rawTokens.spacing24,
       flexGrow: 1
     },

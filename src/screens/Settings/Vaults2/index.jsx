@@ -9,6 +9,7 @@ import {
   useTheme,
   Text
 } from '@tetherto/pearpass-lib-ui-kit'
+import { Add } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import { Layout } from 'src/containers/Layout'
@@ -18,7 +19,7 @@ import { VaultRow } from './VaultRow'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { VAULT_ACTION } from '../../../constants/vaultActions'
 import { BottomSheetAddDeviceContent } from '../../../containers/BottomSheetAddDeviceContent'
-import { ModifyVaultModalContent } from '../../../containers/Modal/ModifyVaultModalContent'
+import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
 
@@ -54,7 +55,7 @@ export const VaultsV2 = () => {
   const buildVaultActions = (vault) => ({
     onRename: () =>
       openModal(
-        <ModifyVaultModalContent
+        <ModifyVaultModalContentV2
           vaultId={vault.id}
           vaultName={vault.name}
           action={VAULT_ACTION.NAME}
@@ -67,7 +68,7 @@ export const VaultsV2 = () => {
       }),
     onSetPassword: () =>
       openModal(
-        <ModifyVaultModalContent
+        <ModifyVaultModalContentV2
           vaultId={vault.id}
           vaultName={vault.name}
           action={VAULT_ACTION.PASSWORD}
@@ -102,8 +103,13 @@ export const VaultsV2 = () => {
       }
       contentStyle={styles.content}
       footer={
-        <Button variant="primary" fullWidth onClick={handleCreateNewVault}>
-          {t`+ Create New Vault`}
+        <Button
+          variant="primary"
+          iconBefore={<Add />}
+          fullWidth
+          onClick={handleCreateNewVault}
+        >
+          {t`Create New Vault`}
         </Button>
       }
     >
@@ -152,6 +158,7 @@ export const VaultsV2 = () => {
 const styles = StyleSheet.create({
   content: {
     padding: rawTokens.spacing16,
+    paddingTop: rawTokens.spacing24,
     gap: rawTokens.spacing20,
     flexGrow: 1
   },

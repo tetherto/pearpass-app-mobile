@@ -11,16 +11,23 @@ import {
 import { Add, LockFilled, MoreVert } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { VAULT_ACTION } from 'src/constants/vaultActions'
 
 import { createStyles } from './styles'
 import { useGlobalLoading } from '../../context/LoadingContext'
 import { useModal } from '../../context/ModalContext'
+import { isModifyVaultModalV2Enabled } from '../../utils/modifyVaultModalV2Flag'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { BottomSheetVaultAction } from '../BottomSheetVaultAction'
 import { Layout } from '../Layout'
+import { ModifyVaultModalContentV2 } from '../Modal/ModifyVaultModalContentV2'
 import { VaultPasswordFormModalContent } from '../Modal/VaultPasswordFormModalContent'
 
-export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
+export const BottomSheetVaultSelectorContent = ({
+  onCreateVault,
+  onRequestClose,
+  onNavigate
+}) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const styles = createStyles()
@@ -38,9 +45,14 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
     refetch: refetchVault
   } = useVault()
 
+  const closeSelector = () => {
+    onRequestClose?.()
+    collapse()
+  }
+
   const handleVaultPress = async (vault) => {
     if (vault.id === activeVault?.id) {
-      collapse()
+      closeSelector()
       return
     }
 
@@ -58,7 +70,7 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
               try {
                 await refetchVault(vault.id, { password })
                 closeModal()
-                collapse()
+                closeSelector()
               } finally {
                 setIsLoading(false)
               }
@@ -67,24 +79,72 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
         )
       } else {
         await refetchVault(vault.id)
-        collapse()
+        closeSelector()
       }
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleCreateVault = () => {
-    collapse()
-    onCreateVault?.()
+  const openModifyVaultModal = (vault, action) => {
+    openModal(
+      <ModifyVaultModalContentV2
+        vaultId={vault.id}
+        vaultName={vault.name}
+        action={action}
+      />
+    )
   }
+
+  const buildVaultActions = (vault) => ({
+    onRename: () => {
+      if (isModifyVaultModalV2Enabled()) {
+        openModifyVaultModal(vault, VAULT_ACTION.NAME)
+        return
+      }
+
+      onNavigate?.('VaultRenameScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
+    },
+    onPassword: () => {
+      if (isModifyVaultModalV2Enabled()) {
+        openModifyVaultModal(vault, VAULT_ACTION.PASSWORD)
+        return
+      }
+
+      onNavigate?.('VaultPasswordScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
+    },
+    onMembers: () => {
+      onNavigate?.('VaultSettingsScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
+    },
+    onShare: () => {
+      onNavigate?.('VaultShareScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
+    },
+    onDelete: () => {
+      onNavigate?.('VaultDeleteScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
+    }
+  })
 
   return (
     <Layout
       mode="sheet"
       scrollable
       contentStyle={{ padding: 0, paddingBottom: bottom }}
-      header={<SheetHeader title={t`Vaults`} onClose={collapse} />}
+      header={<SheetHeader title={t`Vaults`} onClose={closeSelector} />}
     >
       {vaultsData?.map((vault) => (
         <ListItem
@@ -109,8 +169,9 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
               }
             >
               <BottomSheetVaultAction
-                vaultId={vault.id}
                 vaultName={vault.name}
+                showBackButton
+                {...buildVaultActions(vault)}
               />
             </ContextMenu>
           }
@@ -123,7 +184,10 @@ export const BottomSheetVaultSelectorContent = ({ onCreateVault }) => {
         title={t`Create New Vault`}
         iconSize={16}
         style={styles.listItem}
-        onClick={handleCreateVault}
+        onClick={() => {
+          closeSelector()
+          onCreateVault?.()
+        }}
       />
     </Layout>
   )

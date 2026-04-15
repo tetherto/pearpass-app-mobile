@@ -94,7 +94,7 @@ export const AboutV2 = () => {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    padding: rawTokens.spacing16,
+    paddingTop: rawTokens.spacing24,
     gap: rawTokens.spacing20,
     flexGrow: 1
   },

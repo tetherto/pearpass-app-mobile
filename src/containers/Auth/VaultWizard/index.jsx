@@ -4,17 +4,10 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useCreateVault, useVault } from '@tetherto/pearpass-lib-vault'
-import {
-  KeyboardAvoidingView,
-  Platform,
-  View,
-  StyleSheet,
-  ActivityIndicator
-} from 'react-native'
+import { Platform, View, StyleSheet, ActivityIndicator } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { StepIdentity } from './StepIdentity'
-import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { TOAST_CONFIG } from '../../../constants/toast'
 import { logger } from '../../../utils/logger'
 
@@ -33,9 +26,7 @@ export const VaultWizard = () => {
   const { addDevice } = useVault()
 
   const handleBack = () => {
-    navigation.navigate('Welcome', {
-      state: NAVIGATION_ROUTES.SELECT_OR_LOAD
-    })
+    navigation.goBack()
   }
 
   const handleCreate = async (data) => {
@@ -67,30 +58,23 @@ export const VaultWizard = () => {
     }
   }
 
-  return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={styles.container}>
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary400.mode1} />
-          </View>
-        ) : (
-          <StepIdentity
-            initialData={formData}
-            onSubmit={handleCreate}
-            onBack={handleBack}
-          />
-        )}
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary400.mode1} />
       </View>
-    </KeyboardAvoidingView>
+    )
+  }
+
+  return (
+    <StepIdentity
+      initialData={formData}
+      onSubmit={handleCreate}
+      onBack={handleBack}
+    />
   )
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  container: { flex: 1, backgroundColor: 'transparent' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' }
 })

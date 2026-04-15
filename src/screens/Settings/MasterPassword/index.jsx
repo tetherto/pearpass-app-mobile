@@ -208,6 +208,7 @@ export const MasterPassword = () => {
 
 const styles = StyleSheet.create({
   scrollContent: {
+    paddingTop: rawTokens.spacing24,
     gap: rawTokens.spacing20,
     flexGrow: 1
   },

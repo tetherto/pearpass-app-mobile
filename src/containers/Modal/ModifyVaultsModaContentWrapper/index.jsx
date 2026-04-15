@@ -1,5 +1,4 @@
 import { useLingui } from '@lingui/react/macro'
-import { Button } from '@tetherto/pearpass-lib-ui-kit'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator } from 'react-native'
 
@@ -10,6 +9,7 @@ import {
   ModalActions,
   Title
 } from './styles'
+import { ButtonPrimary, ButtonSecondary } from '../../../libComponents'
 
 /**
  * @param {{
@@ -42,23 +42,13 @@ export const ModifyVaultsModaContentWrapper = ({
           <ActivityIndicator size="small" color={colors.primary400.mode1} />
         ) : (
           <>
-            <Button
-              variant="primary"
-              size="medium"
-              fullWidth
-              onClick={primaryAction}
-            >
+            <ButtonPrimary onPress={primaryAction} size="sm">
               {t`Save`}
-            </Button>
+            </ButtonPrimary>
 
-            <Button
-              variant="secondary"
-              size="medium"
-              fullWidth
-              onClick={secondaryAction}
-            >
+            <ButtonSecondary onPress={secondaryAction} size="sm">
               {t`Cancel`}
-            </Button>
+            </ButtonSecondary>
           </>
         )}
       </ModalActions>

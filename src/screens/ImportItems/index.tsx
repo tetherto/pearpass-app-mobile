@@ -455,6 +455,7 @@ export const ImportItems = () => {
       header={
         <BackScreenHeader title={t`Settings`} onBack={navigation.goBack} />
       }
+      contentStyle={styles.container}
       footer={renderFooter()}
     >
       {state === 'default' && (
