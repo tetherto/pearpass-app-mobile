@@ -29,6 +29,7 @@ import {
 import { RecordDetails } from '../../screens/RecordDetails'
 import { AboutV2 } from '../../screens/Settings/About/AboutV2'
 import { AppearanceV2 } from '../../screens/Settings/Appearance/AppearanceV2'
+import { AppPreferences } from '../../screens/Settings/AppPreferences'
 import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
 import { MyDevices } from '../../screens/Settings/MyDevices'
@@ -120,6 +121,7 @@ export const Navigation = ({ initialRouteName }) => (
       name="CreateFolder"
       component={isV2() ? CreateFolderV2 : CreateFolder}
     />
+    <Stack.Screen name="AppPreferences" component={AppPreferences} />
     <Stack.Screen name="MasterPassword" component={MasterPassword} />
     <Stack.Screen name="BlindPeering" component={BlindPeeringSectionV2} />
     <Stack.Screen name="ImportVault" component={ImportVault} />

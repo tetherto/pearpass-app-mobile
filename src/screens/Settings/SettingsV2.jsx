@@ -51,7 +51,7 @@ export const SettingsV2 = () => {
           {
             key: 'app-preferences',
             label: t`App Preferences`,
-            screen: 'Security',
+            screen: 'AppPreferences',
             icon: SettingsApplicationsFilled
           },
           {
