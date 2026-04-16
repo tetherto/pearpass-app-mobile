@@ -8,7 +8,6 @@ import {
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
-import { CameraView } from 'expo-camera'
 import * as Clipboard from 'expo-clipboard'
 import {
   ActivityIndicator,
@@ -19,6 +18,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
+import { Camera } from 'react-native-vision-camera'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
@@ -43,10 +43,10 @@ export const PairAnotherDeviceContent = ({
 
   const {
     hasPermission,
-    isScanning,
-    cameraRef,
+    codeScanner,
+    device,
+    frameProcessor,
     pauseScanning,
-    handleBarCodeScanned,
     requestPermission
   } = useQRScanner({
     onScanned: (data) => {
@@ -103,21 +103,17 @@ export const PairAnotherDeviceContent = ({
                   {t`Grant Permission`}
                 </ButtonPrimary>
               </View>
-            ) : (
-              <CameraView
-                ref={cameraRef}
-                onBarcodeScanned={
-                  isScanning && !isLoading ? handleBarCodeScanned : undefined
-                }
-                zoom={0}
+            ) : device ? (
+              <Camera
+                device={device}
+                isActive={!isLoading}
                 style={styles.camera}
-                barcodeScannerSettings={{
-                  barcodeTypes: ['qr']
-                }}
+                codeScanner={codeScanner}
+                frameProcessor={frameProcessor}
               >
                 <View style={styles.cameraSpot} />
-              </CameraView>
-            )}
+              </Camera>
+            ) : null}
           </View>
         </View>
 

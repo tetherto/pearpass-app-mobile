@@ -8,6 +8,7 @@
     "start": "expo start --dev-client",
     "build": "npm run bundle-bare && npm run lingui:extract && npm run lingui:compile",
     "android": "expo run:android",
+    "android:fdroid": "PEARPASS_DISTRIBUTION=fdroid expo run:android --variant fdroidDebug",
     "ios": "expo run:ios",
     "lint:fix": "eslint --fix ./src",
     "lint": "eslint ./src",
