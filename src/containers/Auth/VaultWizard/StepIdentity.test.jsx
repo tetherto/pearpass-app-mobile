@@ -30,14 +30,20 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
         <RN.Text>{children}</RN.Text>
       </RN.Pressable>
     ),
-    InputField: ({ label, value, onChangeText, testID }) => (
+    InputField: ({ label, value, onChange, testID }) => (
       <RN.View>
         <RN.Text>{label}</RN.Text>
         <RN.TextInput
           testID={testID}
           value={value}
-          onChangeText={onChangeText}
+          onChangeText={(text) => onChange?.({ target: { value: text } })}
         />
+      </RN.View>
+    ),
+    PageHeader: ({ title, subtitle, subtitleTestID }) => (
+      <RN.View>
+        <RN.Text>{title}</RN.Text>
+        <RN.Text testID={subtitleTestID}>{subtitle}</RN.Text>
       </RN.View>
     ),
     ToggleSwitch: ({ label, description, checked, onChange }) => (
@@ -63,7 +69,12 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
         />
         {errorMessage ? <RN.Text>{errorMessage}</RN.Text> : null}
       </RN.View>
-    )
+    ),
+    rawTokens: {
+      spacing16: 16,
+      spacing20: 20,
+      spacing24: 24
+    }
   }
 })
 
@@ -71,20 +82,29 @@ jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
   KeyboardArrowRightFilled: () => null
 }))
 
-jest.mock('../shared/AuthFlowFormLayout', () => {
-  const RN = require('react-native')
-
-  return {
-    AuthFlowFormLayout: ({ title, subtitle, children, footer }) => (
+jest.mock('../../Layout', () => ({
+  Layout: ({ header, children, footer }) => {
+    const RN = require('react-native')
+    return (
       <RN.View>
-        <RN.Text>{title}</RN.Text>
-        <RN.Text>{subtitle}</RN.Text>
+        {header}
         {children}
         {footer}
       </RN.View>
     )
   }
-})
+}))
+
+jest.mock('../../ScreenHeader/BackScreenHeader', () => ({
+  BackScreenHeader: ({ title, onBack }) => {
+    const RN = require('react-native')
+    return (
+      <RN.Pressable testID="back-screen-header" onPress={onBack}>
+        <RN.Text>{title}</RN.Text>
+      </RN.Pressable>
+    )
+  }
+}))
 
 const renderWithProviders = (ui) =>
   render(<I18nProvider i18n={i18n}>{ui}</I18nProvider>)
