@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -22,7 +22,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { createStyles } from './styles'
 import { useSharedFilter } from '../../context/SharedFilterContext'
-import { useVaultSelector } from '../../context/VaultSelectorContext'
+import { useRegisterVaultSelectorOpener } from '../../context/VaultSelectorContext'
 import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
 import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
@@ -83,18 +83,10 @@ export const ContentHeader = ({
   const { state } = useSharedFilter()
   const styles = createStyles(theme.colors)
   const menuItems = useRecordMenuItems({ exclude: ['password'] })
-  const { isOpen: isVaultSelectorRequested, close: closeVaultSelectorRequest } =
-    useVaultSelector()
   const [isVaultSelectorOpen, setIsVaultSelectorOpen] = useState(false)
-  const prevRequested = useRef(false)
 
-  useEffect(() => {
-    if (isVaultSelectorRequested && !prevRequested.current) {
-      setIsVaultSelectorOpen(true)
-      closeVaultSelectorRequest()
-    }
-    prevRequested.current = isVaultSelectorRequested
-  }, [isVaultSelectorRequested, closeVaultSelectorRequest])
+  const openVaultSelector = useCallback(() => setIsVaultSelectorOpen(true), [])
+  useRegisterVaultSelectorOpener(openVaultSelector)
 
   const bgColor = theme.colors.colorSurfacePrimary
   const vaultName = vaultData?.name || t`Personal Vault`

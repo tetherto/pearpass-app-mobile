@@ -20,9 +20,6 @@ export const useCopyToClipboard = () => {
   const [isCopyToClipboardEnabled, setIsCopyToClipboardEnabled] =
     useState(false)
   const [isCopied, setIsCopied] = useState(false)
-  const [clipboardTimeout, setClipboardTimeout] = useState(
-    CLIPBOARD_CLEAR_TIMEOUT
-  )
   const timeoutRef = useRef(null)
   const clearClipboardTimeoutRef = useRef(null)
   const lastCopiedTextRef = useRef(null)
@@ -30,7 +27,7 @@ export const useCopyToClipboard = () => {
   const { hapticSuccess } = useHapticFeedback()
 
   useEffect(() => {
-    const loadSettings = async () => {
+    const loadOptIn = async () => {
       const optIn = await SecureStore.getItemAsync(
         SECURE_STORAGE_KEYS.COPY_TO_CLIPBOARD,
         {
@@ -38,18 +35,9 @@ export const useCopyToClipboard = () => {
         }
       )
       setIsCopyToClipboardEnabled(optIn !== 'false')
-
-      const storedTimeout = await SecureStore.getItemAsync(
-        SECURE_STORAGE_KEYS.CLIPBOARD_CLEAR_TIMEOUT
-      )
-      if (storedTimeout === 'null') {
-        setClipboardTimeout(null)
-      } else if (storedTimeout !== null) {
-        setClipboardTimeout(Number(storedTimeout))
-      }
     }
 
-    loadSettings()
+    loadOptIn()
 
     return () => {
       if (timeoutRef.current) {
@@ -89,6 +77,14 @@ export const useCopyToClipboard = () => {
         if (globalClearTimer) {
           clearTimeout(globalClearTimer)
         }
+
+        const storedTimeout = await SecureStore.getItemAsync(
+          SECURE_STORAGE_KEYS.CLIPBOARD_CLEAR_TIMEOUT
+        )
+        let clipboardTimeout = CLIPBOARD_CLEAR_TIMEOUT
+        if (storedTimeout === 'null') clipboardTimeout = null
+        else if (storedTimeout !== null)
+          clipboardTimeout = Number(storedTimeout)
 
         if (clipboardTimeout === null) {
           await Clipboard.setStringAsync(text)
@@ -144,7 +140,7 @@ export const useCopyToClipboard = () => {
         return false
       }
     },
-    [isCopyToClipboardEnabled, clipboardTimeout, t, hapticSuccess]
+    [isCopyToClipboardEnabled, t, hapticSuccess]
   )
 
   return { copyToClipboard, isCopied, isCopyToClipboardEnabled }

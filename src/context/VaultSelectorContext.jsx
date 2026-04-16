@@ -1,22 +1,44 @@
-import { createContext, useCallback, useContext, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef
+} from 'react'
 
 const VaultSelectorContext = createContext({
-  isOpen: false,
-  open: () => {},
-  close: () => {}
+  registerOpener: () => () => {},
+  openVaultSelector: () => {}
 })
 
 export const VaultSelectorProvider = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const openerRef = useRef(null)
 
-  const open = useCallback(() => setIsOpen(true), [])
-  const close = useCallback(() => setIsOpen(false), [])
+  const registerOpener = useCallback((fn) => {
+    openerRef.current = fn
+    return () => {
+      if (openerRef.current === fn) {
+        openerRef.current = null
+      }
+    }
+  }, [])
+
+  const openVaultSelector = useCallback(() => {
+    openerRef.current?.()
+  }, [])
 
   return (
-    <VaultSelectorContext.Provider value={{ isOpen, open, close }}>
+    <VaultSelectorContext.Provider
+      value={{ registerOpener, openVaultSelector }}
+    >
       {children}
     </VaultSelectorContext.Provider>
   )
 }
 
 export const useVaultSelector = () => useContext(VaultSelectorContext)
+
+export const useRegisterVaultSelectorOpener = (open) => {
+  const { registerOpener } = useVaultSelector()
+  useEffect(() => registerOpener(open), [registerOpener, open])
+}

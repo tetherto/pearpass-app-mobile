@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createBottomTabNavigator, type BottomTabBarButtonProps } from '@react-navigation/bottom-tabs'
 import { useLingui } from '@lingui/react/macro'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { AlertMessage, useTheme, rawTokens, Text } from '@tetherto/pearpass-lib-ui-kit'
+import { useTheme, rawTokens, Text } from '@tetherto/pearpass-lib-ui-kit'
 import {
   LockFilled,
   LockOutlined,
@@ -13,48 +13,46 @@ import {
   Settings as SettingsIcon,
   SettingsOutlined,
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { type GestureResponderEvent, Pressable, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import Toast from 'react-native-toast-message'
 
 import { DrawerNavigator } from '../DrawerNavigator'
 import { SettingsNavigator } from '../SettingsNavigator'
 import { Authenticator } from '../../screens/Authenticator'
 import { useVaultSelector } from '../../context/VaultSelectorContext'
+import { showInfoAlertToast } from '../../utils/showInfoAlertToast'
 
 const Tab = createBottomTabNavigator()
 
-const VaultTabButton = ({ onPress, onLongPress: _onLongPress, accessibilityState, ...rest }: Record<string, unknown>) => {
+// Drops onLongPress from props so the spread below doesn't reinstate the
+// Tab Navigator's default long-press handler.
+const VaultTabButton = ({
+  onPress,
+  onLongPress: _onLongPress,
+  accessibilityState,
+  ...rest
+}: BottomTabBarButtonProps) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const insets = useSafeAreaInsets()
-  const { open: openVaultSelector } = useVaultSelector()
-  const isFocused = (accessibilityState as { selected?: boolean })?.selected
+  const { openVaultSelector } = useVaultSelector()
+  const isFocused = accessibilityState?.selected
   const toastOffset = 66 + insets.bottom + 8
 
-  const handlePress = useCallback(() => {
-    if (isFocused) {
-      Toast.show({
-        type: 'alertToast',
-        props: {
-          render: () => (
-            <AlertMessage
-              variant="info"
-              size="small"
-              backgroundColor={theme.colors.backgroundSnackbar}
-              color={theme.colors.colorOnPrimary}
-              title=""
-              description={t`Press and hold to open vault manager`}
-            />
-          )
-        },
-        position: 'bottom',
-        bottomOffset: toastOffset
-      })
-      return
-    }
-    (onPress as () => void)?.()
-  }, [isFocused, onPress, t, toastOffset])
+  const handlePress = useCallback(
+    (event: GestureResponderEvent) => {
+      if (isFocused) {
+        showInfoAlertToast({
+          theme,
+          description: t`Press and hold to open vault manager`,
+          bottomOffset: toastOffset
+        })
+        return
+      }
+      onPress?.(event)
+    },
+    [isFocused, onPress, t, theme, toastOffset]
+  )
 
   const handleLongPress = useCallback(() => {
     if (isFocused) {
@@ -183,4 +181,3 @@ const styles = StyleSheet.create({
     gap: rawTokens.spacing2
   }
 })
-
