@@ -306,7 +306,7 @@ export const AppPreferences = () => {
               description={t`Automatically fill usernames, passwords, and codes when you sign in`}
             />
           </View>
-          <View style={styles.cardRow}>
+          <View style={UNSUPPORTED ? styles.cardRow : styles.cardRowLast}>
             <View style={styles.dropdownColumn}>
               <View style={styles.rowTextContent}>
                 <Text variant="labelEmphasized">{t`Clear Clipboard`}</Text>
@@ -327,14 +327,16 @@ export const AppPreferences = () => {
               </Pressable>
             </View>
           </View>
-          <View style={styles.cardRowLast}>
-            <ToggleSwitch
-              checked={isNonSecureAllowed}
-              onChange={handleNonSecureToggle}
-              label={t`Allow non-secure websites`}
-              description={t`Allow autofill and access on HTTP websites. When disabled, only secure HTTPS sites are supported`}
-            />
-          </View>
+          {UNSUPPORTED && (
+            <View style={styles.cardRowLast}>
+              <ToggleSwitch
+                checked={isNonSecureAllowed}
+                onChange={handleNonSecureToggle}
+                label={t`Allow non-secure websites`}
+                description={t`Allow autofill and access on HTTP websites. When disabled, only secure HTTPS sites are supported`}
+              />
+            </View>
+          )}
         </View>
       </View>
 
