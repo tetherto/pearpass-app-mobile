@@ -94,6 +94,7 @@ describe('useQRScanner', () => {
 
   it('should deny camera permission and show alert', async () => {
     Camera.getCameraPermissionStatus.mockReturnValue('denied')
+    Camera.requestCameraPermission.mockResolvedValue('denied')
 
     const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
       wrapper: ({ children }) => (
@@ -112,6 +113,26 @@ describe('useQRScanner', () => {
       expect.stringContaining("You've previously denied"),
       expect.any(Array)
     )
+  })
+
+  it('should still request permission when current status is denied', async () => {
+    Camera.getCameraPermissionStatus.mockReturnValue('denied')
+    Camera.requestCameraPermission.mockResolvedValue('granted')
+
+    const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    await act(async () => {
+      const permission = await result.current.requestPermission()
+      expect(permission).toBe(true)
+    })
+
+    expect(Camera.requestCameraPermission).toHaveBeenCalledTimes(1)
+    expect(Alert.alert).not.toHaveBeenCalled()
+    expect(result.current.hasPermission).toBe(true)
   })
 
   it('should call onScanned when a valid QR code is scanned', () => {

@@ -115,11 +115,6 @@ export const useQRScanner = ({
         return true
       }
 
-      if (permissionStatus === 'denied') {
-        showPermissionAlert(t`Camera`)
-        return false
-      }
-
       const result = await Camera.requestCameraPermission()
       const granted = result === 'granted'
 
@@ -128,7 +123,15 @@ export const useQRScanner = ({
         return true
       }
 
-      showPermissionAlert(t`Camera`)
+      if (
+        permissionStatus === 'denied' ||
+        permissionStatus === 'restricted' ||
+        result === 'denied' ||
+        result === 'restricted'
+      ) {
+        showPermissionAlert(t`Camera`)
+      }
+
       setHasPermission(false)
       return false
     } catch (error) {
