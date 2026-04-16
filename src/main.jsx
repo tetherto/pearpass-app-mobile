@@ -29,6 +29,7 @@ import { HapticsProvider } from './context/HapticsContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
 import { SharedFilterProvider } from './context/SharedFilterContext'
+import { VaultSelectorProvider } from './context/VaultSelectorContext'
 import { messages } from './locales/en/messages'
 import { logger } from './utils/logger'
 import * as SplashScreen from './utils/SplashScreen'
@@ -97,21 +98,23 @@ export const Main = () => {
                 <SafeAreaProvider>
                   <VaultProvider>
                     <SharedFilterProvider>
-                      <NavigationContainer>
-                        <AutoLockProvider>
-                          <AutoLockTouchCapture>
-                            <ModalProvider>
-                              <BottomSheetProvider>
-                                <BottomSheetV2Provider>
-                                  <BottomSheetModalProvider>
-                                    <App />
-                                  </BottomSheetModalProvider>
-                                </BottomSheetV2Provider>
-                              </BottomSheetProvider>
-                            </ModalProvider>
-                          </AutoLockTouchCapture>
-                        </AutoLockProvider>
-                      </NavigationContainer>
+                      <VaultSelectorProvider>
+                        <NavigationContainer>
+                          <AutoLockProvider>
+                            <AutoLockTouchCapture>
+                              <ModalProvider>
+                                <BottomSheetProvider>
+                                  <BottomSheetV2Provider>
+                                    <BottomSheetModalProvider>
+                                      <App />
+                                    </BottomSheetModalProvider>
+                                  </BottomSheetV2Provider>
+                                </BottomSheetProvider>
+                              </ModalProvider>
+                            </AutoLockTouchCapture>
+                          </AutoLockProvider>
+                        </NavigationContainer>
+                      </VaultSelectorProvider>
                     </SharedFilterProvider>
                   </VaultProvider>
                 </SafeAreaProvider>
