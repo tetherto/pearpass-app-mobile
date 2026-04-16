@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")",
+      "Bash(ls -la /Users/denislupookov/pearpass-app-mobile-tether/src/*.tsx)",
+      "Bash(file /Users/denislupookov/pearpass-app-mobile-tether/assets/fonts/*.otf)"
+    ]
+  }
+}
