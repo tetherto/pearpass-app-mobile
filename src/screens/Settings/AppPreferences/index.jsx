@@ -7,7 +7,9 @@ import {
   UNSUPPORTED
 } from '@tetherto/pearpass-lib-constants'
 import {
+  AlertMessage,
   Button,
+  Checkbox,
   ContextMenu,
   NavbarListItem,
   PageHeader,
@@ -17,7 +19,6 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Check,
   ExpandMore,
   InfoOutlined,
   Key,
@@ -25,10 +26,12 @@ import {
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import * as SecureStore from 'expo-secure-store'
-import { AppState, Pressable, StyleSheet, View } from 'react-native'
+import { AppState, Platform, Pressable, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import Toast from 'react-native-toast-message'
 
 import { SECURE_STORAGE_KEYS } from '../../../constants/secureStorageKeys'
+import { TOAST_CONFIG } from '../../../constants/toast'
 import { SheetHeader } from '../../../containers/BottomSheet/SheetHeader'
 import { Layout } from '../../../containers/Layout'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
@@ -131,8 +134,38 @@ export const AppPreferences = () => {
   const handleAutofillToggle = useCallback(async () => {
     if (isAutofillEnabled) {
       await openAutofillSettings()
+      return
+    }
+
+    const isIOS18OrNewer =
+      Platform.OS === 'ios' &&
+      Number(String(Platform.Version).split('.')[0]) >= 18
+
+    if (isIOS18OrNewer) {
+      const enabled = await requestToEnableAutofill()
+      if (!enabled) {
+        Toast.show({
+          type: 'alertToast',
+          props: {
+            render: () => (
+              <AlertMessage
+                variant="info"
+                size="small"
+                backgroundColor={theme.colors.backgroundSnackbar}
+                color={theme.colors.colorOnPrimary}
+                title=""
+                description={t`Autofill couldn't be enabled`}
+                actionText={t`Open Settings`}
+                onAction={() => openAutofillSettings()}
+              />
+            )
+          },
+          position: 'bottom',
+          bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+        })
+      }
     } else {
-      await requestToEnableAutofill()
+      await openAutofillSettings()
     }
   }, [isAutofillEnabled])
 
@@ -354,56 +387,23 @@ export const AppPreferences = () => {
         </View>
         <View style={styles.card}>
           <View style={styles.cardRow}>
-            <View style={styles.checkboxRowInner}>
-              <View
-                style={[
-                  styles.checkbox,
-                  styles.checkboxChecked,
-                  styles.checkboxDisabled
-                ]}
-              >
-                <Check
-                  width={12}
-                  height={12}
-                  color={theme.colors.colorSurfacePrimary}
-                />
-              </View>
-              <View style={styles.rowTextContent}>
-                <Text variant="labelEmphasized">{t`Master Password`}</Text>
-                <Text variant="caption" color={theme.colors.colorTextSecondary}>
-                  {t`Use your master password to unlock PearPass and decrypt your vault`}
-                </Text>
-              </View>
-            </View>
+            <Checkbox
+              checked
+              disabled
+              label={t`Master Password`}
+              description={t`Use your master password to unlock PearPass and decrypt your vault`}
+            />
           </View>
 
           {UNSUPPORTED && (
             <View style={styles.cardRow}>
               <View style={styles.checkboxRowInner}>
-                <Pressable
-                  style={[
-                    styles.checkbox,
-                    isPinEnabled && styles.checkboxChecked
-                  ]}
-                  onPress={handlePinToggle}
-                >
-                  {isPinEnabled && (
-                    <Check
-                      width={12}
-                      height={12}
-                      color={theme.colors.colorSurfacePrimary}
-                    />
-                  )}
-                </Pressable>
-                <View style={styles.rowTextContent}>
-                  <Text variant="labelEmphasized">{t`Pin Code`}</Text>
-                  <Text
-                    variant="caption"
-                    color={theme.colors.colorTextSecondary}
-                  >
-                    {t`Use a short PIN to quickly unlock PearPass on this device`}
-                  </Text>
-                </View>
+                <Checkbox
+                  checked={isPinEnabled}
+                  onChange={handlePinToggle}
+                  label={t`Pin Code`}
+                  description={t`Use a short PIN to quickly unlock PearPass on this device`}
+                />
                 {isPinEnabled && (
                   <ContextMenu
                     trigger={
@@ -441,30 +441,13 @@ export const AppPreferences = () => {
           )}
 
           <View style={styles.cardRowLast}>
-            <View style={styles.checkboxRowInner}>
-              <Pressable
-                style={[
-                  styles.checkbox,
-                  isBiometricsEnabled && styles.checkboxChecked
-                ]}
-                onPress={handleBiometricsToggle}
-                disabled={!isBiometricsSupported}
-              >
-                {isBiometricsEnabled && (
-                  <Check
-                    width={12}
-                    height={12}
-                    color={theme.colors.colorSurfacePrimary}
-                  />
-                )}
-              </Pressable>
-              <View style={styles.rowTextContent}>
-                <Text variant="labelEmphasized">{t`Biometrics`}</Text>
-                <Text variant="caption" color={theme.colors.colorTextSecondary}>
-                  {t`Use your device's built-in authentications (Face ID, fingerprint, or system PIN)`}
-                </Text>
-              </View>
-            </View>
+            <Checkbox
+              checked={isBiometricsEnabled}
+              onChange={handleBiometricsToggle}
+              disabled={!isBiometricsSupported}
+              label={t`Biometrics`}
+              description={t`Use your device's built-in authentications (Face ID, fingerprint, or system PIN)`}
+            />
           </View>
         </View>
       </View>
@@ -562,21 +545,5 @@ const getStyles = (theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: rawTokens.spacing12
-    },
-    checkbox: {
-      width: 16,
-      height: 16,
-      borderRadius: 4,
-      borderWidth: 1,
-      borderColor: theme.colors.colorBorderSecondary,
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    checkboxChecked: {
-      backgroundColor: theme.colors.colorPrimary,
-      borderColor: theme.colors.colorPrimary
-    },
-    checkboxDisabled: {
-      opacity: 0.25
     }
   })
