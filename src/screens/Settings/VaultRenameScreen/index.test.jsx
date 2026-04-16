@@ -22,70 +22,70 @@ jest.mock('@tetherto/pearpass-lib-vault', () => ({
   useVault: () => mockUseVault()
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  BackIcon: (props) => {
-    const { View } = require('react-native')
-    return <View {...props} testID="back-icon" />
-  },
-  EyeClosedIcon: (props) => {
-    const { View } = require('react-native')
-    return <View {...props} testID="eye-closed-icon" />
-  },
-  EyeIcon: (props) => {
-    const { View } = require('react-native')
-    return <View {...props} testID="eye-icon" />
-  }
-}))
-
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
-  colors: {
-    white: { mode1: '#FFFFFF' }
-  }
-}))
-
-jest.mock('react-native-safe-area-context', () => {
-  const { View } = require('react-native')
+jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+  const RN = require('react-native')
   return {
-    SafeAreaView: ({ children, ...props }) => <View {...props}>{children}</View>
+    Button: ({ children, disabled, onClick, testID }) => (
+      <RN.TouchableOpacity
+        testID={testID}
+        disabled={disabled}
+        onPress={disabled ? undefined : onClick}
+      >
+        <RN.Text>{children}</RN.Text>
+      </RN.TouchableOpacity>
+    ),
+    InputField: ({ label, value, onChange, testID }) => (
+      <RN.View>
+        <RN.Text>{label}</RN.Text>
+        <RN.TextInput
+          testID={testID}
+          value={value}
+          onChangeText={(text) => onChange?.({ target: { value: text } })}
+        />
+      </RN.View>
+    ),
+    PasswordField: ({ label, value, onChange, testID }) => (
+      <RN.View>
+        <RN.Text>{label}</RN.Text>
+        <RN.TextInput
+          testID={testID}
+          value={value}
+          onChangeText={(text) => onChange?.({ target: { value: text } })}
+        />
+      </RN.View>
+    ),
+    rawTokens: { spacing16: 16 }
   }
 })
 
-jest.mock('react-native-svg', () => {
-  const { View } = require('react-native')
-
-  const MockComponent = ({ children, ...props }) => (
-    <View {...props}>{children}</View>
-  )
-
-  return {
-    __esModule: true,
-    default: MockComponent,
-    Defs: MockComponent,
-    LinearGradient: MockComponent,
-    Rect: MockComponent,
-    Stop: MockComponent
+jest.mock('../../../containers/Layout', () => ({
+  Layout: ({ header, children, footer }) => {
+    const { View } = require('react-native')
+    return (
+      <View>
+        {header}
+        {children}
+        {footer}
+      </View>
+    )
   }
-})
+}))
+
+jest.mock('../../../containers/ScreenHeader/BackScreenHeader', () => ({
+  BackScreenHeader: ({ title, onBack }) => {
+    const { Text, TouchableOpacity } = require('react-native')
+    return (
+      <TouchableOpacity testID="rename-vault-back-button" onPress={onBack}>
+        <Text>{title}</Text>
+      </TouchableOpacity>
+    )
+  }
+}))
 
 jest.mock('react-native-toast-message', () => ({
   __esModule: true,
   default: {
     show: jest.fn()
-  }
-}))
-
-jest.mock('../../../libComponents', () => ({
-  ButtonPrimary: ({ children, disabled, onPress, testID }) => {
-    const { Text, TouchableOpacity } = require('react-native')
-    return (
-      <TouchableOpacity
-        testID={testID}
-        disabled={disabled}
-        onPress={disabled ? undefined : onPress}
-      >
-        <Text>{children}</Text>
-      </TouchableOpacity>
-    )
   }
 }))
 

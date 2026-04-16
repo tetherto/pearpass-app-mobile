@@ -89,6 +89,7 @@ export const TabNavigatorV2 = () => {
           backgroundColor: theme.colors.colorSurfacePrimary,
           borderTopWidth: 1,
           borderTopColor: theme.colors.colorBorderPrimary,
+          borderColor: theme.colors.colorBorderPrimary,
           elevation: 0,
           paddingTop: rawTokens.spacing12,
           paddingBottom: rawTokens.spacing8 + insets.bottom,

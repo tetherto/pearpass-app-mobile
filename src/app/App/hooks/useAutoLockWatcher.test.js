@@ -47,6 +47,12 @@ jest.mock('../../../utils/autoLockStorage', () => ({
 jest.mock('../../../utils/filesCache', () => ({
   clearAllFileCache: jest.fn()
 }))
+jest.mock('../../../utils/designVersion', () => ({
+  isV2: jest.fn(() => false)
+}))
+jest.mock('../../../utils/unsupportedFeatures', () => ({
+  unsupportedFeaturesEnabled: jest.fn(() => false)
+}))
 
 describe('useAutoLockWatcher', () => {
   const addListenerRemoveMock = jest.fn()
