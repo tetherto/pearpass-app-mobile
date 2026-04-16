@@ -10,6 +10,29 @@ import messages from '../../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
+jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
+  const RN = require('react-native')
+  return {
+    Text: ({ children, ...props }) => <RN.Text {...props}>{children}</RN.Text>,
+    rawTokens: {
+      spacing8: 8,
+      spacing12: 12,
+      spacing20: 20,
+      spacing24: 24
+    },
+    useTheme: () => ({
+      theme: {
+        colors: {
+          colorBorderPrimary: '#ccc',
+          colorSurfacePrimary: '#fff',
+          colorSurfaceHover: '#f0f0f0',
+          colorTextSecondary: '#666'
+        }
+      }
+    })
+  }
+})
+
 jest.mock('@tetherto/pear-apps-utils-qr', () => ({
   generateQRCodeSVG: jest.fn()
 }))

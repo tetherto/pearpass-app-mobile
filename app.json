@@ -70,7 +70,21 @@
           "fonts": [
             "assets/fonts/humble-nostalgia.otf",
             "assets/fonts/inter.ttf"
-          ]
+          ],
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "Humble Nostalgia",
+                "fontDefinitions": [
+                  {
+                    "path": "assets/fonts/humble-nostalgia.otf",
+                    "weight": 400,
+                    "style": "normal"
+                  }
+                ]
+              }
+            ]
+          }
         }
       ],
       "expo-asset",
