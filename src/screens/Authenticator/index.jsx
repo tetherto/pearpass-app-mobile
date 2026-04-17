@@ -117,13 +117,15 @@ export const Authenticator = () => {
     // Record item
     const { record } = item
     const code = record.otpPublic?.currentCode ?? null
+    const websiteDomain =
+      record.type === 'login' ? record?.data?.websites?.[0] : null
 
     return (
       <TouchableOpacity
         style={styles.recordItem}
         onPress={() => handleRecordPress(record)}
       >
-        <AvatarRecord record={record} />
+        <AvatarRecord websiteDomain={websiteDomain} record={record} />
         <View style={styles.recordTextContainer}>
           <Text style={styles.recordTitle} numberOfLines={1}>
             {record.data?.title}
