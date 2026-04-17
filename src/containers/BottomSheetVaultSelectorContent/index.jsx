@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import {
   Button,
-  ContextMenu,
   ListItem,
   useBottomSheetClose,
   useTheme
@@ -36,6 +35,7 @@ export const BottomSheetVaultSelectorContent = ({
   const { openModal, closeModal } = useModal()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [menuVault, setMenuVault] = useState(null)
   useGlobalLoading({ isLoading })
 
   const { data: vaultsData } = useVaults()
@@ -120,13 +120,13 @@ export const BottomSheetVaultSelectorContent = ({
       })
     },
     onMembers: () => {
-      onNavigate?.('VaultSettingsScreen', {
+      onNavigate?.('ShareVault', {
         vaultId: vault.id,
         vaultName: vault.name
       })
     },
     onShare: () => {
-      onNavigate?.('VaultShareScreen', {
+      onNavigate?.('ShareVault', {
         vaultId: vault.id,
         vaultName: vault.name
       })
@@ -138,6 +138,19 @@ export const BottomSheetVaultSelectorContent = ({
       })
     }
   })
+
+  if (menuVault) {
+    const actions = buildVaultActions(menuVault)
+    return (
+      <BottomSheetVaultAction
+        vaultName={menuVault.name}
+        showBackButton
+        onBack={() => setMenuVault(null)}
+        onClose={closeSelector}
+        {...actions}
+      />
+    )
+  }
 
   return (
     <Layout
@@ -156,24 +169,13 @@ export const BottomSheetVaultSelectorContent = ({
           iconSize={16}
           style={styles.listItem}
           rightElement={
-            <ContextMenu
-              trigger={
-                <Button
-                  variant="tertiary"
-                  size="small"
-                  iconBefore={
-                    <MoreVert color={theme.colors.colorTextPrimary} />
-                  }
-                  aria-label={t`Vault actions`}
-                />
-              }
-            >
-              <BottomSheetVaultAction
-                vaultName={vault.name}
-                showBackButton
-                {...buildVaultActions(vault)}
-              />
-            </ContextMenu>
+            <Button
+              variant="tertiary"
+              size="small"
+              iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
+              aria-label={t`Vault actions`}
+              onClick={() => setMenuVault(vault)}
+            />
           }
           onClick={() => handleVaultPress(vault)}
         />

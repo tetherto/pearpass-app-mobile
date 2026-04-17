@@ -9,6 +9,7 @@ import {
   Button
 } from '@tetherto/pearpass-lib-ui-kit'
 import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { useVault } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import Animated, {
   Easing,
@@ -37,6 +38,7 @@ export const ShareVault = () => {
   const { theme } = useTheme()
   const navigation = useNavigation()
 
+  const { data: vault } = useVault()
   const { svg, isExpired, formattedTime, secondsLeft, vaultLink, handleCopy } =
     useShareVault()
 
@@ -61,7 +63,7 @@ export const ShareVault = () => {
   return (
     <Layout
       header={
-        <BackScreenHeader title={t`Share Personal Vault`} onBack={handleBack} />
+        <BackScreenHeader title={t`Share ${vault?.name ?? ''} Vault`} onBack={handleBack} />
       }
       scrollable
       hideFooter
@@ -127,11 +129,11 @@ export const ShareVault = () => {
                 </Svg>
               </View>
 
-              <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              <Text variant="label" color={theme.colors.colorTextSecondary}>
                 {isExpired ? t`Code expired` : t`Code expires in`}
               </Text>
               {!isExpired && (
-                <Text variant="caption" color={theme.colors.colorPrimary}>
+                <Text variant="label" color={theme.colors.colorPrimary}>
                   {formattedTime}s
                 </Text>
               )}

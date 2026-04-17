@@ -68,6 +68,8 @@ const VaultActionHeader = ({ title, onBack, onClose, showBackButton }) => {
  * @param {() => void} [props.onMembers]
  * @param {() => void} [props.onShare]
  * @param {() => void} [props.onDelete]
+ * @param {() => void} [props.onBack]
+ * @param {() => void} [props.onClose]
  * @param {boolean} [props.showBackButton]
  * @param {boolean} [props.unsupportedFeaturesEnabled]
  */
@@ -78,6 +80,8 @@ export const BottomSheetVaultAction = ({
   onMembers,
   onShare,
   onDelete,
+  onBack,
+  onClose,
   showBackButton = false,
   unsupportedFeaturesEnabled = false
 }) => {
@@ -87,9 +91,16 @@ export const BottomSheetVaultAction = ({
   const { bottom } = useSafeAreaInsets()
   const { hapticButtonPrimary } = useHapticFeedback()
 
+  const handleBack = onBack ?? dismiss
+  const handleClose = onClose ?? dismiss
+
   const closeAndRun = (action) => {
     hapticButtonPrimary()
-    dismissAll()
+    if (onClose) {
+      onClose()
+    } else {
+      dismissAll()
+    }
     InteractionManager.runAfterInteractions(() => {
       action?.()
     })
@@ -101,6 +112,12 @@ export const BottomSheetVaultAction = ({
       label: t`Rename Vault`,
       icon: <EditOutlined color={theme.colors.colorTextPrimary} />,
       onClick: () => closeAndRun(onRename)
+    },
+    {
+      key: 'members',
+      label: t`Manage Access`,
+      icon: <VerifiedUser color={theme.colors.colorTextPrimary} />,
+      onClick: () => closeAndRun(onMembers)
     },
     ...(PROTECTED_VAULT_ENABLED
       ? [
@@ -115,28 +132,24 @@ export const BottomSheetVaultAction = ({
     ...(unsupportedFeaturesEnabled
       ? [
           {
-            key: 'members',
-            label: t`Manage Access`,
-            icon: <VerifiedUser color={theme.colors.colorTextPrimary} />,
-            onClick: () => closeAndRun(onMembers)
-          },
-          {
             key: 'share',
             label: t`Share Personal Vault`,
             icon: <Share color={theme.colors.colorTextPrimary} />,
             onClick: () => closeAndRun(onShare)
+          },
+          {
+            key: 'delete',
+            label: t`Delete Vault`,
+            icon: (
+              <TrashOutlined
+                color={theme.colors.colorSurfaceDestructiveElevated}
+              />
+            ),
+            variant: 'destructive',
+            onClick: () => closeAndRun(onDelete)
           }
         ]
-      : []),
-    {
-      key: 'delete',
-      label: t`Delete Vault`,
-      icon: (
-        <TrashOutlined color={theme.colors.colorSurfaceDestructiveElevated} />
-      ),
-      variant: 'destructive',
-      onClick: () => closeAndRun(onDelete)
-    }
+      : [])
   ]
 
   return (
@@ -147,8 +160,8 @@ export const BottomSheetVaultAction = ({
       header={
         <VaultActionHeader
           title={vaultName}
-          onBack={dismiss}
-          onClose={dismiss}
+          onBack={handleBack}
+          onClose={handleClose}
           showBackButton={showBackButton}
         />
       }

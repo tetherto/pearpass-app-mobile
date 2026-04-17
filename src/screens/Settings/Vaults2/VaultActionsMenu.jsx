@@ -47,44 +47,49 @@ export const VaultActionsMenu = ({
       }
     >
       <View style={{ paddingBottom: bottom }}>
-        <NavbarListItem
-          platform="mobile"
-          icon={<EditOutlined color={theme.colors.colorTextPrimary} />}
-          label={t`Rename`}
-          showDivider
-          onClick={() => closeAndRun(onRename)}
-        />
-        {isManageMembersEnabled && (
-          <NavbarListItem
-            platform="mobile"
-            icon={<PersonAdd color={theme.colors.colorTextPrimary} />}
-            label={t`Manage Members`}
-            showDivider
-            onClick={() => closeAndRun(onManageMembers)}
-          />
-        )}
-        {PROTECTED_VAULT_ENABLED && (
-          <NavbarListItem
-            platform="mobile"
-            icon={<Key color={theme.colors.colorTextPrimary} />}
-            label={t`Set Vault Password`}
-            showDivider
-            onClick={() => closeAndRun(onSetPassword)}
-          />
-        )}
-        {isDeleteEnabled && (
-          <NavbarListItem
-            platform="mobile"
-            variant="destructive"
-            icon={
+        {[
+          {
+            key: 'rename',
+            icon: <EditOutlined color={theme.colors.colorTextPrimary} />,
+            label: t`Rename`,
+            onClick: () => closeAndRun(onRename)
+          },
+          isManageMembersEnabled && {
+            key: 'members',
+            icon: <PersonAdd color={theme.colors.colorTextPrimary} />,
+            label: t`Manage Members`,
+            onClick: () => closeAndRun(onManageMembers)
+          },
+          PROTECTED_VAULT_ENABLED && {
+            key: 'password',
+            icon: <Key color={theme.colors.colorTextPrimary} />,
+            label: t`Set Vault Password`,
+            onClick: () => closeAndRun(onSetPassword)
+          },
+          isDeleteEnabled && {
+            key: 'delete',
+            icon: (
               <TrashOutlined
                 color={theme.colors.colorSurfaceDestructiveElevated}
               />
-            }
-            label={t`Delete Vault`}
-            onClick={() => closeAndRun(onDelete)}
-          />
-        )}
+            ),
+            label: t`Delete Vault`,
+            variant: 'destructive',
+            onClick: () => closeAndRun(onDelete)
+          }
+        ]
+          .filter(Boolean)
+          .map((item, index, arr) => (
+            <NavbarListItem
+              key={item.key}
+              platform="mobile"
+              icon={item.icon}
+              label={item.label}
+              variant={item.variant}
+              showDivider={index < arr.length - 1}
+              onClick={item.onClick}
+            />
+          ))}
       </View>
     </ContextMenu>
   )

@@ -33,6 +33,7 @@ import {
   isFacialRecognitionSupported
 } from '../../utils/biometricLogin'
 import { logger } from '../../utils/logger'
+import { unsupportedFeaturesEnabled } from '../../utils/unsupportedFeatures'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { Layout } from '../Layout'
 import { styles } from './styles'
@@ -58,7 +59,7 @@ export const BottomSheetReauthContent = ({
   const { logIn } = useUserData()
   const { initVaults } = useVaults()
 
-  const [mode, setMode] = useState<InputMode>('pin')
+  const [mode, setMode] = useState<InputMode>(unsupportedFeaturesEnabled() ? 'pin' : 'password')
   const [pin, setPin] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
