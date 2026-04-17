@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
-import { CameraView } from 'expo-camera'
+import { Camera } from 'react-native-vision-camera'
 
 import {
   CameraSpot,
@@ -26,11 +26,11 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
 
   const {
     hasPermission,
-    isScanning,
-    cameraRef,
+    codeScanner,
+    device,
+    frameProcessor,
     pauseScanning,
     pickImageForScan,
-    handleBarCodeScanned,
     requestPermission
   } = useQRScanner({
     onScanned: (data) => {
@@ -71,22 +71,23 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
         ) : (
           <>
             <Title>{t`Join Vault from QR code`}</Title>
-            <CameraView
-              ref={cameraRef}
-              onBarcodeScanned={isScanning ? handleBarCodeScanned : undefined}
-              zoom={0}
-              style={{
-                flex: 1,
-                borderRadius: 10,
-                aspectRatio: 1,
-                alignSelf: 'center'
-              }}
-              barcodeScannerSettings={{
-                barcodeTypes: ['qr']
-              }}
-            >
-              <CameraSpot />
-            </CameraView>
+            {device ? (
+              <Camera
+                device={device}
+                isActive={true}
+                style={{
+                  flex: 1,
+                  borderRadius: 10,
+                  aspectRatio: 1,
+                  alignSelf: 'center',
+                  margin: 16
+                }}
+                codeScanner={codeScanner}
+                frameProcessor={frameProcessor}
+              >
+                <CameraSpot />
+              </Camera>
+            ) : null}
             <ButtonSecondary
               onPress={async () => {
                 await pickImageForScan()

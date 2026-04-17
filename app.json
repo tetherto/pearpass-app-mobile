@@ -99,7 +99,13 @@
             "usesCleartextTraffic": true
           },
           "ios": {
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "15.1",
+            "extraPods": [
+              {
+                "name": "ZXingObjC",
+                "modular_headers": true
+              }
+            ]
           }
         }
       ],
