@@ -55,7 +55,7 @@ export const CREATE_IDENTITY_DETAIL_OF_ADDRESS_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_ADDRESS_FIELD = {
-  title: 'Address',
+  title: ' Address ',
   inputPlaceholder: 'Insert address',
 } as const;
 
@@ -64,7 +64,7 @@ export const CREATE_IDENTITY_ADDRESS_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_ZIP_FIELD = {
-  title: 'ZIP',
+  title: ' ZIP ',
   inputPlaceholder: 'Insert ZIP',
 } as const;
 
@@ -73,7 +73,7 @@ export const CREATE_IDENTITY_ZIP_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_CITY_FIELD = {
-  title: 'City',
+  title: ' City ',
   inputPlaceholder: 'Insert city',
 } as const;
 
@@ -82,7 +82,7 @@ export const CREATE_IDENTITY_CITY_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_REGION_FIELD = {
-  title: 'Region',
+  title: ' Region ',
   inputPlaceholder: 'Insert region',
 } as const;
 
@@ -91,7 +91,7 @@ export const CREATE_IDENTITY_REGION_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_COUNTRY_FIELD = {
-  title: 'Country',
+  title: ' Country ',
   inputPlaceholder: 'Insert country',
 } as const;
 
@@ -100,7 +100,7 @@ export const CREATE_IDENTITY_COUNTRY_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_PASSPORT_FIELD = {
-  title: 'Passport',
+  title: ' Passport ',
 } as const;
 
 /* =====================================================
@@ -310,7 +310,7 @@ export const CREATE_IDENTITY_NEW_FILE_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_SHARED_FILE_POPUP = {
-  title: 'owners-manual.pdf',
+  title: 'Sharing 1 file',
   text: 'No recommended people to share with',
 } as const;
 
@@ -319,8 +319,8 @@ export const CREATE_IDENTITY_SHARED_FILE_POPUP = {
   ===================================================== */
 
 export const CREATE_IDENTITY_NOTE_FIELD = {
-  title: ' Note ',
-  inputPlaceholder: 'Note',
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
 } as const;
 
 /* =====================================================
@@ -336,7 +336,16 @@ export const CREATE_IDENTITY_CUSTOM_FIELD = {
   ===================================================== */
 
 export const CREATE_IDENTITY_NEW_ELEMENT_IN_CUSTOM_FIELD = {
-  text: 'Note',
+  text: 'Comment',
+} as const;
+
+/* =====================================================
+        CREATE IDENTITY PAGE - NEW NOTE FIELD (ADDITIONAL COMMENT)
+  ===================================================== */
+
+export const CREATE_IDENTITY_NEW_NOTE_FIELD = {
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
 } as const;
 
 /* =====================================================
@@ -388,7 +397,7 @@ export const CREATE_IDENTITY_UPLOAD_PICTURE_POPUP = {
   ===================================================== */
 
 export const CREATE_IDENTITY_PASSPORT_PICTURE_PREVIEW_PAGE = {
-  title: '1000000064.jpg',
+  title: '1000000035.jpg',
 } as const;
 
 /* =====================================================
@@ -396,7 +405,7 @@ export const CREATE_IDENTITY_PASSPORT_PICTURE_PREVIEW_PAGE = {
   ===================================================== */
 
 export const CREATE_IDENTITY_IDENTITY_CARD_PICTURE_PREVIEW_PAGE = {
-  title: '1000000064.jpg',
+  title: '1000000034.jpg',
 } as const;
 
 /* =====================================================
@@ -404,7 +413,7 @@ export const CREATE_IDENTITY_IDENTITY_CARD_PICTURE_PREVIEW_PAGE = {
   ===================================================== */
 
 export const CREATE_IDENTITY_DRIVING_LICENSE_PICTURE_PREVIEW_PAGE = {
-  title: '1000000064.jpg',
+  title: '1000000033.jpg',
 } as const;
 
 /* =====================================================
@@ -413,5 +422,5 @@ export const CREATE_IDENTITY_DRIVING_LICENSE_PICTURE_PREVIEW_PAGE = {
 
 export const CREATE_IDENTITY_PICTURE_SHARED = {
   sharedPageTitle: 'No recommended people to share with',
-  quickShareButtonText: 'Quick Share',
+  quickShareButtonText: 'Nearby',
 } as const;

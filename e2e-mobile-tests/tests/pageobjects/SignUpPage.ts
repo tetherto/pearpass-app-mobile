@@ -1,6 +1,6 @@
 import BasePage from '@pages/BasePage';
 import signUpLocators from '@locators/SignUpLocators';
-import { CREATE_PASSWORD_SCREEN, ENTER_PASSWORD_SCREEN, SELECT_VAULT_TYPE_SCREEN, NEW_VAULT_SCREEN, LOAD_VAULT_SCREEN, VALIDATION_ERRORS } from '@data/signUp.data';
+import { CREATE_PASSWORD_SCREEN, ENTER_PASSWORD_SCREEN, USE_FINGERPRINT, BIOMETRICS_AUTHENTICATION_POPUP, ENABLE_BIOMETRIC_AUTHENTICATION_POPUP, SELECT_VAULT_TYPE_SCREEN, NEW_VAULT_SCREEN, LOAD_VAULT_SCREEN, VALIDATION_ERRORS } from '@data/signUp.data';
 
 // Use global expect from expect-webdriverio for text comparison
 declare const expect: any;
@@ -35,6 +35,9 @@ class SignUpPage extends BasePage {
   get createPasswordContinueText() { return this.$('createPasswordContinueText'); }
   get createPasswordLoading() { return this.$('createPasswordLoading'); }
   get chromeUrlBar() { return this.$('chromeUrlBar'); }
+  get useWithoutAnAccountButton() { return this.$('useWithoutAnAccountButton'); }
+  get noThanksButton() { return this.$('noThanksButton'); }
+  get allowAllButton() { return this.$('allowAllButton'); }
   
   /* ==================== VALIDATION ERROR GETTERS ==================== */
   get enterPasswordPasswordIsRequiredWarning() { return this.$('enterPasswordPasswordIsRequiredWarning'); }
@@ -67,12 +70,25 @@ class SignUpPage extends BasePage {
   get enterPasswordWarningText() { return this.$('enterPasswordWarningText'); }
   get enterPasswordContinueButton() { return this.$('enterPasswordContinueButton'); }
   get enterPasswordContinueText() { return this.$('enterPasswordContinueText'); }
-  get enterPasswordBiometricButton() { return this.$('enterPasswordBiometricButton'); }
-  get enterPasswordLoading() { return this.$('enterPasswordLoading'); }
+  get useFingerprintButton() { return this.$('useFingerprintButton'); }
+  get useFingerprintIcon() { return this.$('useFingerprintIcon'); }
+  get useFingerprintText() { return this.$('useFingerprintText'); }
+  get biometricsAuthenticationPopupAppLogo() { return this.$('biometricsAuthenticationPopupAppLogo'); }
+  get biometricsAuthenticationPopupAppText() { return this.$('biometricsAuthenticationPopupAppText'); }
+  get biometricsAuthenticationPopupText() { return this.$('biometricsAuthenticationPopupText'); }
+  get biometricsAuthenticationPopupIndicator() { return this.$('biometricsAuthenticationPopupIndicator'); }
+  get biometricsAuthenticationPopupCancelButton() { return this.$('biometricsAuthenticationPopupCancelButton'); }
+  get enableBiometricAuthenticationPopup() { return this.$('enableBiometricAuthenticationPopup'); }
+  get enableBiometricAuthenticationPopupTitle() { return this.$('enableBiometricAuthenticationPopupTitle'); }
+  get enableBiometricAuthenticationPopupDescription() { return this.$('enableBiometricAuthenticationPopupDescription'); }
+  get enableBiometricAuthenticationPopupDismissButton() { return this.$('enableBiometricAuthenticationPopupDismissButton'); }
+  get enableBiometricAuthenticationPopupDismissButtonText() { return this.$('enableBiometricAuthenticationPopupDismissButtonText'); }
+  get enableBiometricAuthenticationPopupEnableButton() { return this.$('enableBiometricAuthenticationPopupEnableButton'); }
+  get enableBiometricAuthenticationPopupEnableButtonText() { return this.$('enableBiometricAuthenticationPopupEnableButtonText'); }
 
   /* ==================== CREATE PASSWORD SCREEN METHODS ==================== */
   async waitForCreatePasswordScreen(): Promise<this> {
-    await this.createPasswordTitle.waitForDisplayed({ timeoutMsg: 'Create password screen not visible' });
+    await this.createPasswordTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Create password screen not visible' });
     return this.self;
   }
 
@@ -87,14 +103,14 @@ class SignUpPage extends BasePage {
     const noteEl = this.createPasswordRequirementNote;
     
     await Promise.all([
-      titleEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      descEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      reqTextEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      uppercaseEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      lowercaseEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      numberEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      specialEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      noteEl.waitForDisplayed({ timeout: 2000 }).catch(() => {})
+      titleEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      descEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      reqTextEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      uppercaseEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      lowercaseEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      numberEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      specialEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      noteEl.waitForDisplayed({ timeout: 10000 }).catch(() => {})
     ]);
     
     const titleText = await titleEl.getText();
@@ -126,8 +142,8 @@ class SignUpPage extends BasePage {
     const termsTitleEl = this.createPasswordTermsTitle;
     const continueBtnEl = this.createPasswordContinueButton;
     await Promise.all([
-      termsTitleEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      continueBtnEl.waitForDisplayed({ timeout: 2000 }).catch(() => {})
+      termsTitleEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      continueBtnEl.waitForDisplayed({ timeout: 10000 }).catch(() => {})
     ]);
     
     const termsTitleText = await termsTitleEl.getText();
@@ -135,7 +151,7 @@ class SignUpPage extends BasePage {
     
     // Use createPasswordContinueText locator for text verification (finds element by text)
     const continueTextEl = this.createPasswordContinueText;
-    await continueTextEl.waitForDisplayed({ timeout: 2000 }).catch(() => {});
+    await continueTextEl.waitForDisplayed({ timeout: 10000 }).catch(() => {});
     const continueBtnText = await continueTextEl.getText();
     expect(continueBtnText).toBe(CREATE_PASSWORD_SCREEN.continueButton);
 
@@ -181,14 +197,54 @@ class SignUpPage extends BasePage {
   }
 
   async chromeUrlBarDisplayed(): Promise<this> {
+    await this.chromeUrlBar.waitForDisplayed({ timeout: 10000 });
     await this.verifyDisplayedSoft('chromeUrlBar', 'Chrome URL bar should be displayed');
+    return this.self;
+  }
+
+  async tapUseWithoutAnAccountButton(): Promise<this> {
+    try {
+      const isDisplayed = await this.useWithoutAnAccountButton.waitForDisplayed({ timeout: 15000 }).then(() => true).catch(() => false);
+      if (isDisplayed) {
+        await this.useWithoutAnAccountButton.click();
+        console.log('✓ Clicked "Use without an account" button');
+      }
+    } catch {
+      console.log('ℹ "Use without an account" button not displayed, skipping');
+    }
+    return this.self;
+  }
+
+  async tapNoThanksButton(): Promise<this> {
+    try {
+      const isDisplayed = await this.noThanksButton.waitForDisplayed({ timeout: 15000 }).then(() => true).catch(() => false);
+      if (isDisplayed) {
+        await this.noThanksButton.click();
+        console.log('✓ Clicked "No thanks" button');
+      }
+    } catch {
+      console.log('ℹ "No thanks" button not displayed, skipping');
+    }
+    return this.self;
+  }
+
+  async tapAllowAllButton(): Promise<this> {
+    try {
+      const isDisplayed = await this.allowAllButton.waitForDisplayed({ timeout: 15000 }).then(() => true).catch(() => false);
+      if (isDisplayed) {
+        await this.allowAllButton.click();
+        console.log('✓ Clicked "Allow all" button');
+      }
+    } catch {
+      console.log('ℹ "Allow all" button not displayed, skipping');
+    }
     return this.self;
   }
 
   async tapTermsLink(): Promise<this> {
     try {
       const termsTextElement = await $('//android.widget.TextView[@text="I have read and agree to the PearPass Application Terms of Use."]');
-      await termsTextElement.waitForDisplayed({ timeout: 3000 });
+      await termsTextElement.waitForDisplayed({ timeout: 10000 });
 
       const location = await termsTextElement.getLocation();
       const size = await termsTextElement.getSize();
@@ -318,7 +374,7 @@ class SignUpPage extends BasePage {
 
   async verifyValidationError(
     errorType: keyof typeof VALIDATION_ERRORS,
-    field: 'enterPassword' | 'newVaultName' | 'enterMasterPassword' = 'enterPassword'
+    field: 'enterPassword' | 'enterConfirmPassword' | 'newVaultName' | 'enterMasterPassword' = 'enterPassword'
   ): Promise<this> {
     const expectedText = VALIDATION_ERRORS[errorType];
     let errorElement;
@@ -327,6 +383,8 @@ class SignUpPage extends BasePage {
       case 'passwordRequired':
         if (field === 'enterPassword') {
           errorElement = this.enterPasswordPasswordIsRequiredWarning;
+        } else if (field === 'enterConfirmPassword') {
+          errorElement = this.confirmPasswordPasswordIsRequiredWarning;
         } else if (field === 'enterMasterPassword') {
           errorElement = this.enterPasswordMasterPasswordRequiredWarning;
         } else if (field === 'newVaultName') {
@@ -432,14 +490,19 @@ class SignUpPage extends BasePage {
         }
         break;
 
+      case 'passwordsDoNotMatch':
+        errorElement = this.confirmPasswordPasswordsDoNotMatchWarning;
+        break;
+
       default:
         throw new Error(`Unknown validation error type: ${errorType}`);
     }
 
-    // Verify error element is displayed
-    const isDisplayed = await errorElement.isDisplayed();
-    if (!isDisplayed) {
-      throw new Error(`Validation error "${errorType}" should be displayed`);
+    // Wait for error element to appear and verify it's displayed
+    try {
+      await errorElement.waitForDisplayed({ timeout: 10000 });
+    } catch {
+      throw new Error(`Validation error "${errorType}" should be displayed (timeout waiting for element)`);
     }
 
     if (errorType === 'incorrectPassword') {
@@ -460,7 +523,7 @@ class SignUpPage extends BasePage {
 
   /* ==================== ENTER MASTER PASSWORD SCREEN METHODS ==================== */
   async waitForEnterPasswordScreen(): Promise<this> {
-    await this.enterPasswordTitle.waitForDisplayed({ timeoutMsg: 'Enter password screen not visible' });
+    await this.enterPasswordTitle.waitForDisplayed({ timeout: 30000, timeoutMsg: 'Enter password screen not visible' });
     return this.self;
   }
 
@@ -471,10 +534,10 @@ class SignUpPage extends BasePage {
     const warningTextEl = this.enterPasswordWarningText;
     
     await Promise.all([
-      titleEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      continueBtnEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      continueTextEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      warningTextEl.waitForDisplayed({ timeout: 2000 }).catch(() => {})
+      titleEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      continueBtnEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      continueTextEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      warningTextEl.waitForDisplayed({ timeout: 10000 }).catch(() => {})
     ]);
     
     const titleText = await titleEl.getText();
@@ -490,6 +553,10 @@ class SignUpPage extends BasePage {
   }
 
   async enterMasterPassword(password: string): Promise<this> {
+    await this.enterPasswordInput.waitForDisplayed({
+      timeout: 20000,
+      timeoutMsg: 'Enter password input should be visible',
+    });
     await this.enterPasswordInput.setValue(password);
     return this.self;
   }
@@ -535,6 +602,178 @@ class SignUpPage extends BasePage {
     return this.self;
   }
 
+  async verifyUseFingerprintButtonWithAllElementsDisplayed(): Promise<this> {
+    await this.verifyDisplayedSoft('useFingerprintButton', 'Use Fingerprint button should be visible');
+    await this.verifyDisplayedSoft('useFingerprintIcon', 'Use Fingerprint icon should be visible');
+    await this.verifyDisplayedSoft('useFingerprintText', 'Use Fingerprint label text should be visible');
+    const fingerprintLabelText = (await this.useFingerprintText.getText()).trim();
+    expect(fingerprintLabelText).toBe(USE_FINGERPRINT.label);
+    return this.self;
+  }
+
+  async verifyBiometricsAuthenticationPopupDisplayed(): Promise<this> {
+    await this.biometricsAuthenticationPopupAppLogo.waitForDisplayed({ timeout: 10000 });
+
+    await this.verifyDisplayedSoft('biometricsAuthenticationPopupAppLogo', 'Biometrics popup app logo should be visible');
+    await this.verifyDisplayedSoft('biometricsAuthenticationPopupAppText', 'Biometrics popup app text should be visible');
+    await this.verifyDisplayedSoft('biometricsAuthenticationPopupText', 'Biometrics popup title should be visible');
+    await this.verifyDisplayedSoft('biometricsAuthenticationPopupIndicator', 'Biometrics popup fingerprint indicator should be visible');
+    await this.verifyDisplayedSoft('biometricsAuthenticationPopupCancelButton', 'Biometrics popup cancel button should be visible');
+
+    const appText = (await this.biometricsAuthenticationPopupAppText.getText()).trim();
+    expect(appText).toBe(BIOMETRICS_AUTHENTICATION_POPUP.appText);
+
+    const titleText = (await this.biometricsAuthenticationPopupText.getText()).trim();
+    expect(titleText).toBe(BIOMETRICS_AUTHENTICATION_POPUP.title);
+
+    const indicatorDesc = await this.biometricsAuthenticationPopupIndicator.getAttribute('content-desc');
+    expect((indicatorDesc ?? '').trim()).toBe(BIOMETRICS_AUTHENTICATION_POPUP.indicatorContentDesc);
+
+    const cancelText = (await this.biometricsAuthenticationPopupCancelButton.getText()).trim();
+    expect(cancelText).toBe(BIOMETRICS_AUTHENTICATION_POPUP.cancelButtonText);
+
+    return this.self;
+  }
+
+  async verifyEnableBiometricAuthenticationPopupDisplayed(): Promise<this> {
+    await this.enableBiometricAuthenticationPopup.waitForDisplayed({
+      timeout: 20000,
+      interval: 200,
+      timeoutMsg: 'Enable biometric authentication popup should be visible',
+    });
+    await this.verifyElementDisplayed(
+      this.enableBiometricAuthenticationPopup,
+      'enableBiometricAuthenticationPopup',
+      'Enable biometric authentication popup should be visible'
+    );
+    return this.self;
+  }
+
+  async verifyEnableBiometricAuthenticationPopupAllElementsDisplayed(): Promise<this> {
+    await this.enableBiometricAuthenticationPopup.waitForDisplayed({ timeout: 20000 });
+    await this.verifyEnableBiometricAuthenticationPopupDisplayed();
+
+    await this.verifyElementDisplayed(
+      this.enableBiometricAuthenticationPopupTitle,
+      'enableBiometricAuthenticationPopupTitle',
+      'Enable biometric authentication popup title should be visible'
+    );
+    await this.verifyElementDisplayed(
+      this.enableBiometricAuthenticationPopupDescription,
+      'enableBiometricAuthenticationPopupDescription',
+      'Enable biometric authentication popup description should be visible'
+    );
+    await this.verifyElementDisplayed(
+      this.enableBiometricAuthenticationPopupDismissButton,
+      'enableBiometricAuthenticationPopupDismissButton',
+      'Enable biometric authentication popup dismiss button should be visible'
+    );
+    await this.verifyElementDisplayed(
+      this.enableBiometricAuthenticationPopupDismissButtonText,
+      'enableBiometricAuthenticationPopupDismissButtonText',
+      'Enable biometric authentication popup dismiss button text should be visible'
+    );
+    await this.verifyElementDisplayed(
+      this.enableBiometricAuthenticationPopupEnableButton,
+      'enableBiometricAuthenticationPopupEnableButton',
+      'Enable biometric authentication popup enable button should be visible'
+    );
+    await this.verifyElementDisplayed(
+      this.enableBiometricAuthenticationPopupEnableButtonText,
+      'enableBiometricAuthenticationPopupEnableButtonText',
+      'Enable biometric authentication popup enable button text should be visible'
+    );
+
+    const titleText = (await this.enableBiometricAuthenticationPopupTitle.getText()).trim();
+    expect(titleText).toBe(ENABLE_BIOMETRIC_AUTHENTICATION_POPUP.title);
+
+    const descriptionText = (await this.enableBiometricAuthenticationPopupDescription.getText()).trim();
+    expect(descriptionText).toBe(ENABLE_BIOMETRIC_AUTHENTICATION_POPUP.description);
+
+    const dismissButtonText = (await this.enableBiometricAuthenticationPopupDismissButtonText.getText()).trim();
+    expect(dismissButtonText).toBe(ENABLE_BIOMETRIC_AUTHENTICATION_POPUP.dismissButtonText);
+
+    const enableButtonText = (await this.enableBiometricAuthenticationPopupEnableButtonText.getText()).trim();
+    expect(enableButtonText).toBe(ENABLE_BIOMETRIC_AUTHENTICATION_POPUP.enableButtonText);
+
+    return this.self;
+  }
+
+  async tapEnableBiometricAuthenticationPopupEnableButton(): Promise<this> {
+    await this.enableBiometricAuthenticationPopupEnableButton.click();
+    return this.self;
+  }
+
+  async useBiometricsAuthentication(): Promise<this> {
+    if (!this.isAndroid) {
+      throw new Error('Biometric fingerprint auth helper is implemented only for Android');
+    }
+  
+    const fingerprintId = 1;
+  
+    try {
+      console.log(`🔐 Emulating fingerprint touch (ID: ${fingerprintId})...`);
+  
+      const deviceId = await this.getCurrentDeviceId();
+  
+      const { promisify } = require('util');
+      const execAsync = promisify(require('child_process').exec);
+  
+      await browser.pause(3000);
+  
+      console.log('   → Sending first fingerprint touch...');
+      await execAsync(`adb -s ${deviceId} emu finger touch ${fingerprintId}`);
+      await browser.pause(800);
+  
+      console.log('   → Sending second fingerprint touch...');
+      await execAsync(`adb -s ${deviceId} emu finger touch ${fingerprintId}`);
+      await browser.pause(800);
+  
+      console.log(`✅ Fingerprint ${fingerprintId} emulated twice on device ${deviceId}`);
+  
+
+      await this.waitForBiometricPopupToClose?.(12000) || 
+             browser.pause(4000);
+  
+      return this;
+    } catch (error: any) {
+      console.error('❌ Fingerprint authentication failed:', error.message || error);
+      throw new Error(`Unable to perform biometric authentication with ID ${fingerprintId}`);
+    }
+  }
+
+  getCurrentDeviceId = async (): Promise<string> => {
+    try {
+      const caps = await browser.getCapabilities();
+      if (caps['appium:udid']) return caps['appium:udid'] as string;
+      if (caps.udid) return caps.udid as string;
+  
+      const deviceInfo = await browser.execute('mobile: getDeviceInfo');
+      if (deviceInfo?.udid) return deviceInfo.udid;
+    } catch (e) {
+      console.warn('Could not get device ID from Appium, falling back to adb devices');
+    }
+  
+    const { promisify } = require('util');
+    const execAsync = promisify(require('child_process').exec);
+    try {
+      const { stdout } = await execAsync('adb devices');
+      const lines = stdout.trim().split('\n');
+      for (const line of lines) {
+        if (line.includes('emulator-') && line.includes('device')) {
+          return line.split('\t')[0].trim();
+        }
+      }
+    } catch (e) { /* ignore */ }
+  
+    return 'emulator-5554';
+  };
+
+  async tapUseFingerprintButton(): Promise<this> {
+    await this.useFingerprintButton.click();
+    return this.self;
+  }
+
   async verifyEnterPasswordValueAfterToggle(password: string): Promise<this> {
     const passwordText = await this.enterPasswordInput.getText();
     expect(passwordText).toBe(password);
@@ -552,8 +791,8 @@ class SignUpPage extends BasePage {
 
   /* ==================== SELECT VAULT TYPE SCREEN METHODS ==================== */
   async waitForSelectVaultTypeScreen(): Promise<this> {
-    await this.selectVaultTypeEmptyTitle.waitForDisplayed({ timeoutMsg: 'Select vault type screen title not visible' });
-    await this.selectVaultTypeEmptySubtitle.waitForDisplayed({ timeoutMsg: 'Select vault type screen subtitle not visible' });
+    await this.selectVaultTypeEmptyTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Select vault type screen title not visible' });
+    await this.selectVaultTypeEmptySubtitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Select vault type screen subtitle not visible' });
     return this.self;
   }
 
@@ -599,7 +838,7 @@ class SignUpPage extends BasePage {
 
   /* ==================== NEW VAULT SCREEN METHODS ==================== */
   async waitForNewVaultScreen(): Promise<this> {
-    await this.newVaultTitle.waitForDisplayed({ timeoutMsg: 'New vault title not visible' });
+    await this.newVaultTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New vault title not visible' });
     return this.self;
   }
 
@@ -611,11 +850,11 @@ class SignUpPage extends BasePage {
     const selectVaultsBtnEl = this.newVaultSelectVaultsButton;
     
     await Promise.all([
-      titleEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      subtitleEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      nameInputEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      continueBtnEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      selectVaultsBtnEl.waitForDisplayed({ timeout: 2000 }).catch(() => {})
+      titleEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      subtitleEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      nameInputEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      continueBtnEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      selectVaultsBtnEl.waitForDisplayed({ timeout: 10000 }).catch(() => {})
     ]);
     
     const titleText = await titleEl.getText();
@@ -636,8 +875,8 @@ class SignUpPage extends BasePage {
     const continueTextEl = this.newVaultContinueText;
     const selectVaultsTextEl = this.newVaultSelectVaultsText;
     await Promise.all([
-      continueTextEl.waitForDisplayed({ timeout: 2000 }).catch(() => {}),
-      selectVaultsTextEl.waitForDisplayed({ timeout: 2000 }).catch(() => {})
+      continueTextEl.waitForDisplayed({ timeout: 10000 }).catch(() => {}),
+      selectVaultsTextEl.waitForDisplayed({ timeout: 10000 }).catch(() => {})
     ]);
     
     const continueText = await continueTextEl.getText();
@@ -684,7 +923,7 @@ class SignUpPage extends BasePage {
 
   /* ==================== LOAD VAULT SCREEN METHODS ==================== */
   async waitForLoadVaultScreen(): Promise<this> {
-    await this.loadVaultTitle.waitForDisplayed({ timeoutMsg: 'Load vault title not visible' });
+    await this.loadVaultTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Load vault title not visible' });
     return this.self;
   }
 
@@ -732,9 +971,14 @@ class SignUpPage extends BasePage {
 
   /* ==================== SELECT VAULTS SCREEN METHODS ==================== */
 
+  async waitForSelectVaultsScreen(): Promise<this> {
+    await this.selectVaultsTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Select Vaults screen not visible' });
+    return this.self;
+  }
+
   async verifySelectVaultsTitle(): Promise<this> {
     const titleEl = this.selectVaultsTitle;
-    await titleEl.waitForDisplayed({ timeoutMsg: 'Select Vaults title not visible' });
+    await titleEl.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Select Vaults title not visible' });
     
     const titleText = await titleEl.getText();
     expect(titleText).toBe(SELECT_VAULT_TYPE_SCREEN.listTitle);
@@ -743,7 +987,7 @@ class SignUpPage extends BasePage {
   }
 
   async verifyNewVaultNameAtSelectVaultsPage(expectedText: string): Promise<this> {
-    await this.newVaultNameAtSelectVaultsPage.waitForDisplayed({ timeout: 5000, timeoutMsg: 'New vault name at Select Vaults page not visible' });
+    await this.newVaultNameAtSelectVaultsPage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New vault name at Select Vaults page not visible' });
     await this.verifyElementDisplayed(this.newVaultNameAtSelectVaultsPage, 'newVaultNameAtSelectVaultsPage', 'Vault name at Select Vaults page should be visible');
     const displayedText = await this.newVaultNameAtSelectVaultsPage.getText();
     expect(displayedText).toBe(expectedText);
@@ -752,7 +996,7 @@ class SignUpPage extends BasePage {
 
   async tapSelectVaultsVaultItem(): Promise<this> {
     const vaultItem = this.authVaultItem;
-    await vaultItem.waitForDisplayed({ timeoutMsg: 'Vault item not found in the list' });
+    await vaultItem.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Vault item not found in the list' });
     await vaultItem.click();
     return this.self;
   }

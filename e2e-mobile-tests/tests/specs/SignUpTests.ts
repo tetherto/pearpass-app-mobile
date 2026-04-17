@@ -1,373 +1,324 @@
 import 'mocha';
 import { Pages } from '@support/page-factory';
 import { TEST_PASSWORDS, NEW_VAULT_SCREEN, ENTER_PASSWORD_SCREEN } from '@data/signUp.data';
+import {
+  navigateToCreatePasswordScreen,
+  restartAndWaitForEnterPasswordScreen,
+  restartAndNavigateToNewVaultScreen,
+  restartAndNavigateToHome,
+  registerValidPasswordTests,
+  registerInvalidPasswordTests,
+  completePasswordCreationFlow
+} from '@helpers/test-setup';
 
 declare const expect: any;
 
+// ============================================================
+// CREATE MASTER PASSWORD SCREEN
+// ============================================================
+
 describe('Sign Up Flow - Create Master Password', () => {
-
-  it('[PAS-XXX] User should see Create Master Password screen with all elements', async () => {
-    const signUp = Pages.signUp;
-    await signUp.verifyCreatePasswordScreenContent();
-    await signUp.verifyPasswordInputsVisible();
-    await signUp.verifyRequirementsVisible();
+  const getSignUp = () => Pages.signUp;
+  
+  beforeEach(async () => {
+    await navigateToCreatePasswordScreen();
   });
 
-  it('[PAS-XXX] User should see Continue button disabled when terms are not accepted', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
-    await signUp.verifyContinueButtonDisabled();
-  });
-
-  it('[PAS-XXX] User should see Continue button enabled after accepting terms', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
-    await signUp.acceptTerms();
-    await signUp.verifyTermsCheckboxChecked();
-    await signUp.verifyContinueButtonEnabled();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User can enter password in password input field', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPassword(TEST_PASSWORDS.valid.standard);
-    await signUp.togglePasswordVisibility();
-    const passwordText = await signUp.createPasswordInput.getText();
-    expect(passwordText).toBe(TEST_PASSWORDS.valid.standard);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.valid.standard);
-    await signUp.togglePasswordVisibility();
-    await signUp.toggleConfirmPasswordVisibility();
-  });
-
-  it('[PAS-XXX] User can enter password in confirm password input field', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterConfirmPassword(TEST_PASSWORDS.valid.standard);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.valid.standard);
-    await signUp.toggleConfirmPasswordVisibility();
-  });
-
-  it('[PAS-XXX] User can create password with valid password (standard)', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.valid.standard);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.acceptTerms();
-    await signUp.verifyContinueButtonEnabled();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User can create password with valid password (long)', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.valid.long);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.valid.long);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.acceptTerms();
-    await signUp.verifyContinueButtonEnabled();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User can create password with valid password (with special chars)', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.valid.withSpecial);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.valid.withSpecial);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.acceptTerms();
-    await signUp.verifyContinueButtonEnabled();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User can create password with valid password (complex)', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.valid.complex);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.valid.complex);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.acceptTerms();
-    await signUp.verifyContinueButtonEnabled();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User cannot proceed with password that is too short (7 characters)', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.tooShort.sevenChars);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.tooShort.sevenChars);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.enterPasswordPasswordMustBeAtLeast8CharactersLongWarning.waitForDisplayed({ timeout: 5000 });
-    await signUp.verifyValidationError('passwordTooShort');
-    await signUp.acceptTerms();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User cannot proceed with password missing uppercase letter', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.missingUppercase);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.missingUppercase);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.enterPasswordPasswordMustContainAtLeastOneUppercaseLetterWarning.waitForDisplayed({ timeout: 5000 });
-    await signUp.verifyValidationError('passwordMissingUppercase');
-    await signUp.acceptTerms();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User cannot proceed with password missing lowercase letter', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.missingLowercase);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.missingLowercase);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.enterPasswordPasswordMustContainAtLeastOneLowercaseLetterWarning.waitForDisplayed({ timeout: 5000 });
-    await signUp.verifyValidationError('passwordMissingLowercase');
-    await signUp.acceptTerms();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User cannot proceed with password missing number', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.missingNumber);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.missingNumber);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.enterPasswordPasswordMustContainAtLeastOneNumberWarning.waitForDisplayed({ timeout: 5000 });
-    await signUp.verifyValidationError('passwordMissingNumber');
-    await signUp.acceptTerms();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User cannot proceed with password missing special character', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.missingSpecial);
-    await signUp.toggleConfirmPasswordVisibility();
-    const confirmPasswordText = await signUp.createPasswordConfirmInput.getText();
-    expect(confirmPasswordText).toBe(TEST_PASSWORDS.missingSpecial);
-    await signUp.toggleConfirmPasswordVisibility()
-    await signUp.enterPasswordPasswordMustContainAtLeastOneSpecialCharacterWarning.waitForDisplayed({ timeout: 5000 });
-    await signUp.verifyValidationError('passwordMissingSpecial');
-    await signUp.acceptTerms();
-    await signUp.declineTerms();
-  });
-
-  it('[PAS-XXX] User can toggle terms checkbox', async () => {
-    const signUp = Pages.signUp;
-    await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
-    await signUp.verifyContinueButtonDisabled();
+  describe('Screen Elements', () => {
     
-    await signUp.acceptTerms();
-    await signUp.verifyContinueButtonEnabled();
+    it('[3001] User should see Create Master Password screen with all elements', async () => {
+      const signUp = getSignUp();
+      await signUp.verifyCreatePasswordScreenContent();
+      await signUp.verifyPasswordInputsVisible();
+      await signUp.verifyRequirementsVisible();
+    });
+
+    it('[3002] User sees warning message about password recovery', async () => {
+      const signUp = getSignUp();
+      await signUp.createPasswordWarning.waitForDisplayed({ timeout: 10000 });
+      await signUp.verifyCreatePasswordWarningText();
+    });
+  });
+
+  describe('Terms Checkbox', () => {
     
-    await signUp.declineTerms();
-    await signUp.verifyContinueButtonDisabled();
+    it('[930] User should see Continue button disabled when terms are not accepted', async () => {
+      const signUp = getSignUp();
+      await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
+      await signUp.verifyContinueButtonDisabled();
+    });
+
+    it('[3003] User should see Continue button enabled after accepting terms', async () => {
+      const signUp = getSignUp();
+      await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
+      await signUp.acceptTerms();
+      await signUp.verifyTermsCheckboxChecked();
+      await signUp.verifyContinueButtonEnabled();
+    });
+
+    it('[3004] User can toggle terms checkbox on and off', async () => {
+      const signUp = getSignUp();
+      await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
+      
+      await signUp.verifyContinueButtonDisabled();
+      await signUp.acceptTerms();
+      await signUp.verifyContinueButtonEnabled();
+      await signUp.declineTerms();
+      await signUp.verifyContinueButtonDisabled();
+    });
+
+    it('[933] User can tap on Terms of Use link', async () => {
+      const signUp = getSignUp();
+      await signUp.createPasswordTermsLink.waitForDisplayed({ timeout: 10000 });
+      await signUp.tapTermsLink();
+      await signUp.tapUseWithoutAnAccountButton();
+      await signUp.tapNoThanksButton();
+      await signUp.tapAllowAllButton();
+      await signUp.chromeUrlBarDisplayed();
+      await signUp.pressBack();
+    });
   });
 
-  it('[PAS-XXX] User can tap on Terms of Use link', async () => {
-    const signUp = Pages.signUp;
-    const isDisplayed = await signUp.createPasswordTermsLink.isDisplayed();
-    if (!isDisplayed) throw new Error('Terms link should be visible');
-    await signUp.tapTermsLink();
-    await signUp.chromeUrlBarDisplayed();
-    await signUp.pressBack();
-  });
-
-  it('[PAS-XXX] User sees warning message about password recovery', async () => {
-    const signUp = Pages.signUp;
-    const isDisplayed = await signUp.createPasswordWarning.isDisplayed();
-    if (!isDisplayed) throw new Error('Warning should be visible');
-    await signUp.verifyCreatePasswordWarningText();
-  });
-
-  it('[PAS-XXX] User sees all password requirements listed', async () => {
-    const signUp = Pages.signUp;
-    await signUp.verifyRequirementsVisible();
-  });
-
-
-  it('[PAS-XXX] User can toggle password visibility to see password instead of dots', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
-
-    await signUp.enterPassword(password);
-    await signUp.verifyPasswordVisibilityToggleVisible();
-    await signUp.togglePasswordVisibility();
-    await signUp.verifyPasswordValueAfterToggle(password);
-    await signUp.togglePasswordVisibility();
-  });
-
-  it('[PAS-XXX] User can toggle confirm password visibility to see password instead of dots', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
+  describe('Password Input', () => {
     
-    await signUp.enterConfirmPassword(password);
-    await signUp.verifyConfirmPasswordVisibilityToggleVisible();
-    await signUp.toggleConfirmPasswordVisibility();
-    await signUp.verifyConfirmPasswordValueAfterToggle(password);
-    await signUp.toggleConfirmPasswordVisibility();
+    it('[3005] User can enter password in both input fields', async () => {
+      const signUp = getSignUp();
+      const password = TEST_PASSWORDS.valid.standard;
+      
+      await signUp.enterPassword(password);
+      await signUp.togglePasswordVisibility();
+      const passwordText = await signUp.createPasswordInput.getText();
+      expect(passwordText).toBe(password);
+      
+      await signUp.enterConfirmPassword(password);
+      await signUp.toggleConfirmPasswordVisibility();
+      const confirmText = await signUp.createPasswordConfirmInput.getText();
+      expect(confirmText).toBe(password);
+    });
   });
 
-  it('[PAS-XXX] User can toggle password visibility for both password fields independently', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
-    const masked = TEST_PASSWORDS.valid.masked;
-    const maskedConfirm = TEST_PASSWORDS.valid.maskedConfirm;
+  describe('Password Visibility Toggle', () => {
     
-    await signUp.enterPasswords(password);
-    await signUp.togglePasswordVisibility();
-    await signUp.verifyPasswordValueAfterToggle(password);
-    await signUp.togglePasswordVisibility();
-    await signUp.verifyPasswordValueAfterToggle(masked);
-    await signUp.toggleConfirmPasswordVisibility();
-    await signUp.verifyConfirmPasswordValueAfterToggle(password);
-    await signUp.toggleConfirmPasswordVisibility();
-    await signUp.verifyConfirmPasswordValueAfterToggle(maskedConfirm);
+    it('[3006] User can toggle password visibility to see password instead of dots', async () => {
+      const signUp = getSignUp();
+      const password = TEST_PASSWORDS.valid.standard;
+
+      await signUp.enterPassword(password);
+      await signUp.verifyPasswordVisibilityToggleVisible();
+      await signUp.togglePasswordVisibility();
+      await signUp.verifyPasswordValueAfterToggle(password);
+    });
+
+    it('[3007] User can toggle confirm password visibility to see password instead of dots', async () => {
+      const signUp = getSignUp();
+      const password = TEST_PASSWORDS.valid.standard;
+      
+      await signUp.enterConfirmPassword(password);
+      await signUp.verifyConfirmPasswordVisibilityToggleVisible();
+      await signUp.toggleConfirmPasswordVisibility();
+      await signUp.verifyConfirmPasswordValueAfterToggle(password);
+    });
+
+    it('[3008] User can toggle password visibility for both fields independently', async () => {
+      const signUp = getSignUp();
+      const { standard: password, masked, maskedConfirm } = TEST_PASSWORDS.valid;
+      
+      await signUp.enterPasswords(password);
+      
+      await signUp.togglePasswordVisibility();
+      await signUp.verifyPasswordValueAfterToggle(password);
+      await signUp.togglePasswordVisibility();
+      await signUp.verifyPasswordValueAfterToggle(masked);
+      
+      await signUp.toggleConfirmPasswordVisibility();
+      await signUp.verifyConfirmPasswordValueAfterToggle(password);
+      await signUp.toggleConfirmPasswordVisibility();
+      await signUp.verifyConfirmPasswordValueAfterToggle(maskedConfirm);
+    });
   });
 
-  it('[PAS-XXX] User can not complete password creation flow with different passwords', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
-    const differentPassword = TEST_PASSWORDS.valid.withSpecial;
-
-    await signUp.enterPassword(password);
-    await signUp.togglePasswordVisibility();
-    await signUp.enterConfirmPassword(differentPassword);
-    await signUp.toggleConfirmPasswordVisibility();
-    await signUp.acceptTerms();
-    await signUp.tapContinue();
-    await signUp.verifyPasswordMismatchWarningVisible();
-    await signUp.declineTerms();
+  describe('Valid Passwords', () => {
+    registerValidPasswordTests();
   });
 
-  it('[PAS-XXX] User can complete password creation flow with valid password', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
+  describe('Invalid Passwords', () => {
+    registerInvalidPasswordTests();
+  });
 
-    await signUp.enterPasswords(password);
-    await signUp.acceptTerms();
-    await signUp.tapContinue();
+  describe('Password Mismatch and Empty Fields', () => {
+    
+    it('[2239] User cannot complete flow with mismatched passwords', async () => {
+      const signUp = getSignUp();
+
+      await signUp.enterPassword(TEST_PASSWORDS.valid.standard);
+      await signUp.enterConfirmPassword(TEST_PASSWORDS.valid.withSpecial);
+      await signUp.acceptTerms();
+      await signUp.tapContinue();
+      await signUp.verifyPasswordMismatchWarningVisible();
+    });
+
+    it('[2240] User cannot complete flow with both password fields empty', async () => {
+      const signUp = getSignUp();
+
+      await signUp.acceptTerms();
+      await signUp.tapContinue();
+      await signUp.verifyValidationError('passwordRequired', 'enterPassword');
+      await signUp.verifyValidationError('passwordRequired', 'enterConfirmPassword');
+    });
+
+    it('[2241] User cannot complete flow with empty Enter password field', async () => {
+      const signUp = getSignUp();
+      
+      await signUp.enterConfirmPassword(TEST_PASSWORDS.valid.standard);
+      await signUp.acceptTerms();
+      await signUp.tapContinue();
+      await signUp.verifyValidationError('passwordRequired', 'enterPassword');
+    });
+
+    it('[2242] User cannot complete flow with empty Confirm password field', async () => {
+      const signUp = getSignUp();
+      
+      await signUp.enterPassword(TEST_PASSWORDS.valid.standard);
+      await signUp.acceptTerms();
+      await signUp.tapContinue();
+      await signUp.verifyValidationError('passwordRequired', 'enterConfirmPassword');
+    });
+  });
+
+  describe('Complete Flow', () => {
+    
+    it('[2244, 204, 928, 929, 935] User can complete password creation flow', async () => {
+      await completePasswordCreationFlow(TEST_PASSWORDS.valid.standard);
+    });
+
+    it('[209] User can enable biometrics authentication', async () => {
+      const signUp = getSignUp();
+
+      await signUp.enterPasswords(TEST_PASSWORDS.valid.standard);
+      await signUp.acceptTerms();
+      await signUp.tapContinue();
+
+      await signUp.verifyEnableBiometricAuthenticationPopupDisplayed();
+      await signUp.verifyEnableBiometricAuthenticationPopupAllElementsDisplayed();
+      await signUp.tapEnableBiometricAuthenticationPopupEnableButton();
+      
+      await signUp.useBiometricsAuthentication();
+      await signUp.useBiometricsAuthentication();
+      await Pages.signUp.waitForEnterPasswordScreen();
+    });
   });
 });
 
+// ============================================================
+// ENTER MASTER PASSWORD SCREEN
+// ============================================================
+
 describe('Sign Up Flow - Enter Master Password', () => {
+  const testPassword = TEST_PASSWORDS.valid.standard;
+  const getSignUp = () => Pages.signUp;
 
-  it('[PAS-XXX] User should see Enter Master Password screen with all elements', async () => {
-    const signUp = Pages.signUp;
-
-    await signUp.verifyEnterPasswordScreenContent();
-    await signUp.verifyEnterPasswordInputVisible();
-    await signUp.verifyEnterPasswordInputIconVisible();
-    await signUp.verifyEnterPasswordWarningIconVisible();
+  beforeEach(async () => {
+    await restartAndWaitForEnterPasswordScreen();
   });
 
-  it('[PAS-XXX] User should see placeholder text in password input field', async () => {
-    const signUp = Pages.signUp;
-
-    const placeholderText = await signUp.enterPasswordInput.getText();
-    expect(placeholderText).toBe(ENTER_PASSWORD_SCREEN.placeholder);
-  });
-
-  it('[PAS-XXX] User can enter master password in password input field', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
+  describe('Screen Elements', () => {
     
-    await signUp.enterMasterPassword(password);
-    await signUp.toggleEnterPasswordVisibility();
-
-    const enterPasswordText = await signUp.enterPasswordInput.getText();
-    expect(enterPasswordText).toBe(password);
-    await signUp.toggleEnterPasswordVisibility();
-  });
-
-  it('[PAS-XXX] User can toggle password visibility to see password instead of dots', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
-    const masked = TEST_PASSWORDS.valid.masked;
-    
-    await signUp.enterMasterPassword(password);
-    await signUp.verifyEnterPasswordVisibilityToggleVisible();
-    await signUp.toggleEnterPasswordVisibility();
-    await signUp.verifyEnterPasswordValueAfterToggle(password);
-    await signUp.toggleEnterPasswordVisibility();
-    await signUp.verifyEnterPasswordValueAfterToggle(masked);
-  });
-
-  it('[PAS-XXX] User can not complete password creation flow with different passwords', async () => {
-    const signUp = Pages.signUp;
-    const wrongPassword = TEST_PASSWORDS.valid.complex;
-    
-    await signUp.enterMasterPassword(wrongPassword);
-    await signUp.tapEnterPasswordContinue();
-    await signUp.enterPasswordIncorrectPassword4AttemptsWarning.waitForDisplayed({ timeout: 5000 });
-    await signUp.verifyValidationError('incorrectPassword4Attempts', 'enterMasterPassword');
-  });
-
-  it('[PAS-XXX] User can login with correct master password', async () => {
-    const signUp = Pages.signUp;
-    const password = TEST_PASSWORDS.valid.standard;
-    
-    await signUp.enterMasterPassword(password);
-    await signUp.tapEnterPasswordContinue();
-  });
-
-  describe('Sign Up Flow - Select Vault Type', () => {
-
-    it('[PAS-XXX] User should see Select Vault Type screen with all elements', async () => {
-      const signUp = Pages.signUp;
-
-      await signUp.waitForSelectVaultTypeScreen();
-      await signUp.verifySelectVaultTypeScreenContent();
+    it('[3012] User should see Enter Master Password screen with all elements', async () => {
+      const signUp = getSignUp();
+      await signUp.verifyEnterPasswordScreenContent();
+      await signUp.verifyEnterPasswordInputVisible();
+      await signUp.verifyEnterPasswordInputIconVisible();
+      await signUp.verifyEnterPasswordWarningIconVisible();
     });
 
-    it('[PAS-XXX] User can tap Load a vault button and navigate to Load Vault screen', async () => {
-      const signUp = Pages.signUp;
+    it('[3013] User should see placeholder text in password input field', async () => {
+      const signUp = getSignUp();
+      const placeholderText = await signUp.enterPasswordInput.getText();
+      expect(placeholderText).toBe(ENTER_PASSWORD_SCREEN.placeholder);
+    });
+  });
 
-      await signUp.tapLoadExistingVault();
-      await signUp.waitForLoadVaultScreen();
-      await signUp.verifyLoadVaultScreenContent();
-      await signUp.tapLoadVaultSelectVaults();
+  describe('Password Entry', () => {
+    
+    it('[3014] User can enter master password in input field', async () => {
+      const signUp = getSignUp();
+      
+      await signUp.enterMasterPassword(testPassword);
+      await signUp.toggleEnterPasswordVisibility();
+      const enterPasswordText = await signUp.enterPasswordInput.getText();
+      expect(enterPasswordText).toBe(testPassword);
+    });
+
+    it('[3015] User can toggle password visibility to see password', async () => {
+      const signUp = getSignUp();
+      
+      await signUp.enterMasterPassword(testPassword);
+      await signUp.verifyEnterPasswordVisibilityToggleVisible();
+      
+      await signUp.toggleEnterPasswordVisibility();
+      await signUp.verifyEnterPasswordValueAfterToggle(testPassword);
+      
+      await signUp.toggleEnterPasswordVisibility();
+      await signUp.verifyEnterPasswordValueAfterToggle(TEST_PASSWORDS.valid.masked);
+    });
+  });
+
+  describe('Password Validation', () => {
+    
+    it('[1256] User cannot proceed with incorrect password', async () => {
+      const signUp = getSignUp();
+      
+      await signUp.enterMasterPassword(TEST_PASSWORDS.valid.complex);
+      await signUp.tapEnterPasswordContinue();
+      await signUp.verifyValidationError('incorrectPassword4Attempts', 'enterMasterPassword');
+    });
+
+    it('[206, 207, 932] User can login with correct master password', async () => {
+      const signUp = getSignUp();
+      
+      await signUp.enterMasterPassword(testPassword);
+      await signUp.tapEnterPasswordContinue();
       await signUp.waitForSelectVaultTypeScreen();
     });
+  });
+});
 
-    it('[PAS-XXX] User can tap Create a new vault button and navigate to New Vault screen', async () => {
-      const signUp = Pages.signUp;
+// ============================================================
+// CREATE NEW VAULT SCREEN
+// ============================================================
 
-      await signUp.tapCreateNewVault();
-      await signUp.waitForNewVaultScreen();
-      await signUp.verifyNewVaultScreenContent();
-    });
+describe('Sign Up Flow - Create New Vault', () => {
+  const testPassword = TEST_PASSWORDS.valid.standard;
+  const getSignUp = () => Pages.signUp;
+
+  beforeEach(async () => {
+    await restartAndNavigateToNewVaultScreen(testPassword);
   });
 
-  describe('Sign Up Flow - Create New Vault', () => {
+  it('[215] User should see New Vault screen with all elements', async () => {
+    const signUp = getSignUp();
+    await signUp.verifyNewVaultScreenContent();
+  });
 
-    it('[PAS-XXX] User can verify Create New Vault screen, navigate and create vault', async () => {
-      const signUp = Pages.signUp;
-      const home = Pages.home;
-      const vaultName = 'Valeron';
+  it('[3016] User can navigate back from New Vault to Select Vaults', async () => {
+    const signUp = getSignUp();
+    
+    await signUp.tapNewVaultSelectVaults();
+    await signUp.waitForSelectVaultTypeScreen();
+  });
 
-      await signUp.tapNewVaultSelectVaults();
-      await signUp.waitForSelectVaultTypeScreen();
-      await signUp.tapCreateNewVault();
-      await signUp.waitForNewVaultScreen();
-      const newVaultTitleText = await signUp.newVaultTitle.getText();
-      expect(newVaultTitleText).toBe(NEW_VAULT_SCREEN.title);
-      await signUp.enterVaultName(vaultName);
-      const vaultNameText = await signUp.newVaultNameInput.getText();
-      expect(vaultNameText).toBe(vaultName);
-      await signUp.tapNewVaultContinue();
-      await home.verifyHomeLogoLockVisible();
-    });
+  it('[219] User can create a new vault and navigate to Home', async () => {
+    const signUp = getSignUp();
+    const vaultName = 'Valeron';
+    
+    const titleText = await signUp.newVaultTitle.getText();
+    expect(titleText).toBe(NEW_VAULT_SCREEN.title);
+    
+    await signUp.enterVaultName(vaultName);
+    const inputText = await signUp.newVaultNameInput.getText();
+    expect(inputText).toBe(vaultName);
+    
+    await signUp.tapNewVaultContinue();
+    await Pages.home.verifyHomeLogoLockVisible();
   });
 });

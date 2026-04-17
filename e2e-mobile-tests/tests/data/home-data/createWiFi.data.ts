@@ -21,8 +21,8 @@ export const CREATE_WIFI_PASSWORD_FIELD = {
   ===================================================== */
 
 export const CREATE_WIFI_NOTE_FIELD = {
-  title: ' Note ',
-  inputPlaceholder: 'Insert Note',
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
 } as const;
 
 /* =====================================================
@@ -38,7 +38,7 @@ export const CREATE_WIFI_CUSTOM_FIELD = {
   ===================================================== */
 
 export const CREATE_WIFI_SHOW_CUSTOM_FIELD_POPUP = {
-  noteText: 'Note',
+  noteText: 'Comment',
 } as const;
 
 /* =====================================================
@@ -46,8 +46,8 @@ export const CREATE_WIFI_SHOW_CUSTOM_FIELD_POPUP = {
   ===================================================== */
 
 export const CREATE_WIFI_NEW_NOTE_FIELD = {
-  title: ' Note ',
-  inputPlaceholder: 'Add note',
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
 } as const;
 
 /* =====================================================

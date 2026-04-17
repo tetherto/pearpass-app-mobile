@@ -25,8 +25,17 @@ export const SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_FIELD = {
   ===================================================== */
 
 export const SAVE_RECOVERY_PHRASE_NOTE_FIELD = {
-  title: ' Note ',
-  inputPlaceholder: 'Add note',
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
+} as const;
+
+/* =====================================================
+        SAVE RECOVERY PHRASE PAGE - NEW NOTE FIELD (ADDED)
+  ===================================================== */
+
+export const SAVE_RECOVERY_PHRASE_NEW_NOTE_FIELD = {
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
 } as const;
 
 /* =====================================================
@@ -35,6 +44,14 @@ export const SAVE_RECOVERY_PHRASE_NOTE_FIELD = {
 
 export const SAVE_RECOVERY_PHRASE_CUSTOM_FIELD = {
   title: 'Create Custom',
+} as const;
+
+/* =====================================================
+        SAVE RECOVERY PHRASE PAGE - SHOW CUSTOM FIELD POPUP
+  ===================================================== */
+
+export const SAVE_RECOVERY_PHRASE_SHOW_CUSTOM_FIELD_POPUP = {
+  noteText: 'Comment',
 } as const;
 
 /* =====================================================
@@ -176,4 +193,5 @@ export const SAVE_RECOVERY_PHRASE_TWELFTH_PASTED_RECOVERY_PHRASE = {
 export const SAVE_RECOVERY_PHRASE_ENTERED_FIELDS = {
   applicationName: 'Test Application',
   note: 'Val Vall Valeron Valerik Valodia Eeee Ffasda wewqe qweqwe ewqe ewqeqw qweq',
+  newNote: 'Additional note field for recovery phrase',
 } as const;

@@ -14,9 +14,10 @@ const sidebarLocators = {
   sidebarFavoritesIcon: '//android.view.ViewGroup[@content-desc="Favorites, 0 items"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
   sidebarFavoritesCount: '//android.widget.TextView[@resource-id="sidebar-favorites-count"]',
   sidebarFavoritesSelected: '//android.view.ViewGroup[@content-desc="Favorites, 0 items"]/com.horcrux.svg.SvgView[2]',
-  sidebarCreateNew: '//android.widget.TextView[@text="Create new"]',
+  sidebarCreateNew: '~Create new',
   sidebarCreateNewIcon: '//android.view.ViewGroup[@content-desc="Create new"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.PathView',
-/* ============================
+  sidebarCreateNewText: '//android.widget.TextView[@text="Create new"]',
+  /* ============================
         ACTIONS BUTTONS
 ============================ */
   sidebarAddDeviceButton: '//android.view.ViewGroup[@content-desc="Add Device"]',
@@ -72,9 +73,9 @@ const sidebarLocators = {
 /* ============================
         TEST FOLDER
 ============================ */
-  testFolder: '~TestFolder, 0 items',
-  testFolderIcon: '//android.view.ViewGroup[@content-desc="TestFolder, 0 items"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
-  testFolderText: '//android.widget.TextView[@text="TestFolder"]',
+  testFolder: '~Test Folder, 0 items',
+  testFolderIcon: '//android.view.ViewGroup[@content-desc="Test Folder, 0 items"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  testFolderText: '//android.widget.TextView[@text="Test Folder"]',
   testFolderCount: '(//android.widget.TextView[@text="0 items"])[3]',
   testFolderSelected: '//com.horcrux.svg.SvgView[@resource-id="sidebar-folder-undefined-active"]',
   testFolder1: '//android.widget.TextView[@text="Test Folder1"]',

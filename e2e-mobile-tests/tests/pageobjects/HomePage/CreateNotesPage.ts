@@ -1,6 +1,6 @@
 import BasePage from '@pages/BasePage';
 import createNotesLocators from '@locators/HomeLocators/CreateNotesLocators';
-import { CREATE_NOTES_TITLE_FIELD, CREATE_NOTES_WRITE_NOTE_FIELD, CREATE_NOTES_ADD_FILE_FIELD, CREATE_NOTES_NEW_ADDED_FILE_FIELD, CREATE_NOTES_CUSTOM_FIELD, CREATE_NOTES_NEW_ELEMENT_IN_CUSTOM_FIELD, CREATE_NOTES_ENTERED_FIELDS } from '@data/home-data/createNotes.data';
+import { CREATE_NOTES_TITLE_FIELD, CREATE_NOTES_WRITE_NOTE_FIELD, CREATE_NOTES_ADD_FILE_FIELD, CREATE_NOTES_NEW_ADDED_FILE_FIELD, CREATE_NOTES_CUSTOM_FIELD, CREATE_NOTES_NEW_ELEMENT_IN_CUSTOM_FIELD, CREATE_NOTES_NEW_NOTE_FIELD, CREATE_NOTES_ENTERED_FIELDS } from '@data/home-data/createNotes.data';
 
 declare const expect: any;
 
@@ -28,6 +28,13 @@ export class CreateNotesPage extends BasePage {
   get newAddedFileFieldDeleteButton() { return this.$('newAddedFileFieldDeleteButton'); }
   get customFieldsIcon3() { return this.$('customFieldsIcon3'); }
   get customFieldsText2() { return this.$('customFieldsText2'); }
+  get expandCreateCustomFieldButton() { return this.$('expandCreateCustomFieldButton'); }
+  get addCommentButton() { return this.$('addCommentButton'); }
+  get newNoteField() { return this.$('newNoteField'); }
+  get newNoteFieldIcon() { return this.$('newNoteFieldIcon'); }
+  get newNoteFieldTitle() { return this.$('newNoteFieldTitle'); }
+  get newNoteFieldInput() { return this.$('newNoteFieldInput'); }
+  get newNoteFieldDeleteButton() { return this.$('newNoteFieldDeleteButton'); }
 
   async tapTitleField(): Promise<this> {
     await this.titleField.click();
@@ -49,6 +56,24 @@ export class CreateNotesPage extends BasePage {
     return this.self;
   }
 
+  async tapExpandCreateCustomFieldButton(): Promise<this> {
+    await this.customFieldIcon2.waitForDisplayed({ timeout: 5000 });
+    await this.customFieldIcon2.click();
+    return this.self;
+  }
+
+  async tapAddCommentButton(): Promise<this> {
+    await this.addCommentButton.waitForDisplayed({ timeout: 5000 });
+    await this.addCommentButton.click();
+    return this.self;
+  }
+
+  async tapNewNoteFieldDeleteButton(): Promise<this> {
+    await this.newNoteFieldDeleteButton.waitForDisplayed({ timeout: 5000 });
+    await this.newNoteFieldDeleteButton.click();
+    return this.self;
+  }
+
   async enterTextInFields(
     fieldName: keyof typeof CREATE_NOTES_ENTERED_FIELDS
   ): Promise<this> {
@@ -56,6 +81,7 @@ export class CreateNotesPage extends BasePage {
     const inputByField = {
       title: this.titleFieldInput,
       writeNote: this.writeNoteText,
+      newNote: this.newNoteFieldInput,
     } as const;
     const input = inputByField[fieldName];
     await input.setValue(value);
@@ -69,6 +95,7 @@ export class CreateNotesPage extends BasePage {
     const inputByField = {
       title: this.titleFieldInput,
       writeNote: this.writeNoteText,
+      newNote: this.newNoteFieldInput,
     } as const;
     const input = inputByField[fieldName];
     const actual = (await input.getText()) ?? (await input.getAttribute('text')) ?? '';
@@ -133,6 +160,34 @@ export class CreateNotesPage extends BasePage {
     return this.self;
   }
 
+  async verifyAllElementsInFieldVisible(): Promise<this> {
+    const { text } = CREATE_NOTES_NEW_ELEMENT_IN_CUSTOM_FIELD;
+    await this.customFieldsIcon3.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Custom field icon (Comment) should be visible' });
+    await this.customFieldsText2.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Custom field text (Comment) should be visible' });
+    const textActual = (await this.customFieldsText2.getText()) ?? (await this.customFieldsText2.getAttribute('text')) ?? '';
+    expect(textActual).toBe(text);
+    return this.self;
+  }
+
+  async verifyNewNoteFieldVisibleWithAllElements(): Promise<this> {
+    const { title, inputPlaceholder } = CREATE_NOTES_NEW_NOTE_FIELD;
+    await this.newNoteField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field should be visible' });
+    await this.newNoteFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field icon should be visible' });
+    await this.newNoteFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field title should be visible' });
+    await this.newNoteFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field input should be visible' });
+    await this.newNoteFieldDeleteButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field delete button should be visible' });
+    const titleActual = await this.newNoteFieldTitle.getText();
+    expect(titleActual).toBe(title);
+    const inputText = (await this.newNoteFieldInput.getText()) ?? (await this.newNoteFieldInput.getAttribute('text')) ?? '';
+    expect(inputText).toBe(inputPlaceholder);
+    return this.self;
+  }
+
+  async verifyNewNoteFieldNotVisible(): Promise<this> {
+    await this.newNoteField.waitForDisplayed({ timeout: 10000, reverse: true, timeoutMsg: 'New note field should not be visible' });
+    return this.self;
+  }
+
   async verifyNewFileFieldWithAllElementsVisible(): Promise<this> {
     const { title, text } = CREATE_NOTES_NEW_ADDED_FILE_FIELD;
     await this.newAddedFileField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New added file field should be visible' });
@@ -151,6 +206,15 @@ export class CreateNotesPage extends BasePage {
     await this.titleField.waitForDisplayed({
       timeout,
       timeoutMsg: 'Create notes page title field not visible',
+    });
+    return this.self;
+  }
+
+  async verifyCreateNotesPageNotVisible(timeout = 10000): Promise<this> {
+    await this.titleField.waitForDisplayed({
+      timeout,
+      reverse: true,
+      timeoutMsg: 'Create notes page should not be visible',
     });
     return this.self;
   }

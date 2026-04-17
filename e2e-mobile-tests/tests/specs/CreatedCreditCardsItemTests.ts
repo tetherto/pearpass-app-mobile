@@ -4,14 +4,14 @@ import { Pages } from '@support/page-factory';
 
 describe('Created Credit Cards Flow - User can interact with three dots menu on Home page', () => {
 
-    it('[PAS-XXX] User can tap on three dots menu on Created Credit Cards Item on Home page and see three dots menu popup', async () => {
+    it('User can tap on three dots menu on Created Credit Cards Item on Home page and see three dots menu popup', async () => {
         const { createdCreditCardsItem } = Pages;
 
         await createdCreditCardsItem.tapThreeDotsButtonOnCreatedCreditCards();
         await createdCreditCardsItem.verifyThreeDotsMenuPopupVisible();
     });
 
-    it('[PAS-XXX] User can verify that all options in three dots menu are visible', async () => {
+    it('User can verify that all options in three dots menu are visible', async () => {
         const { createdCreditCardsItem } = Pages;
 
         await createdCreditCardsItem.verifyCopyNameOnCardButtonAllElementsVisible();
@@ -21,14 +21,14 @@ describe('Created Credit Cards Flow - User can interact with three dots menu on 
         await createdCreditCardsItem.verifyDeleteButtonAllElementsVisible();
     });
 
-    it('[PAS-XXX] User can tap on Copy Name on card button and verify that name on card is copied', async () => {
+    it('User can tap on Copy Name on card button and verify that name on card is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapCopyNameOnCardButton();
         await createdCreditCardsItem.verifyNameOnCardCopied();
     });
 
-    it('[PAS-XXX] User can tap on Copy Number on card button and verify that number on card is copied', async () => {
+    it('User can tap on Copy Number on card button and verify that number on card is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapThreeDotsButtonOnCreatedCreditCards();
@@ -37,7 +37,7 @@ describe('Created Credit Cards Flow - User can interact with three dots menu on 
         await createdCreditCardsItem.verifyNumberOnCardCopied();
     });
 
-    it('[PAS-XXX] User can tap on Mark as favorite button and verify that item is marked as favorite', async () => {
+    it('[280] User can tap on Mark as favorite button and verify that item is marked as favorite', async () => {
         const { createdCreditCardsItem, home, sidebar } = Pages;
         
         await createdCreditCardsItem.tapThreeDotsButtonOnCreatedCreditCards();
@@ -50,7 +50,7 @@ describe('Created Credit Cards Flow - User can interact with three dots menu on 
         await sidebar.closeSidebarPageBySwipe();
     });
 
-    it('[PAS-XXX] User can tap on Remove from favorites button and verify that item is removed from favorites', async () => {
+    it('[282] User can tap on Remove from favorites button and verify that item is removed from favorites', async () => {
         const { createdCreditCardsItem, home, sidebar } = Pages;
         
         await createdCreditCardsItem.tapThreeDotsButtonOnCreatedCreditCards();
@@ -67,14 +67,14 @@ describe('Created Credit Cards Flow - User can interact with three dots menu on 
 
 describe('Created Credit Cards Flow - User can interact with Created Credit Cards Item page', () => {
 
-    it('[PAS-XXX] User can tap on Created Credit Cards Item and see Created Credit Cards Item page', async () => {
+    it('User can tap on Created Credit Cards Item and see Created Credit Cards Item page', async () => {
         const { createdCreditCardsItem } = Pages;
 
         await createdCreditCardsItem.tapCreatedCreditCardsItem();
         await createdCreditCardsItem.verifyTitleCreditCardsItemPageVisible();
     });
 
-    it('[PAS-XXX] User can verify that all elements on Created Credit Cards Item page are visible', async () => {
+    it('User can verify that all elements on Created Credit Cards Item page are visible', async () => {
         const { createdCreditCardsItem } = Pages;
 
         await createdCreditCardsItem.verifyBackButtonCreditCardsItemPageVisible();
@@ -92,67 +92,59 @@ describe('Created Credit Cards Flow - User can interact with Created Credit Card
         await createdCreditCardsItem.verifyNotesFieldCreditCardsItemPageAllElementsVisible();
     });
 
-    it('[PAS-XXX] User can tap on show security code icon button and verify that security code is shown', async () => {
+    it('[277] User can tap on show security code icon button and verify that security code is shown', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapShowSecurityCodeIconButton();
         await createdCreditCardsItem.verifySecurityCodePasswordIsVisible();
     });
 
-    it('[PAS-XXX] User can tap on show pin code icon button and verify that pin code is shown', async () => {
+    it('User can tap on show pin code icon button and verify that pin code is shown', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapShowPinCodeIconButton();
         await createdCreditCardsItem.verifyPinCodeFieldCreditCardsItemPageVisible();
     });
 
-    it('[PAS-XXX] User can tap on copy name on card button and verify that name on card is copied', async () => {
+    it('User can tap on copy name on card button and verify that name on card is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapCopyNameOnCardButton();
         await createdCreditCardsItem.verifyNameOnCardCopied();
     });
 
-    it('[PAS-XXX] User can tap on copy number on card button and verify that number on card is copied', async () => {
+    it('User can tap on copy number on card button and verify that number on card is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapCopyNumberOnCardButton();
         await createdCreditCardsItem.verifyNumberOnCardCopied();
     });
 
-    it('[PAS-XXX] User can tap on copy expiration date button and verify that expiration date is copied', async () => {
+    it('User can tap on copy expiration date button and verify that expiration date is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapCopyExpirationDateButton();
         await createdCreditCardsItem.verifyExpirationDateCopied();
     });
 
-    it('[PAS-XXX] User can tap on copy security code button and verify that security code is copied', async () => {
+    it('User can tap on copy security code button and verify that security code is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapCopySecurityCodeButton();
         await createdCreditCardsItem.verifySecurityCodeCopied();
     });
 
-    it('[PAS-XXX] User can tap on copy pin code button and verify that pin code is copied', async () => {
+    it('User can tap on copy pin code button and verify that pin code is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapCopyPinCodeButton();
         await createdCreditCardsItem.verifyPinCodeCopied();
     });
     
-    it('[PAS-XXX] User can tap on note field button and verify that note is copied', async () => {
+    it('User can tap on note field button and verify that note is copied', async () => {
         const { createdCreditCardsItem } = Pages;
         
         await createdCreditCardsItem.tapCopyNoteButton();
         await createdCreditCardsItem.verifyNoteCopied();
     });
 });   
-
-    
-    
-
-
-
-
-

@@ -46,5 +46,17 @@ export const CREATE_CUSTOM_ELEMENT_NEW_FILE_FIELD = {
   ===================================================== */
 
 export const CREATE_CUSTOM_ELEMENT_NEW_ELEMENT_IN_CUSTOM_FIELD = {
-  text: 'Custom title for test',
+  /** content-desc for createCustomFieldIcon3 (Comment type icon) */
+  label: 'Comment',
+  /** Text for createCustomFieldText2 (Comment type label) */
+  text: 'Comment',
+} as const;
+
+/* =====================================================
+        CREATE CUSTOM ELEMENT PAGE - NEW NOTE FIELD
+  ===================================================== */
+
+export const CREATE_CUSTOM_ELEMENT_NEW_NOTE_FIELD = {
+  title: ' Comment ',
+  inputPlaceholder: 'Add comment',
 } as const;

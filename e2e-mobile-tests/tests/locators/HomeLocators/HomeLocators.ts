@@ -162,9 +162,8 @@ const homeLocators = {
   nordPassCsvCreditIconText: '//android.widget.TextView[@text="NC"]',
   nordPassCsvCreditText: '//android.widget.TextView[@text="Nordpass credit"]',
 
-  nordPassCsvGmail: '~GM',
-  nordPassCsvGmailIcon: '//android.view.ViewGroup[@content-desc="GM"]/android.view.ViewGroup[1]',
-  nordPassCsvGmailIconText: '//android.widget.TextView[@text="GM"]',
+  nordPassCsvGmail: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]',
+  nordPassCsvGmailIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[1]',
   nordPassCsvGmailText: '//android.widget.TextView[@text="Gmail.com"]',
 /* =====================================================
         IMPORTED VAULTS - PROTONPASS CSV
@@ -173,16 +172,18 @@ const homeLocators = {
   protonPassCsvIdentityIcon: '//android.view.ViewGroup[@content-desc="PI, Personal"]/android.view.ViewGroup[1]',
   protonPassCsvIdentityIconText: '//android.widget.TextView[@text="PI"]',
   protonPassCsvIdentityText: '//android.widget.TextView[@text="prot identity"]',
+  protonPassCsvIdentityText2: '(//android.widget.TextView[@text="Personal"])[1]',
 
   protonPassCsvNote: '~PN, Personal',
   protonPassCsvNoteIcon: '//android.view.ViewGroup[@content-desc="PN, Personal"]/android.view.ViewGroup[1]',
   protonPassCsvNoteIconText: '//android.widget.TextView[@text="PN"]',
   protonPassCsvNoteText: '//android.widget.TextView[@text="prot note"]',
+  protonPassCsvNoteText2: '(//android.widget.TextView[@text="Personal"])[2]',
 
   protonPassCsvLogin: '~PL, Personal',
-  protonPassCsvLoginIcon: '//android.view.ViewGroup[@content-desc="PL, Personal"]/android.view.ViewGroup[1]',
-  protonPassCsvLoginIconText: '//android.widget.TextView[@text="PL"]',
+  protonPassCsvLoginIcon: '//android.view.ViewGroup[@content-desc="Personal"]/android.view.ViewGroup[1]',
   protonPassCsvLoginText: '//android.widget.TextView[@text="prot login"]',
+  protonPassCsvLoginText2: '(//android.widget.TextView[@text="Personal"])[3]',
 /* =====================================================
         IMPORTED VAULTS - PROTONPASS CSV
 ===================================================== */
@@ -198,8 +199,8 @@ const homeLocators = {
 
   protonPassJsonLogin: '(//android.view.ViewGroup[@content-desc="PL, Personal"])[1]',
   protonPassJsonLoginIcon: '(//android.view.ViewGroup[@content-desc="PL, Personal"])[1]/android.view.ViewGroup[1]',
-  protonPassJsonLoginIconText: '(//android.widget.TextView[@text="PL"])[1]',
   protonPassJsonLoginText: '(//android.widget.TextView[@text="prot login"])[1]',
+  protonPassJsonLoginText2: '(//android.widget.TextView[@text="Personal"])[3]',
 /* =====================================================
         IMPORTED VAULTS - UNENCRYPTED FILE CSV
 ===================================================== */
@@ -212,6 +213,8 @@ const homeLocators = {
   unencryptedFileCsvIncIcon: '//android.view.ViewGroup[@content-desc="IN, New reg"]/android.view.ViewGroup[1]',
   unencryptedFileCsvIncIconText: '//android.widget.TextView[@text="IN"]',
   unencryptedFileCsvIncText: '//android.widget.TextView[@text="Inc"]',
+
+  unencryptedFileJsonDisplayed: '~HG',
 /* =====================================================
         CREATE ITEM POPUP
 ===================================================== */
@@ -267,7 +270,7 @@ const homeLocators = {
         HOME PAGE - LOGIN CREATED ON HOME PAGE
 ===================================================== */
   loginCreatedOnHomePage: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup',
-  loginCreatedOnHomePageIcon: '//android.widget.ImageView[@resource-id="avatar-image"]',
+  loginCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="LT"]/android.view.ViewGroup[1]',
   loginCreatedOnHomePageText: '//android.widget.TextView[@text="Login to Google"]',
   newLoginCreatedOnHomePageText: '//android.widget.TextView[@text="Login to Google New Title"]',
   loginCreatedOnHomePageThreeDotsButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
@@ -295,24 +298,24 @@ const homeLocators = {
 /* =====================================================
         HOME PAGE - IDENTITY CREATED ON HOME PAGE
 ===================================================== */
-  identityCreatedOnHomePage: '~TI',
-  identityCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TI"]/android.view.ViewGroup[1]',
+  identityCreatedOnHomePage: '~TI, Test Folder',
+  identityCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TI, Test Folder"]/android.view.ViewGroup[1]',
   identityCreatedOnHomePageText: '//android.widget.TextView[@text="Test Identity Title"]',
-  identityCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TI"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+  identityCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TI, Test Folder"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
 /* =====================================================
         HOME PAGE - NOTE CREATED ON HOME PAGE
 ===================================================== */
-  noteCreatedOnHomePage: '~TN',
-  noteCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TN"]/android.view.ViewGroup[1]',
+  noteCreatedOnHomePage: '~TN, Test Folder',
+  noteCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TN, Test Folder"]/android.view.ViewGroup[1]',
   noteCreatedOnHomePageText: '//android.widget.TextView[@text="Test Note Title"]',
-  noteCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TN"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+  noteCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TN, Test Folder"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
 /* =====================================================
         HOME PAGE - CUSTOM ELEMENT CREATED ON HOME PAGE
 ===================================================== */
-  customElementCreatedOnHomePage: '~CT',
-  customElementCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="CT"]/android.view.ViewGroup[1]',
-  customElementCreatedOnHomePageText: '//android.widget.TextView[@text="Custom title for test"]',
-  customElementCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="CT"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
+  customElementCreatedOnHomePage: '~TC, Testing Folder',
+  customElementCreatedOnHomePageIcon: '//android.view.ViewGroup[@content-desc="TC, Testing Folder"]/android.view.ViewGroup[1]',
+  customElementCreatedOnHomePageText: '//android.widget.TextView[@text="Test Custom Title"]',
+  customElementCreatedOnHomePageThreeDotsButton: '//android.view.ViewGroup[@content-desc="TC, Testing Folder"]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView',
 
 }
 export default homeLocators
