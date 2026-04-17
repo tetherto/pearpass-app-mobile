@@ -233,14 +233,29 @@ export const withIosAutofillExtension: ConfigPlugin<AutofillPluginOptions> = (co
     const configLists = project.pbxXCConfigurationList();
     const configList = configLists[configListUuid];
 
+    // Debug-only settings: SwiftUI Previews require -Onone + incremental compilation.
+    // Without these, Xcode shows "Cannot preview in this file — Not built with -Onone".
+    const debugOnlyBuildSettings: Record<string, string> = {
+      SWIFT_OPTIMIZATION_LEVEL: '"-Onone"',
+      SWIFT_COMPILATION_MODE: 'singlefile',
+    };
+
     if (configList && configList.buildConfigurations) {
       const xcBuildConfigs = project.pbxXCBuildConfigurationSection();
       configList.buildConfigurations.forEach((configRef: { value: string }) => {
         const configUuid = configRef.value;
-        if (xcBuildConfigs[configUuid] && xcBuildConfigs[configUuid].buildSettings) {
+        const xcConfig = xcBuildConfigs[configUuid];
+        if (xcConfig && xcConfig.buildSettings) {
           Object.entries(buildSettings).forEach(([key, value]) => {
-            xcBuildConfigs[configUuid].buildSettings[key] = value;
+            xcConfig.buildSettings[key] = value;
           });
+          // xcode package returns `name` wrapped in literal quotes (e.g. `"Debug"`).
+          const configName = String(xcConfig.name).replace(/^"|"$/g, '');
+          if (configName === 'Debug') {
+            Object.entries(debugOnlyBuildSettings).forEach(([key, value]) => {
+              xcConfig.buildSettings[key] = value;
+            });
+          }
         }
       });
     }
