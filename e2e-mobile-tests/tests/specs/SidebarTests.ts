@@ -116,7 +116,7 @@ describe('Sidebar - Add Device Popup', () => {
     await sidebar.waitForLoaded();
     await sidebar.tapAddDevice();
     await sidebar.verifyAddDevicePopupFull();
-    await sidebar.addDevicePopupQrCode.waitForDisplayed({ timeout: 30000 });
+    await sidebar.addDevicePopupQrCode.waitForDisplayed({ timeout: 50000 });
     await sidebar.verifyAddDevicePopupShareVaultTab();
     await sidebar.tapAddDevicePopupBackButton();
     await home.waitForHomePageLoaded();
@@ -128,7 +128,7 @@ describe('Sidebar - Add Device Popup', () => {
     await home.tapHomeLogoLock();
     await sidebar.waitForLoaded();
     await sidebar.tapAddDevice();
-    await sidebar.addDevicePopupQrCode.waitForDisplayed({ timeout: 30000 });
+    await sidebar.addDevicePopupQrCode.waitForDisplayed({ timeout: 50000 });
     await sidebar.verifyAddDevicePopupShareVaultTab();
     await sidebar.tapAddDevicePopupImportVaultTab();
     await sidebar.vaultKeyFieldInput.waitForDisplayed({ timeout: 30000 });

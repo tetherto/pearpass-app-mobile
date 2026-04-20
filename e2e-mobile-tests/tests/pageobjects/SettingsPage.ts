@@ -3,7 +3,6 @@ import settingsLocators from '@locators/SettingsLocators';
 import { SETTINGS_PAGE, SECURITY_PAGE, SYNCING_PAGE, AUTOFILL_PAGE, VAULT_PAGE, APPEARANCE_PAGE, ABOUT_PAGE, MASTER_PASSWORD_SECTION, PEAR_PASS_FUNCTIONS_SECTION, CONTINUE_USING_BIOMETRICS_ACCESS_POPUP, LANGUAGE_SECTION, MODIFY_MASTER_PASSWORD_POPUP, REPORT_PROBLEM_SECTION, VERSION_SECTION, LEGAL_LINKS, CHANGE_VAULT_NAME_POPUP, EXPORT_SECTION, IMPORT_SECTION, CUSTOM_SETTINGS_SECTION, BLIND_PEERING_SECTION, AUTOFILL_SECTION, YOUR_VAULT_SECTION, LINKED_DEVICES_SECTION, IMPORT_VAULT_POPUP, ImportWalletType, DropTextWalletType } from '@data/settings.data';
 import { browser } from '@wdio/globals';
 
-// Use global expect from expect-webdriverio for text comparison
 declare const expect: any;
 
 export class SettingsPage extends BasePage {
@@ -1276,72 +1275,36 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async tapBlindPeeringSectionToggle(): Promise<this> {
-    try {
-      console.log('Waiting for blind peering toggle...');
-      await this.blindPeeringSectionToggleOff.waitForDisplayed({ timeout: 20000 });
-      const elementId = await this.blindPeeringSectionToggleOff.elementId;
-      await driver.elementClick(elementId);
-      console.log('Toggle clicked successfully');
-      await browser.pause(2000); 
-      return this.self;
-    } catch (error: any) {
-      console.error(`Failed to click toggle: ${error.message}`);
-      const x = 842 + 65;
-      const y = 570 + 37;
-      
-      console.log(`Tapping at coordinates: x=${x}, y=${y}`);
-      
-      await driver.execute('mobile: tap', {
-        x: x,
-        y: y,
-        duration: 100 
-      });
-      await browser.pause(2000);
-      return this.self;
-    }
+    await this.blindPeeringSectionToggleOff.waitForDisplayed({ timeout: 20000 });
+    await this.blindPeeringSectionToggleOff.click();
+    return this.self;
   }
 
-  async verifyChooseYourBlindPeerPopupDisplayed(timeout: number = 20000): Promise<this> {
-    try {
-      await this.chooseBlindPeeringPopup.waitForDisplayed({ timeout });
-      const isDisplayed = await this.chooseBlindPeeringPopup.isDisplayed();
-      if (!isDisplayed) {
-        throw new Error('Choose your Blind Peer popup is not displayed after waiting');
-      }
-      console.log('✓ Choose your Blind Peer popup is successfully displayed');
-      return this;
-    } catch (error: any) {
-      throw new Error(
-        `Failed to wait for Choose your Blind Peer popup display: ${error.message}`
-      );
-    }
+  async verifyChooseYourBlindPeerPopupDisplayed(timeout = 20000): Promise<this> {
+    await this.chooseBlindPeeringPopup.waitForDisplayed({ timeout });
+    return this.self;
   }
 
   async verifyChooseYourBlindPeerPopupElements(): Promise<this> {
-    // Verify Popup Title
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupTitle, 'chooseBlindPeeringPopupTitle', 'Choose your Blind Peer popup title should be visible');
     const titleText = await this.chooseBlindPeeringPopupTitle.getText();
     expect(titleText).toBe(BLIND_PEERING_SECTION.chooseBlindPeerPopup.title);
     
-    // Verify Automatic Blind Peers Radio Button
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupAutomaticBlindPeersRadioButtonChoose, 'chooseBlindPeeringPopupAutomaticBlindPeersRadioButtonChoose', 'Automatic Blind Peers radio button should be visible');
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupAutomaticBlindPeersRadioButtonText, 'chooseBlindPeeringPopupAutomaticBlindPeersRadioButtonText', 'Automatic Blind Peers radio button text should be visible');
     const automaticText = await this.chooseBlindPeeringPopupAutomaticBlindPeersRadioButtonText.getText();
     expect(automaticText).toBe(BLIND_PEERING_SECTION.chooseBlindPeerPopup.options.automatic);
     
-    // Verify Manual Blind Peers Radio Button
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupManualBlindPeersRadioButtonText, 'chooseBlindPeeringPopupManualBlindPeersRadioButtonText', 'Manual Blind Peers radio button text should be visible');
     const manualText = await this.chooseBlindPeeringPopupManualBlindPeersRadioButtonText.getText();
     expect(manualText).toBe(BLIND_PEERING_SECTION.chooseBlindPeerPopup.options.manual);
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupManualBlindPeersRadioButtonUnchoose, 'chooseBlindPeeringPopupManualBlindPeersRadioButtonUnchoose', 'Manual Blind Peers radio button unchoose should be visible');
     
-    // Verify Confirm Button
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupConfirmButton, 'chooseBlindPeeringPopupConfirmButton', 'Confirm button should be visible');
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupConfirmButtonText, 'chooseBlindPeeringPopupConfirmButtonText', 'Confirm button text should be visible');
     const confirmButtonText = await this.chooseBlindPeeringPopupConfirmButtonText.getText();
     expect(confirmButtonText).toBe(BLIND_PEERING_SECTION.chooseBlindPeerPopup.buttons.confirm);
     
-    // Verify Cancel Button
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupCancelButton, 'chooseBlindPeeringPopupCancelButton', 'Cancel button should be visible');
     await this.verifyElementDisplayed(this.chooseBlindPeeringPopupCancelButtonText, 'chooseBlindPeeringPopupCancelButtonText', 'Cancel button text should be visible');
     const cancelButtonText = await this.chooseBlindPeeringPopupCancelButtonText.getText();
@@ -1424,37 +1387,29 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyAllNewElementsInYourBlindPeersSection(): Promise<this> {
-    // Verify Your Blind Peers Text
     await this.yourBlindPeersText.waitForDisplayed({ timeout: 20000, timeoutMsg: 'Your Blind Peers text not visible' });
     await this.verifyElementDisplayed(this.yourBlindPeersText, 'yourBlindPeersText', 'Your Blind Peers text should be visible');
     const yourBlindPeersTextValue = await this.yourBlindPeersText.getText();
     expect(yourBlindPeersTextValue).toBe(BLIND_PEERING_SECTION.yourBlindPeers.text);
     
-    // Verify Your Blind Peers Field
     await this.verifyElementDisplayed(this.yourBlindPeersField, 'yourBlindPeersField', 'Your Blind Peers field should be visible');
     
-    // Verify Our Blind Peers Field Text
     await this.verifyElementDisplayed(this.ourBlindPeersFieldText, 'ourBlindPeersFieldText', 'Our Blind Peers field text should be visible');
     const ourBlindPeersFieldTextValue = await this.ourBlindPeersFieldText.getText();
     expect(ourBlindPeersFieldTextValue).toBe(BLIND_PEERING_SECTION.yourBlindPeers.fieldText);
     
-    // Verify Our Blind Peers Field Icon
     await this.verifyElementDisplayed(this.ourBlindPeersFieldIcon, 'ourBlindPeersFieldIcon', 'Our Blind Peers field icon should be visible');
     
-    // Verify Our Blind Peers Field Status
     await this.verifyElementDisplayed(this.ourBlindPeersFieldStatus, 'ourBlindPeersFieldStatus', 'Our Blind Peers field status should be visible');
     const ourBlindPeersFieldStatusValue = await this.ourBlindPeersFieldStatus.getText();
     expect(ourBlindPeersFieldStatusValue).toBe(BLIND_PEERING_SECTION.yourBlindPeers.status);
     
-    // Verify Edit Button
     await this.verifyElementDisplayed(this.editBlindPeersButton, 'editBlindPeersButton', 'Edit Blind Peers button should be visible');
     
-    // Verify Edit Button Text
     await this.verifyElementDisplayed(this.editBlindPeersButtonText, 'editBlindPeersButtonText', 'Edit Blind Peers button text should be visible');
     const editButtonText = await this.editBlindPeersButtonText.getText();
     expect(editButtonText).toBe(BLIND_PEERING_SECTION.editButton);
     
-    // Verify Edit Button Icon
     await this.verifyElementDisplayed(this.editBlindPeersButtonIcon, 'editBlindPeersButtonIcon', 'Edit Blind Peers button icon should be visible');
     
     return this.self;
@@ -1474,57 +1429,46 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   async verifyManualBlindPeersPopupElements(): Promise<this> {
     const popupWaitOpts = { timeout: 20000, timeoutMsg: 'Manual Blind Peers popup element not visible' };
 
-    // Verify Popup Title
     await this.manualBlindPeersPopupTitle.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.manualBlindPeersPopupTitle, 'manualBlindPeersPopupTitle', 'Manual Blind Peers popup title should be visible');
     const titleText = await this.manualBlindPeersPopupTitle.getText();
     expect(titleText).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.title);
 
-    // Verify Back Button
     await this.manualBlindPeersPopupBackButton.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.manualBlindPeersPopupBackButton, 'manualBlindPeersPopupBackButton', 'Manual Blind Peers popup back button should be visible');
 
-    // Verify Blind Peer 1 Text
     await this.oneBlinPeerText.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.oneBlinPeerText, 'oneBlinPeerText', 'Blind Peer 1 text should be visible');
     const blindPeer1Text = await this.oneBlinPeerText.getText();
     expect(blindPeer1Text).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.blindPeer1);
 
-    // Verify Input Field
     await this.addHereYourCodeField.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.addHereYourCodeField, 'addHereYourCodeField', 'Add here your code field should be visible');
     const inputFieldPlaceholder = await this.addHereYourCodeField.getAttribute('text') || await this.addHereYourCodeField.getAttribute('hint');
     expect(inputFieldPlaceholder).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.inputFieldPlaceholder);
 
-    // Verify Add Peer Button
     await this.addPeerButton.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.addPeerButton, 'addPeerButton', 'Add Peer button should be visible');
 
-    // Verify Add Peer Button Text
     await this.addPeerButtonText.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.addPeerButtonText, 'addPeerButtonText', 'Add Peer button text should be visible');
     const addPeerButtonTextValue = await this.addPeerButtonText.getText();
     expect(addPeerButtonTextValue).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.buttons.addPeer);
 
-    // Verify Add Peer Button Icon
     await this.addPeerButtonIcon.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.addPeerButtonIcon, 'addPeerButtonIcon', 'Add Peer button icon should be visible');
 
-    // Verify Confirm Button
     await this.manualBlindPeersPopupConfirmButton.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.manualBlindPeersPopupConfirmButton, 'manualBlindPeersPopupConfirmButton', 'Confirm button should be visible');
 
-    // Verify Confirm Button Text
     await this.manualBlindPeersPopupConfirmButtonText.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.manualBlindPeersPopupConfirmButtonText, 'manualBlindPeersPopupConfirmButtonText', 'Confirm button text should be visible');
     const confirmButtonText = await this.manualBlindPeersPopupConfirmButtonText.getText();
     expect(confirmButtonText).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.buttons.confirm);
 
-    // Verify Cancel Button
     await this.manualBlindPeersPopupCancelButton.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.manualBlindPeersPopupCancelButton, 'manualBlindPeersPopupCancelButton', 'Cancel button should be visible');
 
-    // Verify Cancel Button Text
     await this.manualBlindPeersPopupCancelButtonText.waitForDisplayed(popupWaitOpts);
     await this.verifyElementDisplayed(this.manualBlindPeersPopupCancelButtonText, 'manualBlindPeersPopupCancelButtonText', 'Cancel button text should be visible');
     const cancelButtonText = await this.manualBlindPeersPopupCancelButtonText.getText();
@@ -1539,27 +1483,22 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyTwoBlinPeersElementsDisplayed(): Promise<this> {
-    // Verify Blind Peer 2 Text
+
     await this.verifyElementDisplayed(this.twoBlinPeerText, 'twoBlinPeerText', 'Blind Peer 2 text should be visible');
     const blindPeer2Text = await this.twoBlinPeerText.getText();
     expect(blindPeer2Text).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.blindPeer2);
-    
-    // Verify Input Field for Blind Peer 2
+
     await this.verifyElementDisplayed(this.twoBlinPeerAddHereYourCodeField, 'twoBlinPeerAddHereYourCodeField', 'Add here your code field for Blind Peer 2 should be visible');
     const inputFieldPlaceholder2 = await this.twoBlinPeerAddHereYourCodeField.getAttribute('text') || await this.twoBlinPeerAddHereYourCodeField.getAttribute('hint');
     expect(inputFieldPlaceholder2).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.inputFieldPlaceholder);
     
-    // Verify Remove Peer Button
     await this.verifyElementDisplayed(this.removePeerButton, 'removePeerButton', 'Remove Peer button should be visible');
-    
-    // Verify Remove Peer Button Text
+
     await this.verifyElementDisplayed(this.removePeerButtonText, 'removePeerButtonText', 'Remove Peer button text should be visible');
     const removePeerButtonTextValue = await this.removePeerButtonText.getText();
     expect(removePeerButtonTextValue).toBe(BLIND_PEERING_SECTION.manualBlindPeersPopup.buttons.removePeer);
-    
-    // Verify Remove Peer Button Icon
+
     await this.verifyElementDisplayed(this.removePeerButtonIcon, 'removePeerButtonIcon', 'Remove Peer button icon should be visible');
-    
     return this.self;
   }
 
@@ -1678,27 +1617,21 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     const yourBlindPeersTextValue = await this.yourBlindPeersText.getText();
     expect(yourBlindPeersTextValue).toBe(BLIND_PEERING_SECTION.yourBlindPeers.text);
     
-    // Verify Manual Blind Peers Field
     await this.verifyElementDisplayed(this.manualBlindPeersField, 'manualBlindPeersField', 'Manual Blind Peers field should be visible');
     
-    // Verify Manual Blind Peers Field Text
     await this.verifyElementDisplayed(this.manualBlindPeersFieldText, 'manualBlindPeersFieldText', 'Manual Blind Peers field text should be visible');
     const manualBlindPeersFieldTextValue = await this.manualBlindPeersFieldText.getText();
     expect(manualBlindPeersFieldTextValue).toBe(BLIND_PEERING_SECTION.yourBlindPeers.manualFieldText);
     
-    // Verify Manual Blind Peers Field Icon
     await this.manualBlindPeersFieldIcon.waitForDisplayed({ timeout: 20000 });
     await this.verifyElementDisplayed(this.manualBlindPeersFieldIcon, 'manualBlindPeersFieldIcon', 'Manual Blind Peers field icon should be visible');
     
-    // Verify Manual Blind Peers Field Status
     await this.verifyElementDisplayed(this.manualBlindPeersFieldStatus, 'manualBlindPeersFieldStatus', 'Manual Blind Peers field status should be visible');
     const manualBlindPeersFieldStatusValue = await this.manualBlindPeersFieldStatus.getText();
     expect(manualBlindPeersFieldStatusValue).toBe(BLIND_PEERING_SECTION.yourBlindPeers.manualStatus);
     
-    // Verify Separate Icon
     await this.verifyElementDisplayed(this.separateIcon, 'separateIcon', 'Separate icon should be visible');
     
-    // Verify Manual Blind Peers Field Text Count
     await this.verifyElementDisplayed(this.manualBlindPeersFieldTextCount, 'manualBlindPeersFieldTextCount', 'Manual Blind Peers field text count should be visible');
     const manualBlindPeersFieldTextCountValue = await this.manualBlindPeersFieldTextCount.getText();
     expect(manualBlindPeersFieldTextCountValue).toBe(BLIND_PEERING_SECTION.yourBlindPeers.manualTextCount);
@@ -1744,14 +1677,12 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   async verifyPearPassAppRadioButtonDisplayed(): Promise<this> {
     const popupWaitTimeout = 10000;
 
-    // Verify Radio Button
     await this.autoFIllServicesPearPassRadioButton.waitForDisplayed({
       timeout: popupWaitTimeout,
       timeoutMsg: 'PearPass app radio button should be visible',
     });
     await this.verifyElementDisplayed(this.autoFIllServicesPearPassRadioButton, 'autoFIllServicesPearPassRadioButton', 'PearPass app radio button should be visible');
 
-    // Verify Radio Button Text
     await this.autoFIllServicesPearPassRadioButtonText.waitForDisplayed({
       timeout: popupWaitTimeout,
       timeoutMsg: 'PearPass app radio button text should be visible',
@@ -1760,7 +1691,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     const radioButtonText = await this.autoFIllServicesPearPassRadioButtonText.getText();
     expect(radioButtonText).toBe(AUTOFILL_SECTION.autofillService.pearPassAppName);
 
-    // Verify Radio Button Icon
     await this.autoFIllServicesPearPassRadioButtonIcon.waitForDisplayed({
       timeout: popupWaitTimeout,
       timeoutMsg: 'PearPass app radio button icon should be visible',
@@ -1776,20 +1706,15 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyAutofillPopupTextDisplayed(): Promise<this> {
-    // Verify Autofill Popup
     await this.verifyElementDisplayed(this.autofillPopup, 'autofillPopup', 'Autofill popup should be visible');
     
-    // Verify Autofill Popup Text
     await this.verifyElementDisplayed(this.autofillPopupText, 'autofillPopupText', 'Autofill popup text should be visible');
     const popupText = await this.autofillPopupText.getText();
     expect(popupText).toBe(AUTOFILL_SECTION.autofillPopup.text);
     
-    // Verify Autofill Popup OK Button
     await this.verifyElementDisplayed(this.autofillPopupOkButton, 'autofillPopupOkButton', 'Autofill popup OK button should be visible');
     
-    // Verify Autofill Popup Cancel Button
     await this.verifyElementDisplayed(this.autofillPopupCancelButton, 'autofillPopupCancelButton', 'Autofill popup Cancel button should be visible');
-    
     return this.self;
   }
 
@@ -1798,7 +1723,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     return this.self;
   }
 
-  /** Back on Android system "Change autofill provider" screen (`~Navigate up`). */
   async tapBackButtonInChangeAutofillProviderPage(): Promise<this> {
     await this.autoFIllServicesBackButton.waitForDisplayed({
       timeout: 20000,
@@ -1809,12 +1733,10 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyNewElementsInAutofillSection(): Promise<this> {
-    // Verify Autofill New Text
     await this.verifyElementDisplayed(this.autofillNewText, 'autofillNewText', 'Autofill enabled text should be visible');
     const autofillText = await this.autofillNewText.getText();
     expect(autofillText).toBe(AUTOFILL_SECTION.autofillEnabled.text);
     
-    // Verify Manage Autofill Settings Link
     await this.verifyElementDisplayed(this.autoFillNewLinkManageAutofillSettings, 'autoFillNewLinkManageAutofillSettings', 'Manage autofill settings link should be visible');
     const manageLinkText = await this.autoFillNewLinkManageAutofillSettings.getText();
     expect(manageLinkText).toBe(AUTOFILL_SECTION.autofillEnabled.manageAutofillSettingsLink);
@@ -1925,26 +1847,21 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyChangeVaultNamePopupWindowElements(): Promise<this> {
-    // Verify Window Title
     await this.verifyElementDisplayed(this.changeVaultNamePopUpWindowTitle, 'changeVaultNamePopUpWindowTitle', 'Change Vault Name window title should be visible');
     const windowTitleText = await this.changeVaultNamePopUpWindowTitle.getText();
     expect(windowTitleText).toBe(CHANGE_VAULT_NAME_POPUP.windowTitle);
     
-    // Verify Input Field Name
     await this.verifyElementDisplayed(this.changeVaultNamePopUpWindowInputFieldName, 'changeVaultNamePopUpWindowInputFieldName', 'Input field name label should be visible');
     const inputFieldNameText = await this.changeVaultNamePopUpWindowInputFieldName.getText();
     expect(inputFieldNameText).toBe(CHANGE_VAULT_NAME_POPUP.inputFieldLabel);
     
-    // Verify Input Field
     await this.verifyElementDisplayed(this.changeVaultNamePopUpWindowInputField, 'changeVaultNamePopUpWindowInputField', 'Input field should be visible');
     
-    // Verify Cancel Button
     await this.verifyElementDisplayed(this.changeVaultNamePopUpWindowCancelButton, 'changeVaultNamePopUpWindowCancelButton', 'Cancel button should be visible');
     await this.verifyElementDisplayed(this.changeVaultNamePopUpWindowCancelButtonText, 'changeVaultNamePopUpWindowCancelButtonText', 'Cancel button text should be visible');
     const cancelButtonText = await this.changeVaultNamePopUpWindowCancelButtonText.getText();
     expect(cancelButtonText).toBe(CHANGE_VAULT_NAME_POPUP.buttons.cancel);
-    
-    // Verify Save Button
+
     await this.verifyElementDisplayed(this.changeVaultNamePopUpWindowSaveButton, 'changeVaultNamePopUpWindowSaveButton', 'Save button should be visible');
     await this.verifyElementDisplayed(this.changeVaultNamePopUpWindowSaveButtonText, 'changeVaultNamePopUpWindowSaveButtonText', 'Save button text should be visible');
     const saveButtonText = await this.changeVaultNamePopUpWindowSaveButtonText.getText();
@@ -2100,17 +2017,14 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyAllExportVaultsPopupElementsShouldBeDisplayed(): Promise<this> {
-    // Verify Popup Title
     await this.verifyElementDisplayed(this.exportVaultsPopupTitle, 'exportVaultsPopupTitle', 'Export Vaults popup title should be visible');
     const titleText = await this.exportVaultsPopupTitle.getText();
     expect(titleText).toBe(EXPORT_SECTION.popup.title);
 
-    // Verify Popup Text
     await this.verifyElementDisplayed(this.exportVaultsPopupText, 'exportVaultsPopupText', 'Export Vaults popup text should be visible');
     const popupText = await this.exportVaultsPopupText.getText();
     expect(popupText).toBe(EXPORT_SECTION.popup.description);
 
-    // Verify Input Field
     await this.verifyElementDisplayed(this.exportVaultsPopupField, 'exportVaultsPopupField', 'Export Vaults popup field should be visible');
     await this.verifyElementDisplayed(this.exportVaultsPopupFieldIcon, 'exportVaultsPopupFieldIcon', 'Export Vaults popup field icon should be visible');
     await this.verifyElementDisplayed(this.exportVaultsPopupFieldShowPasswordIcon, 'exportVaultsPopupFieldShowPasswordIcon', 'Export Vaults popup field show password icon should be visible');
@@ -2119,13 +2033,11 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     const inputFieldPlaceholder = await this.exportVaultsPopupInputField.getAttribute('text') || await this.exportVaultsPopupInputField.getAttribute('hint');
     expect(inputFieldPlaceholder).toBe(EXPORT_SECTION.popup.inputFieldPlaceholder);
 
-    // Verify Export Button
     await this.verifyElementDisplayed(this.exportVaultsPopupExportButton, 'exportVaultsPopupExportButton', 'Export Vaults popup export button should be visible');
     await this.verifyElementDisplayed(this.exportVaultsPopupExportButtonText, 'exportVaultsPopupExportButtonText', 'Export Vaults popup export button text should be visible');
     const exportButtonText = await this.exportVaultsPopupExportButtonText.getText();
     expect(exportButtonText).toBe(EXPORT_SECTION.popup.buttons.export);
 
-    // Verify Cancel Button
     await this.verifyElementDisplayed(this.exportVaultsPopupCancelButton, 'exportVaultsPopupCancelButton', 'Export Vaults popup cancel button should be visible');
     await this.verifyElementDisplayed(this.exportVaultsPopupCancelButtonText, 'exportVaultsPopupCancelButtonText', 'Export Vaults popup cancel button text should be visible');
     const cancelButtonText = await this.exportVaultsPopupCancelButtonText.getText();
@@ -2230,12 +2142,10 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   /* ==================== IMPORT SECTION VERIFICATIONS ==================== */  
 
   async verifyImportSection(): Promise<this> {
-    // Verify Import Section Title
     await this.verifyElementDisplayed(this.importVaultSectionTitle, 'importVaultSectionTitle', 'Import section title should be visible');
     const titleText = await this.importVaultSectionTitle.getText();
     expect(titleText).toBe(IMPORT_SECTION.title);
     
-    // Verify Import Section Description
     await this.verifyElementDisplayed(this.importVaultSectionDescription, 'importVaultSectionDescription', 'Import section description should be visible');
     const descriptionText = await this.importVaultSectionDescription.getText();
     expect(descriptionText).toBe(IMPORT_SECTION.description);
@@ -2244,38 +2154,29 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyOnePasswordButtonWithAllElements(): Promise<this> {
-    // Verify 1Password Button
     await this.verifyElementDisplayed(this.onePasswordButton, 'onePasswordButton', '1Password button should be visible');
     
-    // Verify 1Password Button Icon
     await this.verifyElementDisplayed(this.onePasswordButtonIcon, 'onePasswordButtonIcon', '1Password button icon should be visible');
     
-    // Verify 1Password Button Name
     await this.verifyElementDisplayed(this.onePasswordButtonName, 'onePasswordButtonName', '1Password button name should be visible');
     const buttonName = await this.onePasswordButtonName.getText();
     expect(buttonName).toBe(IMPORT_SECTION.importSources.onePassword.name);
     
-    // Verify 1Password Button Text (Format)
     await this.verifyElementDisplayed(this.onePasswordButtonText, 'onePasswordButtonText', '1Password button text should be visible');
     const buttonText = await this.onePasswordButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.onePassword.formats);
-    
     return this.self;
   }
 
   async verifyBitwardenButtonWithAllElements(): Promise<this> {
-    // Verify Bitwarden Button
     await this.verifyElementDisplayed(this.bitwardenButton, 'bitwardenButton', 'Bitwarden button should be visible');
     
-    // Verify Bitwarden Button Icon
     await this.verifyElementDisplayed(this.bitwardenButtonIcon, 'bitwardenButtonIcon', 'Bitwarden button icon should be visible');
     
-    // Verify Bitwarden Button Name
     await this.verifyElementDisplayed(this.bitwardenButtonName, 'bitwardenButtonName', 'Bitwarden button name should be visible');
     const buttonName = await this.bitwardenButtonName.getText();
     expect(buttonName).toBe(IMPORT_SECTION.importSources.bitwarden.name);
-    
-    // Verify Bitwarden Button Text (Format)
+
     await this.verifyElementDisplayed(this.bitwardenButtonText, 'bitwardenButtonText', 'Bitwarden button text should be visible');
     const buttonText = await this.bitwardenButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.bitwarden.formats);
@@ -2284,38 +2185,29 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyLastPassButtonWithAllElements(): Promise<this> {
-    // Verify LastPass Button
     await this.verifyElementDisplayed(this.lastPassButton, 'lastPassButton', 'LastPass button should be visible');
     
-    // Verify LastPass Button Icon
     await this.verifyElementDisplayed(this.lastPassButtonIcon, 'lastPassButtonIcon', 'LastPass button icon should be visible');
     
-    // Verify LastPass Button Name
     await this.verifyElementDisplayed(this.lastPassButtonName, 'lastPassButtonName', 'LastPass button name should be visible');
     const buttonName = await this.lastPassButtonName.getText();
     expect(buttonName).toBe(IMPORT_SECTION.importSources.lastPass.name);
     
-    // Verify LastPass Button Text (Format)
     await this.verifyElementDisplayed(this.lastPassButtonText, 'lastPassButtonText', 'LastPass button text should be visible');
     const buttonText = await this.lastPassButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.lastPass.formats);
-    
     return this.self;
   }
 
   async verifyNordPassButtonWithAllElements(): Promise<this> {
-    // Verify NordPass Button
     await this.verifyElementDisplayed(this.nordPassButton, 'nordPassButton', 'NordPass button should be visible');
     
-    // Verify NordPass Button Icon
     await this.verifyElementDisplayed(this.nordPassButtonIcon, 'nordPassButtonIcon', 'NordPass button icon should be visible');
     
-    // Verify NordPass Button Name
     await this.verifyElementDisplayed(this.nordPassButtonName, 'nordPassButtonName', 'NordPass button name should be visible');
     const buttonName = await this.nordPassButtonName.getText();
     expect(buttonName).toBe(IMPORT_SECTION.importSources.nordPass.name);
     
-    // Verify NordPass Button Text (Format)
     await this.verifyElementDisplayed(this.nordPassButtonText, 'nordPassButtonText', 'NordPass button text should be visible');
     const buttonText = await this.nordPassButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.nordPass.formats);
@@ -2324,22 +2216,17 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   }
 
   async verifyProtonPassButtonWithAllElements(): Promise<this> {
-    // Verify Proton Pass Button
     await this.verifyElementDisplayed(this.protonPassButton, 'protonPassButton', 'Proton Pass button should be visible');
     
-    // Verify Proton Pass Button Icon
     await this.verifyElementDisplayed(this.protonPassButtonIcon, 'protonPassButtonIcon', 'Proton Pass button icon should be visible');
     
-    // Verify Proton Pass Button Name
     await this.verifyElementDisplayed(this.protonPassButtonName, 'protonPassButtonName', 'Proton Pass button name should be visible');
     const buttonName = await this.protonPassButtonName.getText();
     expect(buttonName).toBe(IMPORT_SECTION.importSources.protonPass.name);
-    
-    // Verify Proton Pass Button Text (Format)
+
     await this.verifyElementDisplayed(this.protonPassButtonText, 'protonPassButtonText', 'Proton Pass button text should be visible');
     const buttonText = await this.protonPassButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.protonPass.formats);
-    
     return this.self;
   }
 
@@ -2354,7 +2241,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     await this.verifyElementDisplayed(this.keePassButtonText, 'keePassButtonText', 'KeePass button text should be visible');
     const buttonText = await this.keePassButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.keePass.formats);
-    
     return this.self;
   }
 
@@ -2369,27 +2255,18 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     await this.verifyElementDisplayed(this.keePassXCButtonText, 'keePassXCButtonText', 'KeePassXC button text should be visible');
     const buttonText = await this.keePassXCButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.keePassXC.formats);
-    
     return this.self;
   }
 
   async verifyUnencryptedFileButtonWithAllElements(): Promise<this> {
-    // Verify Unencrypted File Button
     await this.verifyElementDisplayed(this.unencryptedFileButton, 'unencryptedFileButton', 'Unencrypted file button should be visible');
-    
-    // Verify Unencrypted File Button Icon
     await this.verifyElementDisplayed(this.unencryptedFileButtonIcon, 'unencryptedFileButtonIcon', 'Unencrypted file button icon should be visible');
-    
-    // Verify Unencrypted File Button Name
     await this.verifyElementDisplayed(this.unencryptedFileButtonName, 'unencryptedFileButtonName', 'Unencrypted file button name should be visible');
     const buttonName = await this.unencryptedFileButtonName.getText();
     expect(buttonName).toBe(IMPORT_SECTION.importSources.unencryptedFile.name);
-    
-    // Verify Unencrypted File Button Text (Format)
     await this.verifyElementDisplayed(this.unencryptedFileButtonText, 'unencryptedFileButtonText', 'Unencrypted file button text should be visible');
     const buttonText = await this.unencryptedFileButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.unencryptedFile.formats);
-    
     return this.self;
   }
 
@@ -2404,7 +2281,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     await this.verifyElementDisplayed(this.encryptedFileButtonText, 'encryptedFileButtonText', 'Encrypted file button text should be visible');
     const buttonText = await this.encryptedFileButtonText.getText();
     expect(buttonText).toBe(IMPORT_SECTION.importSources.encryptedFile.formats);
-    
     return this.self;
   }
 
@@ -2447,7 +2323,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     await this.verifyElementDisplayed(this.importVaultPopupBrowseFolderButtonText, 'importVaultPopupBrowseFolderButtonText', 'Browse Folder button text should be visible');
     const browseFolderText = await this.importVaultPopupBrowseFolderButtonText.getText();
     expect(browseFolderText).toBe(IMPORT_VAULT_POPUP.browseFolderButtonText);
-
     return this.self;
   }
 
@@ -2492,7 +2367,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     await this.verifyElementDisplayed(this.importVaultPopupImportButtonText, 'importVaultPopupImportButtonText', 'Import button text should be visible');
     const importButtonText = await this.importVaultPopupImportButtonText.getText();
     expect(importButtonText).toBe(IMPORT_VAULT_POPUP.importButtonText);
-
     return this.self;
   }
 
@@ -2730,11 +2604,9 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   async verifyVaultsImportedSuccessfullyToastDisplayed(): Promise<this> {
     await this.vaultsImportedSuccessfullyToast.waitForDisplayed({ timeout: 20000 });
     await this.verifyElementDisplayed(this.vaultsImportedSuccessfullyToast, 'vaultsImportedSuccessfullyToast', 'Vaults imported successfully toast should be visible');
-    
     await this.verifyElementDisplayed(this.vaultsImportedSuccessfullyToastText, 'vaultsImportedSuccessfullyToastText', 'Vaults imported successfully toast text should be visible');
     const toastText = await this.vaultsImportedSuccessfullyToastText.getText();
     expect(toastText).toBe(IMPORT_SECTION.toastMessages.importSuccess);
-    
     return this.self;
   }
 
@@ -2761,7 +2633,6 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     await this.verifyElementDisplayed(this.addDeviceButtonText, 'addDeviceButtonText', 'Add device button text should be visible');
     const addDeviceText = await this.addDeviceButtonText.getText();
     expect(addDeviceText).toBe(LINKED_DEVICES_SECTION.addDeviceButtonText);
-
     return this.self;
   }
 
@@ -2803,10 +2674,8 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   async verifyLanguageDropdownMenu(): Promise<this> {
     await this.languageDropdownMenu.waitForDisplayed({ timeout: 20000 });
     await this.verifyElementDisplayed(this.languageDropdownMenu, 'languageDropdownMenu', 'Language dropdown menu should be visible');
-    
     const languageText = await this.languageDropdownText.getText();
     expect(languageText).toBe(LANGUAGE_SECTION.defaultLanguage);
-    
     return this.self;
   }
 
@@ -2866,11 +2735,8 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
 
   async verifyIssueInputFieldPlaceholder(): Promise<this> {
     await this.verifyElementDisplayed(this.issueInputField, 'issueInputField', 'Issue input field should be visible');
-    
-    // Check placeholder text - in Android it's usually in the 'text' attribute when field is empty
     const placeholder = await this.issueInputField.getAttribute('text') || await this.issueInputField.getAttribute('hint');
     expect(placeholder).toBe(REPORT_PROBLEM_SECTION.issueInputPlaceholder);
-    
     return this.self;
   }
 
@@ -2896,12 +2762,9 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
   async verifyFeedbackSentToast(): Promise<this> {
     await this.feedbackSentToast.waitForDisplayed({ timeout: 20000 });
     await this.verifyElementDisplayed(this.feedbackSentToast, 'feedbackSentToast', 'Feedback sent toast should be visible');
-    
     await this.verifyElementDisplayed(this.feedbackSentToastText, 'feedbackSentToastText', 'Feedback sent toast text should be visible');
-    
     const toastText = await this.feedbackSentToastText.getText();
     expect(toastText).toBe(REPORT_PROBLEM_SECTION.feedbackSentToastText);
-    
     return this.self;
   }
 
@@ -2922,17 +2785,14 @@ async verifyNewPasswordDifferentFromOldPasswordWarning(): Promise<this> {
     
     const pageTitleText = await this.termsOfUseLinkPageTitle.getText();
     expect(pageTitleText).toBe(LEGAL_LINKS.termsOfUsePageTitle);
-    
     return this.self;
   }
 
   async verifyPrivacyStatementPage(): Promise<this> {
     await this.privacyStatementLinkPageTitle.waitForDisplayed({ timeout: 20000 });
     await this.verifyElementDisplayed(this.privacyStatementLinkPageTitle, 'privacyStatementLinkPageTitle', 'Privacy Statement page title should be visible');
-    
     const pageTitleText = await this.privacyStatementLinkPageTitle.getText();
     expect(pageTitleText).toBe(LEGAL_LINKS.privacyStatementPageTitle);
-    
     return this.self;
   }
 

@@ -132,6 +132,20 @@ function pushTestDataToEmulator(): void {
   console.log(`📁 ${files.length} file(s) pushed to ${deviceDownload}`);
 }
 
+/** Push identity document templates to DCIM (gallery-style path; Android local_emulator / manual adb). */
+function pushTemplateImagesToDcim(): void {
+  const scriptPath = path.resolve(__dirname, 'scripts', 'push-templates-to-dcim.cjs');
+  if (!fs.existsSync(scriptPath)) {
+    console.warn(`⚠️ push-templates script not found: ${scriptPath}`);
+    return;
+  }
+  try {
+    execSync(`node "${scriptPath}"`, { stdio: 'inherit' });
+  } catch (err) {
+    console.warn('⚠️ pushTemplateImagesToDcim failed:', (err as Error).message);
+  }
+}
+
 const isBS = RUN_TARGET === 'bs';
 const isAndroid = PLATFORM === 'Android';
 
@@ -484,6 +498,7 @@ export const config: Options.Testrunner & {
   async onPrepare() {
     if (RUN_TARGET === 'local_emulator' && PLATFORM === 'Android' && process.env.PUSH_TEST_DATA === 'true') {
       pushTestDataToEmulator();
+      pushTemplateImagesToDcim();
     }
     if (ENABLE_QASE) {
       await beforeRunHook();

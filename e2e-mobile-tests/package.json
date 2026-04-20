@@ -4,7 +4,9 @@
   "description": "End-to-end mobile automation tests for PearPass (Android & iOS, BrowserStack & local)",
   "main": "index.js",
   "scripts": {
+    "postinstall": "patch-package",
     "wdio": "wdio run ./wdio.conf.ts",
+    "push:test-templates-dcim": "node ./scripts/push-templates-to-dcim.cjs",
     "e2e:android:bs": "cross-env PLATFORM=Android RUN_TARGET=bs ENABLE_QASE=true ENABLE_SLACK=true npm run wdio -- --suite all",
     "e2e:ios:bs": "cross-env PLATFORM=iOS RUN_TARGET=bs ENABLE_QASE=true ENABLE_SLACK=true npm run wdio -- --suite all",
     "e2e:android:bs:auth": "cross-env PLATFORM=Android RUN_TARGET=bs ENABLE_QASE=true ENABLE_SLACK=true npm run wdio -- --suite auth",
@@ -42,6 +44,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",
     "expect-webdriverio": "^5.5.0",
+    "patch-package": "^8.0.0",
     "slack-ctrf": "^0.0.31",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",

@@ -258,7 +258,7 @@ const settingsLocators = {
 /* ============================
         AUTOFILL PAGE
 ============================ */
-  autofillPageTitle: '~Preferred service for passwords, passkeys & autofill',
+  autofillPageTitle: '(//android.widget.TextView[@text="Autofill"])[1]',
   autofillSection: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[1]',
   autofillSectionTitle: '(//android.widget.TextView[@text="Autofill"])[2]',
   autofillSectionDescription: '//android.widget.TextView[@text="Set your Autofill for your entire account"]',

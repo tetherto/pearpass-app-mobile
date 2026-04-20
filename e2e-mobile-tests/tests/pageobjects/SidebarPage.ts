@@ -89,8 +89,8 @@ export class SidebarPage extends BasePage {
   get newVaultNameAtSidebar() { return this.$('newVaultNameAtSidebar'); }
 
   async waitForLoaded(): Promise<this> {
-    await this.title.waitForDisplayed({ timeoutMsg: 'Sidebar title not visible' });
-    await this.allItems.waitForDisplayed({ timeoutMsg: 'All Items option not visible' });
+    await this.title.waitForDisplayed({ timeout: 15000, timeoutMsg: 'Sidebar title not visible' });
+    await this.allItems.waitForDisplayed({ timeout: 15000, timeoutMsg: 'All Items option not visible' });
     return this.self;
   }
 
@@ -212,15 +212,16 @@ export class SidebarPage extends BasePage {
   }
 
   async verifyTestFolder(): Promise<this> {
-    const timeout = 5000;
-    await this.testFolder.waitForDisplayed({ timeout, timeoutMsg: 'Test Folder option should be visible' });
+
+    await this.testFolder.waitForDisplayed({ timeout: 5000, timeoutMsg: 'Test Folder option should be visible' });
     await this.verifyElementDisplayed(this.testFolder, 'testFolder', 'Test Folder option should be visible');
-    await this.testFolderText.waitForDisplayed({ timeout, timeoutMsg: 'Test Folder text should be visible' });
+    await this.testFolderText.waitForDisplayed({ timeout: 5000, timeoutMsg: 'Test Folder text should be visible' });
     await this.verifyElementDisplayed(this.testFolderText, 'testFolderText', 'Test Folder text should be visible');
     const text = await this.testFolderText.getText();
     expect(text).toBe('Test Folder');
-    await this.testFolderIcon.waitForDisplayed({ timeout, timeoutMsg: 'Test Folder icon should be visible' });
+    await this.testFolderIcon.waitForDisplayed({ timeout: 5000, timeoutMsg: 'Test Folder icon should be visible' });
     await this.verifyElementDisplayed(this.testFolderIcon, 'testFolderIcon', 'Test Folder icon should be visible');
+    return this.self;
   }
 
   async verifyTestFolder1(): Promise<this> {

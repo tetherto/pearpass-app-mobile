@@ -411,7 +411,6 @@ describe('Settings - Syncing - Blind Peers', () => {
     await sidebar.pressBack();
     await settings.verifyBlindPeeringSectionInformationPopupDisplayed();
     await settings.tapRandomlyOnScreen();
-    await browser.pause(1000);
   });
 
   it('[PAS-1451] User can tap on Blind Peering toggle and see Choose Blind Peer popup', async () => {
