@@ -7,5 +7,8 @@ export const SECURE_STORAGE_KEYS = {
   BIOMETRICS_ENABLED: 'biometricsEnabled',
   COPY_TO_CLIPBOARD: 'copyToClipboard',
   ACCEPTED_TERMS: 'acceptedTerms',
-  HAPTICS_ENABLED: 'hapticsEnabled'
+  HAPTICS_ENABLED: 'hapticsEnabled',
+  ALLOW_NON_SECURE_WEBSITES: 'allowNonSecureWebsites',
+  CLIPBOARD_CLEAR_TIMEOUT: 'clipboardClearTimeout',
+  PIN_ENABLED: 'pinEnabled'
 }

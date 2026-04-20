@@ -27,7 +27,7 @@ export const useCopyToClipboard = () => {
   const { hapticSuccess } = useHapticFeedback()
 
   useEffect(() => {
-    const checkCopyToClipboardOptIn = async () => {
+    const loadOptIn = async () => {
       const optIn = await SecureStore.getItemAsync(
         SECURE_STORAGE_KEYS.COPY_TO_CLIPBOARD,
         {
@@ -37,7 +37,7 @@ export const useCopyToClipboard = () => {
       setIsCopyToClipboardEnabled(optIn !== 'false')
     }
 
-    checkCopyToClipboardOptIn()
+    loadOptIn()
 
     return () => {
       if (timeoutRef.current) {
@@ -78,33 +78,45 @@ export const useCopyToClipboard = () => {
           clearTimeout(globalClearTimer)
         }
 
-        const nativeAvailable = await NativeClipboard.isAvailable()
+        const storedTimeout = await SecureStore.getItemAsync(
+          SECURE_STORAGE_KEYS.CLIPBOARD_CLEAR_TIMEOUT
+        )
+        let clipboardTimeout = CLIPBOARD_CLEAR_TIMEOUT
+        if (storedTimeout === 'null') clipboardTimeout = null
+        else if (storedTimeout !== null)
+          clipboardTimeout = Number(storedTimeout)
 
-        if (nativeAvailable) {
-          await NativeClipboard.setStringWithExpiration(
-            text,
-            CLIPBOARD_CLEAR_TIMEOUT / 1000
-          )
-        } else {
+        if (clipboardTimeout === null) {
           await Clipboard.setStringAsync(text)
+        } else {
+          const nativeAvailable = await NativeClipboard.isAvailable()
 
-          const timerId = setTimeout(async () => {
-            try {
-              const currentClipboardText = await Clipboard.getStringAsync()
+          if (nativeAvailable) {
+            await NativeClipboard.setStringWithExpiration(
+              text,
+              clipboardTimeout / 1000
+            )
+          } else {
+            await Clipboard.setStringAsync(text)
 
-              if (
-                currentClipboardText === lastCopiedTextRef.current ||
-                currentClipboardText === globalLastCopiedText
-              ) {
-                await Clipboard.setStringAsync('')
-                lastCopiedTextRef.current = null
-                globalLastCopiedText = null
-              }
-            } catch {}
-          }, CLIPBOARD_CLEAR_TIMEOUT)
+            const timerId = setTimeout(async () => {
+              try {
+                const currentClipboardText = await Clipboard.getStringAsync()
 
-          clearClipboardTimeoutRef.current = timerId
-          globalClearTimer = timerId
+                if (
+                  currentClipboardText === lastCopiedTextRef.current ||
+                  currentClipboardText === globalLastCopiedText
+                ) {
+                  await Clipboard.setStringAsync('')
+                  lastCopiedTextRef.current = null
+                  globalLastCopiedText = null
+                }
+              } catch {}
+            }, clipboardTimeout)
+
+            clearClipboardTimeoutRef.current = timerId
+            globalClearTimer = timerId
+          }
         }
 
         setIsCopied(true)

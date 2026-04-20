@@ -108,7 +108,7 @@ const isAllowedType = (fileType, accepts) =>
 
 const images = {
   '1password': require('../../../../assets/images/1password.png'),
-  bitwarden: require('../../../../assets/images/BitWarden.png'),
+  bitwarden: require('../../../../assets/images/BitWarden.jpg'),
   keepass: require('../../../../assets/images/KeePass.png'),
   keepassxc: require('../../../../assets/images/KeePassXC.png'),
   lastpass: require('../../../../assets/images/LastPass.png'),

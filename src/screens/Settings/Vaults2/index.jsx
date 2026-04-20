@@ -18,16 +18,13 @@ import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { VaultRow } from './VaultRow'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { VAULT_ACTION } from '../../../constants/vaultActions'
-import { BottomSheetAddDeviceContent } from '../../../containers/BottomSheetAddDeviceContent'
 import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
 
 export const VaultsV2 = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
-  const { expand } = useBottomSheet()
   const { openModal } = useModal()
   const { data: currentVault, refetch: refetchVault } = useVault()
   const { data: allVaults } = useVaults()
@@ -42,10 +39,7 @@ export const VaultsV2 = () => {
   )
 
   const handleAddMember = () => {
-    expand({
-      children: <BottomSheetAddDeviceContent />,
-      snapPoints: ['10%', '50%', '90%']
-    })
+    navigation.navigate('ShareVault')
   }
 
   const handleCreateNewVault = () => {
@@ -54,18 +48,11 @@ export const VaultsV2 = () => {
 
   const buildVaultActions = (vault) => ({
     onRename: () =>
-      openModal(
-        <ModifyVaultModalContentV2
-          vaultId={vault.id}
-          vaultName={vault.name}
-          action={VAULT_ACTION.NAME}
-        />
-      ),
-    onManageMembers: () =>
-      expand({
-        children: <BottomSheetAddDeviceContent />,
-        snapPoints: ['10%', '50%', '90%']
+      navigation.navigate('VaultRenameScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
       }),
+    onManageMembers: () => navigation.navigate('ShareVault'),
     onSetPassword: () =>
       openModal(
         <ModifyVaultModalContentV2

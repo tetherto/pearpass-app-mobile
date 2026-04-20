@@ -14,6 +14,7 @@ import {
   InputField,
   DateField,
   MultiSlotInput,
+  PasswordField,
   Text,
   rawTokens,
   useTheme
@@ -314,6 +315,10 @@ export const CreateOrEditIdentityContent = ({
     addItem: addCustomField,
     removeItem: removeCustomField
   } = registerArray('customFields')
+
+  const handleFirstHiddenMessageChange = (value: string) => {
+    setValue('customFields', [{ type: 'note', note: value }])
+  }
 
   const identityAttachmentSources = useMemo(
     () =>
@@ -708,7 +713,7 @@ export const CreateOrEditIdentityContent = ({
               iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >
-              {t`Add Another Field`}
+              {t`Add Another Message`}
             </Button>
           }
           errorMessage={
@@ -716,34 +721,47 @@ export const CreateOrEditIdentityContent = ({
               errors as Record<string, { error?: { note?: string } }[]>
             )?.customFields?.find(Boolean)?.error?.note
           }
-          testID="custom-fields-multi-slot-input"
+          testID="hidden-messages-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note?: string }>).map(
-            (field, index) => (
-              <InputField
-                key={`${field.type}-${index}`}
-                label={t`Custom Field`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Value`}
-                onChangeText={(val) =>
-                  setValue(`customFields[${index}].note`, val)
-                }
-                isGrouped
-                testID={`custom-fields-multi-slot-input-slot-${index}`}
-                rightSlot={
-                  <Button
-                    size="small"
-                    variant="tertiary"
-                    aria-label="Delete custom field"
-                    iconBefore={
-                      <TrashOutlined color={theme.colors.colorTextPrimary} />
+          {(values.customFields as Array<{ type: string; note?: string }>).length
+            ? (values.customFields as Array<{ type: string; note?: string }>).map(
+                (field, index) => (
+                  <PasswordField
+                    key={`${field.type}-${index}`}
+                    label={t`Hidden Message`}
+                    value={field.note ?? ''}
+                    placeholder={t`Enter Hidden Message`}
+                    onChangeText={(val) =>
+                      setValue(`customFields[${index}].note`, val)
                     }
-                    onClick={() => removeCustomField(index)}
+                    isGrouped
+                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                    rightSlot={
+                      (values.customFields as Array<{ type: string; note?: string }>).length > 1 ? (
+                        <Button
+                          size="small"
+                          variant="tertiary"
+                          aria-label="Delete hidden message"
+                          iconBefore={
+                            <TrashOutlined color={theme.colors.colorTextPrimary} />
+                          }
+                          onClick={() => removeCustomField(index)}
+                        />
+                      ) : undefined
+                    }
                   />
-                }
+                )
+              )
+            : (
+              <PasswordField
+                label={t`Hidden Message`}
+                value=""
+                placeholder={t`Enter Hidden Message`}
+                onChangeText={handleFirstHiddenMessageChange}
+                isGrouped
+                testID="hidden-messages-multi-slot-input-slot-0"
               />
-            )
-          )}
+            )}
         </MultiSlotInput>
 
         <AttachmentFieldsV2<AttachmentFile>

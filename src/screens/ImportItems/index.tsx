@@ -131,7 +131,7 @@ const images = {
     require('../../../assets/images/1password.png')
   ).uri,
   bitwarden: Image.resolveAssetSource(
-    require('../../../assets/images/BitWarden.png')
+    require('../../../assets/images/BitWarden.jpg')
   ).uri,
   keepass: Image.resolveAssetSource(
     require('../../../assets/images/KeePass.png')

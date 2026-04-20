@@ -22,6 +22,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { createStyles } from './styles'
 import { useSharedFilter } from '../../context/SharedFilterContext'
+import { useRegisterVaultSelectorOpener } from '../../context/VaultSelectorContext'
 import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
 import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
@@ -83,6 +84,9 @@ export const ContentHeader = ({
   const styles = createStyles(theme.colors)
   const menuItems = useRecordMenuItems({ exclude: ['password'] })
   const [isVaultSelectorOpen, setIsVaultSelectorOpen] = useState(false)
+
+  const openVaultSelector = useCallback(() => setIsVaultSelectorOpen(true), [])
+  useRegisterVaultSelectorOpener(openVaultSelector)
 
   const bgColor = theme.colors.colorSurfacePrimary
   const vaultName = vaultData?.name || t`Personal Vault`

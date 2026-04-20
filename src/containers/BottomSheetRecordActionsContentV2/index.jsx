@@ -96,8 +96,8 @@ export const BottomSheetRecordActionsContentV2 = ({
         ? [{ icon: CheckBox, label: t`Select Item`, onPress: handleSelectItem }]
         : []),
       ...(UNSUPPORTED
-        ? []
-        : [{ icon: Share, label: t`Share Item`, onPress: () => {} }]),
+        ? [{ icon: Share, label: t`Share Item`, onPress: () => {} }]
+        : []),
       {
         icon: DriveFileMoveOutlined,
         label: t`Move to Another Folder`,

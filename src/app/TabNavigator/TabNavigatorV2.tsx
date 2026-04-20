@@ -1,4 +1,7 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { useCallback } from 'react'
+
+import { createBottomTabNavigator, type BottomTabBarButtonProps } from '@react-navigation/bottom-tabs'
+import { useLingui } from '@lingui/react/macro'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 import { useTheme, rawTokens, Text } from '@tetherto/pearpass-lib-ui-kit'
 import {
@@ -10,14 +13,62 @@ import {
   Settings as SettingsIcon,
   SettingsOutlined,
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { StyleSheet, View } from 'react-native'
+import { type GestureResponderEvent, Pressable, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { DrawerNavigator } from '../DrawerNavigator'
 import { SettingsNavigator } from '../SettingsNavigator'
 import { Authenticator } from '../../screens/Authenticator'
+import { useVaultSelector } from '../../context/VaultSelectorContext'
+import { showInfoAlertToast } from '../../utils/showInfoAlertToast'
 
 const Tab = createBottomTabNavigator()
+
+// Drops onLongPress from props so the spread below doesn't reinstate the
+// Tab Navigator's default long-press handler.
+const VaultTabButton = ({
+  onPress,
+  onLongPress: _onLongPress,
+  accessibilityState,
+  ...rest
+}: BottomTabBarButtonProps) => {
+  const { t } = useLingui()
+  const { theme } = useTheme()
+  const insets = useSafeAreaInsets()
+  const { openVaultSelector } = useVaultSelector()
+  const isFocused = accessibilityState?.selected
+  const toastOffset = 66 + insets.bottom + 8
+
+  const handlePress = useCallback(
+    (event: GestureResponderEvent) => {
+      if (isFocused) {
+        showInfoAlertToast({
+          theme,
+          description: t`Press and hold to open vault manager`,
+          bottomOffset: toastOffset
+        })
+        return
+      }
+      onPress?.(event)
+    },
+    [isFocused, onPress, t, theme, toastOffset]
+  )
+
+  const handleLongPress = useCallback(() => {
+    if (isFocused) {
+      openVaultSelector()
+    }
+  }, [isFocused, openVaultSelector])
+
+  return (
+    <Pressable
+      {...rest}
+      accessibilityState={accessibilityState}
+      onPress={handlePress}
+      onLongPress={handleLongPress}
+    />
+  )
+}
 
 export const TabNavigatorV2 = () => {
   const { theme } = useTheme()
@@ -108,7 +159,11 @@ export const TabNavigatorV2 = () => {
         }
       })}
     >
-      <Tab.Screen name="MainDrawerNavigator" component={DrawerNavigator} />
+      <Tab.Screen
+        name="MainDrawerNavigator"
+        component={DrawerNavigator}
+        options={{ tabBarButton: (props) => <VaultTabButton {...props} /> }}
+      />
 
       {AUTHENTICATOR_ENABLED && (
         <Tab.Screen name="Authenticator" component={Authenticator} />
@@ -124,5 +179,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: rawTokens.spacing2
-  },
+  }
 })
