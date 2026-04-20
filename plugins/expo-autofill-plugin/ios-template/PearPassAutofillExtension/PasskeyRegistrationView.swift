@@ -24,6 +24,9 @@ struct PasskeyRegistrationView: View {
     @State private var selectedVault: Vault?
     @State private var currentStep: RegistrationStep = .initializing
 
+    // TODO: read from App Group feature flag instead of hardcoding.
+    private let v2Enabled: Bool = true
+
     // User initialization state
     @State private var hasPasswordSet: Bool = false
     @State private var isLoggedIn: Bool = false
@@ -55,31 +58,65 @@ struct PasskeyRegistrationView: View {
                 loadingView
 
             case .initializationError:
-                MissingConfigurationView(onCancel: handleCancel)
+                if v2Enabled {
+                    MissingConfigurationViewV2(onCancel: handleCancel)
+                        .pearpassTheme()
+                } else {
+                    MissingConfigurationView(onCancel: handleCancel)
+                }
 
             case .masterPassword:
-                MasterPasswordView(
-                    viewModel: viewModel,
-                    onCancel: handleCancel,
-                    vaultClient: vaultClient,
-                    presentationWindow: presentationWindow
-                )
+                if v2Enabled {
+                    MasterPasswordViewV2(
+                        viewModel: viewModel,
+                        onCancel: handleCancel,
+                        vaultClient: vaultClient,
+                        presentationWindow: presentationWindow
+                    )
+                    .pearpassTheme()
+                } else {
+                    MasterPasswordView(
+                        viewModel: viewModel,
+                        onCancel: handleCancel,
+                        vaultClient: vaultClient,
+                        presentationWindow: presentationWindow
+                    )
+                }
 
             case .vaultSelection:
-                VaultSelectionView(
-                    viewModel: viewModel,
-                    onCancel: handleCancel,
-                    vaultClient: vaultClient
-                )
-
-            case .vaultPassword:
-                if let vault = selectedVault {
-                    VaultPasswordView(
+                if v2Enabled {
+                    VaultSelectionViewV2(
                         viewModel: viewModel,
-                        vault: vault,
                         onCancel: handleCancel,
                         vaultClient: vaultClient
                     )
+                    .pearpassTheme()
+                } else {
+                    VaultSelectionView(
+                        viewModel: viewModel,
+                        onCancel: handleCancel,
+                        vaultClient: vaultClient
+                    )
+                }
+
+            case .vaultPassword:
+                if let vault = selectedVault {
+                    if v2Enabled {
+                        VaultPasswordViewV2(
+                            viewModel: viewModel,
+                            vault: vault,
+                            onCancel: handleCancel,
+                            vaultClient: vaultClient
+                        )
+                        .pearpassTheme()
+                    } else {
+                        VaultPasswordView(
+                            viewModel: viewModel,
+                            vault: vault,
+                            onCancel: handleCancel,
+                            vaultClient: vaultClient
+                        )
+                    }
                 }
 
             case .searchingCredentials:

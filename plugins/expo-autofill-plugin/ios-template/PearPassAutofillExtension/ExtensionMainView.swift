@@ -53,6 +53,9 @@ struct ExtensionMainView: View {
     @State private var isLoggedIn: Bool = false
     @State private var isVaultOpen: Bool = false
 
+    // TODO: read from App Group feature flag instead of hardcoding.
+    private let v2Enabled: Bool = true
+
     // Standard initializer for password-only flows
     init(serviceIdentifiers: [ASCredentialServiceIdentifier] = [], presentationWindow: UIWindow? = nil, onCancel: @escaping () -> Void, onComplete: @escaping (String, String) -> Void, onVaultClientCreated: ((PearPassVaultClient) -> Void)? = nil) {
         self.serviceIdentifiers = serviceIdentifiers
@@ -210,7 +213,6 @@ struct ExtensionMainView: View {
             SimpleBackgroundView()
 
             if initializationState.isInitializing {
-                // Show loading state while initializing
                 VStack(spacing: 20) {
                     ProgressView()
                         .scaleEffect(1.2)
@@ -221,30 +223,48 @@ struct ExtensionMainView: View {
                         .foregroundColor(.white.opacity(0.8))
                 }
             } else {
-                switch viewModel.currentFlow {
-                case .missingConfiguration:
-                    MissingConfigurationView(onCancel: onCancel)
+                Group {
+                    switch viewModel.currentFlow {
+                    case .missingConfiguration:
+                        if v2Enabled {
+                            MissingConfigurationViewV2(onCancel: onCancel).pearpassTheme()
+                        } else {
+                            MissingConfigurationView(onCancel: onCancel)
+                        }
 
-                case .masterPassword:
-                    MasterPasswordView(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient, presentationWindow: presentationWindow)
+                    case .masterPassword:
+                        if v2Enabled {
+                            MasterPasswordViewV2(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient, presentationWindow: presentationWindow).pearpassTheme()
+                        } else {
+                            MasterPasswordView(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient, presentationWindow: presentationWindow)
+                        }
 
-                case .vaultSelection:
-                    VaultSelectionView(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient)
+                    case .vaultSelection:
+                        if v2Enabled {
+                            VaultSelectionViewV2(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient).pearpassTheme()
+                        } else {
+                            VaultSelectionView(viewModel: viewModel, onCancel: onCancel, vaultClient: vaultClient)
+                        }
 
-                case .vaultPassword(let vault):
-                    VaultPasswordView(viewModel: viewModel, vault: vault, onCancel: onCancel, vaultClient: vaultClient)
+                    case .vaultPassword(let vault):
+                        if v2Enabled {
+                            VaultPasswordViewV2(viewModel: viewModel, vault: vault, onCancel: onCancel, vaultClient: vaultClient).pearpassTheme()
+                        } else {
+                            VaultPasswordView(viewModel: viewModel, vault: vault, onCancel: onCancel, vaultClient: vaultClient)
+                        }
 
-                case .credentialsList(let vault):
-                    CredentialsListView(
-                        viewModel: viewModel,
-                        vault: vault,
-                        serviceIdentifiers: serviceIdentifiers,
-                        onCancel: onCancel,
-                        onComplete: onComplete,
-                        vaultClient: vaultClient,
-                        passkeyRpId: passkeyRpId,
-                        onPasskeySelected: onPasskeySelected
-                    )
+                    case .credentialsList(let vault):
+                        CredentialsListView(
+                            viewModel: viewModel,
+                            vault: vault,
+                            serviceIdentifiers: serviceIdentifiers,
+                            onCancel: onCancel,
+                            onComplete: onComplete,
+                            vaultClient: vaultClient,
+                            passkeyRpId: passkeyRpId,
+                            onPasskeySelected: onPasskeySelected
+                        )
+                    }
                 }
             }
         }
