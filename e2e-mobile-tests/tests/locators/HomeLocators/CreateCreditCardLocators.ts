@@ -33,7 +33,8 @@ const createCreditCardLocators = {
     securityCodeFieldIcon: '//android.view.ViewGroup[@content-desc="Security code field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     securityCodeFieldTitle: '//android.widget.TextView[@text=" Security code "]',
     securityCodeFieldInput: '~Security doe input field',
-    showSecurityCodeIconButton: '//android.view.ViewGroup[@content-desc="Security code field"]/android.view.ViewGroup/com.horcrux.svg.SvgView',
+    showSecurityCodeIconButton: '~Show security code button',
+    hideSecurityCodeIconButton: '~Hide security code button',
 /* =====================================================
         PIN CODE FIELD
 ===================================================== */
@@ -41,15 +42,15 @@ const createCreditCardLocators = {
     pinCodeFieldIcon: '//android.view.ViewGroup[@content-desc="Pin code field"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     pinCodeFieldTitle: '//android.widget.TextView[@text=" Pin code "]',
     pinCodeFieldInput: '~Pin code input field',
-    showPinCodeIconButton: '//android.view.ViewGroup[@content-desc="Pin code field"]/android.view.ViewGroup/com.horcrux.svg.SvgView',
+    showPinCodeIconButton: '~Show pin code button',
 /* =====================================================
         FILE FIELD
 ===================================================== */
     fileField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[6]',
     fileFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     fileFieldTitle: '//android.widget.TextView[@text="File"]',
-    fileFieldText: '//android.widget.TextView[@text="Add file"]',
-    addFileButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]/com.horcrux.svg.SvgView',
+    fileFieldText: '//android.widget.TextView[@content-desc="Add file text"]',
+    addFileButton: '~Add file button',
 /* =====================================================
         NOTE FIELD
 ===================================================== */
@@ -60,10 +61,10 @@ const createCreditCardLocators = {
 /* =====================================================
         CUSTOM FIELD
 ===================================================== */
-    customFields: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[9]',
-    customFieldsIcon: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView',
-    customFieldsIcon2: '//android.view.ViewGroup[@content-desc="Create Custom"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
-    customFieldsText: '//android.widget.TextView[@text="Create Custom"]',
+    customFields: '~Create custom field',
+    customFieldsIcon: '~Create custom field plus icon',
+    customFieldsIcon2: '//android.view.ViewGroup[@content-desc="Expand create custom field button"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
+    customFieldsText: '~Create custom field text',
     customFieldsIcon3: '//android.view.ViewGroup[@content-desc="Comment"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
     customFieldsText2: '//android.widget.TextView[@text="Comment"]',
 
@@ -73,11 +74,13 @@ const createCreditCardLocators = {
     warningMessageText: `//android.widget.TextView[@text="Your file is too large. Please upload one that’s 6 MB or smaller."]`,
     warningMessageIcon: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
 
-    newFileField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[8]',
+    validationToastNumbersOnly: '//android.widget.TextView[@text="Should contain only numbers"]',
+
+    newFileField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[9]',
     newFileFieldIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
     newFileFieldTitle: '(//android.widget.TextView[@text="File"])[2]',
     newFileFieldText: '//android.widget.TextView[@text="Test.docx"]',
-    newFileFieldDeleteButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[10]/com.horcrux.svg.SvgView',
+    newFileFieldDeleteButton: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[11]/com.horcrux.svg.SvgView',
 
 }
 export default createCreditCardLocators;

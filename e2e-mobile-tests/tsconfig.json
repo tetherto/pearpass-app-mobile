@@ -20,6 +20,10 @@
       "@wdio/mocha-framework",
       "@wdio/appium-service"
     ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
     "skipLibCheck": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
@@ -30,5 +34,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["tests", "wdio.conf.ts"]
+  "include": [
+    "tests",
+    "wdio.conf.ts",
+    "types/**/*.d.ts"
+  ]
 }

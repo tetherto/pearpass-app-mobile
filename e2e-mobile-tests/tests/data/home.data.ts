@@ -9,6 +9,14 @@ export const HOME_SCREEN = {
 } as const;
 
 /* =====================================================
+        HOME SEARCH FIELD DATA
+  ===================================================== */
+
+export const HOME_SEARCH_FIELD = {
+  inputPlaceholder: 'Search...',
+} as const;
+
+/* =====================================================
         CATEGORIES DATA
   ===================================================== */
 
@@ -35,6 +43,45 @@ export const CREATE_ITEM_BUTTONS = {
   saveRecoveryPhrase: 'Save a Recovery phrase',
   createNote: 'Create a note',
   createCustomElement: 'Create a custom element',
+} as const;
+
+/* =====================================================
+        CREATE ITEM POPUP FIELDS DATA
+  ===================================================== */
+
+export const CREATE_ITEM_POPUP_FIELDS = {
+  logins: {
+    title: 'Logins',
+    text: 'Save your username and password for any website or app.',
+  },
+  creditCards: {
+    title: 'Credit cards',
+    text: 'Securely store card number, expiry date, and CVV.',
+  },
+  wifi: {
+    title: 'Wi-Fi',
+    text: 'Keep your Wi-Fi name and password safe.',
+  },
+  recoveryPhrase: {
+    title: 'Recovery phrase',
+    text: 'Securely store app recovery phrases.',
+  },
+  identities: {
+    title: 'Identities',
+    text: 'Keep personal info like ID numbers and addresses safe.',
+  },
+  notes: {
+    title: 'Notes',
+    text: 'Encrypt and store private notes or sensitive text.',
+  },
+  custom: {
+    title: 'Custom',
+    text: 'Create your own entry with fully custom fields.',
+  },
+  password: {
+    title: 'Password',
+    text: 'Create a safe password or passphrase',
+  },
 } as const;
 
 /* =====================================================

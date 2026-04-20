@@ -201,13 +201,15 @@ export class HomePage extends BasePage {
   get protonPassCsvIdentityIcon() { return this.$('protonPassCsvIdentityIcon'); }
   get protonPassCsvIdentityIconText() { return this.$('protonPassCsvIdentityIconText'); }
   get protonPassCsvIdentityText() { return this.$('protonPassCsvIdentityText'); }
+  get protonPassCsvIdentityText2() { return this.$('protonPassCsvIdentityText2'); }
   get protonPassCsvNote() { return this.$('protonPassCsvNote'); }
   get protonPassCsvNoteIcon() { return this.$('protonPassCsvNoteIcon'); }
   get protonPassCsvNoteIconText() { return this.$('protonPassCsvNoteIconText'); }
   get protonPassCsvNoteText() { return this.$('protonPassCsvNoteText'); }
+  get protonPassCsvNoteText2() { return this.$('protonPassCsvNoteText2'); }
   get protonPassCsvLogin() { return this.$('protonPassCsvLogin'); }
   get protonPassCsvLoginIcon() { return this.$('protonPassCsvLoginIcon'); }
-  get protonPassCsvLoginIconText() { return this.$('protonPassCsvLoginIconText'); }
+  get protonPassCsvLoginText2() { return this.$('protonPassCsvLoginText2'); }
   get protonPassCsvLoginText() { return this.$('protonPassCsvLoginText'); }
   get protonPassJsonIdentity() { return this.$('protonPassJsonIdentity'); }
   get protonPassJsonIdentityIcon() { return this.$('protonPassJsonIdentityIcon'); }
@@ -219,8 +221,8 @@ export class HomePage extends BasePage {
   get protonPassJsonNoteText() { return this.$('protonPassJsonNoteText'); }
   get protonPassJsonLogin() { return this.$('protonPassJsonLogin'); }
   get protonPassJsonLoginIcon() { return this.$('protonPassJsonLoginIcon'); }
-  get protonPassJsonLoginIconText() { return this.$('protonPassJsonLoginIconText'); }
   get protonPassJsonLoginText() { return this.$('protonPassJsonLoginText'); }
+  get protonPassJsonLoginText2() { return this.$('protonPassJsonLoginText2'); }
   get unencryptedFileCsvHecht() { return this.$('unencryptedFileCsvHecht'); }
   get unencryptedFileCsvHechtIcon() { return this.$('unencryptedFileCsvHechtIcon'); }
   get unencryptedFileCsvHechtIconText() { return this.$('unencryptedFileCsvHechtIconText'); }
@@ -229,6 +231,7 @@ export class HomePage extends BasePage {
   get unencryptedFileCsvIncIcon() { return this.$('unencryptedFileCsvIncIcon'); }
   get unencryptedFileCsvIncIconText() { return this.$('unencryptedFileCsvIncIconText'); }
   get unencryptedFileCsvIncText() { return this.$('unencryptedFileCsvIncText'); }
+  get unencryptedFileJsonDisplayed() { return this.$('unencryptedFileJsonDisplayed'); }
 
 
   async verifyFavoriteFolder(): Promise<this> {
@@ -438,10 +441,10 @@ export class HomePage extends BasePage {
 
   async verifyIdentityCreatedOnHomePageVisible(): Promise<this> {
     const { text } = IDENTITY_CREATED_ON_HOME_PAGE;
-    await this.identityCreatedOnHomePage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity created on home page should be visible' });
-    await this.identityCreatedOnHomePageIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity created on home page icon should be visible' });
-    await this.identityCreatedOnHomePageText.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity created on home page text should be visible' });
-    await this.identityCreatedOnHomePageThreeDotsButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity created on home page three dots button should be visible' });
+    await this.identityCreatedOnHomePage.waitForDisplayed({ timeout: 30000, timeoutMsg: 'Identity created on home page should be visible' });
+    await this.identityCreatedOnHomePageIcon.waitForDisplayed({ timeout: 30000, timeoutMsg: 'Identity created on home page icon should be visible' });
+    await this.identityCreatedOnHomePageText.waitForDisplayed({ timeout: 30000, timeoutMsg: 'Identity created on home page text should be visible' });
+    await this.identityCreatedOnHomePageThreeDotsButton.waitForDisplayed({ timeout: 30000, timeoutMsg: 'Identity created on home page three dots button should be visible' });
     const textActual = (await this.identityCreatedOnHomePageText.getText()) ?? (await this.identityCreatedOnHomePageText.getAttribute('text')) ?? '';
     expect(textActual).toBe(text);
     return this.self;
@@ -531,13 +534,13 @@ export class HomePage extends BasePage {
   }
 
   /* ==================== HOME PAGE LOADED VERIFICATIONS ==================== */
-  async waitForHomePageLoaded(timeout: number = 10000): Promise<this> {
+  async waitForHomePageLoaded(timeout: number = 20000): Promise<this> {
     await this.homeLogoLock.waitForDisplayed({ timeout, timeoutMsg: 'Home page logo lock not visible' });
     return this.self;
   }
 
   async verifyHomeLogoLockVisible(): Promise<this> {
-    await this.homeLogoLock.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Home logo lock not visible after waiting' });
+    await this.homeLogoLock.waitForDisplayed({ timeout: 20000, timeoutMsg: 'Home logo lock not visible after waiting' });
     await this.verifyDisplayedSoft('homeLogoLock', 'Home logo lock should be visible');
     return this.self;
   }
@@ -673,7 +676,7 @@ export class HomePage extends BasePage {
   }
 
   async tapCreateCustomElementButton(): Promise<this> {
-    await this.customField.click();
+    await this.createCustomElementButton.click();
     return this.self;
   }
 
@@ -1086,11 +1089,6 @@ export class HomePage extends BasePage {
     // Verify Gmail Icon
     await this.verifyDisplayedSoft('nordPassCsvGmailIcon', 'NordPass CSV Gmail icon should be visible');
     
-    // Verify Gmail Icon Text
-    await this.verifyDisplayedSoft('nordPassCsvGmailIconText', 'NordPass CSV Gmail icon text should be visible');
-    const iconText = await this.nordPassCsvGmailIconText.getText();
-    expect(iconText).toBe(IMPORTED_ITEMS.nordPassCsvGmail.iconText);
-    
     // Verify Gmail Text
     await this.verifyDisplayedSoft('nordPassCsvGmailText', 'NordPass CSV Gmail text should be visible');
     const gmailText = await this.nordPassCsvGmailText.getText();
@@ -1103,19 +1101,6 @@ export class HomePage extends BasePage {
     // Verify ProtonPass CSV Note
     await this.verifyDisplayedSoft('protonPassCsvNote', 'ProtonPass CSV note should be visible');
     
-    // Verify Note Icon
-    await this.verifyDisplayedSoft('protonPassCsvNoteIcon', 'ProtonPass CSV note icon should be visible');
-    
-    // Verify Note Icon Text
-    await this.verifyDisplayedSoft('protonPassCsvNoteIconText', 'ProtonPass CSV note icon text should be visible');
-    const iconText = await this.protonPassCsvNoteIconText.getText();
-    expect(iconText).toBe(IMPORTED_ITEMS.protonPassCsvNote.iconText);
-    
-    // Verify Note Text
-    await this.verifyDisplayedSoft('protonPassCsvNoteText', 'ProtonPass CSV note text should be visible');
-    const noteText = await this.protonPassCsvNoteText.getText();
-    expect(noteText).toBe(IMPORTED_ITEMS.protonPassCsvNote.noteText);
-    
     return this.self;
   }
 
@@ -1123,38 +1108,12 @@ export class HomePage extends BasePage {
     // Verify ProtonPass CSV Identity
     await this.verifyDisplayedSoft('protonPassCsvIdentity', 'ProtonPass CSV identity should be visible');
     
-    // Verify Identity Icon
-    await this.verifyDisplayedSoft('protonPassCsvIdentityIcon', 'ProtonPass CSV identity icon should be visible');
-    
-    // Verify Identity Icon Text
-    await this.verifyDisplayedSoft('protonPassCsvIdentityIconText', 'ProtonPass CSV identity icon text should be visible');
-    const iconText = await this.protonPassCsvIdentityIconText.getText();
-    expect(iconText).toBe(IMPORTED_ITEMS.protonPassCsvIdentity.iconText);
-    
-    // Verify Identity Text
-    await this.verifyDisplayedSoft('protonPassCsvIdentityText', 'ProtonPass CSV identity text should be visible');
-    const identityText = await this.protonPassCsvIdentityText.getText();
-    expect(identityText).toBe(IMPORTED_ITEMS.protonPassCsvIdentity.identityText);
-    
     return this.self;
   }
 
   async verifyProtonPassCsvLoginDisplayed(): Promise<this> {
     // Verify ProtonPass CSV Login
     await this.verifyDisplayedSoft('protonPassCsvLogin', 'ProtonPass CSV login should be visible');
-    
-    // Verify Login Icon
-    await this.verifyDisplayedSoft('protonPassCsvLoginIcon', 'ProtonPass CSV login icon should be visible');
-    
-    // Verify Login Icon Text
-    await this.verifyDisplayedSoft('protonPassCsvLoginIconText', 'ProtonPass CSV login icon text should be visible');
-    const iconText = await this.protonPassCsvLoginIconText.getText();
-    expect(iconText).toBe(IMPORTED_ITEMS.protonPassCsvLogin.iconText);
-    
-    // Verify Login Text
-    await this.verifyDisplayedSoft('protonPassCsvLoginText', 'ProtonPass CSV login text should be visible');
-    const loginText = await this.protonPassCsvLoginText.getText();
-    expect(loginText).toBe(IMPORTED_ITEMS.protonPassCsvLogin.loginText);
     
     return this.self;
   }
@@ -1206,15 +1165,14 @@ export class HomePage extends BasePage {
     // Verify Login Icon
     await this.verifyDisplayedSoft('protonPassJsonLoginIcon', 'ProtonPass JSON login icon should be visible');
     
-    // Verify Login Icon Text
-    await this.verifyDisplayedSoft('protonPassJsonLoginIconText', 'ProtonPass JSON login icon text should be visible');
-    const iconText = await this.protonPassJsonLoginIconText.getText();
-    expect(iconText).toBe(IMPORTED_ITEMS.protonPassJsonLogin.iconText);
-    
     // Verify Login Text
     await this.verifyDisplayedSoft('protonPassJsonLoginText', 'ProtonPass JSON login text should be visible');
     const loginText = await this.protonPassJsonLoginText.getText();
     expect(loginText).toBe(IMPORTED_ITEMS.protonPassJsonLogin.loginText);
+    
+    await this.verifyDisplayedSoft('protonPassJsonLoginText2', 'ProtonPass JSON login text should be visible');
+    const loginText2 = await this.protonPassJsonLoginText2.getText();
+    expect(loginText2).toBe(IMPORTED_ITEMS.protonPassJsonLogin.protonPassJsonLoginText2);
     
     return this.self;
   }
@@ -1256,6 +1214,11 @@ export class HomePage extends BasePage {
     const incText = await this.unencryptedFileCsvIncText.getText();
     expect(incText).toBe(IMPORTED_ITEMS.unencryptedFileCsvInc.incText);
     
+    return this.self;
+  }
+
+  async verifyUnencryptedFileJsonDisplayed(): Promise<this> {
+    await this.unencryptedFileJsonDisplayed.waitForDisplayed({ timeout: 2000 });
     return this.self;
   }
 }

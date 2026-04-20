@@ -105,6 +105,15 @@ export const CREATE_CREDIT_CARD_WARNING_MESSAGE = {
 } as const;
 
 /* =====================================================
+        CREATE CREDIT CARD PAGE - VALIDATION (schema / input handlers)
+  ===================================================== */
+
+export const CREATE_CREDIT_CARD_VALIDATION_MESSAGES = {
+  /** Shown as toast when Save is tapped with non-numeric security code or pin (CreateOrEditCreditCardContent). */
+  numbersOnly: 'Should contain only numbers',
+} as const;
+
+/* =====================================================
         CREATE CREDIT CARD PAGE - EXPECTED ENTERED TEXT IN FIELDS
   ===================================================== */
 

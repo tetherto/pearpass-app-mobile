@@ -27,10 +27,10 @@ const signUpLocators = {
   createPasswordContinueButton: '~Continue',
   createPasswordContinueText: '//android.widget.TextView[@text="Continue"]',
   chromeUrlBar: '//android.widget.EditText[@resource-id="com.android.chrome:id/url_bar"]',
-  enterPasswordPasswordIsRequiredWarning: '//android.widget.TextView[@text=" Password is required "][1]',
-  enterPasswordPasswordIsRequiredWarningIcon: '//android.view.ViewGroup[@resource-id="create-password-input"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[1]',
-  confirmPasswordPasswordIsRequiredWarning: '//android.widget.TextView[@text=" Password is required "][2]',
-  confirmPasswordPasswordIsRequiredWarningIcon: '//android.view.ViewGroup[@resource-id="create-password-confirm-input"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[1]',
+  enterPasswordPasswordIsRequiredWarning: '//android.view.ViewGroup[@resource-id="create-password-input"]//android.widget.TextView[@text=" Password is required "]',
+  enterPasswordPasswordIsRequiredWarningIcon: '//android.view.ViewGroup[@resource-id="create-password-input"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
+  confirmPasswordPasswordIsRequiredWarning: '//android.view.ViewGroup[@resource-id="create-password-confirm-input"]//android.widget.TextView[@text=" Password is required "]',
+  confirmPasswordPasswordIsRequiredWarningIcon: '//android.view.ViewGroup[@resource-id="create-password-confirm-input"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView',
   enterPasswordPasswordMustBeAtLeast8CharactersLongWarning: '//android.widget.TextView[@text=" Password must be at least 8 characters long "]',
   enterPasswordPasswordMustBeAtLeast8CharactersLongIcon: '//android.view.ViewGroup[@content-desc=" Password must be at least 8 characters long "]/com.horcrux.svg.SvgView[2]',
   enterPasswordPasswordMustContainAtLeastOneUppercaseLetterWarning: '//android.widget.TextView[@text=" Password must contain at least one uppercase letter "]',
@@ -43,7 +43,7 @@ const signUpLocators = {
   enterPasswordPasswordMustContainAtLeastOneSpecialCharacterWarningIcon: '//android.view.ViewGroup[@content-desc=" Password must contain at least one special character "]/com.horcrux.svg.SvgView[2]',
   confirmPasswordPasswordsDoNotMatchWarning: '//android.widget.TextView[@text=" Passwords do not match "]',
   confirmPasswordPasswordsDoNotMatchWarningIcon: '//android.view.ViewGroup[@content-desc=" Passwords do not match "]/com.horcrux.svg.SvgView[2]',
-/* =====================================================
+  /* =====================================================
         ENTER MASTER PASSWORD
 ===================================================== */
   enterPasswordTitle: '//android.widget.TextView[@resource-id="enter-password-title"]',
@@ -61,7 +61,24 @@ const signUpLocators = {
   enterPasswordIncorrectPassword4AttemptsWarning: '//android.widget.TextView[@text=" Incorrect password. You have 4 attempts before the app will be temporarily locked. "]',
   enterPasswordIncorrectPassword3AttemptsWarning: '//android.widget.TextView[@text=" Incorrect password. You have 3 attempts before the app will be temporarily locked. "]',
   enterPasswordIncorrectPassword2AttemptsWarning: '//android.widget.TextView[@text=" Incorrect password. You have 2 attempts before the app will be temporarily locked. "]',
-  enterPasswordIncorrectPassword1AttemptWarning: '//android.widget.TextView[@text=" Incorrect password. You have 1 attempt before the app will be temporarily locked. "]',
+  enterPasswordIncorrectPassword1AttemptWarning: '//android.widget.TextView[@text=" Incorrect password. You have 2 attempt before the app will be temporarily locked. "]',
+  useFingerprintButton: '~Use Fingerprint',
+  useFingerprintIcon: '//android.view.ViewGroup[@content-desc="Use Fingerprint"]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView',
+  useFingerprintText: '//android.widget.TextView[@resource-id="biometric-login-button"]',
+
+  biometricsAuthenticationPopupAppLogo: '~App logo',
+  biometricsAuthenticationPopupAppText: '//android.widget.TextView[@resource-id="com.android.systemui:id/logo_description"]',
+  biometricsAuthenticationPopupText: '//android.widget.TextView[@resource-id="com.android.systemui:id/title"]',
+  biometricsAuthenticationPopupIndicator: '~Fingerprint sensor',
+  biometricsAuthenticationPopupCancelButton: '//android.widget.Button[@resource-id="com.android.systemui:id/button_negative"]',
+
+  enableBiometricAuthenticationPopup: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]',
+  enableBiometricAuthenticationPopupTitle: '//android.widget.TextView[@text="Enable biometric authentication"]',
+  enableBiometricAuthenticationPopupDescription: '//android.widget.TextView[@text="Your device supports biometric authentication. Do you want to enable biometric authentication for easier and more secure sign-in?"]',
+  enableBiometricAuthenticationPopupDismissButton: '~Dismiss',
+  enableBiometricAuthenticationPopupDismissButtonText: '//android.widget.TextView[@text="Dismiss"]',
+  enableBiometricAuthenticationPopupEnableButton: '~Enable',
+  enableBiometricAuthenticationPopupEnableButtonText: '//android.widget.TextView[@text="Enable"]',
 /* =====================================================
         SELECT VAULT TYPE
 ===================================================== */
@@ -114,6 +131,10 @@ const signUpLocators = {
   selectVaultsTitle: '//android.widget.TextView[@resource-id="select-vault-type-list-title"]',
   authVaultItem: '~auth-vault-item-0',
   newVaultNameAtSelectVaultsPage: '//android.view.ViewGroup[@content-desc="auth-vault-item-0"]//android.widget.TextView[1]',
+
+  useWithoutAnAccountButton: '//android.widget.Button[@resource-id="com.android.chrome:id/signin_fre_dismiss_button"]',
+  noThanksButton: '//android.widget.Button[@resource-id="com.android.chrome:id/negative_button"]',
+  allowAllButton: '//android.widget.Button[@resource-id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]',
 }
 
 export default signUpLocators

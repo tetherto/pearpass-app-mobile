@@ -604,4 +604,19 @@ export default abstract class BasePage {
       throw new Error(`Failed to activate app: ${error.message}`);
     }
   }
+
+  async closeApp(): Promise<this> {
+    try {
+      if (this.isAndroid) {
+        await browser.terminateApp('com.pears.pass');
+        await browser.pause(500);
+      } else {
+        await browser.terminateApp('com.pears.pass');
+        await browser.pause(500);
+      }
+      return this;
+    } catch (error: any) {
+      throw new Error(`Failed to close app: ${error.message}`);
+    }
+  }
 }

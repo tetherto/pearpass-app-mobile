@@ -16,7 +16,8 @@ error-shots/
 allure-results/
 allure-report/
 
-# CTRF reports
+# CTRF / wdio JSON reports (generated under ctrl/)
+ctrl/
 ctrf/
 
 # Environment files

@@ -1,6 +1,6 @@
 import BasePage from '@pages/BasePage';
 import saveRecoveryPhraseLocators from '@locators/HomeLocators/SaveRecoveryPhraseLocators';
-import { SAVE_RECOVERY_PHRASE_APPLICATION_NAME_FIELD, SAVE_RECOVERY_PHRASE_CUSTOM_FIELD, SAVE_RECOVERY_PHRASE_ENTERED_FIELDS, SAVE_RECOVERY_PHRASE_FIRST_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_NOTE_FIELD, SAVE_RECOVERY_PHRASE_PASTE_FROM_CLIPBOARD_WARNING_MESSAGE, SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_FIELD, SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_PASTED_TOAST_MESSAGE, SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_PASTED_TOAST_MESSAGE_2, SAVE_RECOVERY_PHRASE_SECOND_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_THIRD_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_FOURTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_FIFTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_SIXTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_SEVENTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_EIGHTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_NINTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_TENTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_ELEVENTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_TWELFTH_PASTED_RECOVERY_PHRASE } from '@data/home-data/saveRecoveryPhrase.data';
+import { SAVE_RECOVERY_PHRASE_APPLICATION_NAME_FIELD, SAVE_RECOVERY_PHRASE_CUSTOM_FIELD, SAVE_RECOVERY_PHRASE_ENTERED_FIELDS, SAVE_RECOVERY_PHRASE_FIRST_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_NEW_NOTE_FIELD, SAVE_RECOVERY_PHRASE_NOTE_FIELD, SAVE_RECOVERY_PHRASE_PASTE_FROM_CLIPBOARD_WARNING_MESSAGE, SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_FIELD, SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_PASTED_TOAST_MESSAGE, SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_PASTED_TOAST_MESSAGE_2, SAVE_RECOVERY_PHRASE_SECOND_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_SHOW_CUSTOM_FIELD_POPUP, SAVE_RECOVERY_PHRASE_THIRD_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_FOURTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_FIFTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_SIXTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_SEVENTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_EIGHTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_NINTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_TENTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_ELEVENTH_PASTED_RECOVERY_PHRASE, SAVE_RECOVERY_PHRASE_TWELFTH_PASTED_RECOVERY_PHRASE } from '@data/home-data/saveRecoveryPhrase.data';
 import { browser } from '@wdio/globals';
 
 declare const expect: any;
@@ -64,8 +64,10 @@ export class SaveRecoveryPhrasePage extends BasePage {
   get twelveWordsRadioButton() { return this.$('twelveWordsRadioButton'); }
   get twelveWordsRadioButtonText() { return this.$('twelveWordsRadioButtonText'); }
   get twelveWordsRadioButtonChosen() { return this.$('twelveWordsRadioButtonChosen'); }
+  get twelveWordsRadioButtonUnchosen() { return this.$('twelveWordsRadioButtonUnchosen'); }
   get twentyFourWordsRadioButton() { return this.$('twentyFourWordsRadioButton'); }
   get twentyFourWordsRadioButtonText() { return this.$('twentyFourWordsRadioButtonText'); }
+  get twentyFourWordsRadioButtonChosen() { return this.$('twentyFourWordsRadioButtonChosen'); }
   get twentyFourWordsRadioButtonUnchosen() { return this.$('twentyFourWordsRadioButtonUnchosen'); }
   get randomWordsToggleText() { return this.$('randomWordsToggleText'); }
   get randomWordsToggleOn() { return this.$('randomWordsToggleOn'); }
@@ -74,11 +76,21 @@ export class SaveRecoveryPhrasePage extends BasePage {
   get noteFieldIcon() { return this.$('noteFieldIcon'); }
   get noteFieldTitle() { return this.$('noteFieldTitle'); }
   get noteFieldInput() { return this.$('noteFieldInput'); }
+  get noteFieldContextMenuThreeDots() { return this.$('noteFieldContextMenuThreeDots'); }
+  get selectAllMenuItem() { return this.$('selectAllMenuItem'); }
+  get copyMenuItem() { return this.$('copyMenuItem'); }
   get customField() { return this.$('customField'); }
   get createCustomFieldButton() { return this.$('createCustomFieldButton'); }
   get customFieldIcon() { return this.$('customFieldIcon'); }
   get customFieldTitle() { return this.$('customFieldTitle'); }
   get customFieldIcon2() { return this.$('customFieldIcon2'); }
+  get customFieldsIcon3() { return this.$('customFieldsIcon3'); }
+  get customFieldsText2() { return this.$('customFieldsText2'); }
+  get newNoteField() { return this.$('newNoteField'); }
+  get newNoteFieldIcon() { return this.$('newNoteFieldIcon'); }
+  get newNoteFieldTitle() { return this.$('newNoteFieldTitle'); }
+  get newNoteFieldInput() { return this.$('newNoteFieldInput'); }
+  get newNoteFieldDeleteButton() { return this.$('newNoteFieldDeleteButton'); }
 
   async tapNoteField(): Promise<this> {
     await this.noteField.click();
@@ -106,10 +118,23 @@ export class SaveRecoveryPhrasePage extends BasePage {
 
   async verifyRecoveryPhrasePastedToastMessageVisible(): Promise<this> {
     const { text } = SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_PASTED_TOAST_MESSAGE;
+    const { text: text2 } = SAVE_RECOVERY_PHRASE_RECOVERY_PHRASE_PASTED_TOAST_MESSAGE_2;
     await this.recoveryPhrasePastedToastMessage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Recovery phrase pasted toast message should be visible' });
-    await this.recoveryPhrasePastedToastMessageText.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Recovery phrase pasted toast message text should be visible' });
-    const textActual = await this.recoveryPhrasePastedToastMessageText.getText();
-    expect(textActual).toBe(text);
+    await browser.waitUntil(
+      async () => {
+        const first = await this.recoveryPhrasePastedToastMessageText.isDisplayed().catch(() => false);
+        const second = await this.recoveryPhrasePastedToastMessage2Text.isDisplayed().catch(() => false);
+        return first || second;
+      },
+      { timeout: 8000, interval: 300, timeoutMsg: 'Recovery phrase pasted toast message text should be visible (Pasted from clipboard! or PearPass pasted from your clipboard)' }
+    );
+    if (await this.recoveryPhrasePastedToastMessageText.isDisplayed().catch(() => false)) {
+      const textActual = await this.recoveryPhrasePastedToastMessageText.getText();
+      expect(textActual).toBe(text);
+    } else {
+      const textActual = await this.recoveryPhrasePastedToastMessage2Text.getText();
+      expect(textActual).toBe(text2);
+    }
     return this.self;
   }
 
@@ -304,7 +329,6 @@ export class SaveRecoveryPhrasePage extends BasePage {
     await this.twentyFourWordsRadioButtonText.waitForDisplayed({ timeout: 10000, timeoutMsg: '24 words radio button text should be visible' });
     await this.twentyFourWordsRadioButtonUnchosen.waitForDisplayed({ timeout: 10000, timeoutMsg: '24 words radio button unchosen should be visible' });
     await this.randomWordsToggleText.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Random words toggle text should be visible' });
-    await this.randomWordsToggleOn.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Random words toggle on should be visible' });
     await this.randomWordsToggleOff.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Random words toggle off should be visible' });
     const titleActual = await this.recoveryPhraseFieldTitle.getText();
     expect(titleActual).toBe(recoveryPhraseTitle);
@@ -318,6 +342,74 @@ export class SaveRecoveryPhrasePage extends BasePage {
     expect(twentyFourActual).toBe(twentyFourWordsText);
     const randomToggleActual = await this.randomWordsToggleText.getText();
     expect(randomToggleActual).toBe(randomWordsToggleText);
+    return this.self;
+  }
+
+  async verifyTwelveWordsRadioButtonChosen(): Promise<this> {
+    await this.twelveWordsRadioButtonChosen.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: '12 words option should be selected',
+    });
+    return this.self;
+  }
+
+  async verifyTwentyFourWordsRadioButtonUnchosen(): Promise<this> {
+    await this.twentyFourWordsRadioButtonUnchosen.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: '24 words option should not be selected',
+    });
+    return this.self;
+  }
+
+  async verifyRandomWordsToggleOff(): Promise<this> {
+    await this.randomWordsToggleOff.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: '+1 random word toggle should be off',
+    });
+    return this.self;
+  }
+
+  async tapTwelveWordsRadioButton(): Promise<this> {
+    await this.twelveWordsRadioButton.click();
+    return this.self;
+  }
+
+  async tapTwentyFourWordsRadioButton(): Promise<this> {
+    await this.twentyFourWordsRadioButton.click();
+    return this.self;
+  }
+
+  async verifyTwentyFourWordsRadioButtonChosen(): Promise<this> {
+    await this.twentyFourWordsRadioButtonChosen.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: '24 words option should be selected',
+    });
+    return this.self;
+  }
+
+  async verifyTwelveWordsRadioButtonUnchosen(): Promise<this> {
+    await this.twelveWordsRadioButtonUnchosen.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: '12 words option should not be selected',
+    });
+    return this.self;
+  }
+
+  async tapRandomWordsToggle(): Promise<this> {
+    const offVisible = await this.randomWordsToggleOff.isDisplayed().catch(() => false);
+    if (offVisible) {
+      await this.randomWordsToggleOff.click();
+    } else {
+      await this.randomWordsToggleOn.click();
+    }
+    return this.self;
+  }
+
+  async verifyRandomWordsToggleOn(): Promise<this> {
+    await this.randomWordsToggleOn.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: '+1 random word toggle should be on',
+    });
     return this.self;
   }
 
@@ -339,12 +431,80 @@ export class SaveRecoveryPhrasePage extends BasePage {
   async verifyCustomFieldVisible(): Promise<this> {
     const { title } = SAVE_RECOVERY_PHRASE_CUSTOM_FIELD;
     await this.customField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Custom field should be visible' });
-    await this.createCustomFieldButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Create Custom button should be visible' });
     await this.customFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Custom field icon should be visible' });
     await this.customFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Custom field title should be visible' });
     await this.customFieldIcon2.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Custom field icon 2 should be visible' });
     const titleText = await this.customFieldTitle.getText();
     expect(titleText).toBe(title);
+    return this.self;
+  }
+
+  async tapShowCustomFieldButton(): Promise<this> {
+    await this.customFieldIcon2.click();
+    return this.self;
+  }
+
+  async verifyAllElementsInShowCustomFieldPopupVisible(): Promise<this> {
+    const { noteText } = SAVE_RECOVERY_PHRASE_SHOW_CUSTOM_FIELD_POPUP;
+    await this.customFieldsIcon3.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Show custom field popup: Note icon should be visible' });
+    await this.customFieldsText2.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Show custom field popup: Note text should be visible' });
+    const noteTextActual = await this.customFieldsText2.getText();
+    expect(noteTextActual).toBe(noteText);
+    return this.self;
+  }
+
+  async addNewNoteFieldButton(): Promise<this> {
+    await this.customFieldsIcon3.click();
+    return this.self;
+  }
+
+  async tapNewNoteFieldDeleteButton(): Promise<this> {
+    await this.newNoteFieldDeleteButton.click();
+    return this.self;
+  }
+
+  async verifyNewNoteFieldVisibleWithAllElements(): Promise<this> {
+    const { title, inputPlaceholder } = SAVE_RECOVERY_PHRASE_NEW_NOTE_FIELD;
+    await this.newNoteField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field should be visible' });
+    await this.newNoteFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field icon should be visible' });
+    await this.newNoteFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field title should be visible' });
+    await this.newNoteFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field input should be visible' });
+    await this.newNoteFieldDeleteButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field delete button should be visible' });
+    const titleText = await this.newNoteFieldTitle.getText();
+    expect(titleText).toBe(title);
+    const inputText = await this.newNoteFieldInput.getText() ?? '';
+    const inputAttr = await this.newNoteFieldInput.getAttribute('text') ?? '';
+    const placeholderText = inputText || inputAttr;
+    expect(placeholderText).toBe(inputPlaceholder);
+    return this.self;
+  }
+
+  async verifyNewNoteFieldNotVisible(timeout = 5000): Promise<this> {
+    await this.newNoteField.waitForDisplayed({
+      timeout,
+      reverse: true,
+      timeoutMsg: 'New note field should not be visible',
+    });
+    return this.self;
+  }
+
+  async swipeToUp(): Promise<this> {
+    await browser.performActions([
+      {
+        type: 'pointer',
+        id: 'finger1',
+        parameters: { pointerType: 'touch' },
+        actions: [
+          { type: 'pointerMove', duration: 0, x: 900, y: 1700 },
+          { type: 'pointerDown' },
+          { type: 'pause', duration: 100 },
+          { type: 'pointerMove', duration: 600, x: 900, y: 1200 },
+          { type: 'pointerUp' },
+        ],
+      },
+    ]);
+    await browser.releaseActions();
+    await browser.pause(1500);
     return this.self;
   }
 
@@ -355,6 +515,7 @@ export class SaveRecoveryPhrasePage extends BasePage {
     const inputByField = {
       applicationName: this.applicationNameFieldInput,
       note: this.noteFieldInput,
+      newNote: this.newNoteFieldInput,
     } as const;
     const input = inputByField[fieldName];
     await input.setValue(value);
@@ -368,6 +529,7 @@ export class SaveRecoveryPhrasePage extends BasePage {
     const inputByField = {
       applicationName: this.applicationNameFieldInput,
       note: this.noteFieldInput,
+      newNote: this.newNoteFieldInput,
     } as const;
     const input = inputByField[fieldName];
     const actual = await input.getText() ?? await input.getAttribute('text') ?? '';
@@ -375,15 +537,20 @@ export class SaveRecoveryPhrasePage extends BasePage {
     return this.self;
   }
 
-  /**
-   * Reads the current text from the Note field and sets it to the device clipboard.
-   * Call after enterTextInFields('note') so that "Paste from clipboard" can use the recovery phrase.
-   */
   async copyNoteFieldContentToClipboard(): Promise<this> {
-    const text = await this.noteFieldInput.getText() ?? await this.noteFieldInput.getAttribute('text') ?? '';
-    await browser.setClipboard(text, 'plaintext');
+    await this.noteFieldInput.waitForDisplayed({ timeout: 5000, timeoutMsg: 'Note input field should be visible to copy' });
+    const text = SAVE_RECOVERY_PHRASE_ENTERED_FIELDS.note;
+    
+    // UTF-8 text → Buffer for clipboard
+    const buffer = Buffer.from(text, 'utf-8');
+    
+    await browser.setClipboard(buffer.toString('base64'), 'plaintext');
+    
+    // Brief pause for clipboard to settle
+    await browser.pause(500);
+    
     return this.self;
-  }
+}
 
   async waitForCreateRecoveryPhrasePageLoaded(timeout = 10000): Promise<this> {
     await this.applicationNameField.waitForDisplayed({

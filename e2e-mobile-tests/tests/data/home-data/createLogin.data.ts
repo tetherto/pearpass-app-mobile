@@ -35,7 +35,7 @@ export const CREATE_LOGIN_CREATE_NEW_BUTTON = {
   ===================================================== */
 
 export const CREATE_LOGIN_TEST_FOLDER_POPUP = {
-  title: 'TestFolder',
+  title: 'Test Folder',
   itemsText: '0 items',
 } as const;
 

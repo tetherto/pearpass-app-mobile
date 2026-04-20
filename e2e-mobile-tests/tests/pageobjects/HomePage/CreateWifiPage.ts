@@ -50,6 +50,7 @@ export class CreateWifiPage extends BasePage {
 
   async tapShowPasswordIconButton(): Promise<this> {
     await this.showPasswordIcon.click();
+    await this.showPasswordIcon.click();
     return this.self;
   }
 
@@ -60,6 +61,11 @@ export class CreateWifiPage extends BasePage {
 
   async addNewNoteFieldButton(): Promise<this> {
     await this.customFieldsIcon3.click();
+    return this.self;
+  }
+
+  async tapNewNoteField(): Promise<this> {
+    await this.newNoteField.click();
     return this.self;
   }
 

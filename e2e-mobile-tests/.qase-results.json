@@ -1,0 +1,1791 @@
+{
+  "withId": [
+    {
+      "caseId": 203,
+      "title": "[203] User should see onboarding screens when opening the app for the first time",
+      "status": "passed",
+      "duration": 6130
+    },
+    {
+      "caseId": 926,
+      "title": "[926] User is moved to the next screen by tapping Continue button",
+      "status": "passed",
+      "duration": 237946
+    },
+    {
+      "caseId": 925,
+      "title": "[925] User can choose any onboarding screen by tapping on the screen picker",
+      "status": "passed",
+      "duration": 13097
+    },
+    {
+      "caseId": 927,
+      "title": "[927] User skips Onboarding screens by tapping Skip button",
+      "status": "passed",
+      "duration": 6742
+    },
+    {
+      "caseId": 931,
+      "title": "[931] User is moved to Sign-up screen after Onboarding",
+      "status": "passed",
+      "duration": 7807
+    },
+    {
+      "caseId": 3001,
+      "title": "[3001] User should see Create Master Password screen with all elements",
+      "status": "passed",
+      "duration": 2506
+    },
+    {
+      "caseId": 3002,
+      "title": "[3002] User sees warning message about password recovery",
+      "status": "passed",
+      "duration": 218
+    },
+    {
+      "caseId": 930,
+      "title": "[930] User should see Continue button disabled when terms are not accepted",
+      "status": "passed",
+      "duration": 3192
+    },
+    {
+      "caseId": 3003,
+      "title": "[3003] User should see Continue button enabled after accepting terms",
+      "status": "passed",
+      "duration": 3608
+    },
+    {
+      "caseId": 3004,
+      "title": "[3004] User can toggle terms checkbox on and off",
+      "status": "passed",
+      "duration": 5061
+    },
+    {
+      "caseId": 933,
+      "title": "[933] User can tap on Terms of Use link",
+      "status": "passed",
+      "duration": 9336
+    },
+    {
+      "caseId": 3005,
+      "title": "[3005] User can enter password in both input fields",
+      "status": "passed",
+      "duration": 4692
+    },
+    {
+      "caseId": 3006,
+      "title": "[3006] User can toggle password visibility to see password instead of dots",
+      "status": "passed",
+      "duration": 2444
+    },
+    {
+      "caseId": 3007,
+      "title": "[3007] User can toggle confirm password visibility to see password instead of dots",
+      "status": "passed",
+      "duration": 2641
+    },
+    {
+      "caseId": 3008,
+      "title": "[3008] User can toggle password visibility for both fields independently",
+      "status": "passed",
+      "duration": 6201
+    },
+    {
+      "caseId": 3009,
+      "title": "[3009] User can create password with valid password (standard)",
+      "status": "passed",
+      "duration": 5587
+    },
+    {
+      "caseId": 3010,
+      "title": "[3010] User can create password with valid password (long)",
+      "status": "passed",
+      "duration": 5413
+    },
+    {
+      "caseId": 3011,
+      "title": "[3011] User can create password with valid password (with special chars)",
+      "status": "passed",
+      "duration": 5476
+    },
+    {
+      "caseId": 1237,
+      "title": "[1237] User can create password with valid password (complex)",
+      "status": "passed",
+      "duration": 5939
+    },
+    {
+      "caseId": 1322,
+      "title": "[1322] User cannot proceed with password too short (7 characters)",
+      "status": "passed",
+      "duration": 4976
+    },
+    {
+      "caseId": 1323,
+      "title": "[1323] User cannot proceed with password missing uppercase letter",
+      "status": "passed",
+      "duration": 4573
+    },
+    {
+      "caseId": 1324,
+      "title": "[1324] User cannot proceed with password missing lowercase letter",
+      "status": "passed",
+      "duration": 5160
+    },
+    {
+      "caseId": 1326,
+      "title": "[1326] User cannot proceed with password missing number",
+      "status": "passed",
+      "duration": 5034
+    },
+    {
+      "caseId": 1325,
+      "title": "[1325] User cannot proceed with password missing special character",
+      "status": "passed",
+      "duration": 5057
+    },
+    {
+      "caseId": 2239,
+      "title": "[2239] User cannot complete flow with mismatched passwords",
+      "status": "passed",
+      "duration": 4818
+    },
+    {
+      "caseId": 2240,
+      "title": "[2240] User cannot complete flow with both password fields empty",
+      "status": "passed",
+      "duration": 1671
+    },
+    {
+      "caseId": 2241,
+      "title": "[2241] User cannot complete flow with empty Enter password field",
+      "status": "passed",
+      "duration": 3105
+    },
+    {
+      "caseId": 2242,
+      "title": "[2242] User cannot complete flow with empty Confirm password field",
+      "status": "passed",
+      "duration": 3037
+    },
+    {
+      "caseId": 2244,
+      "title": "[2244, 204, 928, 929, 935] User can complete password creation flow",
+      "status": "passed",
+      "duration": 3925
+    },
+    {
+      "caseId": 204,
+      "title": "[2244, 204, 928, 929, 935] User can complete password creation flow",
+      "status": "passed",
+      "duration": 3925
+    },
+    {
+      "caseId": 928,
+      "title": "[2244, 204, 928, 929, 935] User can complete password creation flow",
+      "status": "passed",
+      "duration": 3925
+    },
+    {
+      "caseId": 929,
+      "title": "[2244, 204, 928, 929, 935] User can complete password creation flow",
+      "status": "passed",
+      "duration": 3925
+    },
+    {
+      "caseId": 935,
+      "title": "[2244, 204, 928, 929, 935] User can complete password creation flow",
+      "status": "passed",
+      "duration": 3925
+    },
+    {
+      "caseId": 209,
+      "title": "[209] User can enable biometrics authentication",
+      "status": "passed",
+      "duration": 20966
+    },
+    {
+      "caseId": 3012,
+      "title": "[3012] User should see Enter Master Password screen with all elements",
+      "status": "passed",
+      "duration": 856
+    },
+    {
+      "caseId": 3013,
+      "title": "[3013] User should see placeholder text in password input field",
+      "status": "passed",
+      "duration": 36
+    },
+    {
+      "caseId": 3014,
+      "title": "[3014] User can enter master password in input field",
+      "status": "passed",
+      "duration": 2448
+    },
+    {
+      "caseId": 3015,
+      "title": "[3015] User can toggle password visibility to see password",
+      "status": "passed",
+      "duration": 4090
+    },
+    {
+      "caseId": 1256,
+      "title": "[1256] User cannot proceed with incorrect password",
+      "status": "failed",
+      "duration": 12957,
+      "error": "Validation error \"incorrectPassword4Attempts\" should be displayed (timeout waiting for element)"
+    },
+    {
+      "caseId": 206,
+      "title": "[206, 207, 932] User can login with correct master password",
+      "status": "passed",
+      "duration": 3597
+    },
+    {
+      "caseId": 207,
+      "title": "[206, 207, 932] User can login with correct master password",
+      "status": "passed",
+      "duration": 3597
+    },
+    {
+      "caseId": 932,
+      "title": "[206, 207, 932] User can login with correct master password",
+      "status": "passed",
+      "duration": 3597
+    },
+    {
+      "caseId": 215,
+      "title": "[215] User should see New Vault screen with all elements",
+      "status": "passed",
+      "duration": 439
+    },
+    {
+      "caseId": 3016,
+      "title": "[3016] User can navigate back from New Vault to Select Vaults",
+      "status": "passed",
+      "duration": 776
+    },
+    {
+      "caseId": 219,
+      "title": "[219] User can create a new vault and navigate to Home",
+      "status": "passed",
+      "duration": 3578
+    },
+    {
+      "caseId": 433,
+      "title": "[433, 434] User should see Sidebar page with all elements",
+      "status": "passed",
+      "duration": 5616
+    },
+    {
+      "caseId": 434,
+      "title": "[433, 434] User should see Sidebar page with all elements",
+      "status": "passed",
+      "duration": 5616
+    },
+    {
+      "caseId": 3017,
+      "title": "[3017] User should see All Folders selected by default",
+      "status": "passed",
+      "duration": 2404
+    },
+    {
+      "caseId": 3018,
+      "title": "[3018] User can tap on Favorites and see favorite folder on HomePage",
+      "status": "passed",
+      "duration": 4909
+    },
+    {
+      "caseId": 3019,
+      "title": "[3019] User should see Favorites selected in Sidebar after tapping on it",
+      "status": "passed",
+      "duration": 9105
+    },
+    {
+      "caseId": 437,
+      "title": "[437, 2488] User can open and close Create new folder page",
+      "status": "passed",
+      "duration": 4290
+    },
+    {
+      "caseId": 2488,
+      "title": "[437, 2488] User can open and close Create new folder page",
+      "status": "passed",
+      "duration": 4290
+    },
+    {
+      "caseId": 2487,
+      "title": "[2487] User can see validation warning when trying to create folder without title",
+      "status": "passed",
+      "duration": 4588
+    },
+    {
+      "caseId": 3020,
+      "title": "[3020] User can enter folder title in Create new folder page",
+      "status": "passed",
+      "duration": 6706
+    },
+    {
+      "caseId": 1665,
+      "title": "[1665] User can tap on Add Device button and see Add Device popup with all elements",
+      "status": "passed",
+      "duration": 29634
+    },
+    {
+      "caseId": 1666,
+      "title": "[1666, 1667] User can switch between Share this Vault and Import Vault tabs",
+      "status": "passed",
+      "duration": 20041
+    },
+    {
+      "caseId": 1667,
+      "title": "[1666, 1667] User can switch between Share this Vault and Import Vault tabs",
+      "status": "passed",
+      "duration": 20041
+    },
+    {
+      "caseId": 3021,
+      "title": "[3021] User can see warning message in Add Device popup",
+      "status": "passed",
+      "duration": 11926
+    },
+    {
+      "caseId": 3022,
+      "title": "[3022] User can see QR code and vault key in Add Device popup",
+      "status": "passed",
+      "duration": 8199
+    },
+    {
+      "caseId": 871,
+      "title": "[871, 2486] User can create new folder",
+      "status": "failed",
+      "duration": 22956,
+      "error": "Sidebar title not visible"
+    },
+    {
+      "caseId": 2486,
+      "title": "[871, 2486] User can create new folder",
+      "status": "failed",
+      "duration": 22956,
+      "error": "Sidebar title not visible"
+    },
+    {
+      "caseId": 438,
+      "title": "[438, 2489, 2490, 2491] User can rename folder",
+      "status": "passed",
+      "duration": 27312
+    },
+    {
+      "caseId": 2489,
+      "title": "[438, 2489, 2490, 2491] User can rename folder",
+      "status": "passed",
+      "duration": 27312
+    },
+    {
+      "caseId": 2490,
+      "title": "[438, 2489, 2490, 2491] User can rename folder",
+      "status": "passed",
+      "duration": 27312
+    },
+    {
+      "caseId": 2491,
+      "title": "[438, 2489, 2490, 2491] User can rename folder",
+      "status": "passed",
+      "duration": 27312
+    },
+    {
+      "caseId": 2493,
+      "title": "[2493, 2495] User can delete folder",
+      "status": "passed",
+      "duration": 13816
+    },
+    {
+      "caseId": 2495,
+      "title": "[2493, 2495] User can delete folder",
+      "status": "passed",
+      "duration": 13816
+    },
+    {
+      "caseId": 2494,
+      "title": "[2494] Cancel button does not delete folder",
+      "status": "passed",
+      "duration": 19120
+    },
+    {
+      "caseId": 440,
+      "title": "[440] User can scroll list of folders",
+      "status": "passed",
+      "duration": 22690
+    },
+    {
+      "caseId": 1649,
+      "title": "[1649] Folders are displayed in alphabetical order",
+      "status": "failed",
+      "duration": 14727,
+      "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: < \u001b[32m878\u001b[39m\nReceived:   \u001b[31m1127\u001b[39m"
+    },
+    {
+      "caseId": 3023,
+      "title": "[3023] User can create new vault (Kazik) from sidebar",
+      "status": "passed",
+      "duration": 33493
+    },
+    {
+      "caseId": 402,
+      "title": "[402, 1463] User can see and choose vault in Sidebar",
+      "status": "passed",
+      "duration": 19404
+    },
+    {
+      "caseId": 1463,
+      "title": "[402, 1463] User can see and choose vault in Sidebar",
+      "status": "passed",
+      "duration": 19404
+    },
+    {
+      "caseId": 212,
+      "title": "[212] User can tap on Close Vault button and navigate to Enter Master Password page",
+      "status": "passed",
+      "duration": 26353
+    },
+    {
+      "caseId": 1643,
+      "title": "[1643] User is logged out when closing the app",
+      "status": "passed",
+      "duration": 6113
+    },
+    {
+      "caseId": 3024,
+      "title": "[3024] User can tap on Settings tab and appear on Settings page",
+      "status": "passed",
+      "duration": 302
+    },
+    {
+      "caseId": 3025,
+      "title": "[3025] User should see Settings page with all elements",
+      "status": "passed",
+      "duration": 4502
+    },
+    {
+      "caseId": 3026,
+      "title": "[3026] User can tap on Security button and appear on Security page",
+      "status": "passed",
+      "duration": 2941
+    },
+    {
+      "caseId": 3027,
+      "title": "[3027] User can tap on Syncing button and appear on Syncing page",
+      "status": "passed",
+      "duration": 2719
+    },
+    {
+      "caseId": 3028,
+      "title": "[3028] User can tap on Autofill button and appear on Autofill page",
+      "status": "passed",
+      "duration": 2119
+    },
+    {
+      "caseId": 3029,
+      "title": "[3029] User can tap on Vault button and appear on Vault page",
+      "status": "passed",
+      "duration": 2674
+    },
+    {
+      "caseId": 3030,
+      "title": "[3030] User can tap on Appearance button and appear on Appearance page",
+      "status": "passed",
+      "duration": 2089
+    },
+    {
+      "caseId": 3031,
+      "title": "[3031] User can tap on About button and appear on About page",
+      "status": "passed",
+      "duration": 2636
+    },
+    {
+      "caseId": 3032,
+      "title": "[3032] User can verify Security page with all elements",
+      "status": "passed",
+      "duration": 8049
+    },
+    {
+      "caseId": 3033,
+      "title": "[3033] User can tap on Master Vault edit icon and see Modify master password popup",
+      "status": "passed",
+      "duration": 3191
+    },
+    {
+      "caseId": 3034,
+      "title": "[3034] User can see warning messages if all fields are empty and tap on continue button",
+      "status": "passed",
+      "duration": 1437
+    },
+    {
+      "caseId": 442,
+      "title": "[442] User can see warning if old password is invalid",
+      "status": "passed",
+      "duration": 4603
+    },
+    {
+      "caseId": 443,
+      "title": "[443] User can see warning if new password is invalid format",
+      "status": "passed",
+      "duration": 4197
+    },
+    {
+      "caseId": 3035,
+      "title": "[3035] User can see warning if new password is same as old password",
+      "status": "passed",
+      "duration": 4020
+    },
+    {
+      "caseId": 2622,
+      "title": "[2622] It is impossible to change password when there are less than 8 characters",
+      "status": "passed",
+      "duration": 4330
+    },
+    {
+      "caseId": 2623,
+      "title": "[2623] It is impossible to change password when there is no uppercase",
+      "status": "passed",
+      "duration": 3929
+    },
+    {
+      "caseId": 2624,
+      "title": "[2624] It is impossible to change password when there is no lowercase",
+      "status": "passed",
+      "duration": 3958
+    },
+    {
+      "caseId": 2625,
+      "title": "[2625] It is impossible to change password when there is no special character",
+      "status": "passed",
+      "duration": 3924
+    },
+    {
+      "caseId": 2626,
+      "title": "[2626] It is impossible to change password when there is no digit",
+      "status": "passed",
+      "duration": 3996
+    },
+    {
+      "caseId": 2627,
+      "title": "[2627] It is impossible to change password when entering different passwords in each field",
+      "status": "passed",
+      "duration": 3994
+    },
+    {
+      "caseId": 441,
+      "title": "[441, 2621] User can change password of master vault",
+      "status": "passed",
+      "duration": 20144
+    },
+    {
+      "caseId": 2621,
+      "title": "[441, 2621] User can change password of master vault",
+      "status": "passed",
+      "duration": 20144
+    },
+    {
+      "caseId": 1438,
+      "title": "[1438] User can see biometrics popup and tap on enable button",
+      "status": "passed",
+      "duration": 3425
+    },
+    {
+      "caseId": 1436,
+      "title": "[1436] User can apply fingerprint authentication",
+      "status": "passed",
+      "duration": 6540
+    },
+    {
+      "caseId": 1098,
+      "title": "[1098] User logs in the App by entering changed master password",
+      "status": "passed",
+      "duration": 11450
+    },
+    {
+      "caseId": 1315,
+      "title": "[1315] User logs in after changing password and trying biometrics",
+      "status": "passed",
+      "duration": 13888
+    },
+    {
+      "caseId": 410,
+      "title": "[410, 411] User can turn on and turn off Reminders toggle",
+      "status": "passed",
+      "duration": 1881
+    },
+    {
+      "caseId": 411,
+      "title": "[410, 411] User can turn on and turn off Reminders toggle",
+      "status": "passed",
+      "duration": 1881
+    },
+    {
+      "caseId": 414,
+      "title": "[414, 415] User can turn on and turn off Copy to Clipboard toggle",
+      "status": "passed",
+      "duration": 1642
+    },
+    {
+      "caseId": 415,
+      "title": "[414, 415] User can turn on and turn off Copy to Clipboard toggle",
+      "status": "passed",
+      "duration": 1642
+    },
+    {
+      "caseId": 470,
+      "title": "[470, 471] User can turn on and turn off Unlock with biometrics toggle",
+      "status": "passed",
+      "duration": 962
+    },
+    {
+      "caseId": 471,
+      "title": "[470, 471] User can turn on and turn off Unlock with biometrics toggle",
+      "status": "passed",
+      "duration": 962
+    },
+    {
+      "caseId": 3036,
+      "title": "[3036] Verify that information icon about Auto Logout is displayed",
+      "status": "passed",
+      "duration": 405
+    },
+    {
+      "caseId": 3037,
+      "title": "[3037] User can tap on Auto Logout information icon and see popup",
+      "status": "passed",
+      "duration": 2409
+    },
+    {
+      "caseId": 1444,
+      "title": "[1444] User can select Auto Logout timeout options",
+      "status": "failed",
+      "duration": 20893,
+      "error": "element (\"(//android.widget.SeekBar[@content-desc=\"Bottom Sheet\"])[2]\") still not displayed after 20000ms"
+    },
+    {
+      "caseId": 1450,
+      "title": "[1450] User can switch between Auto Logout timeout options",
+      "status": "failed",
+      "duration": 15083,
+      "error": "Can't call click on element with selector \"//android.view.ViewGroup[@content-desc=\"Never\"]/android.view.ViewGroup\" because element wasn't found"
+    },
+    {
+      "caseId": 1447,
+      "title": "[1447] Verify all Auto Logout timeout options are displayed",
+      "status": "failed",
+      "duration": 12073,
+      "error": "30 seconds radio button should be unselected\n  Error: 30 seconds radio button should be unselected\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_thirtySecondsRadioButtonUnchoose_1776257688854.png\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_thirtySecondsRadioButtonUnchoose_1776257689324.png"
+    },
+    {
+      "caseId": 3038,
+      "title": "[3038] User can verify Syncing page with all elements",
+      "status": "passed",
+      "duration": 1066
+    },
+    {
+      "caseId": 1466,
+      "title": "[1466] User can tap on Blind Peering information icon and see popup",
+      "status": "passed",
+      "duration": 2087
+    },
+    {
+      "caseId": 1465,
+      "title": "[1465] User can tap on Learn more button and see learn more page",
+      "status": "passed",
+      "duration": 9477
+    },
+    {
+      "caseId": 1451,
+      "title": "[1451] User can tap on Blind Peering toggle and see Choose Blind Peer popup",
+      "status": "failed",
+      "duration": 18249,
+      "error": "Choose your Blind Peer popup title should be visible\n  Error: Choose your Blind Peer popup title should be visible\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_chooseBlindPeeringPopupTitle_1776257734887.png\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_chooseBlindPeeringPopupTitle_1776257735282.png"
+    },
+    {
+      "caseId": 1452,
+      "title": "[1452] User can switch between Automatic and Manual Blind Peers",
+      "status": "failed",
+      "duration": 3084,
+      "error": "Automatic Blind Peers radio button should be selected\n  Error: Automatic Blind Peers radio button should be selected\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_chooseBlindPeeringPopupAutomaticBlindPeersRadioButtonChoose_1776257738020.png\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_chooseBlindPeeringPopupAutomaticBlindPeersRadioButtonChoose_1776257738402.png"
+    },
+    {
+      "caseId": 1455,
+      "title": "[1455] User can choose Automatic Blind Peers",
+      "status": "passed",
+      "duration": 5194
+    },
+    {
+      "caseId": 3039,
+      "title": "[3039] User can verify Automatic Blind Peers status is Active",
+      "status": "passed",
+      "duration": 976
+    },
+    {
+      "caseId": 3040,
+      "title": "[3040] User can tap on Edit Blind Peers button and see popup",
+      "status": "passed",
+      "duration": 2674
+    },
+    {
+      "caseId": 3041,
+      "title": "[3041] User can choose Manual Blind Peers",
+      "status": "passed",
+      "duration": 3642
+    },
+    {
+      "caseId": 3042,
+      "title": "[3042] Verify that Manual Blind Peers popup has all elements",
+      "status": "passed",
+      "duration": 2212
+    },
+    {
+      "caseId": 1456,
+      "title": "[1456] User can add one more code field for blind peer",
+      "status": "passed",
+      "duration": 1476
+    },
+    {
+      "caseId": 1454,
+      "title": "[1454] User can remove one code for blind peer",
+      "status": "passed",
+      "duration": 868
+    },
+    {
+      "caseId": 3043,
+      "title": "[3043] User can see error for invalid blind peer code",
+      "status": "passed",
+      "duration": 7172
+    },
+    {
+      "caseId": 1453,
+      "title": "[1453] User can add valid code for blind peer",
+      "status": "passed",
+      "duration": 15270
+    },
+    {
+      "caseId": 3044,
+      "title": "[3044] User can verify Manual Blind Peers status is Active",
+      "status": "passed",
+      "duration": 1119
+    },
+    {
+      "caseId": 3045,
+      "title": "[3045] User can verify Autofill page with all elements",
+      "status": "passed",
+      "duration": 486
+    },
+    {
+      "caseId": 412,
+      "title": "[412] User can set PearPass as default autofill provider",
+      "status": "passed",
+      "duration": 5649
+    },
+    {
+      "caseId": 3046,
+      "title": "[3046] User can tap on Manage autofill settings link",
+      "status": "passed",
+      "duration": 1672
+    },
+    {
+      "caseId": 2389,
+      "title": "[2389] User can verify Vault page with Your Vault section",
+      "status": "failed",
+      "duration": 2102,
+      "error": "First vault item should be visible\n  Error: First vault item should be visible\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_manageVaultsSectionItem_1776257814118.png\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_manageVaultsSectionItem_1776257814679.png"
+    },
+    {
+      "caseId": 3047,
+      "title": "[3047] User can tap on Manage Vaults edit icon and see Change Vault Name popup",
+      "status": "failed",
+      "duration": 15153,
+      "error": "Can't call click on element with selector \"//android.view.ViewGroup[@content-desc=\"vault-item-982a56153365c95d5d5a4aa765e8864a\"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView\" because element wasn't found"
+    },
+    {
+      "caseId": 1104,
+      "title": "[1104] User can change name of vault",
+      "status": "failed",
+      "duration": 15130,
+      "error": "Can't call click on element with selector \"//android.view.ViewGroup[@content-desc=\"vault-item-982a56153365c95d5d5a4aa765e8864a\"]/com.horcrux.svg.SvgView[2]/com.horcrux.svg.GroupView\" because element wasn't found"
+    },
+    {
+      "caseId": 3048,
+      "title": "[3048] Check that name of vault is changed everywhere",
+      "status": "failed",
+      "duration": 25104,
+      "error": "First vault item text (new vault name) not visible"
+    },
+    {
+      "caseId": 1467,
+      "title": "[1467] User can verify Linked Devices section",
+      "status": "failed",
+      "duration": 1498,
+      "error": "Linked devices section item should be visible\n  Error: Linked devices section item should be visible\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_linkedDevicesSectionItem_1776257871321.png\n  Platform: Android\n  Screenshot → C:\\Projects\\pearpass-app-mobile\\e2e-mobile-tests\\screenshots\\FAIL_visibility_SettingsPage_linkedDevicesSectionItem_1776257871722.png"
+    },
+    {
+      "caseId": 1468,
+      "title": "[1468] User can tap on Add device button and see popup",
+      "status": "passed",
+      "duration": 9133
+    },
+    {
+      "caseId": 1470,
+      "title": "[1470] Import vault tab is opened when tapping it",
+      "status": "passed",
+      "duration": 2551
+    },
+    {
+      "caseId": 1469,
+      "title": "[1469] Share this Vault tab is opened when tapping it",
+      "status": "passed",
+      "duration": 4109
+    },
+    {
+      "caseId": 3049,
+      "title": "[3049] Verify that json radio button is selected by default",
+      "status": "passed",
+      "duration": 101
+    },
+    {
+      "caseId": 3050,
+      "title": "[3050] User can switch between CSV and JSON file format",
+      "status": "passed",
+      "duration": 1845
+    },
+    {
+      "caseId": 2394,
+      "title": "[2394] User can tap Export button and see Export Vaults popup",
+      "status": "passed",
+      "duration": 3814
+    },
+    {
+      "caseId": 3051,
+      "title": "[3051] Verify Export button in popup is not clickable by default",
+      "status": "passed",
+      "duration": 2223
+    },
+    {
+      "caseId": 3052,
+      "title": "[3052] Verify Export button is clickable after entering Master password",
+      "status": "passed",
+      "duration": 3481
+    },
+    {
+      "caseId": 1250,
+      "title": "[1250] User can see warning for invalid Master password",
+      "status": "passed",
+      "duration": 6647
+    },
+    {
+      "caseId": 458,
+      "title": "[458, 1249, 2393] User can export vaults in JSON format",
+      "status": "passed",
+      "duration": 13938
+    },
+    {
+      "caseId": 1249,
+      "title": "[458, 1249, 2393] User can export vaults in JSON format",
+      "status": "passed",
+      "duration": 13938
+    },
+    {
+      "caseId": 2393,
+      "title": "[458, 1249, 2393] User can export vaults in JSON format",
+      "status": "passed",
+      "duration": 13938
+    },
+    {
+      "caseId": 455,
+      "title": "[455, 1235] User can export vaults in CSV format",
+      "status": "passed",
+      "duration": 8851
+    },
+    {
+      "caseId": 1235,
+      "title": "[455, 1235] User can export vaults in CSV format",
+      "status": "passed",
+      "duration": 8851
+    },
+    {
+      "caseId": 3053,
+      "title": "[3053] User can verify Vault page with Import section",
+      "status": "passed",
+      "duration": 386
+    },
+    {
+      "caseId": 3054,
+      "title": "[3054] Verify OnePassword button with all elements",
+      "status": "passed",
+      "duration": 507
+    },
+    {
+      "caseId": 3055,
+      "title": "[3055] Verify Bitwarden button with all elements",
+      "status": "passed",
+      "duration": 722
+    },
+    {
+      "caseId": 3056,
+      "title": "[3056] Verify KeePass button with all elements",
+      "status": "passed",
+      "duration": 577
+    },
+    {
+      "caseId": 3057,
+      "title": "[3057] Verify KeePassXC button with all elements",
+      "status": "passed",
+      "duration": 567
+    },
+    {
+      "caseId": 3058,
+      "title": "[3058] Verify LastPass button with all elements",
+      "status": "passed",
+      "duration": 539
+    },
+    {
+      "caseId": 3059,
+      "title": "[3059] Verify NordPass button with all elements",
+      "status": "passed",
+      "duration": 543
+    },
+    {
+      "caseId": 3060,
+      "title": "[3060] Verify ProtonPass button with all elements",
+      "status": "passed",
+      "duration": 581
+    },
+    {
+      "caseId": 3061,
+      "title": "[3061] Verify Encrypted file button with all elements",
+      "status": "passed",
+      "duration": 2826
+    },
+    {
+      "caseId": 3062,
+      "title": "[3062] Verify Unencrypted file button with all elements",
+      "status": "passed",
+      "duration": 552
+    },
+    {
+      "caseId": 461,
+      "title": "[461] It is possible to import 1Password .csv vault",
+      "status": "passed",
+      "duration": 21539
+    },
+    {
+      "caseId": 462,
+      "title": "[462] It is possible to import Bitwarden .csv vault",
+      "status": "passed",
+      "duration": 43310
+    },
+    {
+      "caseId": 463,
+      "title": "[463] It is possible to import Bitwarden .json vault",
+      "status": "passed",
+      "duration": 53604
+    },
+    {
+      "caseId": 464,
+      "title": "[464] It is possible to import LastPass .csv vault",
+      "status": "passed",
+      "duration": 58346
+    },
+    {
+      "caseId": 465,
+      "title": "[465] It is possible to import NordPass .csv vault",
+      "status": "passed",
+      "duration": 49000
+    },
+    {
+      "caseId": 466,
+      "title": "[466] It is possible to import Proton Pass .csv vault",
+      "status": "passed",
+      "duration": 40109
+    },
+    {
+      "caseId": 3063,
+      "title": "[3063] It is possible to import Proton Pass .json vault",
+      "status": "passed",
+      "duration": 72498
+    },
+    {
+      "caseId": 2414,
+      "title": "[2414] It is possible to import Unencrypted file .csv vault",
+      "status": "passed",
+      "duration": 45265
+    },
+    {
+      "caseId": 2415,
+      "title": "[2415] It is possible to import Unencrypted file .json vault",
+      "status": "passed",
+      "duration": 78303
+    },
+    {
+      "caseId": 3064,
+      "title": "[3064] User can verify Appearance page with all elements",
+      "status": "passed",
+      "duration": 530
+    },
+    {
+      "caseId": 407,
+      "title": "[407] User can open language dropdown and see language menu",
+      "status": "passed",
+      "duration": 1764
+    },
+    {
+      "caseId": 3065,
+      "title": "[3065] User can verify About page with all elements",
+      "status": "passed",
+      "duration": 471
+    },
+    {
+      "caseId": 408,
+      "title": "[408] User can send feedback in Report a problem section",
+      "status": "passed",
+      "duration": 7324
+    },
+    {
+      "caseId": 1435,
+      "title": "[1435] Nothing happens when tapping Send with empty field",
+      "status": "passed",
+      "duration": 424
+    },
+    {
+      "caseId": 3066,
+      "title": "[3066] User can verify Version section with all elements",
+      "status": "passed",
+      "duration": 1633
+    },
+    {
+      "caseId": 453,
+      "title": "[453] User can tap on Terms of use link and verify page",
+      "status": "failed",
+      "duration": 25291,
+      "error": "element (\"//android.widget.TextView[@text=\"PearPass Application Terms of Use\"]\") still not displayed after 20000ms"
+    },
+    {
+      "caseId": 454,
+      "title": "[454] User can tap on Privacy statement link and verify page",
+      "status": "failed",
+      "duration": 22034,
+      "error": "element (\"//android.widget.TextView[@text=\"PearPass Application Privacy Statement\"]\") still not displayed after 20000ms"
+    },
+    {
+      "caseId": 1432,
+      "title": "[1432] User can tap on Visit our website link and verify page",
+      "status": "passed",
+      "duration": 5959
+    },
+    {
+      "caseId": 3067,
+      "title": "[3067] User can tap on Home tab and appear on Home page",
+      "status": "passed",
+      "duration": 538
+    },
+    {
+      "caseId": 3068,
+      "title": "[3068] Verify that search field with all elements is displayed on Home page",
+      "status": "passed",
+      "duration": 903
+    },
+    {
+      "caseId": 368,
+      "title": "[368] Verify that categories (filters) with all elements are displayed on Home page",
+      "status": "passed",
+      "duration": 4952
+    },
+    {
+      "caseId": 369,
+      "title": "[369] User can tap on Logins category and see Create a login button",
+      "status": "passed",
+      "duration": 1838
+    },
+    {
+      "caseId": 371,
+      "title": "[371] User can tap on Credit cards category and see Create a credit card button",
+      "status": "passed",
+      "duration": 1760
+    },
+    {
+      "caseId": 372,
+      "title": "[372] User can tap on Wifi category and see Create a wifi button",
+      "status": "passed",
+      "duration": 1664
+    },
+    {
+      "caseId": 373,
+      "title": "[373] User can tap on Recovery phrase category and see Save a recovery phrase button",
+      "status": "passed",
+      "duration": 1957
+    },
+    {
+      "caseId": 370,
+      "title": "[370] User can tap on Identities category and see Create an identity button",
+      "status": "passed",
+      "duration": 1660
+    },
+    {
+      "caseId": 374,
+      "title": "[374] User can tap on Notes category and see Create a note button",
+      "status": "passed",
+      "duration": 1724
+    },
+    {
+      "caseId": 375,
+      "title": "[375] User can tap on Custom category and see Create a custom element button",
+      "status": "passed",
+      "duration": 1719
+    },
+    {
+      "caseId": 376,
+      "title": "[376] User can tap on All category and see all items buttons",
+      "status": "passed",
+      "duration": 7970
+    },
+    {
+      "caseId": 3069,
+      "title": "[3069] User can tap on Create item button and see Create item popup with all elements",
+      "status": "passed",
+      "duration": 19051
+    },
+    {
+      "caseId": 384,
+      "title": "[384] User can tap on Login field and see Create a login page",
+      "status": "passed",
+      "duration": 2659
+    },
+    {
+      "caseId": 386,
+      "title": "[386] User can tap on Credit card field and see Create a credit card page",
+      "status": "passed",
+      "duration": 2916
+    },
+    {
+      "caseId": 387,
+      "title": "[387] User can tap on Wifi field and see Create a wifi page",
+      "status": "passed",
+      "duration": 2628
+    },
+    {
+      "caseId": 388,
+      "title": "[388] User can tap on Recovery phrase field and see Save a recovery phrase page",
+      "status": "passed",
+      "duration": 2527
+    },
+    {
+      "caseId": 385,
+      "title": "[385] User can tap on Identities field and see Create an identity page",
+      "status": "passed",
+      "duration": 2725
+    },
+    {
+      "caseId": 389,
+      "title": "[389] User can tap on Notes field and see Create a notes page",
+      "status": "passed",
+      "duration": 2548
+    },
+    {
+      "caseId": 390,
+      "title": "[390] User can tap on Custom field and see Create a custom element page",
+      "status": "passed",
+      "duration": 2968
+    },
+    {
+      "caseId": 391,
+      "title": "[391] User can tap on Password field and see Generate password popup",
+      "status": "passed",
+      "duration": 2527
+    },
+    {
+      "caseId": 3070,
+      "title": "[3070] User can tap on Create Login button and see Create a login page with all elements",
+      "status": "failed",
+      "duration": 17215,
+      "error": "Custom fields icon should be visible"
+    },
+    {
+      "caseId": 252,
+      "title": "[252] User can tap on No folder button and create new folder",
+      "status": "passed",
+      "duration": 12632
+    },
+    {
+      "caseId": 3071,
+      "title": "[3071] User can tap on Test folder button and unselect test folder",
+      "status": "passed",
+      "duration": 3803
+    },
+    {
+      "caseId": 3072,
+      "title": "[3072] Verify that TestFolder was created at Sidebar Page",
+      "status": "passed",
+      "duration": 6109
+    },
+    {
+      "caseId": 3073,
+      "title": "[3073] Verify that if User not filled all fields and tap on Save button warning message is displayed",
+      "status": "passed",
+      "duration": 1047
+    },
+    {
+      "caseId": 949,
+      "title": "[949] It is possible to close the screen by tapping on the \"Cross\" icon",
+      "status": "passed",
+      "duration": 931
+    },
+    {
+      "caseId": 3074,
+      "title": "[3074] User can tap on Title field and enter title",
+      "status": "passed",
+      "duration": 3495
+    },
+    {
+      "caseId": 3075,
+      "title": "[3075] User can tap on Email or username field and enter email or username",
+      "status": "passed",
+      "duration": 4028
+    },
+    {
+      "caseId": 250,
+      "title": "[250, 1166] User can tap on Password field and enter password",
+      "status": "passed",
+      "duration": 6447
+    },
+    {
+      "caseId": 1166,
+      "title": "[250, 1166] User can tap on Password field and enter password",
+      "status": "passed",
+      "duration": 6447
+    },
+    {
+      "caseId": 3076,
+      "title": "[3076] User can tap on Website field and enter website",
+      "status": "passed",
+      "duration": 4106
+    },
+    {
+      "caseId": 946,
+      "title": "[946] User can tap on \"Add new website field button\" and see Add new website field",
+      "status": "passed",
+      "duration": 2191
+    },
+    {
+      "caseId": 947,
+      "title": "[947] User can delete last website field",
+      "status": "passed",
+      "duration": 812
+    },
+    {
+      "caseId": 3077,
+      "title": "[3077] User can add file to File field",
+      "status": "passed",
+      "duration": 15945
+    },
+    {
+      "caseId": 3130,
+      "title": "[3130] User can open last added file",
+      "status": "passed",
+      "duration": 2698
+    },
+    {
+      "caseId": 3078,
+      "title": "[3078] User can delete last added file",
+      "status": "passed",
+      "duration": 3173
+    },
+    {
+      "caseId": 3079,
+      "title": "[3079] User can tap on Note field and enter note",
+      "status": "passed",
+      "duration": 3707
+    },
+    {
+      "caseId": 3080,
+      "title": "[3080] User can tap on Custom field and see Create a custom element field with all elements",
+      "status": "passed",
+      "duration": 7735
+    },
+    {
+      "caseId": 3081,
+      "title": "[3081] User can add one more Note field",
+      "status": "passed",
+      "duration": 2363
+    },
+    {
+      "caseId": 3082,
+      "title": "[3082] User can delete last added note field",
+      "status": "passed",
+      "duration": 951
+    },
+    {
+      "caseId": 237,
+      "title": "[237, 257] User can tap on Save button and verify that login was created",
+      "status": "failed",
+      "duration": 10358,
+      "error": "Login created on home page should be visible"
+    },
+    {
+      "caseId": 257,
+      "title": "[237, 257] User can tap on Save button and verify that login was created",
+      "status": "failed",
+      "duration": 10358,
+      "error": "Login created on home page should be visible"
+    },
+    {
+      "caseId": 860,
+      "title": "[860] User can tap on Create Credit Card button and see Create a credit card page with all elements",
+      "status": "passed",
+      "duration": 13150
+    },
+    {
+      "caseId": 1028,
+      "title": "[1028] It is possible to close the screen by clicking on the \"Cross\" icon",
+      "status": "passed",
+      "duration": 2660
+    },
+    {
+      "caseId": 278,
+      "title": "[278] User can tap on No folder button and create new folder",
+      "status": "passed",
+      "duration": 12336
+    },
+    {
+      "caseId": 3083,
+      "title": "[3083] User can tap on Test folder button and unselect test folder at Create a credit card page",
+      "status": "passed",
+      "duration": 4615
+    },
+    {
+      "caseId": 3084,
+      "title": "[3084] Verify that TestFolder was created at Sidebar Page after creating credit card at Create a credit card page",
+      "status": "passed",
+      "duration": 7658
+    },
+    {
+      "caseId": 3085,
+      "title": "[3085] User can tap on Name on card field and enter name on card",
+      "status": "passed",
+      "duration": 3987
+    },
+    {
+      "caseId": 3086,
+      "title": "[3086] User can tap on Number on card field and enter number on card",
+      "status": "passed",
+      "duration": 3405
+    },
+    {
+      "caseId": 3087,
+      "title": "[3087] User can tap on Expiry date field and enter expiry date",
+      "status": "passed",
+      "duration": 3504
+    },
+    {
+      "caseId": 3088,
+      "title": "[3088] User can tap on Security code field and enter security code",
+      "status": "passed",
+      "duration": 4594
+    },
+    {
+      "caseId": 277,
+      "title": "[277] User can tap on Pin code field and enter pin code",
+      "status": "passed",
+      "duration": 5098
+    },
+    {
+      "caseId": 1024,
+      "title": "[1024] User can tap on File field and add file again",
+      "status": "passed",
+      "duration": 18892
+    },
+    {
+      "caseId": 1209,
+      "title": "[1209] User can not add large file to File field",
+      "status": "passed",
+      "duration": 20803
+    },
+    {
+      "caseId": 273,
+      "title": "[273] User can tap on Save button and verify that credit card was created",
+      "status": "passed",
+      "duration": 1782
+    },
+    {
+      "caseId": 3089,
+      "title": "[3089] User can tap on Create Wifi Password button and see Create a wifi password page with all elements",
+      "status": "failed",
+      "duration": 3933,
+      "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"Insert Wi-Fi Password\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m"
+    },
+    {
+      "caseId": 1045,
+      "title": "[1045] It is possible to close the screen by tapping on the \"Cross\" icon",
+      "status": "passed",
+      "duration": 3162
+    },
+    {
+      "caseId": 292,
+      "title": "[292] User can tap on No folder button and create new folder",
+      "status": "passed",
+      "duration": 10555
+    },
+    {
+      "caseId": 3090,
+      "title": "[3090] User can tap on Test folder button and unselect test folder at Create a wifi password page",
+      "status": "passed",
+      "duration": 3349
+    },
+    {
+      "caseId": 3091,
+      "title": "[3091] Verify that TestFolder was created at Sidebar Page after creating at Create a wifi password page",
+      "status": "passed",
+      "duration": 5990
+    },
+    {
+      "caseId": 3092,
+      "title": "[3092] User can tap on Wifi name field and enter wifi name",
+      "status": "passed",
+      "duration": 3696
+    },
+    {
+      "caseId": 291,
+      "title": "[291] User can tap on Wifi password field and enter wifi password",
+      "status": "passed",
+      "duration": 4041
+    },
+    {
+      "caseId": 1042,
+      "title": "[1042] User can add one more Note field and add note",
+      "status": "passed",
+      "duration": 3292
+    },
+    {
+      "caseId": 287,
+      "title": "[287] User can tap on Save button and verify that login was created",
+      "status": "passed",
+      "duration": 1395
+    },
+    {
+      "caseId": 3093,
+      "title": "[3093] User can tap on Create Recovery Phrase button and see Create a recovery phrase page with all elements",
+      "status": "passed",
+      "duration": 7180
+    },
+    {
+      "caseId": 1053,
+      "title": "[1053] It is possible to close the screen by clicking on the \"Cross\" icon",
+      "status": "passed",
+      "duration": 2703
+    },
+    {
+      "caseId": 306,
+      "title": "[306] User can tap on No folder button and create new folder at Create a recovery phrase page",
+      "status": "passed",
+      "duration": 10263
+    },
+    {
+      "caseId": 3094,
+      "title": "[3094] User can tap on Test folder button and unselect test folder at Create a recovery phrase page",
+      "status": "passed",
+      "duration": 4026
+    },
+    {
+      "caseId": 3095,
+      "title": "[3095] Verify that TestFolder was created at Sidebar Page after creating at Create a recovery phrase page",
+      "status": "passed",
+      "duration": 6729
+    },
+    {
+      "caseId": 3096,
+      "title": "[3096] User can tap on Application name field and enter application name",
+      "status": "passed",
+      "duration": 3073
+    },
+    {
+      "caseId": 3097,
+      "title": "[3097] User can tap on Paste from clipboard button and verify that warning message is visible",
+      "status": "passed",
+      "duration": 10679
+    },
+    {
+      "caseId": 3098,
+      "title": "[3098] User can tap on Note field and enter note at Create a recovery phrase page",
+      "status": "passed",
+      "duration": 5110
+    },
+    {
+      "caseId": 3099,
+      "title": "[3099] Verify that 12 words radio button is chosen by default and random words toggle is off",
+      "status": "passed",
+      "duration": 372
+    },
+    {
+      "caseId": 3100,
+      "title": "[3100] User can tap on Paste from clipboard button and verify that recovery phrase is pasted",
+      "status": "passed",
+      "duration": 7164
+    },
+    {
+      "caseId": 866,
+      "title": "[866, 303] Verify that all pasted recovery phrases are visible and correct",
+      "status": "passed",
+      "duration": 7167
+    },
+    {
+      "caseId": 303,
+      "title": "[866, 303] Verify that all pasted recovery phrases are visible and correct",
+      "status": "passed",
+      "duration": 7167
+    },
+    {
+      "caseId": 1050,
+      "title": "[1050] User can add one more Note field and add note",
+      "status": "passed",
+      "duration": 12864
+    },
+    {
+      "caseId": 301,
+      "title": "[301] User can tap on Save button and verify that recovery phrase was saved",
+      "status": "passed",
+      "duration": 1658
+    },
+    {
+      "caseId": 3101,
+      "title": "[3101] User can tap on Create Notes button and see Create a notes page with all elements",
+      "status": "passed",
+      "duration": 4975
+    },
+    {
+      "caseId": 1062,
+      "title": "[1062] User can tap on Close button and verify that create notes page is not visible",
+      "status": "passed",
+      "duration": 2692
+    },
+    {
+      "caseId": 322,
+      "title": "[322] Item is moved to the folder selected in \"Folder\" dropdown",
+      "status": "passed",
+      "duration": 10141
+    },
+    {
+      "caseId": 3102,
+      "title": "[3102] User can tap on Write note field and enter write note at Create a notes page",
+      "status": "passed",
+      "duration": 3469
+    },
+    {
+      "caseId": 3103,
+      "title": "[3103] User can tap on Add file button and add file at Create a notes page",
+      "status": "failed",
+      "duration": 10929,
+      "error": "Add file popup not visible"
+    },
+    {
+      "caseId": 318,
+      "title": "[318] User can tap on Save button and verify that note was created",
+      "status": "passed",
+      "duration": 1401
+    },
+    {
+      "caseId": 3104,
+      "title": "[3104] User can tap on Create Custom Element button and see Create a custom element page with all elements",
+      "status": "passed",
+      "duration": 4552
+    },
+    {
+      "caseId": 336,
+      "title": "[336] Item is moved to the folder selected in \"Folder\" dropdown",
+      "status": "passed",
+      "duration": 7219
+    },
+    {
+      "caseId": 3105,
+      "title": "[3105] User can tap on Title field and enter title at Create a custom element page",
+      "status": "passed",
+      "duration": 3350
+    },
+    {
+      "caseId": 3106,
+      "title": "[3106] User can tap on File field and add file at Create a custom element page",
+      "status": "passed",
+      "duration": 13379
+    },
+    {
+      "caseId": 332,
+      "title": "[332] User can tap on Save button and verify that custom element was created",
+      "status": "failed",
+      "duration": 10156,
+      "error": "Custom element created on home page should be visible"
+    },
+    {
+      "caseId": 3107,
+      "title": "[3107] User can tap on Create Identity button and see Create an identity page with all elements",
+      "status": "passed",
+      "duration": 7815
+    },
+    {
+      "caseId": 1022,
+      "title": "[1022] User can tap on Close button and verify that create notes page is not visible",
+      "status": "passed",
+      "duration": 4958
+    },
+    {
+      "caseId": 264,
+      "title": "[264] Item is moved to the folder selected in \"Folder\" dropdown at Create an identity page",
+      "status": "passed",
+      "duration": 7811
+    },
+    {
+      "caseId": 3108,
+      "title": "[3108] User can tap on Title field and enter title at Create an identity page",
+      "status": "passed",
+      "duration": 6473
+    },
+    {
+      "caseId": 3109,
+      "title": "[3109] User can show and hide Personal information field",
+      "status": "passed",
+      "duration": 8507
+    },
+    {
+      "caseId": 3110,
+      "title": "[3110] User can tap on Personal information field and see Personal information field with all elements",
+      "status": "passed",
+      "duration": 2418
+    },
+    {
+      "caseId": 3111,
+      "title": "[3111] User can fill all fields in Personal information field and then hide it",
+      "status": "passed",
+      "duration": 17197
+    },
+    {
+      "caseId": 3112,
+      "title": "[3112] User can show and hide Detail of address field",
+      "status": "passed",
+      "duration": 2630
+    },
+    {
+      "caseId": 3113,
+      "title": "[3113] User can tap on Detail of address field and see Detail of address field with all elements",
+      "status": "passed",
+      "duration": 3913
+    },
+    {
+      "caseId": 3114,
+      "title": "[3114] User can fill all fields in Detail of address field and then hide it",
+      "status": "passed",
+      "duration": 24346
+    },
+    {
+      "caseId": 3115,
+      "title": "[3115] User can show and hide Passport field",
+      "status": "passed",
+      "duration": 2396
+    },
+    {
+      "caseId": 3116,
+      "title": "[3116] User can tap on Passport field and see Passport field with all elements at Create an identity page",
+      "status": "passed",
+      "duration": 13003
+    },
+    {
+      "caseId": 3117,
+      "title": "[3117] User can fill all fields in Passport field at Create an identity page",
+      "status": "passed",
+      "duration": 41326
+    },
+    {
+      "caseId": 3118,
+      "title": "[3118] User can add passport picture",
+      "status": "passed",
+      "duration": 15571
+    },
+    {
+      "caseId": 3119,
+      "title": "[3119] User can tap on Passport picture in passport picture field and verify that picture is visible",
+      "status": "passed",
+      "duration": 4418
+    },
+    {
+      "caseId": 3120,
+      "title": "[3120] User can show and hide Identity card field",
+      "status": "passed",
+      "duration": 3020
+    },
+    {
+      "caseId": 3121,
+      "title": "[3121] User can tap on Identity card field and see Identity card field with all elements",
+      "status": "passed",
+      "duration": 3480
+    },
+    {
+      "caseId": 3122,
+      "title": "[3122] User can fill all fields in Identity card field",
+      "status": "passed",
+      "duration": 20266
+    },
+    {
+      "caseId": 3123,
+      "title": "[3123] User can add identity card picture",
+      "status": "passed",
+      "duration": 5696
+    },
+    {
+      "caseId": 3124,
+      "title": "[3124] User can tap on Identity card picture in identity card picture field and verify that picture is visible",
+      "status": "passed",
+      "duration": 2405
+    },
+    {
+      "caseId": 3125,
+      "title": "[3125] User can show and hide Driving license field",
+      "status": "passed",
+      "duration": 3018
+    },
+    {
+      "caseId": 3126,
+      "title": "[3126] User can tap on Driving license field and see Driving license field with all elements",
+      "status": "passed",
+      "duration": 6000
+    },
+    {
+      "caseId": 3127,
+      "title": "[3127] User can fill all fields in Driving license field",
+      "status": "passed",
+      "duration": 24886
+    },
+    {
+      "caseId": 3128,
+      "title": "[3128] User can add driving license picture",
+      "status": "passed",
+      "duration": 5493
+    },
+    {
+      "caseId": 3129,
+      "title": "[3129] User can tap on Driving license picture in driving license picture field and verify that picture is visible",
+      "status": "passed",
+      "duration": 2470
+    },
+    {
+      "caseId": 3131,
+      "title": "[3131] User can verify Note field with all elements",
+      "status": "passed",
+      "duration": 1021
+    },
+    {
+      "caseId": 3132,
+      "title": "[3132] User can add note to Note field",
+      "status": "passed",
+      "duration": 5057
+    },
+    {
+      "caseId": 260,
+      "title": "[260] User can tap on Save button and verify that Identity was created",
+      "status": "passed",
+      "duration": 3998
+    }
+  ],
+  "withoutId": []
+}

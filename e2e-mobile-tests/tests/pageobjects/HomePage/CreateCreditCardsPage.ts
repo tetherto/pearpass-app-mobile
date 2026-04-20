@@ -1,6 +1,6 @@
 import BasePage from '@pages/BasePage';
 import createCreditCardLocators from '@locators/HomeLocators/CreateCreditCardLocators';
-import { CREATE_CREDIT_CARD_CUSTOM_FIELD, CREATE_CREDIT_CARD_ENTERED_FIELDS, CREATE_CREDIT_CARD_EXPIRY_DATE_FIELD, CREATE_CREDIT_CARD_FILE_FIELD, CREATE_CREDIT_CARD_NAME_ON_CARD_FIELD, CREATE_CREDIT_CARD_NEW_FILE_FIELD, CREATE_CREDIT_CARD_NOTE_FIELD, CREATE_CREDIT_CARD_NUMBER_ON_CARD_FIELD, CREATE_CREDIT_CARD_PIN_CODE_FIELD, CREATE_CREDIT_CARD_SECURITY_CODE_FIELD, CREATE_CREDIT_CARD_SHOW_CUSTOM_FIELD_POPUP, CREATE_CREDIT_CARD_TITLE_FIELD, CREATE_CREDIT_CARD_WARNING_MESSAGE } from '@data/home-data/createCreditCards.data';
+import { CREATE_CREDIT_CARD_CUSTOM_FIELD, CREATE_CREDIT_CARD_ENTERED_FIELDS, CREATE_CREDIT_CARD_EXPIRY_DATE_FIELD, CREATE_CREDIT_CARD_FILE_FIELD, CREATE_CREDIT_CARD_NAME_ON_CARD_FIELD, CREATE_CREDIT_CARD_NEW_FILE_FIELD, CREATE_CREDIT_CARD_NOTE_FIELD, CREATE_CREDIT_CARD_NUMBER_ON_CARD_FIELD, CREATE_CREDIT_CARD_PIN_CODE_FIELD, CREATE_CREDIT_CARD_SECURITY_CODE_FIELD, CREATE_CREDIT_CARD_SHOW_CUSTOM_FIELD_POPUP, CREATE_CREDIT_CARD_TITLE_FIELD, CREATE_CREDIT_CARD_VALIDATION_MESSAGES, CREATE_CREDIT_CARD_WARNING_MESSAGE } from '@data/home-data/createCreditCards.data';
 
 declare const expect: any;
 
@@ -57,6 +57,7 @@ export class CreateCreditCardsPage extends BasePage {
   get newFileFieldDeleteButton() { return this.$('newFileFieldDeleteButton'); }
   get warningMessageText() { return this.$('warningMessageText'); }
   get warningMessageIcon() { return this.$('warningMessageIcon'); }
+  get validationToastNumbersOnly() { return this.$('validationToastNumbersOnly'); }
 
   async verifyTitleFieldVisible(): Promise<this> {
     const { title, inputPlaceholder } = CREATE_CREDIT_CARD_TITLE_FIELD;
@@ -99,6 +100,7 @@ export class CreateCreditCardsPage extends BasePage {
 
   async tapShowSecurityCodeIconButton(): Promise<this> {
     await this.showSecurityCodeIconButton.click();
+    await this.showSecurityCodeIconButton.click();
     return this.self;
   }
 
@@ -108,6 +110,7 @@ export class CreateCreditCardsPage extends BasePage {
   }
 
   async tapShowPinCodeIconButton(): Promise<this> {
+    await this.showPinCodeIconButton.click();
     await this.showPinCodeIconButton.click();
     return this.self;
   }
@@ -308,10 +311,11 @@ export class CreateCreditCardsPage extends BasePage {
   }
 
   async verifyNewFileFieldNotVisible(timeout = 5000): Promise<this> {
-    await this.newFileField.waitForDisplayed({
-      timeout,
+    // After delete, the file name row disappears; the indexed ViewGroup (newFileField) may stay in the hierarchy.
+    await this.newFileFieldText.waitForDisplayed({
+      timeout: timeout + 2000,
       reverse: true,
-      timeoutMsg: 'New file field should not be visible after deletion',
+      timeoutMsg: 'Attached file name should not be visible after deletion',
     });
     return this.self;
   }
@@ -322,6 +326,20 @@ export class CreateCreditCardsPage extends BasePage {
     await this.warningMessageIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Warning message icon should be visible' });
     const textActual = await this.warningMessageText.getText();
     expect(textActual).toBe(text);
+    return this.self;
+  }
+
+  async verifyNumericOnlyValidationToastDisplayed(): Promise<this> {
+    const { numbersOnly } = CREATE_CREDIT_CARD_VALIDATION_MESSAGES;
+    await this.validationToastNumbersOnly.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: 'Numeric-only validation toast should be visible',
+    });
+    const textActual =
+      (await this.validationToastNumbersOnly.getText()) ??
+      (await this.validationToastNumbersOnly.getAttribute('text')) ??
+      '';
+    expect(textActual).toBe(numbersOnly);
     return this.self;
   }
 

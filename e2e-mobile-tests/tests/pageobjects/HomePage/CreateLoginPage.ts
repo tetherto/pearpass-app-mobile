@@ -18,6 +18,7 @@ export class CreateLoginPage extends BasePage {
   get createNewButtonIcon() { return this.$('createNewButtonIcon'); }
   get createNewButtonText() { return this.$('createNewButtonText'); }
   get testFolderButton() { return this.$('testFolderButton'); }
+  get testingFolderButton() { return this.$('testingFolderButton'); }
   get testFolderButtonIcon() { return this.$('testFolderButtonIcon'); }
   get testFolderButtonText() { return this.$('testFolderButtonText'); }
   get testFolderButtonText2() { return this.$('testFolderButtonText2'); }
@@ -157,6 +158,7 @@ export class CreateLoginPage extends BasePage {
   }
 
   async tapShowPasswordIconButton(): Promise<this> {
+    await this.showPasswordIcon.click();
     await this.showPasswordIcon.click();
     return this.self;
   }
@@ -424,8 +426,11 @@ export class CreateLoginPage extends BasePage {
     await this.newFileField.waitForDisplayed({
       timeout,
       reverse: true,
-      timeoutMsg: 'New file field should not be visible',
+      timeoutMsg: `New file field with locator ${this.newFileField.selector} still visible after ${timeout}ms`,
     });
+    const isExisting = await this.newFileField.isExisting();
+    expect(isExisting).toBe(false);
+    
     return this.self;
   }
 
@@ -548,6 +553,11 @@ export class CreateLoginPage extends BasePage {
 
   async verifyTestFolderButtonVisible(): Promise<this> {
     await this.testFolderButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Test Folder button should be visible' });
+    return this.self;
+  }
+
+  async verifyTestingFolderButtonVisible(): Promise<this> {
+    await this.testingFolderButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Testing Folder button should be visible' });
     return this.self;
   }
 

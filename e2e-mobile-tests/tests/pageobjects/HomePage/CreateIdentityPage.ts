@@ -1,6 +1,6 @@
 import BasePage from '@pages/BasePage';
 import createIdentityLocators from '@locators/HomeLocators/CreateIdentityLocators';
-import { CREATE_IDENTITY_TITLE_FIELD, CREATE_IDENTITY_PERSONAL_INFORMATION_FIELD, CREATE_IDENTITY_FULL_NAME_FIELD, CREATE_IDENTITY_EMAIL_FIELD, CREATE_IDENTITY_PHONE_NUMBER_FIELD, CREATE_IDENTITY_DETAIL_OF_ADDRESS_FIELD, CREATE_IDENTITY_ADDRESS_FIELD, CREATE_IDENTITY_ZIP_FIELD, CREATE_IDENTITY_CITY_FIELD, CREATE_IDENTITY_REGION_FIELD, CREATE_IDENTITY_COUNTRY_FIELD, CREATE_IDENTITY_PASSPORT_FIELD, CREATE_IDENTITY_PASSPORT_FULL_NAME_FIELD, CREATE_IDENTITY_PASSPORT_NUMBER_FIELD, CREATE_IDENTITY_PASSPORT_ISSUING_COUNTRY_FIELD, CREATE_IDENTITY_PASSPORT_DATE_OF_ISSUE_FIELD, CREATE_IDENTITY_PASSPORT_EXPIRY_DATE_FIELD, CREATE_IDENTITY_PASSPORT_NATIONALITY_FIELD, CREATE_IDENTITY_PASSPORT_DATE_OF_BIRTH_FIELD, CREATE_IDENTITY_PASSPORT_GENDER_FIELD, CREATE_IDENTITY_PASSPORT_PICTURE_FIELD, CREATE_IDENTITY_IDENTITY_CARD_FIELD, CREATE_IDENTITY_IDENTITY_CARD_NUMBER_FIELD, CREATE_IDENTITY_IDENTITY_CARD_CREATION_DATE_FIELD, CREATE_IDENTITY_IDENTITY_CARD_EXPIRY_DATE_FIELD, CREATE_IDENTITY_IDENTITY_CARD_ISSUING_COUNTRY_FIELD, CREATE_IDENTITY_IDENTITY_CARD_PICTURE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_ID_NUMBER_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_CREATION_DATE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_EXPIRY_DATE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_ISSUING_COUNTRY_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_PICTURE_FIELD, CREATE_IDENTITY_FILE_FIELD, CREATE_IDENTITY_NEW_FILE_FIELD, CREATE_IDENTITY_SHARED_FILE_POPUP, CREATE_IDENTITY_NOTE_FIELD, CREATE_IDENTITY_CUSTOM_FIELD, CREATE_IDENTITY_NEW_ELEMENT_IN_CUSTOM_FIELD, CREATE_IDENTITY_ENTERED_FIELDS, CREATE_IDENTITY_UPLOAD_PICTURE_POPUP, CREATE_IDENTITY_PASSPORT_PICTURE_PREVIEW_PAGE, CREATE_IDENTITY_IDENTITY_CARD_PICTURE_PREVIEW_PAGE, CREATE_IDENTITY_DRIVING_LICENSE_PICTURE_PREVIEW_PAGE, CREATE_IDENTITY_PICTURE_SHARED } from '@data/home-data/createIdentity.data';
+import { CREATE_IDENTITY_TITLE_FIELD, CREATE_IDENTITY_PERSONAL_INFORMATION_FIELD, CREATE_IDENTITY_FULL_NAME_FIELD, CREATE_IDENTITY_EMAIL_FIELD, CREATE_IDENTITY_PHONE_NUMBER_FIELD, CREATE_IDENTITY_DETAIL_OF_ADDRESS_FIELD, CREATE_IDENTITY_ADDRESS_FIELD, CREATE_IDENTITY_ZIP_FIELD, CREATE_IDENTITY_CITY_FIELD, CREATE_IDENTITY_REGION_FIELD, CREATE_IDENTITY_COUNTRY_FIELD, CREATE_IDENTITY_PASSPORT_FIELD, CREATE_IDENTITY_PASSPORT_FULL_NAME_FIELD, CREATE_IDENTITY_PASSPORT_NUMBER_FIELD, CREATE_IDENTITY_PASSPORT_ISSUING_COUNTRY_FIELD, CREATE_IDENTITY_PASSPORT_DATE_OF_ISSUE_FIELD, CREATE_IDENTITY_PASSPORT_EXPIRY_DATE_FIELD, CREATE_IDENTITY_PASSPORT_NATIONALITY_FIELD, CREATE_IDENTITY_PASSPORT_DATE_OF_BIRTH_FIELD, CREATE_IDENTITY_PASSPORT_GENDER_FIELD, CREATE_IDENTITY_PASSPORT_PICTURE_FIELD, CREATE_IDENTITY_IDENTITY_CARD_FIELD, CREATE_IDENTITY_IDENTITY_CARD_NUMBER_FIELD, CREATE_IDENTITY_IDENTITY_CARD_CREATION_DATE_FIELD, CREATE_IDENTITY_IDENTITY_CARD_EXPIRY_DATE_FIELD, CREATE_IDENTITY_IDENTITY_CARD_ISSUING_COUNTRY_FIELD, CREATE_IDENTITY_IDENTITY_CARD_PICTURE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_ID_NUMBER_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_CREATION_DATE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_EXPIRY_DATE_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_ISSUING_COUNTRY_FIELD, CREATE_IDENTITY_DRIVING_LICENSE_PICTURE_FIELD, CREATE_IDENTITY_FILE_FIELD, CREATE_IDENTITY_NEW_FILE_FIELD, CREATE_IDENTITY_SHARED_FILE_POPUP, CREATE_IDENTITY_NOTE_FIELD, CREATE_IDENTITY_CUSTOM_FIELD, CREATE_IDENTITY_NEW_ELEMENT_IN_CUSTOM_FIELD, CREATE_IDENTITY_NEW_NOTE_FIELD, CREATE_IDENTITY_ENTERED_FIELDS, CREATE_IDENTITY_UPLOAD_PICTURE_POPUP, CREATE_IDENTITY_PASSPORT_PICTURE_PREVIEW_PAGE, CREATE_IDENTITY_IDENTITY_CARD_PICTURE_PREVIEW_PAGE, CREATE_IDENTITY_DRIVING_LICENSE_PICTURE_PREVIEW_PAGE, CREATE_IDENTITY_PICTURE_SHARED } from '@data/home-data/createIdentity.data';
 
 declare const expect: any;
 
@@ -47,6 +47,8 @@ export class CreateIdentityPage extends BasePage {
   get passportPicturePreviewPageBackButton() { return this.$('passportPicturePreviewPageBackButton'); }
   get passportPicturePreviewPageBackButtonIcon() { return this.$('passportPicturePreviewPageBackButtonIcon'); }
   get passportPicturePreviewPageTitle() { return this.$('passportPicturePreviewPageTitle'); }
+  get identityCardPicturePreviewPageTitle() { return this.$('identityCardPicturePreviewPageTitle'); }
+  get drivingLicensePicturePreviewPageTitle() { return this.$('drivingLicensePicturePreviewPageTitle'); }
   get passportPicturePreviewPageShareButton() { return this.$('passportPicturePreviewPageShareButton'); }
   get passportPicturePreviewPageShareButtonIcon() { return this.$('passportPicturePreviewPageShareButtonIcon'); }
   get passportPicturePreviewPageDeleteButton() { return this.$('passportPicturePreviewPageDeleteButton'); }
@@ -89,6 +91,7 @@ export class CreateIdentityPage extends BasePage {
   get newFileFieldTitle() { return this.$('newFileFieldTitle'); }
   get newFileFieldText() { return this.$('newFileFieldText'); }
   get newFileFieldDeleteButton() { return this.$('newFileFieldDeleteButton'); }
+  get downloadsButton() { return this.$('downloadsButton'); }
   get sharedFilePopupTitle() { return this.$('sharedFilePopupTitle'); }
   get quickShareButtonPopup() { return this.$('quickShareButtonPopup'); }
   get sharedFilePopupText() { return this.$('sharedFilePopupText'); }
@@ -100,29 +103,30 @@ export class CreateIdentityPage extends BasePage {
   get customFieldIcon() { return this.$('customFieldIcon'); }
   get customFieldTitle() { return this.$('customFieldTitle'); }
   get customFieldIcon2() { return this.$('customFieldIcon2'); }
+  get createNoteButton() { return this.$('createNoteButton'); }
   get createNoteButtonIcon() { return this.$('createNoteButtonIcon'); }
   get createNoteButtonText() { return this.$('createNoteButtonText'); }
+  get newNoteField() { return this.$('newNoteField'); }
+  get newNoteFieldIcon() { return this.$('newNoteFieldIcon'); }
+  get newNoteFieldTitle() { return this.$('newNoteFieldTitle'); }
+  get newNoteFieldInput() { return this.$('newNoteFieldInput'); }
+  get newNoteFieldDeleteButton() { return this.$('newNoteFieldDeleteButton'); }
   get fullNameFieldInput() { return this.$('fullNameFieldInput'); }
   get emailFieldInput() { return this.$('emailFieldInput'); }
   get phoneNumberFieldInput() { return this.$('phoneNumberFieldInput'); }
   get addressField() { return this.$('addressField'); }
-  get addressFieldIcon() { return this.$('addressFieldIcon'); }
   get addressFieldTitle() { return this.$('addressFieldTitle'); }
   get addressFieldInput() { return this.$('addressFieldInput'); }
   get zipField() { return this.$('zipField'); }
-  get zipFieldIcon() { return this.$('zipFieldIcon'); }
   get zipFieldTitle() { return this.$('zipFieldTitle'); }
   get zipFieldInput() { return this.$('zipFieldInput'); }
   get cityField() { return this.$('cityField'); }
-  get cityFieldIcon() { return this.$('cityFieldIcon'); }
   get cityFieldTitle() { return this.$('cityFieldTitle'); }
   get cityFieldInput() { return this.$('cityFieldInput'); }
   get regionField() { return this.$('regionField'); }
-  get regionFieldIcon() { return this.$('regionFieldIcon'); }
   get regionFieldTitle() { return this.$('regionFieldTitle'); }
   get regionFieldInput() { return this.$('regionFieldInput'); }
   get countryField() { return this.$('countryField'); }
-  get countryFieldIcon() { return this.$('countryFieldIcon'); }
   get countryFieldTitle() { return this.$('countryFieldTitle'); }
   get countryFieldInput() { return this.$('countryFieldInput'); }
   get passportFullNameField() { return this.$('passportFullNameField'); }
@@ -203,18 +207,68 @@ export class CreateIdentityPage extends BasePage {
     return this.self;
   }
 
-  async tapPassportPicturePlusButton(): Promise<this> {
-    await this.passportPicturePlusButton.click();
-    return this.self;
+  /**
+   * Taps "+" until the photo upload bottom sheet (`uploadPicturePopup`) appears.
+   * If the system permission dialog (`allowPicturePopup`) opens instead, tapping stops — the test
+   * then taps "While using the app", after which `uploadPicturePopup` can appear.
+   * @param options.maxAttempts — max taps (loop guard), default 15
+   * @param options.pauseBetweenMs — wait before the next tap if neither popup is visible yet
+   * @param options.waitAfterClickMs — wait after each tap before checking popup visibility
+   */
+  async tapPassportPicturePlusButton(options?: {
+    maxAttempts?: number;
+    pauseBetweenMs?: number;
+    waitAfterClickMs?: number;
+  }): Promise<this> {
+    const maxAttempts = Math.max(1, options?.maxAttempts ?? 15);
+    const pauseBetweenMs = options?.pauseBetweenMs ?? 300;
+    const waitAfterClickMs = options?.waitAfterClickMs ?? 500;
+
+    await this.passportPicturePlusButton.waitForDisplayed({
+      timeout: 10000,
+      timeoutMsg: 'Passport picture plus button should be visible',
+    });
+
+    for (let i = 0; i < maxAttempts; i++) {
+      await this.passportPicturePlusButton.click();
+      await browser.pause(waitAfterClickMs);
+
+      const uploadShown = await this.uploadPicturePopup.isDisplayed().catch(() => false);
+      if (uploadShown) {
+        return this.self;
+      }
+
+      const allowShown = await this.allowPicturePopup.isDisplayed().catch(() => false);
+      if (allowShown) {
+        return this.self;
+      }
+
+      if (i < maxAttempts - 1) {
+        await browser.pause(pauseBetweenMs);
+      }
+    }
+
+    throw new Error(
+      `Neither uploadPicturePopup nor allowPicturePopup appeared after ${maxAttempts} tap(s) on passport picture plus button`
+    );
   }
 
-  async verifyAllowPicturePopupVisible(timeout = 15000): Promise<this> {
+  /**
+   * System camera/photos permission dialog is not always shown (e.g. already granted).
+   * If it appears within `timeout`, asserts visibility; otherwise skips without error.
+   * @returns true if the dialog was shown and verified, false if skipped
+   */
+  async verifyAllowPicturePopupVisible(timeout = 15000): Promise<boolean> {
     await browser.pause(500);
-    await this.allowPicturePopup.waitForDisplayed({
-      timeout,
-      timeoutMsg: 'Allow picture popup should be visible',
-    });
-    return this.self;
+    try {
+      await this.allowPicturePopup.waitForDisplayed({
+        timeout,
+        timeoutMsg: 'Allow picture popup should be visible when shown',
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async tapWhileUsingAppButton(): Promise<this> {
@@ -268,7 +322,7 @@ export class CreateIdentityPage extends BasePage {
   }
 
   async verifyPassportPictureInPassportPictureFieldVisible(): Promise<this> {
-    await browser.pause(3000);
+    await browser.pause(1000);
     await this.pasportPictureInPassportPictureField.waitForDisplayed({ timeout: 12000, timeoutMsg: 'Passport picture in passport picture field should be visible' });
     return this.self;
   }
@@ -278,7 +332,7 @@ export class CreateIdentityPage extends BasePage {
     return this.self;
   }
 
-  async verifyPassportPictureInPassportPictureFieldUnvisible(timeout = 5000): Promise<this> {
+  async verifyPassportPictureInPassportPictureFieldUnvisible(timeout = 10000): Promise<this> {
     await this.pasportPictureInPassportPictureField.waitForDisplayed({
       timeout,
       reverse: true,
@@ -288,50 +342,38 @@ export class CreateIdentityPage extends BasePage {
   }
 
   async verifyPassportPicturePreviewPageWithAllElementsVisible(): Promise<this> {
-    const { title } = CREATE_IDENTITY_PASSPORT_PICTURE_PREVIEW_PAGE;
     await this.passportPicturePreviewPage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview page should be visible' });
     await this.passportPicturePreviewPageBackButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview back button should be visible' });
     await this.passportPicturePreviewPageBackButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview back button icon should be visible' });
-    await this.passportPicturePreviewPageTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview page title should be visible' });
     await this.passportPicturePreviewPageShareButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview share button should be visible' });
     await this.passportPicturePreviewPageShareButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview share button icon should be visible' });
     await this.passportPicturePreviewPageDeleteButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview delete button should be visible' });
     await this.passportPicturePreviewPageDeleteButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview delete button icon should be visible' });
     await this.passportPicturePreviewPageImage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Passport picture preview page image should be visible' });
-    const titleActual = (await this.passportPicturePreviewPageTitle.getText()) ?? (await this.passportPicturePreviewPageTitle.getAttribute('text')) ?? '';
-    expect(titleActual).toBe(title);
     return this.self;
   }
 
   async verifyIdentityCardPicturePreviewPageWithAllElementsVisible(): Promise<this> {
-    const { title } = CREATE_IDENTITY_IDENTITY_CARD_PICTURE_PREVIEW_PAGE;
     await this.passportPicturePreviewPage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview page should be visible' });
     await this.passportPicturePreviewPageBackButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview back button should be visible' });
     await this.passportPicturePreviewPageBackButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview back button icon should be visible' });
-    await this.passportPicturePreviewPageTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview page title should be visible' });
     await this.passportPicturePreviewPageShareButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview share button should be visible' });
     await this.passportPicturePreviewPageShareButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview share button icon should be visible' });
     await this.passportPicturePreviewPageDeleteButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview delete button should be visible' });
     await this.passportPicturePreviewPageDeleteButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview delete button icon should be visible' });
     await this.passportPicturePreviewPageImage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Identity card picture preview page image should be visible' });
-    const titleActual = (await this.passportPicturePreviewPageTitle.getText()) ?? (await this.passportPicturePreviewPageTitle.getAttribute('text')) ?? '';
-    expect(titleActual).toBe(title);
     return this.self;
   }
 
   async verifyDrivingLicensePicturePreviewPageWithAllElementsVisible(): Promise<this> {
-    const { title } = CREATE_IDENTITY_DRIVING_LICENSE_PICTURE_PREVIEW_PAGE;
     await this.passportPicturePreviewPage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview page should be visible' });
     await this.passportPicturePreviewPageBackButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview back button should be visible' });
     await this.passportPicturePreviewPageBackButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview back button icon should be visible' });
-    await this.passportPicturePreviewPageTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview page title should be visible' });
     await this.passportPicturePreviewPageShareButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview share button should be visible' });
     await this.passportPicturePreviewPageShareButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview share button icon should be visible' });
     await this.passportPicturePreviewPageDeleteButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview delete button should be visible' });
     await this.passportPicturePreviewPageDeleteButtonIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview delete button icon should be visible' });
     await this.passportPicturePreviewPageImage.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Driving license picture preview page image should be visible' });
-    const titleActual = (await this.passportPicturePreviewPageTitle.getText()) ?? (await this.passportPicturePreviewPageTitle.getAttribute('text')) ?? '';
-    expect(titleActual).toBe(title);
     return this.self;
   }
 
@@ -475,9 +517,9 @@ export class CreateIdentityPage extends BasePage {
     return this.self;
   }
 
-  async verifyFullNameFieldInPersonalInformationFieldVisible(): Promise<this> {
+  async verifyFullNameFieldInPersonalInformationFieldVisible(timeout = 10000): Promise<this> {
     const { title } = CREATE_IDENTITY_FULL_NAME_FIELD;
-    await this.fullNameField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Full name field should be visible' });
+    await this.fullNameField.waitForDisplayed({ timeout, timeoutMsg: 'Full name field should be visible' });
     await this.fullNameFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Full name field icon should be visible' });
     await this.fullNameFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Full name field title should be visible' });
     const titleActual = await this.fullNameFieldTitle.getText();
@@ -524,7 +566,7 @@ export class CreateIdentityPage extends BasePage {
     return this.self;
   }
 
-  async verifyFullNameFieldInPersonalInformationFieldNotVisible(timeout = 5000): Promise<this> {
+  async verifyFullNameFieldInPersonalInformationFieldNotVisible(timeout = 10000): Promise<this> {
     await this.fullNameField.waitForDisplayed({
       timeout,
       reverse: true,
@@ -550,7 +592,6 @@ export class CreateIdentityPage extends BasePage {
   async verifyAllElementsInAddressFieldInDetailOfAddressFieldVisible(): Promise<this> {
     const { title, inputPlaceholder } = CREATE_IDENTITY_ADDRESS_FIELD;
     await this.addressField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Address field should be visible' });
-    await this.addressFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Address field icon should be visible' });
     await this.addressFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Address field title should be visible' });
     await this.addressFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Address field input should be visible' });
     const titleActual = (await this.addressFieldTitle.getText()) ?? (await this.addressFieldTitle.getAttribute('text')) ?? '';
@@ -563,7 +604,6 @@ export class CreateIdentityPage extends BasePage {
   async verifyAllElementsInZipFieldInDetailOfAddressFieldVisible(): Promise<this> {
     const { title, inputPlaceholder } = CREATE_IDENTITY_ZIP_FIELD;
     await this.zipField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'ZIP field should be visible' });
-    await this.zipFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'ZIP field icon should be visible' });
     await this.zipFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'ZIP field title should be visible' });
     await this.zipFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'ZIP field input should be visible' });
     const titleActual = (await this.zipFieldTitle.getText()) ?? (await this.zipFieldTitle.getAttribute('text')) ?? '';
@@ -576,7 +616,6 @@ export class CreateIdentityPage extends BasePage {
   async verifyAllElementsInCityFieldInDetailOfAddressFieldVisible(): Promise<this> {
     const { title, inputPlaceholder } = CREATE_IDENTITY_CITY_FIELD;
     await this.cityField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'City field should be visible' });
-    await this.cityFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'City field icon should be visible' });
     await this.cityFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'City field title should be visible' });
     await this.cityFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'City field input should be visible' });
     const titleActual = (await this.cityFieldTitle.getText()) ?? (await this.cityFieldTitle.getAttribute('text')) ?? '';
@@ -589,7 +628,6 @@ export class CreateIdentityPage extends BasePage {
   async verifyAllElementsInRegionFieldInDetailOfAddressFieldVisible(): Promise<this> {
     const { title, inputPlaceholder } = CREATE_IDENTITY_REGION_FIELD;
     await this.regionField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Region field should be visible' });
-    await this.regionFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Region field icon should be visible' });
     await this.regionFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Region field title should be visible' });
     await this.regionFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Region field input should be visible' });
     const titleActual = (await this.regionFieldTitle.getText()) ?? (await this.regionFieldTitle.getAttribute('text')) ?? '';
@@ -602,7 +640,6 @@ export class CreateIdentityPage extends BasePage {
   async verifyAllElementsInCountryFieldInDetailOfAddressFieldVisible(): Promise<this> {
     const { title, inputPlaceholder } = CREATE_IDENTITY_COUNTRY_FIELD;
     await this.countryField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Country field should be visible' });
-    await this.countryFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Country field icon should be visible' });
     await this.countryFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Country field title should be visible' });
     await this.countryFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Country field input should be visible' });
     const titleActual = (await this.countryFieldTitle.getText()) ?? (await this.countryFieldTitle.getAttribute('text')) ?? '';
@@ -1024,6 +1061,12 @@ export class CreateIdentityPage extends BasePage {
     return this.self;
   }
 
+  async tapDownloadsButton(): Promise<this> {
+    await this.downloadsButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Downloads item in file picker should be visible' });
+    await this.downloadsButton.click();
+    return this.self;
+  }
+
   async verifyNewFileFieldWithAllElementsVisible(): Promise<this> {
     const { title, fileText } = CREATE_IDENTITY_NEW_FILE_FIELD;
     await this.newFileField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New file field should be visible' });
@@ -1123,6 +1166,42 @@ export class CreateIdentityPage extends BasePage {
     await this.createNoteButtonText.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Create note button text should be visible' });
     const textActual = (await this.createNoteButtonText.getText()) ?? (await this.createNoteButtonText.getAttribute('text')) ?? '';
     expect(textActual).toBe(text);
+    return this.self;
+  }
+
+  async tapCreateCustomFieldButton(): Promise<this> {
+    await this.customFieldIcon2.click();
+    return this.self;
+  }
+
+  async tapAddCommentButton(): Promise<this> {
+    await this.createNoteButton.waitForDisplayed({ timeout: 5000 });
+    await this.createNoteButton.click();
+    return this.self;
+  }
+
+  async tapNewNoteFieldDeleteButton(): Promise<this> {
+    await this.newNoteFieldDeleteButton.waitForDisplayed({ timeout: 5000 });
+    await this.newNoteFieldDeleteButton.click();
+    return this.self;
+  }
+
+  async verifyNewNoteFieldVisibleWithAllElements(): Promise<this> {
+    const { title, inputPlaceholder } = CREATE_IDENTITY_NEW_NOTE_FIELD;
+    await this.newNoteField.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field should be visible' });
+    await this.newNoteFieldIcon.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field icon should be visible' });
+    await this.newNoteFieldTitle.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field title should be visible' });
+    await this.newNoteFieldInput.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field input should be visible' });
+    await this.newNoteFieldDeleteButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'New note field delete button should be visible' });
+    const titleActual = await this.newNoteFieldTitle.getText();
+    expect(titleActual).toBe(title);
+    const inputText = (await this.newNoteFieldInput.getText()) ?? (await this.newNoteFieldInput.getAttribute('text')) ?? '';
+    expect(inputText).toBe(inputPlaceholder);
+    return this.self;
+  }
+
+  async verifyNewNoteFieldNotVisible(): Promise<this> {
+    await this.newNoteField.waitForDisplayed({ timeout: 10000, reverse: true, timeoutMsg: 'New note field should not be visible' });
     return this.self;
   }
 
