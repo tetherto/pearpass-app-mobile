@@ -26,7 +26,11 @@ export const useRedirect = () => {
 
     void (async () => {
       try {
-        const userData = await refetchUserData()
+        let userData = await refetchUserData()
+
+        if (!userData) {
+          userData = await refetchUserData()
+        }
 
         if (!userData?.hasPasswordSet) {
           setInitialRouteName(isV2() ? 'OnboardingV2' : 'Intro')
