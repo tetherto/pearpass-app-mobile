@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { MOBILE_DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   Layers,
   AccountCircleOutlined,
@@ -14,6 +13,8 @@ import {
   WiFi
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
+
+import { isV2 } from '../utils/designVersion'
 
 /**
  * @param {{
@@ -139,5 +140,5 @@ export const useRecordMenuItems = ({ exclude } = {}) => {
     [t, exclude]
   )
 
-  return MOBILE_DESIGN_VERSION === 2 ? defaultV2Items : defaultItems
+  return isV2() ? defaultV2Items : defaultItems
 }

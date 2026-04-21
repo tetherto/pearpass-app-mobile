@@ -26,12 +26,9 @@ jest.mock('@tetherto/pearpass-lib-vault', () => ({
   }
 }))
 
-let mockDesignVersion = 1
-jest.mock('@tetherto/pearpass-lib-constants', () => ({
-  get MOBILE_DESIGN_VERSION() {
-    return mockDesignVersion
-  },
-  PROTECTED_VAULT_ENABLED: false
+let mockIsV2 = false
+jest.mock('../utils/designVersion', () => ({
+  isV2: () => mockIsV2
 }))
 
 const renderHookWithProviders = (hook) =>
@@ -44,7 +41,7 @@ const renderHookWithProviders = (hook) =>
 describe('useRecordMenuItems', () => {
   describe('v1', () => {
     beforeEach(() => {
-      mockDesignVersion = 1
+      mockIsV2 = false
     })
 
     test('returns all items in v1 order', () => {
@@ -67,7 +64,7 @@ describe('useRecordMenuItems', () => {
 
   describe('v2', () => {
     beforeEach(() => {
-      mockDesignVersion = 2
+      mockIsV2 = true
     })
 
     test('returns all items in v2 order', () => {

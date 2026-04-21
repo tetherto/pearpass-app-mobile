@@ -1,9 +1,7 @@
-import { MOBILE_DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
+import { isV2 } from 'src/utils/designVersion'
 
 import { RecordDetailsV1 } from './v1/RecordDetailsV1'
 import { RecordDetailsV2 } from './v2/RecordDetailsV2'
 
-export const RecordDetails = (props) => {
-  if (MOBILE_DESIGN_VERSION === 1) return <RecordDetailsV1 {...props} />
-  return <RecordDetailsV2 {...props} />
-}
+export const RecordDetails = (props) =>
+  isV2() ? <RecordDetailsV2 {...props} /> : <RecordDetailsV1 {...props} />
