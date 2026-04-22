@@ -269,23 +269,42 @@ export const useRecordActionItems = ({
   )
 
   const recordSortActions = useMemo(
-    () => [
-      {
-        name: t`Last Updated (Newest first)`,
-        type: 'sort',
-        click: () => handleSort(SORT_KEYS.LAST_UPDATED_NEWEST)
-      },
-      {
-        name: t`Last Updated (Oldest first)`,
-        type: 'sort',
-        click: () => handleSort(SORT_KEYS.LAST_UPDATED_OLDEST)
-      },
-      {
-        name: t`Title (A-Z)`,
-        type: 'sort',
-        click: () => handleSort(SORT_KEYS.TITLE_AZ)
-      }
-    ],
+    () =>
+      isV2()
+        ? [
+            {
+              name: t`Last Updated (Newest first)`,
+              type: 'sort',
+              click: () => handleSort(SORT_KEYS.LAST_UPDATED_NEWEST)
+            },
+            {
+              name: t`Last Updated (Oldest first)`,
+              type: 'sort',
+              click: () => handleSort(SORT_KEYS.LAST_UPDATED_OLDEST)
+            },
+            {
+              name: t`Title (A-Z)`,
+              type: 'sort',
+              click: () => handleSort(SORT_KEYS.TITLE_AZ)
+            }
+          ]
+        : [
+            {
+              name: t`Recent`,
+              type: 'recent',
+              click: () => handleSort(SORT_KEYS.RECENT)
+            },
+            {
+              name: t`Newest to oldest`,
+              type: 'sort',
+              click: () => handleSort(SORT_KEYS.NEWEST_TO_OLDEST)
+            },
+            {
+              name: t`Oldest to newest`,
+              type: 'sort',
+              click: () => handleSort(SORT_KEYS.OLDEST_TO_NEWEST)
+            }
+          ],
     [handleSort, t]
   )
 

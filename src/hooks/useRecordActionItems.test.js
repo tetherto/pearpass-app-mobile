@@ -70,6 +70,12 @@ jest.mock('../context/SharedFilterContext', () => ({
   })
 }))
 
+jest.mock('../utils/designVersion', () => ({
+  isV2: jest.fn(() => false)
+}))
+
+const { isV2 } = require('../utils/designVersion')
+
 jest.mock('@gorhom/bottom-sheet', () => {
   const MockBottomSheet = ({ children }) => <div>{children}</div>
   MockBottomSheet.displayName = 'BottomSheet'
@@ -259,7 +265,24 @@ describe('useRecordActionItems', () => {
     expect(typeof deleteAction.click).toBe('function')
   })
 
-  it('should return correct sort actions', () => {
+  it('should return V1 sort actions when isV2 is false', () => {
+    isV2.mockReturnValue(false)
+
+    const { result } = renderHook(() => useRecordActionItems(), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    expect(result.current.recordSortActions.length).toBe(3)
+    expect(result.current.recordSortActions[0].name).toBe('Recent')
+    expect(result.current.recordSortActions[1].name).toBe('Newest to oldest')
+    expect(result.current.recordSortActions[2].name).toBe('Oldest to newest')
+  })
+
+  it('should return V2 sort actions when isV2 is true', () => {
+    isV2.mockReturnValue(true)
+
     const { result } = renderHook(() => useRecordActionItems(), {
       wrapper: ({ children }) => (
         <I18nProvider i18n={i18n}>{children}</I18nProvider>

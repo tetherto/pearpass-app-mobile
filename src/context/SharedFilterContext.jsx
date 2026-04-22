@@ -1,13 +1,14 @@
 import { createContext, useContext, useState } from 'react'
 
 import { SORT_KEYS } from '../constants/sortOptions'
+import { isV2 } from '../utils/designVersion'
 
 const SharedFilterContext = createContext()
 
 export const INITIAL_STATE = {
   folder: 'allFolder',
   isFavorite: false,
-  sort: SORT_KEYS.LAST_UPDATED_NEWEST
+  sort: isV2() ? SORT_KEYS.LAST_UPDATED_NEWEST : SORT_KEYS.RECENT
 }
 
 /**
