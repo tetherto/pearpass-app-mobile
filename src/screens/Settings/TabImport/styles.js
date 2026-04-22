@@ -46,7 +46,7 @@ export const ImportOptionItem = styled.TouchableOpacity`
 export const ImportOptionImage = styled.Image`
   width: 25px;
   height: 25px;
-  border-radius: 50%;
+  border-radius: 12.5px;
 `
 
 export const AcceptedFormats = styled.Text`
