@@ -115,7 +115,7 @@
                 android:id="@+id/formFolderSelector"
                 layout="@layout/include_pp_list_item_v2" />
 
-            
+            <!-- Attachments + upload file temporarily hidden per team decision
             <LinearLayout
                 android:id="@+id/formAttachmentsContainer"
                 android:layout_width="match_parent"
@@ -124,7 +124,6 @@
                 android:orientation="vertical"
                 android:visibility="gone" />
 
-            
             <TextView
                 android:id="@+id/formFileSizeError"
                 android:layout_width="match_parent"
@@ -135,7 +134,6 @@
                 android:textColor="@color/pp_v2_surface_error"
                 android:visibility="gone" />
 
-            
             <Button
                 android:id="@+id/formUploadFileButton"
                 style="@style/Button.PearPass.V2.Tertiary"
@@ -143,6 +141,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/pp_v2_spacing_s12"
                 android:text="Upload File" />
+            -->
         </LinearLayout>
     </ScrollView>
 
