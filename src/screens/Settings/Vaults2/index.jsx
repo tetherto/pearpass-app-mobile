@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -18,6 +18,7 @@ import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { VaultRow } from './VaultRow'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { VAULT_ACTION } from '../../../constants/vaultActions'
+import { BottomSheetPairedDevicesContent } from '../../../containers/BottomSheetPairedDevicesContent'
 import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
 import { useModal } from '../../../context/ModalContext'
 
@@ -26,6 +27,7 @@ export const VaultsV2 = () => {
   const navigation = useNavigation()
   const { theme } = useTheme()
   const { openModal } = useModal()
+  const [pairedDevicesOpen, setPairedDevicesOpen] = useState(false)
   const { data: currentVault, refetch: refetchVault } = useVault()
   const { data: allVaults } = useVaults()
 
@@ -52,7 +54,7 @@ export const VaultsV2 = () => {
         vaultId: vault.id,
         vaultName: vault.name
       }),
-    onManageMembers: () => navigation.navigate('ShareVault'),
+    onViewPairedDevices: () => setPairedDevicesOpen(true),
     onSetPassword: () =>
       openModal(
         <ModifyVaultModalContentV2
@@ -103,6 +105,11 @@ export const VaultsV2 = () => {
       <PageHeader
         title={t`Your Vaults`}
         subtitle={t`Manage your vaults, control access permissions, and take protective measures if needed.`}
+      />
+
+      <BottomSheetPairedDevicesContent
+        open={pairedDevicesOpen}
+        onOpenChange={setPairedDevicesOpen}
       />
 
       {currentVault && (

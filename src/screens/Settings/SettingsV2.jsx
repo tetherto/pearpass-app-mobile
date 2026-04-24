@@ -10,7 +10,6 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Devices,
   BugReportFilled,
   SecurityFilled,
   LockOutlined,
@@ -72,12 +71,6 @@ export const SettingsV2 = () => {
             label: t`Blind Peering`,
             screen: 'BlindPeering',
             icon: HubFilled
-          },
-          {
-            key: 'your-devices',
-            label: t`Your Devices`,
-            screen: 'MyDevices',
-            icon: Devices
           }
         ]
       },

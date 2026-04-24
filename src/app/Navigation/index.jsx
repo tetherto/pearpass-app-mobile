@@ -32,7 +32,6 @@ import { AppearanceV2 } from '../../screens/Settings/Appearance/AppearanceV2'
 import { AppPreferences } from '../../screens/Settings/AppPreferences'
 import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
-import { MyDevices } from '../../screens/Settings/MyDevices'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
 import { VaultDeleteScreen } from '../../screens/Settings/VaultDeleteScreen'
 import { VaultPasswordScreen } from '../../screens/Settings/VaultPasswordScreen'
@@ -133,7 +132,6 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="AppearanceV2" component={AppearanceV2} />
     <Stack.Screen name="ImportItems" component={ImportItems} />
     <Stack.Screen name="Vaults2" component={VaultsV2} />
-    <Stack.Screen name="MyDevices" component={MyDevices} />
     <Stack.Screen name="ExportItems" component={ExportItems} />
     <Stack.Screen name="DeleteFolder" component={DeleteFolderV2} />
     <Stack.Screen name="VaultSettingsScreen" component={VaultSettingsScreen} />
