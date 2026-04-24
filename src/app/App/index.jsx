@@ -29,7 +29,7 @@ export const App = () => {
     }
   }, [needsUpdate])
 
-  const { initialRouteName, isLoading } = useRedirect()
+  const { initialRouteName, isLoading } = useRedirect(isFirstLaunchCleanupReady)
 
   if (isLoading || !isFirstLaunchCleanupReady) {
     return null

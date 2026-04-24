@@ -75,4 +75,23 @@ describe('useRedirect', () => {
     expect(result.current.initialRouteName).toBe('Error')
     expect(logger.error).toHaveBeenCalled()
   })
+
+  it('should not refetch user data until enabled', async () => {
+    const { result, rerender } = renderHook(
+      ({ isEnabled }) => useRedirect(isEnabled),
+      { initialProps: { isEnabled: false } }
+    )
+
+    expect(mockRefetchUserData).not.toHaveBeenCalled()
+    expect(result.current.isLoading).toBe(true)
+    expect(result.current.initialRouteName).toBe(null)
+
+    mockRefetchUserData.mockResolvedValue({ hasPasswordSet: false })
+    rerender({ isEnabled: true })
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(mockRefetchUserData).toHaveBeenCalledTimes(1)
+    expect(result.current.initialRouteName).toBe('Intro')
+  })
 })
