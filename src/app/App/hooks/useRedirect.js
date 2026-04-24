@@ -14,7 +14,7 @@ import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
  *  initialRouteName: string | null
  * }} - An object containing the loading state and initial route name.
  */
-export const useRedirect = () => {
+export const useRedirect = (isEnabled = true) => {
   const { refetch: refetchUserData } = useUserData()
 
   const [isLoading, setIsLoading] = useState(true)
@@ -22,6 +22,8 @@ export const useRedirect = () => {
   const [initialRouteName, setInitialRouteName] = useState(null)
 
   useEffect(() => {
+    if (!isEnabled) return
+
     let timeout
 
     void (async () => {
@@ -55,7 +57,7 @@ export const useRedirect = () => {
     })()
 
     return () => clearTimeout(timeout)
-  }, [])
+  }, [isEnabled])
 
   return {
     isLoading,

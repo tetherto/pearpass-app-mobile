@@ -176,6 +176,19 @@ android {
       }
     }
 
+    // Copy fonts
+    const fontSrcDir = path.join(templateDir, 'res/font');
+    const fontDestDir = path.join(resDir, 'font');
+    if (fs.existsSync(fontSrcDir)) {
+      await fs.promises.mkdir(fontDestDir, { recursive: true });
+      const fontFiles = await fs.promises.readdir(fontSrcDir);
+      for (const file of fontFiles) {
+        const srcPath = path.join(fontSrcDir, file);
+        const destPath = path.join(fontDestDir, file);
+        await fs.promises.copyFile(srcPath, destPath);
+      }
+    }
+
     // Copy 16KB-aligned libsodium.so native libs to jniLibs
     const jniLibsSrcDir = path.join(templateDir, 'jniLibs');
     if (fs.existsSync(jniLibsSrcDir)) {

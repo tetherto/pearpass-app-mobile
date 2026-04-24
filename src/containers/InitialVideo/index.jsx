@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { useVideoPlayer, VideoView } from 'expo-video'
+import { ResizeMode, Video } from 'expo-av'
 import { StyleSheet } from 'react-native'
 
 /**
@@ -9,21 +9,7 @@ import { StyleSheet } from 'react-native'
  * @param {() => void} props.onEnded - Callback invoked after 3000 ms (simulated completion).
  */
 export const InitialVideo = ({ onStart, onEnded }) => {
-  const player = useVideoPlayer(
-    require('../../../assets/videos/second_lock.mp4'),
-    (player) => {
-      player.loop = false
-      player.muted = false
-      player.volume = 1.0
-    }
-  )
-
   useEffect(() => {
-    if (!player) {
-      return
-    }
-
-    player.play()
     onStart()
 
     const timer = setTimeout(() => {
@@ -33,15 +19,18 @@ export const InitialVideo = ({ onStart, onEnded }) => {
     return () => {
       clearTimeout(timer)
     }
-  }, [player])
+  }, [onEnded, onStart])
 
   return (
-    <VideoView
+    <Video
       style={styles.logoVideo}
-      player={player}
-      allowsFullscreen={false}
-      allowsPictureInPicture={false}
-      nativeControls={false}
+      source={require('../../../assets/videos/second_lock.mp4')}
+      shouldPlay
+      isLooping={false}
+      isMuted={false}
+      volume={1.0}
+      useNativeControls={false}
+      resizeMode={ResizeMode.CONTAIN}
     />
   )
 }
