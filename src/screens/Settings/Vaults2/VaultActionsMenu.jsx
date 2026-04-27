@@ -8,21 +8,20 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
+  Devices,
   EditOutlined,
   Key,
   MoreVert,
-  PersonAdd,
   TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const isManageMembersEnabled = false
 const isDeleteEnabled = false
 
 export const VaultActionsMenu = ({
   onRename,
-  onManageMembers,
+  onViewPairedDevices,
   onSetPassword,
   onDelete
 }) => {
@@ -54,11 +53,11 @@ export const VaultActionsMenu = ({
             label: t`Rename`,
             onClick: () => closeAndRun(onRename)
           },
-          isManageMembersEnabled && {
+          {
             key: 'members',
-            icon: <PersonAdd color={theme.colors.colorTextPrimary} />,
-            label: t`Manage Members`,
-            onClick: () => closeAndRun(onManageMembers)
+            icon: <Devices color={theme.colors.colorTextPrimary} />,
+            label: t`View Paired Devices`,
+            onClick: () => closeAndRun(onViewPairedDevices)
           },
           PROTECTED_VAULT_ENABLED && {
             key: 'password',
