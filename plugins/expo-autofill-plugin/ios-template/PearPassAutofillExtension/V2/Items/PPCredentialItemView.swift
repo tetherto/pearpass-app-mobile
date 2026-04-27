@@ -24,7 +24,7 @@ struct PPCredentialItemView: View {
                         .foregroundColor(PPColors.primary)
                 }
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: PPSpacing.s2) {
                     Text(title)
                         .font(PPTypography.bodyEmphasized)
                         .foregroundColor(PPColors.textPrimary)

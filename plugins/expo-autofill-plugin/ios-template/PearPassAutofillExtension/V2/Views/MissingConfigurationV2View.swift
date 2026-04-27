@@ -68,7 +68,7 @@ struct MissingConfigurationV2View: View {
     }
 
     private func stepRow(number: Int, text: String) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: PPSpacing.s10) {
             PPStepNumber(number: number)
             Text(text)
                 .font(PPTypography.label)

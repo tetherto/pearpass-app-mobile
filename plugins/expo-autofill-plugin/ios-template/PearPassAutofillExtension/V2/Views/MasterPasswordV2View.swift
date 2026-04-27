@@ -43,7 +43,7 @@ struct MasterPasswordV2View: View {
                             .frame(maxWidth: .infinity)
                             .padding(.top, PPSpacing.s8)
 
-                        Spacer().frame(height: 46)
+                        Spacer().frame(height: PPSpacing.s46)
 
                         PPPasswordField(
                             label: NSLocalizedString("Password", comment: "V2 password input label"),

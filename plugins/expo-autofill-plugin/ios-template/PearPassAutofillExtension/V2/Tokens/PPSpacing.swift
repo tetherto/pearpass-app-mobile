@@ -19,5 +19,6 @@ enum PPSpacing {
     static let s24: CGFloat = 24
     static let s32: CGFloat = 32
     static let s40: CGFloat = 40
+    static let s46: CGFloat = 46
     static let s48: CGFloat = 48
 }
