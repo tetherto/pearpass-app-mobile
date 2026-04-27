@@ -29,13 +29,13 @@ struct MissingConfigurationV2View: View {
                         .padding(.top, 56)
                         .padding(.bottom, PPSpacing.s16)
 
-                    Text("Finish setting up PearPass")
+                    Text(NSLocalizedString("Finish setting up PearPass", comment: "V2 missing config title"))
                         .font(PPTypography.title)
                         .foregroundColor(PPColors.textPrimary)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
 
-                    Text("To use the autofill extension, you'll need to complete a few quick steps in the main app:")
+                    Text(NSLocalizedString("To use the autofill extension, you'll need to complete a few quick steps in the main app:", comment: "V2 missing config subtitle"))
                         .font(PPTypography.label)
                         .foregroundColor(PPColors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -43,9 +43,9 @@ struct MissingConfigurationV2View: View {
                         .padding(.top, PPSpacing.s8)
 
                     VStack(alignment: .leading, spacing: PPSpacing.s8) {
-                        stepRow(number: 1, text: "Open the PearPass app")
-                        stepRow(number: 2, text: "Set your Master Password")
-                        stepRow(number: 3, text: "Create or import a vault")
+                        stepRow(number: 1, text: NSLocalizedString("Open the PearPass app", comment: "V2 setup step 1"))
+                        stepRow(number: 2, text: NSLocalizedString("Set your Master Password", comment: "V2 setup step 2"))
+                        stepRow(number: 3, text: NSLocalizedString("Create or import a vault", comment: "V2 setup step 3"))
                     }
                     .padding(.top, PPSpacing.s24)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -57,7 +57,7 @@ struct MissingConfigurationV2View: View {
                         .frame(height: 1)
                         .padding(.horizontal, -PPSpacing.s16)
 
-                    PPButton(title: "Go Back", variant: .primary, action: onBack)
+                    PPButton(title: NSLocalizedString("Go Back", comment: "V2 go back button"), variant: .primary, action: onBack)
                         .padding(.top, PPSpacing.s16)
                         .padding(.bottom, PPSpacing.s12)
                 }

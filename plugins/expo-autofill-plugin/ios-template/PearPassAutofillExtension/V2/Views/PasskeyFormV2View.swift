@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PasskeyFormV2View: View {
 
-    var headerTitle: String = "Create Passkey"
+    var headerTitle: String = NSLocalizedString("Create Passkey", comment: "V2 sheet header — passkey registration")
 
     @Binding var titleText: String
     @Binding var username: String
@@ -47,9 +47,9 @@ struct PasskeyFormV2View: View {
                         VStack(alignment: .leading, spacing: 0) {
                             // Title
                             PPInputField(
-                                label: "Title",
+                                label: NSLocalizedString("Title", comment: "V2 passkey form field"),
                                 text: $titleText,
-                                placeholder: "Title"
+                                placeholder: NSLocalizedString("Title", comment: "V2 passkey form field")
                             )
 
                             if let titleError = titleError {
@@ -60,35 +60,35 @@ struct PasskeyFormV2View: View {
                             }
 
                             // Section: Credentials
-                            sectionHeader("Credentials")
+                            sectionHeader(NSLocalizedString("Credentials", comment: "V2 passkey form section"))
                                 .padding(.top, PPSpacing.s24)
                                 .padding(.bottom, PPSpacing.s8)
 
                             PPInputField(
-                                label: "Email or Username",
+                                label: NSLocalizedString("Email or Username", comment: "V2 passkey form field"),
                                 text: $username,
-                                placeholder: "Email or Username",
+                                placeholder: NSLocalizedString("Email or Username", comment: "V2 passkey form field"),
                                 keyboardType: .emailAddress
                             )
 
                             Spacer().frame(height: PPSpacing.s8)
 
                             PPInputField(
-                                label: "Passkey",
+                                label: NSLocalizedString("Passkey", comment: "V2 passkey form field"),
                                 text: $passkeyDate,
-                                placeholder: "Date",
+                                placeholder: NSLocalizedString("Date", comment: "V2 passkey form placeholder"),
                                 isEditable: false
                             )
 
                             // Section: Details
-                            sectionHeader("Details")
+                            sectionHeader(NSLocalizedString("Details", comment: "V2 passkey form section"))
                                 .padding(.top, PPSpacing.s24)
                                 .padding(.bottom, PPSpacing.s8)
 
                             PPInputField(
-                                label: "Website",
+                                label: NSLocalizedString("Website", comment: "V2 passkey form field"),
                                 text: $website,
-                                placeholder: "https://...",
+                                placeholder: NSLocalizedString("https://...", comment: "V2 website placeholder"),
                                 keyboardType: .URL
                             )
 
@@ -102,16 +102,16 @@ struct PasskeyFormV2View: View {
                             Spacer().frame(height: PPSpacing.s8)
 
                             PPInputField(
-                                label: "Comment",
+                                label: NSLocalizedString("Comment", comment: "V2 passkey form field"),
                                 text: $comment,
-                                placeholder: "Optional"
+                                placeholder: NSLocalizedString("Optional", comment: "V2 comment placeholder")
                             )
 
                             Spacer().frame(height: PPSpacing.s8)
 
                             // Folder selector
                             PPListItem(
-                                title: folderName ?? "Select folder",
+                                title: folderName ?? NSLocalizedString("Select folder", comment: "V2 folder picker default"),
                                 leadingIcon: nil,
                                 onTap: onSelectFolder
                             )
@@ -137,14 +137,16 @@ struct PasskeyFormV2View: View {
                         }
 
                         PPButton(
-                            title: isSaving ? "Saving..." : "Save & Add Login",
+                            title: isSaving
+                                ? NSLocalizedString("Saving...", comment: "V2 save button — in flight")
+                                : NSLocalizedString("Save & Add Login", comment: "V2 save button"),
                             variant: .primary,
                             isEnabled: !isSaving,
                             action: onSave
                         )
 
                         PPButton(
-                            title: "Discard",
+                            title: NSLocalizedString("Discard", comment: "V2 discard button"),
                             variant: .secondary,
                             isEnabled: !isSaving,
                             action: onDiscard

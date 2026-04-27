@@ -27,7 +27,7 @@ struct CombinedCredentialOption: Identifiable, Equatable {
 
 struct CombinedItemsV2View: View {
 
-    var headerTitle: String = "Add a passkey"
+    var headerTitle: String = NSLocalizedString("Add a passkey", comment: "V2 sheet header default")
     var mode: CombinedItemsMode = .registration
 
     @Binding var searchText: String
@@ -56,7 +56,7 @@ struct CombinedItemsV2View: View {
                 onClose: onClose
             )
 
-            PPSearchField(text: $searchText, placeholder: "Search in All Items")
+            PPSearchField(text: $searchText, placeholder: NSLocalizedString("Search in All Items", comment: "V2 search placeholder"))
                 .padding(.horizontal, PPSpacing.s16)
                 .padding(.bottom, PPSpacing.s16)
                 .background(PPColors.background)
@@ -112,7 +112,7 @@ struct CombinedItemsV2View: View {
                             .padding(.horizontal, PPSpacing.s12)
 
                         PPButton(
-                            title: "Add New Login",
+                            title: NSLocalizedString("Add New Login", comment: "V2 add new login button"),
                             variant: .primary,
                             leadingIcon: Image("Icons/Plus", bundle: .main),
                             action: onAddNewLogin
@@ -161,7 +161,7 @@ struct CombinedItemsV2View: View {
     private var currentVaultName: String {
         guard let id = selectedVaultId,
               let vault = vaults.first(where: { $0.id == id }) else {
-            return "Select Vault"
+            return NSLocalizedString("Select Vault", comment: "V2 vault picker placeholder")
         }
         return vault.name
     }
@@ -209,7 +209,7 @@ struct CombinedItemsV2View: View {
         VStack {
             switch mode {
             case .assertion:
-                Text("No matching items in this vault")
+                Text(NSLocalizedString("No matching items in this vault", comment: "V2 empty state — assertion"))
                     .font(PPTypography.label)
                     .foregroundColor(PPColors.textSecondary)
                     .multilineTextAlignment(.leading)
@@ -229,11 +229,11 @@ struct CombinedItemsV2View: View {
     /// phrase — green + underlined; tapping anywhere on the paragraph fires
     /// onAddNewLogin (mirrors Android's clickable span behavior).
     private var registrationEmptyText: some View {
-        let highlight = Text("save it as a new item")
+        let highlight = Text(NSLocalizedString("save it as a new item", comment: "V2 empty state — clickable highlight"))
             .foregroundColor(PPColors.primary)
             .underline()
-        let prefix = Text("We couldn't find a matching item in this vault. Would you like to ")
-        let suffix = Text(" or look in another vault?")
+        let prefix = Text(NSLocalizedString("We couldn't find a matching item in this vault. Would you like to ", comment: "V2 empty state — registration prefix"))
+        let suffix = Text(NSLocalizedString(" or look in another vault?", comment: "V2 empty state — registration suffix"))
 
         return (prefix + highlight + suffix)
             .font(PPTypography.label)

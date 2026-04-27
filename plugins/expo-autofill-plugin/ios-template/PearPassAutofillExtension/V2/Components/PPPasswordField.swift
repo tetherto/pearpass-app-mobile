@@ -49,7 +49,7 @@ struct PPPasswordField: View {
                     .foregroundColor(PPColors.textPrimary)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Toggle password visibility")
+            .accessibilityLabel(NSLocalizedString("Toggle password visibility", comment: "V2 password field eye button"))
         }
         .padding(PPSpacing.s12)
         .background(background)

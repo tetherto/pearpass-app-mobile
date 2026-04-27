@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MasterPasswordV2View: View {
 
-    var headerTitle: String = "Add a passkey"
+    var headerTitle: String = NSLocalizedString("Add a passkey", comment: "V2 sheet header default")
     @Binding var password: String
 
     var onClose: () -> Void = {}
@@ -29,14 +29,14 @@ struct MasterPasswordV2View: View {
                 VStack(spacing: 0) {
                     // Body
                     VStack(spacing: 0) {
-                        Text("Enter Your Master Password")
+                        Text(NSLocalizedString("Enter Your Master Password", comment: "V2 master password screen title"))
                             .font(PPTypography.title)
                             .foregroundColor(PPColors.textPrimary)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
                             .padding(.top, PPSpacing.s16)
 
-                        Text("Please enter your master password to continue")
+                        Text(NSLocalizedString("Please enter your master password to continue", comment: "V2 master password screen subtitle"))
                             .font(PPTypography.label)
                             .foregroundColor(PPColors.textSecondary)
                             .multilineTextAlignment(.center)
@@ -46,9 +46,9 @@ struct MasterPasswordV2View: View {
                         Spacer().frame(height: 46)
 
                         PPPasswordField(
-                            label: "Password",
+                            label: NSLocalizedString("Password", comment: "V2 password input label"),
                             text: $password,
-                            placeholder: "Enter Master Password"
+                            placeholder: NSLocalizedString("Enter Master Password", comment: "V2 password input placeholder")
                         )
 
                         Spacer()
@@ -62,7 +62,7 @@ struct MasterPasswordV2View: View {
                         .frame(height: 1)
 
                     // Continue button
-                    PPButton(title: "Continue", variant: .primary, action: onContinue)
+                    PPButton(title: NSLocalizedString("Continue", comment: "V2 continue button"), variant: .primary, action: onContinue)
                         .padding(.horizontal, PPSpacing.s16)
                         .padding(.top, PPSpacing.s16)
                         .padding(.bottom, PPSpacing.s12)

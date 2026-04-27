@@ -45,7 +45,7 @@ struct PPSheetHeader: View {
                             .foregroundColor(PPColors.textPrimary)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Close")
+                    .accessibilityLabel(NSLocalizedString("Close", comment: "V2 sheet header close button"))
                 } else {
                     Color.clear.frame(width: 40, height: 40)
                 }

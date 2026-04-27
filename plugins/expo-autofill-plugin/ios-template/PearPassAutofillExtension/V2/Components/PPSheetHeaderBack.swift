@@ -35,7 +35,7 @@ struct PPSheetHeaderBack: View {
                             .foregroundColor(PPColors.textPrimary)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Back")
+                    .accessibilityLabel(NSLocalizedString("Back", comment: "V2 sheet header back button"))
                 } else {
                     Color.clear.frame(width: 40, height: 40)
                 }
@@ -51,7 +51,7 @@ struct PPSheetHeaderBack: View {
                             .foregroundColor(PPColors.textPrimary)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Close")
+                    .accessibilityLabel(NSLocalizedString("Close", comment: "V2 sheet header close button"))
                 } else {
                     Color.clear.frame(width: 40, height: 40)
                 }

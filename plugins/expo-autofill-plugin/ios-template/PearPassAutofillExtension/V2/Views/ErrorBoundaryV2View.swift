@@ -62,7 +62,7 @@ struct ErrorBoundaryV2View: View {
                         .frame(height: 1)
                         .padding(.horizontal, -PPSpacing.s16)
 
-                    PPButton(title: "Go Back", variant: .primary, action: onBack)
+                    PPButton(title: NSLocalizedString("Go Back", comment: "V2 go back button"), variant: .primary, action: onBack)
                         .padding(.top, PPSpacing.s16)
                         .padding(.bottom, PPSpacing.s12)
                 }

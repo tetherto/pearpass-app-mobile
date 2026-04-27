@@ -11,7 +11,7 @@ import SwiftUI
 struct PPSearchField: View {
 
     @Binding var text: String
-    var placeholder: String = "Search"
+    var placeholder: String = NSLocalizedString("Search", comment: "V2 search field default placeholder")
 
     @FocusState private var isFocused: Bool
 

@@ -75,9 +75,9 @@ struct V2HostView: View {
                 LoadingV2View()
             } else if let _ = initialError {
                 ErrorBoundaryV2View(
-                    title: "Autofill Error",
-                    subtitle: "Unable to initialize autofill",
-                    message: "An unexpected error occurred. Please try again.",
+                    title: NSLocalizedString("Autofill Error", comment: "V2 error screen title"),
+                    subtitle: NSLocalizedString("Unable to initialize autofill", comment: "V2 error screen subtitle"),
+                    message: NSLocalizedString("An unexpected error occurred. Please try again.", comment: "V2 error screen body"),
                     onBack: onCancel
                 )
             } else if showPasskeyForm {
@@ -107,7 +107,9 @@ struct V2HostView: View {
 
         case .masterPassword:
             MasterPasswordV2View(
-                headerTitle: mode == .registration ? "Create Passkey" : "Sign in",
+                headerTitle: mode == .registration
+                    ? NSLocalizedString("Create Passkey", comment: "V2 sheet header — passkey registration")
+                    : NSLocalizedString("Sign in", comment: "V2 sheet header — credential assertion"),
                 password: bindingFor(\.masterPassword),
                 onClose: onCancel,
                 onContinue: handleMasterPasswordContinue
@@ -115,7 +117,9 @@ struct V2HostView: View {
 
         case .vaultSelection, .vaultPassword, .credentialsList:
             CombinedItemsV2View(
-                headerTitle: mode == .registration ? "Create Passkey" : "Sign in",
+                headerTitle: mode == .registration
+                    ? NSLocalizedString("Create Passkey", comment: "V2 sheet header — passkey registration")
+                    : NSLocalizedString("Sign in", comment: "V2 sheet header — credential assertion"),
                 mode: mode,
                 searchText: bindingFor(\.searchText),
                 selectedVaultId: Binding(
@@ -161,7 +165,7 @@ struct V2HostView: View {
 
     private var passkeyFormView: some View {
         PasskeyFormV2View(
-            headerTitle: "Create Passkey",
+            headerTitle: NSLocalizedString("Create Passkey", comment: "V2 sheet header — passkey registration"),
             titleText: $formTitleText,
             username: $formUsername,
             passkeyDate: $formPasskeyDate,
@@ -304,11 +308,11 @@ struct V2HostView: View {
               let onCompleteRegistration = onCompleteRegistration,
               let client = vaultClient,
               let vault = viewModel.selectedVault else {
-            formSaveError = "Missing registration context"
+            formSaveError = NSLocalizedString("Missing registration context", comment: "V2 passkey save error")
             return
         }
         guard !formTitleText.trimmingCharacters(in: .whitespaces).isEmpty else {
-            formSaveError = "Title is required"
+            formSaveError = NSLocalizedString("Title is required", comment: "V2 passkey save error")
             return
         }
 
@@ -405,7 +409,7 @@ struct V2HostView: View {
                 NSLog("[V2HostView] Save error: \(error)")
                 await MainActor.run {
                     isSavingPasskey = false
-                    formSaveError = "Failed to save passkey"
+                    formSaveError = NSLocalizedString("Failed to save passkey", comment: "V2 passkey save error")
                 }
             }
         }
