@@ -439,7 +439,10 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
     // MARK: - V2 hosting (design version 2)
 
     private func setupV2AssertionView() {
-        attachV2HostView(mode: .assertion, registrationContext: nil)
+        // passkeyRpId is set by passkey assertion paths (iOS 17+) and stays
+        // nil for password-only autofill — V2HostView falls back to
+        // serviceIdentifiers when nil.
+        attachV2HostView(mode: .assertion, registrationContext: nil, passkeyRpId: passkeyRpId)
     }
 
     @available(iOS 17.0, *)
@@ -452,10 +455,10 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
             userDisplayName: registrationRequest.userDisplayName,
             challenge: registrationRequest.challenge
         )
-        attachV2HostView(mode: .registration, registrationContext: ctx)
+        attachV2HostView(mode: .registration, registrationContext: ctx, passkeyRpId: nil)
     }
 
-    private func attachV2HostView(mode: CombinedItemsMode, registrationContext: V2RegistrationContext?) {
+    private func attachV2HostView(mode: CombinedItemsMode, registrationContext: V2RegistrationContext?, passkeyRpId: String?) {
         // Flatten the system sheet's rounded corners on iOS 16.4+ so V2's edges
         // run flush with the screen (mirrors Android's borderless partial sheet).
         if #available(iOS 16.0, *) {
@@ -482,6 +485,7 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
             presentationWindow: self.view.window,
             mode: mode,
             registrationContext: registrationContext,
+            passkeyRpId: passkeyRpId,
             onCancel: { [weak self] in
                 self?.performCleanupSync()
                 self?.cancel(nil)
