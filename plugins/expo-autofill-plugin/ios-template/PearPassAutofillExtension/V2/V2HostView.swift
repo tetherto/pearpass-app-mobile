@@ -523,9 +523,15 @@ struct V2HostView: View {
         guard let hashedPassword = masterEncryption["hashedPassword"] as? String else {
             throw PearPassVaultError.unknown("No hashed password available in master encryption")
         }
+        guard let ciphertext = masterEncryption["ciphertext"] as? String else {
+            throw PearPassVaultError.unknown("Missing ciphertext in master encryption")
+        }
+        guard let nonce = masterEncryption["nonce"] as? String else {
+            throw PearPassVaultError.unknown("Missing nonce in master encryption")
+        }
         let decryptedKey = try await client.decryptVaultKey(
-            ciphertext: masterEncryption["ciphertext"] as? String ?? "",
-            nonce: masterEncryption["nonce"] as? String ?? "",
+            ciphertext: ciphertext,
+            nonce: nonce,
             hashedPassword: hashedPassword
         )
         guard let encryptionKey = decryptedKey?["value"] as? String

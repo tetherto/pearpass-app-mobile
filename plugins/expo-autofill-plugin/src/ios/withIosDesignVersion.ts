@@ -62,8 +62,10 @@ export const withIosDesignVersion: ConfigPlugin<AutofillPluginOptions> = (config
 
       // Write only into the generated extension Info.plist under the prebuild
       // output. The template under ios-template/ is checked in and must not be
-      // mutated — withIosAutofillExtension is registered before this plugin
-      // (see src/index.ts) so the template has already been copied.
+      // mutated. Expo dangerous mods compose such that the LAST-registered
+      // plugin runs FIRST, so withIosAutofillExtension is registered last in
+      // src/index.ts and its template-copy mod runs before this plugin — by
+      // the time we get here the generated extension Info.plist already exists.
       const generatedPlistPath = path.join(
         cfg.modRequest.platformProjectRoot,
         'PearPassAutofillExtension',
