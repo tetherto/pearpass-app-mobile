@@ -10,7 +10,7 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { Keyboard, Linking, StyleSheet, View } from 'react-native'
+import { Keyboard, StyleSheet, View } from 'react-native'
 
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { AuthFlowFormLayout } from '../../../containers/Auth/shared/AuthFlowFormLayout'
@@ -59,7 +59,7 @@ export const CreatePasswordScreen = () => {
           {t`This is the key to access PearPass.`}{' '}
           {unsupportedFeaturesEnabled() ? (
             <>
-              {'Already using PearPass?'}
+              {t`Already using PearPass?`}
               <Link
                 onClick={handleTransferData}
                 data-testid="onboarding-v2-transfer-data-link"
@@ -83,10 +83,9 @@ export const CreatePasswordScreen = () => {
             >
               {t`By clicking Continue, you confirm that you have read and agree to the`}{' '}
               <Link
-                onClick={() => {
-                  Keyboard.dismiss()
-                  Linking.openURL(TERMS_OF_USE)
-                }}
+                href={TERMS_OF_USE}
+                isExternal
+                onClick={() => Keyboard.dismiss()}
                 data-testid="onboarding-v2-terms-link"
               >
                 {t`PearPass Application Terms of Use`}

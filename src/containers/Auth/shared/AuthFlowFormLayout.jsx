@@ -144,13 +144,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: rawTokens.spacing16
   },
   content: {
-    paddingTop: 60,
-    paddingBottom: 60,
+    paddingTop: rawTokens.spacing60,
+    paddingBottom: rawTokens.spacing60,
     gap: rawTokens.spacing32
   },
   contentKeyboardOpen: {
-    paddingTop: 40,
-    paddingBottom: 40
+    paddingTop: rawTokens.spacing40,
+    paddingBottom: rawTokens.spacing40
   },
   headerBlock: {
     gap: rawTokens.spacing12
