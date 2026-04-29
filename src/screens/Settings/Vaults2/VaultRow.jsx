@@ -15,7 +15,8 @@ export const VaultRow = ({
   showDivider,
   onAddMember,
   vaultActions,
-  isCurrentVault
+  isCurrentVault,
+  onClick
 }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
@@ -24,6 +25,7 @@ export const VaultRow = ({
   return (
     <View>
       <ListItem
+        onClick={() => onClick?.()}
         platform="mobile"
         icon={
           <View style={styles.iconBadge}>
@@ -46,7 +48,9 @@ export const VaultRow = ({
                 onClick={onAddMember}
               />
             )}
-            <VaultActionsMenu {...vaultActions} />
+            {isCurrentVault ? (
+              <VaultActionsMenu {...vaultActions} />
+            ) : undefined}
           </View>
         }
       />

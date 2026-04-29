@@ -2,6 +2,7 @@ export default {
   preset: 'react-native',
   transform: { '^.+\\.[jt]sx?$': 'babel-jest' },
   moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/src/$1',
     '^@tetherto/pearpass-lib-ui-theme-provider/native$':
       '<rootDir>/node_modules/@tetherto/pearpass-lib-ui-theme-provider/native/index.js',
     '^@tetherto/pearpass-lib-ui-theme-provider$':

@@ -21,6 +21,7 @@ import { VAULT_ACTION } from '../../../constants/vaultActions'
 import { BottomSheetPairedDevicesContent } from '../../../containers/BottomSheetPairedDevicesContent'
 import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
 import { useModal } from '../../../context/ModalContext'
+import { useVaultSwitch } from '../../../hooks/useVaultSwitch'
 
 export const VaultsV2 = () => {
   const { t } = useLingui()
@@ -29,6 +30,7 @@ export const VaultsV2 = () => {
   const { openModal } = useModal()
   const [pairedDevicesOpen, setPairedDevicesOpen] = useState(false)
   const { data: currentVault, refetch: refetchVault } = useVault()
+  const { switchVault } = useVaultSwitch()
   const { data: allVaults } = useVaults()
 
   useEffect(() => {
@@ -78,6 +80,7 @@ export const VaultsV2 = () => {
       onAddMember={handleAddMember}
       isCurrentVault={isCurrentVault}
       vaultActions={buildVaultActions(vault)}
+      onClick={() => (!isCurrentVault ? switchVault(vault) : null)}
     />
   )
 
@@ -104,7 +107,7 @@ export const VaultsV2 = () => {
     >
       <PageHeader
         title={t`Your Vaults`}
-        subtitle={t`Manage your vaults, control access permissions, and take protective measures if needed.`}
+        subtitle={t`Manage your vaults. Select the vault you want to apply changes to.`}
       />
 
       <BottomSheetPairedDevicesContent
