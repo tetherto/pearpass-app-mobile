@@ -215,7 +215,7 @@ export const MasterPasswordScreen = () => {
           <View style={styles.linkContainer}>
             {isBiometricAvailable && biometricLabel ? (
               <Link
-                onPress={handleBiometricRetry}
+                onClick={handleBiometricRetry}
                 data-testid="auth-v2-biometric-retry"
               >
                 {biometricLabel}
