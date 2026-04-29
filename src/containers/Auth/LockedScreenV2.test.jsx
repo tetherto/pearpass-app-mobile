@@ -5,7 +5,6 @@ import { AppState } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { LockedScreenV2 } from './LockedScreenV2'
-import { NAVIGATION_ROUTES } from '../../constants/navigation'
 import { messages } from '../../locales/en/messages'
 
 i18n.load('en', messages)
@@ -154,6 +153,12 @@ jest.mock('react-native-toast-message', () => ({
   }
 }))
 
+let mockUnsupportedFeaturesEnabled = false
+
+jest.mock('../../utils/unsupportedFeatures', () => ({
+  unsupportedFeaturesEnabled: () => mockUnsupportedFeaturesEnabled
+}))
+
 const renderLockedScreen = () =>
   render(
     <I18nProvider i18n={i18n}>
@@ -168,6 +173,8 @@ describe('LockedScreenV2', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useRealTimers()
+
+    mockUnsupportedFeaturesEnabled = false
 
     mockUseKeyboardVisibility.mockReturnValue({
       isKeyboardVisible: false,
@@ -269,7 +276,7 @@ describe('LockedScreenV2', () => {
     expect(appStateRemove).toHaveBeenCalledTimes(1)
   })
 
-  it('when the countdown ends and the vault is unlocked, replaces route and shows a toast', async () => {
+  it('when the countdown ends and the vault is unlocked, navigates to the v2 master password screen and shows a toast', async () => {
     jest.useFakeTimers()
 
     mockRefreshMasterPasswordStatus.mockResolvedValue({ isLocked: false })
@@ -287,9 +294,7 @@ describe('LockedScreenV2', () => {
     })
 
     expect(mockRefreshMasterPasswordStatus).toHaveBeenCalled()
-    expect(mockReplace).toHaveBeenCalledWith('Welcome', {
-      state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD
-    })
+    expect(mockReplace).toHaveBeenCalledWith('AuthV2MasterPassword')
     expect(Toast.show).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'baseToast',
@@ -298,6 +303,29 @@ describe('LockedScreenV2', () => {
       })
     )
     expect(getByText('0:00').props.children).toBe('0:00')
+
+    jest.useRealTimers()
+  })
+
+  it('when the countdown ends with unsupported features enabled, navigates to the pin screen', async () => {
+    jest.useFakeTimers()
+
+    mockUnsupportedFeaturesEnabled = true
+    mockRefreshMasterPasswordStatus.mockResolvedValue({ isLocked: false })
+
+    mockUseUserData.mockReturnValue({
+      masterPasswordStatus: { lockoutRemainingMs: 2000 },
+      refreshMasterPasswordStatus: mockRefreshMasterPasswordStatus
+    })
+
+    renderLockedScreen()
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000)
+      await Promise.resolve()
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith('AuthV2Pin')
 
     jest.useRealTimers()
   })

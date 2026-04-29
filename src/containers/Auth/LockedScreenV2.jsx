@@ -14,9 +14,9 @@ import { useUserData } from '@tetherto/pearpass-lib-vault'
 import { AppState, ScrollView, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
-import { NAVIGATION_ROUTES } from '../../constants/navigation'
 import { useKeyboardVisibility } from '../../hooks/useKeyboardVisibility'
 import { OnboardingLayout } from '../../screens/OnboardingV2/components/OnboardingLayout'
+import { unsupportedFeaturesEnabled } from '../../utils/unsupportedFeatures'
 
 export const LockedScreenV2 = () => {
   const { isKeyboardVisible, keyboardHeight } = useKeyboardVisibility()
@@ -41,9 +41,10 @@ export const LockedScreenV2 = () => {
     const status = await refreshMasterPasswordStatus()
 
     if (!status?.isLocked) {
-      navigation.replace('Welcome', {
-        state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD
-      })
+      const routeName = unsupportedFeaturesEnabled()
+        ? 'AuthV2Pin'
+        : 'AuthV2MasterPassword'
+      navigation.replace(routeName)
 
       Toast.show({
         type: 'baseToast',
