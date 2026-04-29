@@ -60,22 +60,24 @@ const titleStyles = css.create({
   }
 })
 
-const renderHighlightedPassword = (
-  text: string,
-) => {
-  const parts = text.split(/(\d+|[^a-zA-Z\d\s])/g)
+const renderHighlightedPassword = (text: string, numberColor: string) => {
+  const parts = text.split(/(\d+)/g)
 
-  return parts.map((part) => {
+  return parts.map((part, index) => {
     if (!part) {
       return null
     }
 
     if (/^\d+$/.test(part)) {
-      return part
-    }
-
-    if (/[^a-zA-Z\d\s]/.test(part)) {
-      return part
+      return (
+        <Title
+          key={`${part}-${index}`}
+          // inline style for dynamic theme color;
+          style={{ color: numberColor } as never}
+        >
+          {part}
+        </Title>
+      )
     }
 
     return part
@@ -236,7 +238,6 @@ export const CreatePasswordItemV2 = ({ route }: CreatePasswordItemV2Props) => {
           {t`Generated Password`}
         </Text>
 
-
         <View
           style={[
             styles.groupedCard,
@@ -255,7 +256,8 @@ export const CreatePasswordItemV2 = ({ route }: CreatePasswordItemV2Props) => {
             <View style={styles.generatedPasswordText}>
               <Title as="h3" style={titleStyles.generatedPasswordTitle}>
                 {renderHighlightedPassword(
-                  generatedValue
+                  generatedValue,
+                  theme.colors.colorPrimary
                 )}
               </Title>
             </View>

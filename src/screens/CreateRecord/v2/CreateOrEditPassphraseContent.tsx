@@ -222,7 +222,7 @@ export const CreateOrEditPassphraseContent = ({
           value={values.note}
           placeholder={t`Enter Comment`}
           onChangeText={(val) => setValue('note', val)}
-          testID="comments-multi-slot-input-slot-0"
+          testID="comment-input-field"
         />
 
         <MultiSlotInput
