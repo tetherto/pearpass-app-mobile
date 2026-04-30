@@ -14,8 +14,7 @@ import {
   KeyboardArrowLeftOutlined,
   LockOutlined,
   Share,
-  TrashOutlined,
-  VerifiedUser
+  TrashOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { InteractionManager, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -65,7 +64,6 @@ const VaultActionHeader = ({ title, onBack, onClose, showBackButton }) => {
  * @param {string} props.vaultName
  * @param {() => void} [props.onRename]
  * @param {() => void} [props.onPassword]
- * @param {() => void} [props.onMembers]
  * @param {() => void} [props.onShare]
  * @param {() => void} [props.onDelete]
  * @param {() => void} [props.onBack]
@@ -77,7 +75,6 @@ export const BottomSheetVaultAction = ({
   vaultName,
   onRename,
   onPassword,
-  onMembers,
   onShare,
   onDelete,
   onBack,
@@ -112,12 +109,6 @@ export const BottomSheetVaultAction = ({
       label: t`Rename Vault`,
       icon: <EditOutlined color={theme.colors.colorTextPrimary} />,
       onClick: () => closeAndRun(onRename)
-    },
-    {
-      key: 'members',
-      label: t`Manage Access`,
-      icon: <VerifiedUser color={theme.colors.colorTextPrimary} />,
-      onClick: () => closeAndRun(onMembers)
     },
     ...(PROTECTED_VAULT_ENABLED
       ? [
