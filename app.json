@@ -62,7 +62,8 @@
         "react-native-vision-camera",
         {
           "cameraPermissionText": "Allow $(PRODUCT_NAME) to access your camera to scan QR codes for securely pairing your vault with another device.",
-          "enableCodeScanner": false
+          "enableCodeScanner": false,
+          "enableLocation": false
         }
       ],
       [
