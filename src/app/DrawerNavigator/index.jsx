@@ -16,7 +16,8 @@ export const DrawerNavigator = () => (
         width: '70%'
       },
       drawerType: 'front',
-      overlayColor: 'rgba(0, 0, 0, 0.5)'
+      overlayColor: 'rgba(0, 0, 0, 0.5)',
+      swipeEnabled: !isV2()
     }}
     drawerContent={(props) => <DrawerContent {...props} />}
   >

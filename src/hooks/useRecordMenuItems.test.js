@@ -82,8 +82,8 @@ describe('useRecordMenuItems', () => {
         RECORD_TYPES.NOTE,
         RECORD_TYPES.PASS_PHRASE,
         RECORD_TYPES.WIFI_PASSWORD,
-        RECORD_TYPES.CUSTOM,
-        'password'
+        'password',
+        RECORD_TYPES.CUSTOM
       ])
     })
 

@@ -20,26 +20,43 @@ import { ScreenHeader } from '../ScreenHeader'
 interface HeaderV2Props {
   setSearchValue: (value: string) => void
   searchValue: string
+  recordType?: string
 }
 
-export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
+export const HeaderV2 = ({
+  setSearchValue,
+  searchValue,
+  recordType = 'all'
+}: HeaderV2Props) => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const navigation = useNavigation<NavigationProp<ParamListBase>>()
 
-  const handleCreateRecord = (recordType: string) => {
-    if (recordType === 'password') {
+  const handleCreateRecord = (type: string) => {
+    if (type === 'password') {
       navigation.navigate('CreatePasswordItem')
       return
     }
 
-    if (recordType === 'authenticator') {
+    if (type === 'authenticator') {
       navigation.navigate('CreateRecord', { recordType: 'login' })
       return
     }
 
-    navigation.navigate('CreateRecord', { recordType })
+    navigation.navigate('CreateRecord', { recordType: type })
   }
+
+  const isAllItems = recordType === 'all'
+
+  const addItemButton = (
+    <Button
+      variant="primary"
+      size="medium"
+      aria-label="Add item"
+      iconBefore={<Add />}
+      onClick={isAllItems ? undefined : () => handleCreateRecord(recordType)}
+    />
+  )
 
   return (
     <ScreenHeader
@@ -65,21 +82,16 @@ export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
             onClick={() => navigation.navigate('ImportVault')}
           />
 
-          <ContextMenu
-            trigger={
-              <Button
-                variant="primary"
-                size="medium"
-                aria-label="Add item"
-                iconBefore={<Add />}
+          {isAllItems ? (
+            <ContextMenu trigger={addItemButton}>
+              <BottomSheetCategorySelectorContent
+                variant="add-item"
+                onSelect={handleCreateRecord}
               />
-            }
-          >
-            <BottomSheetCategorySelectorContent
-              variant="add-item"
-              onSelect={handleCreateRecord}
-            />
-          </ContextMenu>
+            </ContextMenu>
+          ) : (
+            addItemButton
+          )}
         </View>
       }
     />
