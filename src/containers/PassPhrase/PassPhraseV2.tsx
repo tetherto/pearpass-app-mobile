@@ -7,8 +7,6 @@ import {
   VALID_WORD_COUNTS
 } from '@tetherto/pearpass-lib-constants'
 import {
-  CopyIcon,
-  PasteFromClipboardIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import {
   Button,
@@ -19,6 +17,7 @@ import {
   Text,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
+import { ContentCopy, ContentPaste } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
@@ -194,13 +193,21 @@ export const PassPhraseV2 = ({
           <View style={styles.optionSection}>
             <View style={styles.headerRow}>
               <View style={styles.headerInfo}>
-                <Text variant="label">{t`Recovery Phrase`}</Text>
+                <Text
+                  variant="label"
+                  data-testid="passphrase-recovery-phrase-label"
+                >
+                  {t`Recovery Phrase`}
+                </Text>
               </View>
               <Button
                 variant="tertiary"
                 size="small"
-                aria-label="Copy recovery phrase"
-                iconBefore={<CopyIcon color={theme.colors.colorTextPrimary} />}
+                aria-label={t`Copy recovery phrase`}
+                data-testid="passphrase-copy-button"
+                iconBefore={
+                  <ContentCopy color={theme.colors.colorTextPrimary} />
+                }
                 onClick={() => {
                   hapticButtonSecondary()
                   copyToClipboard(value)
@@ -270,11 +277,11 @@ export const PassPhraseV2 = ({
                   }
                   iconBefore={
                     isCreateOrEdit ? (
-                      <PasteFromClipboardIcon
+                      <ContentPaste
                         color={theme.colors.colorTextPrimary}
                       />
                     ) : (
-                      <CopyIcon color={theme.colors.colorTextPrimary} />
+                      <ContentCopy color={theme.colors.colorTextPrimary} />
                     )
                   }
                   onClick={() => {
