@@ -18,8 +18,7 @@ export const ImportVault = () => {
   const [step, setStep] = useState<Step>('scan')
   const [inviteCode, setInviteCode] = useState('')
 
-  const { isLoading, error, pairedVault, pairWithCode, cancelPairing } =
-    useImportVault()
+  const { isLoading, error, pairWithCode, cancelPairing } = useImportVault()
 
   const navigateToHome = useCallback(() => {
     navigation.dispatch(
@@ -37,8 +36,9 @@ export const ImportVault = () => {
 
   const handleCodeScanned = useCallback(
     async (code: string) => {
-      const vault = await pairWithCode(code)
-      if (vault) {
+      setInviteCode(code)
+      const success = await pairWithCode(code)
+      if (success) {
         setStep('preview')
       }
     },
@@ -47,8 +47,8 @@ export const ImportVault = () => {
 
   const handleContinue = useCallback(async () => {
     if (inviteCode.trim()) {
-      const vault = await pairWithCode(inviteCode.trim())
-      if (vault) {
+      const success = await pairWithCode(inviteCode.trim())
+      if (success) {
         setStep('preview')
       }
     }
@@ -100,7 +100,7 @@ export const ImportVault = () => {
           onCodeScanned={handleCodeScanned}
         />
       ) : (
-        <ImportPreviewStep vault={pairedVault} error={error} />
+        <ImportPreviewStep error={error} />
       )}
     </Layout>
   )

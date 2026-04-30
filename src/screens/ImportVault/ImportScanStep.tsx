@@ -6,7 +6,7 @@ import {
   Button,
   InputField
 } from '@tetherto/pearpass-lib-ui-kit'
-import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { ContentPaste } from '@tetherto/pearpass-lib-ui-kit/icons'
 import * as Clipboard from 'expo-clipboard'
 import { Dimensions, StyleSheet, View } from 'react-native'
 import { Camera } from 'react-native-vision-camera'
@@ -114,7 +114,7 @@ export const ImportScanStep = ({
       )}
 
       <InputField
-        label={t`Item / Vault Link`}
+        label={t`Vault Link`}
         value={inviteCode}
         onChangeText={setInviteCode}
         placeholderText={t`Enter Share Link`}
@@ -127,9 +127,9 @@ export const ImportScanStep = ({
             aria-label="Paste"
             data-testid="import-vault-paste-button"
             iconBefore={
-              <ContentCopy
-                width={12}
-                height={15}
+              <ContentPaste
+                width={24}
+                height={24}
                 color={theme.colors.colorTextSecondary}
               />
             }
