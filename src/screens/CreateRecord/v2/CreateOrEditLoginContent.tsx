@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { Add, KeyboardArrowBottom, QrCode, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Add, QrCode, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   RECORD_TYPES,
   useCreateRecord,
@@ -11,11 +11,9 @@ import {
 } from '@tetherto/pearpass-lib-vault'
 import {
   Button,
-  ContextMenu,
   InputField,
   MultiSlotInput,
   PasswordField,
-  SelectField,
   Text,
   rawTokens,
   useTheme
@@ -24,7 +22,7 @@ import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { FormGroup } from '../../../components/FormGroup'
 
-import { BottomSheetFolderSelectorContent } from '../../../containers/BottomSheetFolderSelectorContent'
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
@@ -275,19 +273,6 @@ export const CreateOrEditLoginContent = ({
     })
   }
 
-  const handleFolderSelect = (folder?: { name?: string }) => {
-    if (!folder) {
-      return
-    }
-
-    if (folder.name === 'allFolder') {
-      setValue('folder', '')
-      return
-    }
-
-    setValue('folder', folder.name === values.folder ? '' : (folder.name ?? ''))
-  }
-
   const handleFileUpload = (file?: LoginAttachment | null) => {
     if (!file) {
       return
@@ -454,29 +439,10 @@ export const CreateOrEditLoginContent = ({
           ))}
         </MultiSlotInput>
 
-        <MultiSlotInput testID="folder-multi-slot-input">
-          <ContextMenu
-            trigger={
-              <SelectField
-                label={t`Folder`}
-                value={values.folder ?? ''}
-                placeholder={t`Choose Folder`}
-                isGrouped
-                testID="folder-field"
-                rightSlot={
-                  <KeyboardArrowBottom
-                    color={theme.colors.colorTextPrimary}
-                  />
-                }
-              />
-            }
-          >
-            <BottomSheetFolderSelectorContent
-              selectedFolder={values.folder}
-              onSelect={handleFolderSelect}
-            />
-          </ContextMenu>
-        </MultiSlotInput>
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
       </View>
 
       <View style={styles.section}>
