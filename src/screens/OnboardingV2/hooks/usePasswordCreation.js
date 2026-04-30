@@ -149,11 +149,11 @@ export const usePasswordCreation = () => {
       setIsLoading(true)
       await createMasterPassword(passwordBuffer)
 
-      // Create the default "Personal vault" right after master password setup
+      // Create the default "Personal" vault right after master password setup
       const loginBuffer = stringToBuffer(password)
       await logIn({ password: loginBuffer })
       await initVaults({ password: loginBuffer })
-      await createVault({ name: t`Personal vault` })
+      await createVault({ name: t`Personal` })
       await addDevice(Platform.OS + ' ' + Platform.Version)
       clearBuffer(loginBuffer)
 
