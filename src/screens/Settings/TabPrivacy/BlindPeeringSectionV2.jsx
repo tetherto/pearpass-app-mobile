@@ -25,12 +25,11 @@ import {
 import { Add, Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
 import { Linking, StyleSheet, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
 import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 
-import { SheetHeader } from '../../../containers/BottomSheet/SheetHeader'
+import { UnsavedChangesSheet } from '../../../containers/BottomSheet/UnsavedChangesSheet'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useLoadingContext } from '../../../context/LoadingContext'
 
@@ -251,6 +250,7 @@ export const BlindPeeringSectionV2 = () => {
         expand({
           children: (
             <UnsavedChangesSheet
+              description={t`You have unsaved changes to your Blind Peering settings. Would you like to save them before leaving?`}
               onClose={collapse}
               onDiscard={proceed}
               onSave={async () => {
@@ -393,47 +393,6 @@ export const BlindPeeringSectionV2 = () => {
     </Layout>
   )
 }
-
-const UnsavedChangesSheet = ({ onSave, onDiscard, onClose }) => {
-  const { t } = useLingui()
-  const { bottom } = useSafeAreaInsets()
-
-  return (
-    <View>
-      <SheetHeader showHandle title={t`Unsaved Changes`} onClose={onClose} />
-      <View
-        style={[
-          unsavedChangesStyles.body,
-          { paddingBottom: bottom + rawTokens.spacing16 }
-        ]}
-      >
-        <Text as="p" variant="body">
-          {t`You have unsaved changes to your Blind Peering settings. Would you like to save them before leaving?`}
-        </Text>
-
-        <View style={unsavedChangesStyles.actions}>
-          <Button variant="primary" fullWidth onClick={onSave}>
-            {t`Save Changes`}
-          </Button>
-          <Button variant="secondary" fullWidth onClick={onDiscard}>
-            {t`Discard`}
-          </Button>
-        </View>
-      </View>
-    </View>
-  )
-}
-
-const unsavedChangesStyles = StyleSheet.create({
-  body: {
-    paddingHorizontal: rawTokens.spacing16,
-    paddingTop: rawTokens.spacing8,
-    gap: rawTokens.spacing24
-  },
-  actions: {
-    gap: rawTokens.spacing12
-  }
-})
 
 const getStyles = (theme) =>
   StyleSheet.create({

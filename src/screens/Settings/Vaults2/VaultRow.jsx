@@ -28,9 +28,7 @@ export const VaultRow = ({
     itemCount || deviceCount
       ? {
           primary:
-            itemCount === 1
-              ? t`${itemCount} Item`
-              : t`${itemCount} Items`,
+            itemCount === 1 ? t`${itemCount} Item` : t`${itemCount} Items`,
           secondary:
             deviceCount === 1
               ? t`${deviceCount} Device`
