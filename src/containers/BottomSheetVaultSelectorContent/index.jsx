@@ -143,11 +143,22 @@ export const BottomSheetVaultSelectorContent = ({
     >
       {sortedVaults.map((vault) => {
         const isSelected = vault.id === activeVault?.id
+        const memberCount =
+          (isSelected ? activeVault?.devices?.length : undefined) ??
+          vault.devices?.length ??
+          0
         return (
           <ListItem
             key={vault.id}
             icon={<LockFilled color={theme.colors.colorTextPrimary} />}
             title={vault.name}
+            subtitle={
+              memberCount > 0
+                ? memberCount === 1
+                  ? t`${memberCount} Member`
+                  : t`${memberCount} Members`
+                : undefined
+            }
             selected={isSelected}
             showDivider
             iconSize={16}

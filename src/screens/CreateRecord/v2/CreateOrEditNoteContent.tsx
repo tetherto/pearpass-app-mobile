@@ -26,6 +26,7 @@ import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
+import { FolderSelectField } from '../../../components/FolderSelectField'
 
 type UploadedNoteAttachment = {
   base64: string
@@ -251,6 +252,11 @@ export const CreateOrEditNoteContent = ({
           placeholder={t`Enter Note`}
           onChangeText={(value) => setValue('note', value)}
           testID="note-field"
+        />
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
         />
       </View>
 

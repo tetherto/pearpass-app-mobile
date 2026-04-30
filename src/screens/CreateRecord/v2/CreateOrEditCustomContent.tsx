@@ -23,6 +23,7 @@ import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
+import { FolderSelectField } from '../../../components/FolderSelectField'
 
 type UploadedCustomAttachment = {
   base64: string
@@ -231,6 +232,17 @@ export const CreateOrEditCustomContent = ({
           placeholder={t`Enter Title`}
           onChangeText={(value) => setValue('title', value)}
           testID="title-field"
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Details`}
+        </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
         />
       </View>
 
