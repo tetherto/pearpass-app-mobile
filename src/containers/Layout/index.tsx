@@ -52,7 +52,7 @@ export const Layout = ({
 
   const CardWrapper = useKeyboardAvoidance ? KeyboardAvoidingView : View
   const cardWrapperProps = useKeyboardAvoidance
-    ? { behavior: Platform.OS === 'ios' ? ('padding' as const) : ('height' as const) }
+    ? { behavior: Platform.OS === 'ios' ? ('padding' as const) : undefined }
     : {}
 
   const showFooter = !!footer && !hideFooter

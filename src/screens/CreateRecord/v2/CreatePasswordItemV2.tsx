@@ -2,10 +2,7 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import {
-  checkPassphraseStrength,
-  checkPasswordStrength
-} from '@tetherto/pearpass-utils-password-check'
+import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
 import {
   generatePassphrase,
   generatePassword
@@ -136,13 +133,10 @@ export const CreatePasswordItemV2 = ({ route }: CreatePasswordItemV2Props) => {
     })
   }, [selectedOption, selectedRules])
 
-  const strength = useMemo(() => {
-    if (selectedOption === PASSWORD_OPTIONS.passphrase) {
-      return checkPassphraseStrength(generatedValue.split('-'))
-    }
-
-    return checkPasswordStrength(generatedValue)
-  }, [generatedValue, selectedOption])
+  const strength = useMemo(
+    () => checkPasswordStrength(generatedValue),
+    [generatedValue]
+  )
 
   const indicatorVariant = STRENGTH_TO_INDICATOR[strength.type]
 

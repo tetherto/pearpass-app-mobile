@@ -20,6 +20,7 @@ import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icon
 import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
@@ -215,6 +216,17 @@ export const CreateOrEditWifiPasswordContent = ({
             testID="wifi-password-input-field"
           />
         </MultiSlotInput>
+      </View>
+
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Details`}
+        </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
       </View>
 
       <View style={styles.section}>

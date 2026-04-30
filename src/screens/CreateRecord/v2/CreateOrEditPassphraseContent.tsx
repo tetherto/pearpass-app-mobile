@@ -20,6 +20,7 @@ import {
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { PassPhraseV2 } from '../../../containers/PassPhrase/PassPhraseV2'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
@@ -209,6 +210,11 @@ export const CreateOrEditPassphraseContent = ({
           value={values.passPhrase}
           onChange={(val) => setValue('passPhrase', val)}
           error={(errors as Record<string, string | undefined>)?.passPhrase}
+        />
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
         />
       </View>
 

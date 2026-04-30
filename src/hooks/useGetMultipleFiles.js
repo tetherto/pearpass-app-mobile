@@ -165,6 +165,7 @@ export const useGetMultipleFiles = ({
   }, [
     initialRecord?.id,
     initialRecord?.isFavorite,
+    initialRecord?.updatedAt,
     ...fieldNames.map((fieldName) =>
       JSON.stringify(initialRecord?.data?.[fieldName] || [])
     )

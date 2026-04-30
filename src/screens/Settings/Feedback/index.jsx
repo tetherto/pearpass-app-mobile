@@ -107,6 +107,7 @@ export const Feedback = () => {
   return (
     <Layout
       scrollable
+      disableKeyboardAvoidance
       header={
         <BackScreenHeader
           title={t`Settings`}

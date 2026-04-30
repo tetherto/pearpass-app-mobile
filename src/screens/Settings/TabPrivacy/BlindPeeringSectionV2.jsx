@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import { useCallback, useState, useEffect, useMemo, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
   BLIND_PEER_TYPE,
+  BLIND_PEERS_LEARN_MORE,
   BLIND_PEERS_LIMIT,
   BLIND_PEER_FORM_NAME,
   BLIND_PEERS_FORM_NAME
@@ -12,20 +13,24 @@ import {
 import {
   Button,
   InputField,
+  Link,
   MultiSlotInput,
   Radio,
   PageHeader,
+  Text,
   ToggleSwitch,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { Add, Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useBlindMirrors } from '@tetherto/pearpass-lib-vault'
-import { StyleSheet, View } from 'react-native'
+import { Linking, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 
+import { UnsavedChangesSheet } from '../../../containers/BottomSheet/UnsavedChangesSheet'
+import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useLoadingContext } from '../../../context/LoadingContext'
 
 const { DEFAULT, PERSONAL } = BLIND_PEER_TYPE
@@ -34,6 +39,7 @@ export const BlindPeeringSectionV2 = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
+  const { expand, collapse } = useBottomSheet()
   const { setIsLoading: setIsLoadingContext } = useLoadingContext()
 
   const {
@@ -124,7 +130,7 @@ export const BlindPeeringSectionV2 = () => {
     }
   }
 
-  const handleSave = async () => {
+  const performSave = async () => {
     try {
       isSavingRef.current = true
       setIsLoading(true)
@@ -141,32 +147,34 @@ export const BlindPeeringSectionV2 = () => {
           position: 'bottom',
           bottomOffset: 100
         })
-      } else {
-        const peers = blindPeersList
-          .map((peer) => peer.blindPeer?.trim())
-          .filter((peer) => peer && peer.length > 0)
+        return true
+      }
 
-        if (!peers.length) {
-          Toast.show({
-            type: 'baseToast',
-            text1: t`Please add at least one peer code`,
-            position: 'bottom',
-            bottomOffset: 100
-          })
-          return
-        }
+      const peers = blindPeersList
+        .map((peer) => peer.blindPeer?.trim())
+        .filter((peer) => peer && peer.length > 0)
 
-        if (blindMirrorsData.length > 0) {
-          await removeAllBlindMirrors()
-        }
-        await addBlindMirrors(peers)
+      if (!peers.length) {
         Toast.show({
           type: 'baseToast',
-          text1: t`Manual Blind Peers enabled successfully`,
+          text1: t`Please add at least one peer code`,
           position: 'bottom',
           bottomOffset: 100
         })
+        return false
       }
+
+      if (blindMirrorsData.length > 0) {
+        await removeAllBlindMirrors()
+      }
+      await addBlindMirrors(peers)
+      Toast.show({
+        type: 'baseToast',
+        text1: t`Manual Blind Peers enabled successfully`,
+        position: 'bottom',
+        bottomOffset: 100
+      })
+      return true
     } catch {
       Toast.show({
         type: 'baseToast',
@@ -174,12 +182,22 @@ export const BlindPeeringSectionV2 = () => {
         position: 'bottom',
         bottomOffset: 100
       })
+      return false
     } finally {
       isSavingRef.current = false
       setIsLoading(false)
       setIsLoadingContext(false)
     }
   }
+
+  const handleSave = async () => {
+    await performSave()
+  }
+
+  const performSaveRef = useRef(performSave)
+  useEffect(() => {
+    performSaveRef.current = performSave
+  })
 
   const addPeerRow = () => {
     if (blindPeersList.length < BLIND_PEERS_LIMIT) {
@@ -196,6 +214,63 @@ export const BlindPeeringSectionV2 = () => {
     )
     setValues({ blindPeers: updated })
   }
+
+  const initialState = useMemo(() => {
+    const savedManual = blindMirrorsData
+      .filter((item) => !item.isDefault)
+      .map((item) => item.key)
+
+    return {
+      isEnabled: blindMirrorsData.length > 0,
+      peerMode: blindMirrorsData[0]?.isDefault ? DEFAULT : PERSONAL,
+      peers: savedManual
+    }
+  }, [blindMirrorsData])
+
+  const isDirty = useMemo(() => {
+    if (isEnabled !== initialState.isEnabled) return true
+    if (!isEnabled) return false
+    if (peerMode !== initialState.peerMode) return true
+    if (peerMode !== PERSONAL) return false
+
+    const currentPeers = blindPeersList
+      .map((item) => item.blindPeer?.trim())
+      .filter((peer) => peer && peer.length > 0)
+
+    if (currentPeers.length !== initialState.peers.length) return true
+    return currentPeers.some((peer, i) => peer !== initialState.peers[i])
+  }, [isEnabled, peerMode, blindPeersList, initialState])
+
+  useFocusEffect(
+    useCallback(() => {
+      const sub = navigation.addListener('beforeRemove', (e) => {
+        if (!isDirty) return
+        e.preventDefault()
+
+        const proceed = () => {
+          collapse()
+          navigation.dispatch(e.data.action)
+        }
+
+        expand({
+          children: (
+            <UnsavedChangesSheet
+              description={t`You have unsaved changes to your Blind Peering settings. Would you like to save them before leaving?`}
+              onClose={collapse}
+              onDiscard={proceed}
+              onSave={async () => {
+                collapse()
+                const ok = await performSaveRef.current()
+                if (ok) navigation.dispatch(e.data.action)
+              }}
+            />
+          )
+        })
+      })
+
+      return sub
+    }, [isDirty, navigation, expand, collapse])
+  )
 
   return (
     <Layout
@@ -223,7 +298,18 @@ export const BlindPeeringSectionV2 = () => {
     >
       <PageHeader
         title={t`Blind Peering`}
-        subtitle={t`Sync your encrypted vault with other devices to improve availability and reliability. Peers only see encrypted data - they can't access or read anything`}
+        subtitle={
+          <Text as="span" variant="label">
+            {t`Sync your encrypted vault with other devices to improve availability and reliability. Peers only see encrypted data - they can't access or read anything. `}
+            <Link
+              href={BLIND_PEERS_LEARN_MORE}
+              isExternal
+              onClick={() => Linking.openURL(BLIND_PEERS_LEARN_MORE)}
+            >
+              {t`Learn more about Blind Peering.`}
+            </Link>
+          </Text>
+        }
       />
 
       <View style={styles.card}>
@@ -235,60 +321,77 @@ export const BlindPeeringSectionV2 = () => {
         />
 
         {isEnabled && (
-          <View style={styles.optionsContainer}>
-            <Radio
-              options={[
-                {
-                  value: DEFAULT,
-                  label: t`Automatic Blind Peers`,
-                  description: t`Let PearPass allocate blind peers for you to handle syncing`
-                },
-                {
-                  value: PERSONAL,
-                  label: t`Manual Blind Peers`,
-                  description: t`Setup your own private blind peers`
-                }
-              ]}
-              value={peerMode}
-              onChange={handlePeerModeChange}
-            />
+          <View style={styles.peerModeGroup}>
+            <View style={styles.peerModeRow}>
+              <Radio
+                builtIn
+                options={[
+                  {
+                    value: DEFAULT,
+                    label: t`Automatic Blind Peers`,
+                    description: t`Let PearPass allocate blind peers for you to handle syncing`
+                  }
+                ]}
+                value={peerMode}
+                onChange={handlePeerModeChange}
+              />
+            </View>
 
-            {isManual && (
-              <MultiSlotInput
-                actions={
-                  blindPeersList.length < BLIND_PEERS_LIMIT ? (
-                    <Button
-                      variant="tertiaryAccent"
-                      iconBefore={<Add />}
-                      onClick={addPeerRow}
-                    >
-                      {t`Add Peer`}
-                    </Button>
-                  ) : null
-                }
-              >
-                {blindPeersList.map((item, index) => (
-                  <InputField
-                    key={index}
-                    label={t`Blind Peer`}
-                    value={item.blindPeer ?? ''}
-                    placeholder={t`Enter Peer Code`}
-                    onChange={(e) => handleChangeItem(index, e.target.value)}
-                    rightSlot={
-                      blindPeersList.length > 1 ? (
-                        <Button
-                          variant="tertiary"
-                          size="small"
-                          iconBefore={<Close />}
-                          onClick={() => removeItem(index)}
-                          aria-label={t`Remove peer`}
-                        />
-                      ) : null
-                    }
-                  />
-                ))}
-              </MultiSlotInput>
-            )}
+            <View style={styles.peerModeDivider} />
+
+            <View style={styles.peerModeRow}>
+              <Radio
+                builtIn
+                options={[
+                  {
+                    value: PERSONAL,
+                    label: t`Manual Blind Peers`,
+                    description: t`Setup your own private blind peers`
+                  }
+                ]}
+                value={peerMode}
+                onChange={handlePeerModeChange}
+              />
+
+              {isManual && (
+                <MultiSlotInput
+                  actions={
+                    blindPeersList.length < BLIND_PEERS_LIMIT ? (
+                      <Button
+                        variant="tertiaryAccent"
+                        iconBefore={<Add />}
+                        onClick={addPeerRow}
+                      >
+                        {t`Add Another Peer`}
+                      </Button>
+                    ) : null
+                  }
+                >
+                  {blindPeersList.map((item, index) => (
+                    <InputField
+                      key={index}
+                      label={t`#${index + 1} Blind Peer`}
+                      value={item.blindPeer ?? ''}
+                      placeholder={t`Enter Peer Code`}
+                      onChange={(e) => handleChangeItem(index, e.target.value)}
+                      rightSlot={
+                        blindPeersList.length > 1 ? (
+                          <Button
+                            variant="tertiary"
+                            size="small"
+                            iconBefore={
+                              <Close color={theme.colors.colorTextPrimary} />
+                            }
+                            onClick={() => removeItem(index)}
+                            aria-label={t`Remove peer`}
+                          />
+                        ) : null
+                      }
+                    />
+                  ))}
+                </MultiSlotInput>
+              )}
+            </View>
           </View>
         )}
       </View>
@@ -310,7 +413,18 @@ const getStyles = (theme) =>
       padding: rawTokens.spacing16,
       gap: rawTokens.spacing16
     },
-    optionsContainer: {
-      gap: rawTokens.spacing16
+    peerModeGroup: {
+      borderWidth: 1,
+      borderColor: theme.colors.colorBorderPrimary,
+      borderRadius: rawTokens.radius8,
+      overflow: 'hidden'
+    },
+    peerModeRow: {
+      padding: rawTokens.spacing12,
+      gap: rawTokens.spacing12
+    },
+    peerModeDivider: {
+      height: 1,
+      backgroundColor: theme.colors.colorBorderPrimary
     }
   })
