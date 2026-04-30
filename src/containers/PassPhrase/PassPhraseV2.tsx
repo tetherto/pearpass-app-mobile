@@ -16,6 +16,7 @@ import {
   InputField,
   Radio,
   rawTokens,
+  Text,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { StyleSheet, View } from 'react-native'
@@ -191,6 +192,21 @@ export const PassPhraseV2 = ({
       >
         {!isCreateOrEdit ? (
           <View style={styles.optionSection}>
+            <View style={styles.headerRow}>
+              <View style={styles.headerInfo}>
+                <Text variant="label">{t`Recovery Phrase`}</Text>
+              </View>
+              <Button
+                variant="tertiary"
+                size="small"
+                aria-label="Copy recovery phrase"
+                iconBefore={<CopyIcon color={theme.colors.colorTextPrimary} />}
+                onClick={() => {
+                  hapticButtonSecondary()
+                  copyToClipboard(value)
+                }}
+              />
+            </View>
             <View style={styles.grid}>
               {detailWords.map((word, inputIndex) => (
                 <View
@@ -326,7 +342,7 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: rawTokens.spacing12
   },
   headerInfo: {

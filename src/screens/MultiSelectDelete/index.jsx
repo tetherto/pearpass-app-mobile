@@ -35,11 +35,17 @@ export const MultiSelectDelete = () => {
     }
   })
 
+  const isSingleRecord = selectedRecordIds.length === 1
+
   return (
     <Layout
       header={
         <BackScreenHeader
-          title={t`Delete ${selectedRecordIds.length} Items`}
+          title={
+            isSingleRecord
+              ? t`Delete ${selectedRecordIds.length} Item`
+              : t`Delete ${selectedRecordIds.length} Items`
+          }
           onBack={() => navigation.goBack()}
         />
       }
@@ -50,13 +56,13 @@ export const MultiSelectDelete = () => {
           fullWidth
           onClick={() => deleteRecords(selectedRecordIds)}
         >
-          {t`Delete Items`}
+          {isSingleRecord ? t`Delete Item` : t`Delete Items`}
         </Button>
       }
     >
       <View style={styles.recordsSection}>
         <Text variant="caption" style={styles.sectionLabel}>
-          {t`Selected items`}
+          {isSingleRecord ? t`Selected item` : t`Selected items`}
         </Text>
         <ScrollView
           style={styles.recordsScroll}
@@ -96,7 +102,9 @@ export const MultiSelectDelete = () => {
         )}
       </View>
       <Text variant="caption" style={styles.confirmText}>
-        {t`Are you sure to delete the selected items?`}
+        {isSingleRecord
+          ? t`Are you sure to delete the selected item?`
+          : t`Are you sure to delete the selected items?`}
       </Text>
     </Layout>
   )
