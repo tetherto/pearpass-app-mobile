@@ -194,6 +194,11 @@ export const BlindPeeringSectionV2 = () => {
     await performSave()
   }
 
+  const performSaveRef = useRef(performSave)
+  useEffect(() => {
+    performSaveRef.current = performSave
+  })
+
   const addPeerRow = () => {
     if (blindPeersList.length < BLIND_PEERS_LIMIT) {
       addItem({ name: BLIND_PEER_FORM_NAME })
@@ -255,7 +260,7 @@ export const BlindPeeringSectionV2 = () => {
               onDiscard={proceed}
               onSave={async () => {
                 collapse()
-                const ok = await performSave()
+                const ok = await performSaveRef.current()
                 if (ok) navigation.dispatch(e.data.action)
               }}
             />
