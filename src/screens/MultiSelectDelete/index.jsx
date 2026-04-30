@@ -20,11 +20,16 @@ export const MultiSelectDelete = () => {
   const { theme } = useTheme()
   const styles = createStyles(theme.colors)
 
+  const [containerHeight, setContainerHeight] = useState(0)
+  const [confirmTextHeight, setConfirmTextHeight] = useState(0)
   const [recordsContentHeight, setRecordsContentHeight] = useState(0)
   const [recordsLayoutHeight, setRecordsLayoutHeight] = useState(0)
   const [listItemHeight, setListItemHeight] = useState(0)
 
   const showGradient = recordsContentHeight > recordsLayoutHeight
+
+  const recordsMaxHeight =
+    containerHeight > 0 ? containerHeight - confirmTextHeight : undefined
 
   const { selectedRecordIds, selectedRecordObjects, onComplete } = params
 
@@ -60,52 +65,68 @@ export const MultiSelectDelete = () => {
         </Button>
       }
     >
-      <View style={styles.recordsSection}>
-        <Text variant="caption" style={styles.sectionLabel}>
-          {isSingleRecord ? t`Selected item` : t`Selected items`}
-        </Text>
-        <ScrollView
-          style={styles.recordsScroll}
-          onLayout={(e) => setRecordsLayoutHeight(e.nativeEvent.layout.height)}
-          contentContainerStyle={[
-            styles.recordsContent,
-            showGradient &&
-              listItemHeight > 0 && { paddingBottom: listItemHeight }
+      <View
+        style={styles.container}
+        onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
+      >
+        <View
+          style={[
+            styles.recordsSection,
+            recordsMaxHeight !== undefined && { maxHeight: recordsMaxHeight }
           ]}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
         >
-          {selectedRecordObjects.map((record, index) => (
-            <View
-              key={record.id}
-              onLayout={
-                index === 0
-                  ? (e) => setListItemHeight(e.nativeEvent.layout.height)
-                  : undefined
-              }
-            >
-              <ListItem
-                icon={<RecordItemIcon record={record} />}
-                iconSize={32}
-                title={record.data?.title ?? ''}
-                subtitle={getRecordSubtitle(record) || undefined}
-                style={styles.recordItem}
-              />
-            </View>
-          ))}
-        </ScrollView>
-        {showGradient && (
-          <FadeGradient
-            color={theme.colors.colorSurfacePrimary}
-            style={[styles.fadeGradient, { height: listItemHeight }]}
-          />
-        )}
+          <Text variant="caption" style={styles.sectionLabel}>
+            {isSingleRecord ? t`Selected item` : t`Selected items`}
+          </Text>
+          <ScrollView
+            style={styles.recordsScroll}
+            onLayout={(e) =>
+              setRecordsLayoutHeight(e.nativeEvent.layout.height)
+            }
+            contentContainerStyle={[
+              styles.recordsContent,
+              showGradient &&
+                listItemHeight > 0 && { paddingBottom: listItemHeight }
+            ]}
+            showsVerticalScrollIndicator={false}
+            onContentSizeChange={(_, h) => setRecordsContentHeight(h)}
+          >
+            {selectedRecordObjects.map((record, index) => (
+              <View
+                key={record.id}
+                onLayout={
+                  index === 0
+                    ? (e) => setListItemHeight(e.nativeEvent.layout.height)
+                    : undefined
+                }
+              >
+                <ListItem
+                  icon={<RecordItemIcon record={record} />}
+                  iconSize={32}
+                  title={record.data?.title ?? ''}
+                  subtitle={getRecordSubtitle(record) || undefined}
+                  style={styles.recordItem}
+                />
+              </View>
+            ))}
+          </ScrollView>
+          {showGradient && (
+            <FadeGradient
+              color={theme.colors.colorSurfacePrimary}
+              style={[styles.fadeGradient, { height: listItemHeight }]}
+            />
+          )}
+        </View>
+        <View
+          onLayout={(e) => setConfirmTextHeight(e.nativeEvent.layout.height)}
+        >
+          <Text variant="caption" style={styles.confirmText}>
+            {isSingleRecord
+              ? t`Are you sure to delete the selected item?`
+              : t`Are you sure to delete the selected items?`}
+          </Text>
+        </View>
       </View>
-      <Text variant="caption" style={styles.confirmText}>
-        {isSingleRecord
-          ? t`Are you sure to delete the selected item?`
-          : t`Are you sure to delete the selected items?`}
-      </Text>
     </Layout>
   )
 }
