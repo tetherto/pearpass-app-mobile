@@ -17,9 +17,7 @@ import { useVersionCheck } from '../../hooks/useVersionCheck'
 export const App = () => {
   useAutoLockWatcher()
   const { expand } = useBottomSheet()
-  // TEMP: force modal for pixel-perfect redesign — REVERT BEFORE COMMIT
-  useVersionCheck()
-  const needsUpdate = true
+  const { needsUpdate } = useVersionCheck()
   const hasOpenedUpdateModal = useRef(false)
 
   const isFirstLaunchCleanupReady = useFirstLaunchCleanUp()
