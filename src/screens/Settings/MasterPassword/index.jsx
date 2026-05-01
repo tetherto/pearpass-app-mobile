@@ -97,11 +97,7 @@ export const MasterPassword = () => {
     })
 
     if (!result.success) {
-      const fieldError =
-        result.field === 'newPassword' && result.strengthResult?.errors?.length
-          ? result.strengthResult.errors[0]
-          : result.error
-      setErrors({ [result.field]: fieldError })
+      setErrors({ [result.field]: result.error })
       if (result.field === 'newPassword') {
         setValue('repeatPassword', '')
       }
