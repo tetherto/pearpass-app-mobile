@@ -50,6 +50,8 @@ struct PPCredentialItemView: View {
             }
             .padding(.horizontal, PPSpacing.s4)
             .padding(.vertical, PPSpacing.s12)
+            // Full-row hit-test (gap between username and chevron).
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(onTap == nil)
