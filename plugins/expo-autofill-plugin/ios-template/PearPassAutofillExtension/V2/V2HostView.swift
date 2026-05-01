@@ -855,6 +855,7 @@ struct V2HostView: View {
                 let pending = await loadPendingPasskeysFromJobs(
                     vaultClient: client,
                     existingRecords: records,
+                    currentVaultId: viewModel.selectedVault?.id,
                     filterRpId: mode == .registration ? registrationContext?.rpId : nil,
                     filterUserName: mode == .registration ? registrationContext?.userName : nil
                 )
@@ -943,6 +944,7 @@ struct V2HostView: View {
     private func loadPendingPasskeysFromJobs(
         vaultClient: PearPassVaultClient,
         existingRecords: [VaultRecord],
+        currentVaultId: String?,
         filterRpId: String? = nil,
         filterUserName: String? = nil
     ) async -> [VaultRecord] {
@@ -982,6 +984,10 @@ struct V2HostView: View {
             var pending: [VaultRecord] = []
 
             for job in jobs where job.status == .pending || job.status == .inProgress {
+                // Vault scope — drop jobs queued for a different vault.
+                if let currentVaultId = currentVaultId, job.vaultId != currentVaultId {
+                    continue
+                }
                 switch job.payload {
                 case .addPasskey(let payload):
                     guard !existingPasskeyIds.contains(payload.recordId) else { continue }

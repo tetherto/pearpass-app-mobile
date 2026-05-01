@@ -99,6 +99,41 @@ export const useBiometricsAuthentication = () => {
     [enableBiometrics, disableBiometrics]
   )
 
+  /**
+   * Re-saves ENCRYPTION_DATA in SecureStore with the current vault's
+   * ciphertext/nonce/hashedPassword. Call this after operations that rotate
+   * the master encryption (e.g. master password change) so autofill's
+   * biometric unlock keeps working without prompting the user to re-enable
+   * biometrics. No-op when biometrics aren't enabled.
+   */
+  const refreshBiometricEncryption = useCallback(async () => {
+    try {
+      const enabled = await SecureStore.getItemAsync(
+        SECURE_STORAGE_KEYS.BIOMETRICS_ENABLED,
+        { accessGroup: IOS_APP_GROUP_ID }
+      )
+      if (enabled !== 'true') {
+        return { success: true, skipped: true }
+      }
+
+      const { ciphertext, nonce, hashedPassword } = await getMasterEncryption()
+
+      await SecureStore.setItemAsync(
+        SECURE_STORAGE_KEYS.ENCRYPTION_DATA,
+        JSON.stringify({ ciphertext, nonce, hashedPassword }),
+        {
+          requireAuthentication: true,
+          accessGroup: IOS_APP_GROUP_ID
+        }
+      )
+
+      return { success: true }
+    } catch (error) {
+      logger.error('Error refreshing biometric encryption:', error)
+      return { success: false, error: error.toString() }
+    }
+  }, [])
+
   useEffect(() => {
     const checkBiometricSupport = async () => {
       const hasHardware = await LocalAuthentication.hasHardwareAsync()
@@ -136,6 +171,7 @@ export const useBiometricsAuthentication = () => {
     isBiometricsEnabled,
     enableBiometrics,
     disableBiometrics,
-    toggleBiometrics
+    toggleBiometrics,
+    refreshBiometricEncryption
   }
 }

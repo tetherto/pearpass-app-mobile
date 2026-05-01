@@ -375,7 +375,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
 
                 // Merge pending passkey jobs in assertion mode (registration handles its own).
                 if (MODE_ASSERTION.equals(mode)) {
-                    List<CredentialItem> pending = loadPendingPasskeysFromJobs(parsed);
+                    List<CredentialItem> pending = loadPendingPasskeysFromJobs(parsed, vault.getId());
                     if (!pending.isEmpty()) {
                         Set<String> pendingIds = new HashSet<>();
                         for (CredentialItem p : pending) pendingIds.add(p.getId());
@@ -426,6 +426,15 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             out = filterInitial(allCredentials);
         } else {
             out = new ArrayList<>(allCredentials);
+        }
+
+        // Passkey assertion → keep only items with a passkey.
+        if (MODE_ASSERTION.equals(mode) && isPasskeyAssertionMode()) {
+            List<CredentialItem> passkeysOnly = new ArrayList<>();
+            for (CredentialItem c : out) {
+                if (c.hasPasskey()) passkeysOnly.add(c);
+            }
+            out = passkeysOnly;
         }
 
         if (out.isEmpty() && !allCredentials.isEmpty()) {
@@ -675,6 +684,11 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
         return parts[1] + "." + parts[0];
     }
 
+    private boolean isPasskeyAssertionMode() {
+        return getActivity() instanceof AuthenticationActivity
+                && ((AuthenticationActivity) getActivity()).isPasskeyAssertionMode();
+    }
+
     private boolean domainsMatch(String a, String b) {
         if (a == null || b == null) return false;
         if (a.equals(b)) return true;
@@ -689,9 +703,9 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
         return false;
     }
 
-    /** Surfaces pending ADD/UPDATE passkey jobs as CredentialItems. */
+    /** Surfaces pending ADD/UPDATE passkey jobs scoped to the current vault. */
     @SuppressWarnings("unchecked")
-    private List<CredentialItem> loadPendingPasskeysFromJobs(List<CredentialItem> existingCredentials) {
+    private List<CredentialItem> loadPendingPasskeysFromJobs(List<CredentialItem> existingCredentials, String currentVaultId) {
         List<CredentialItem> pendingPasskeys = new ArrayList<>();
 
         if (getActivity() == null || vaultClient == null) {
@@ -724,6 +738,11 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
 
             for (Job job : jobs) {
                 if (job.getStatus() != Job.JobStatus.PENDING && job.getStatus() != Job.JobStatus.IN_PROGRESS) {
+                    continue;
+                }
+                // Vault scope — drop jobs queued for a different vault so they
+                // don't leak into the active vault's credentials list.
+                if (currentVaultId != null && !currentVaultId.equals(job.getVaultId())) {
                     continue;
                 }
 

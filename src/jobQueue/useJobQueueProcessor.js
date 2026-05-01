@@ -137,7 +137,9 @@ export const useJobQueueProcessor = () => {
     if (isVaultActive) {
       triggerProcessing()
     }
-  }, [isVaultActive])
+    // activeVaultId tracks vault switches so jobs queued for the newly
+    // selected vault drain without an app restart.
+  }, [isVaultActive, activeVaultId])
 
   useEffect(() => {
     const handleAppStateChange = (nextState) => {
