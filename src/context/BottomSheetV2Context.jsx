@@ -26,6 +26,7 @@ export const BottomSheetV2Provider = ({ children }) => {
   const [content, setContent] = useState(null)
   const [expandCount, setExpandCount] = useState(0)
   const [snapPoints, setSnapPoints] = useState([1])
+  const [locked, setLocked] = useState(false)
   const isExpanding = useRef(false)
   const pendingOpen = useRef(false)
   const backdropAnim = useRef(new Animated.Value(0)).current
@@ -41,11 +42,15 @@ export const BottomSheetV2Provider = ({ children }) => {
     ref.current?.close()
   }, [backdropAnim])
 
-  const expand = useCallback(({ children: sheetContent }) => {
-    isExpanding.current = true
-    setExpandCount((c) => c + 1)
-    setContent(sheetContent)
-  }, [])
+  const expand = useCallback(
+    ({ children: sheetContent, locked: lockedOption = false }) => {
+      isExpanding.current = true
+      setExpandCount((c) => c + 1)
+      setContent(sheetContent)
+      setLocked(lockedOption)
+    },
+    []
+  )
 
   const handleContentLayout = useCallback(
     (e) => {
@@ -92,11 +97,11 @@ export const BottomSheetV2Provider = ({ children }) => {
     () => (
       <BackDrop
         animatedOpacity={backdropAnim}
-        onPress={collapse}
+        onPress={locked ? undefined : collapse}
         pointerEvents={content ? 'auto' : 'none'}
       />
     ),
-    [backdropAnim, collapse, content]
+    [backdropAnim, collapse, content, locked]
   )
 
   return (
@@ -115,6 +120,7 @@ export const BottomSheetV2Provider = ({ children }) => {
           snapPoints={snapPoints}
           handleComponent={null}
           backdropComponent={renderBackdrop}
+          enablePanDownToClose={!locked}
           onChange={handleSheetChange}
           onClose={() => {
             if (isExpanding.current) return
@@ -122,6 +128,7 @@ export const BottomSheetV2Provider = ({ children }) => {
             backdropAnim.setValue(0)
             setContent(null)
             setSnapPoints([1])
+            setLocked(false)
           }}
           backgroundStyle={{
             backgroundColor: theme.colors.colorSurfacePrimary,

@@ -10,14 +10,16 @@ import { useAutoLockWatcher } from './hooks/useAutoLockWatcher'
 import { useRedirect } from './hooks/useRedirect'
 import { ToastCard } from '../../components/ToastCard'
 import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
-import { useModal } from '../../context/ModalContext'
+import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useFirstLaunchCleanUp } from '../../hooks/useFirstLaunchCleanUp'
 import { useVersionCheck } from '../../hooks/useVersionCheck'
 
 export const App = () => {
   useAutoLockWatcher()
-  const { openModal } = useModal()
-  const { needsUpdate } = useVersionCheck()
+  const { expand } = useBottomSheet()
+  // TEMP: force modal for pixel-perfect redesign — REVERT BEFORE COMMIT
+  useVersionCheck()
+  const needsUpdate = true
   const hasOpenedUpdateModal = useRef(false)
 
   const isFirstLaunchCleanupReady = useFirstLaunchCleanUp()
@@ -25,7 +27,7 @@ export const App = () => {
   useEffect(() => {
     if (needsUpdate && !hasOpenedUpdateModal.current) {
       hasOpenedUpdateModal.current = true
-      openModal(<UpdateModalContent />, { preventClose: true })
+      expand({ children: <UpdateModalContent />, locked: true })
     }
   }, [needsUpdate])
 

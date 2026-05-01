@@ -1,37 +1,33 @@
 import { useEffect, useState } from 'react'
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import {
+  GITHUB_LATEST_RELEASE_URLS,
+  VERSION_CHECK_CONFIG
+} from '@tetherto/pearpass-lib-constants'
 import Constants from 'expo-constants'
 import { Platform } from 'react-native'
 
 import { isFdroid } from '../constants/distribution'
-import { VERSION_CHECK_CONFIG } from '../constants/versionCheck'
 import { logger } from '../utils/logger'
 
-/**
- * Parses a version string into an array of numbers
- * @param {string} value - The version string to parse
- * @returns {number[]|null} An array of numbers, or null if the string is invalid
- */
+const MS_PER_HOUR = 1000 * 60 * 60
+
 export const parseParts = (value) => {
   if (typeof value !== 'string') return null
 
   const cleaned = value.replace(/[^\d.]/g, '').trim()
-  if (!cleaned) return []
+  if (!cleaned) return null
 
   const parts = cleaned.split('.').map((segment) => {
     const num = Number(segment)
     return Number.isFinite(num) ? num : null
   })
 
-  return parts.every((part) => part !== null) ? parts : null
+  if (parts.length === 0 || parts.some((part) => part === null)) return null
+  return parts
 }
 
-/**
- * Compares two semver version strings
- * @param {string} current - Current app version
- * @param {string} latest - Latest store version
- * @returns {boolean} True if latest > current
- */
 export const compareVersions = (current, latest) => {
   const currentParts = parseParts(current)
   const latestParts = parseParts(latest)
@@ -49,163 +45,128 @@ export const compareVersions = (current, latest) => {
   return false
 }
 
-/**
- * Checks if a release date is within the grace period
- * @param {string} releaseDateString - ISO date string of the release
- * @returns {boolean} True if the release is within the grace period
- */
-export const isWithinGracePeriod = (releaseDateString) => {
+export const isPastGracePeriod = (releaseDateString) => {
   if (!releaseDateString) return false
   const releaseDate = new Date(releaseDateString)
   if (isNaN(releaseDate.getTime())) return false
-  const hoursSinceRelease =
-    (Date.now() - releaseDate.getTime()) / (1000 * 60 * 60)
-  return hoursSinceRelease < 24
+  const hoursSinceRelease = (Date.now() - releaseDate.getTime()) / MS_PER_HOUR
+  return hoursSinceRelease >= VERSION_CHECK_CONFIG.GRACE_PERIOD_DAYS * 24
 }
 
-/**
- * Fetches latest iOS app version from iTunes API
- * @returns {Promise<{version: string, releaseDate: string}|null>}
- */
-const getIOSVersion = async () => {
-  try {
-    const response = await fetch(
-      `${VERSION_CHECK_CONFIG.ITUNES_LOOKUP_URL}?bundleId=${VERSION_CHECK_CONFIG.BUNDLE_ID}`
-    )
-    const data = await response.json()
+// Accepts "1.6.0" or "v1.6.0"; rejects anything else (e.g. "release-1.0").
+const normalizeTag = (tagName) => {
+  if (typeof tagName !== 'string') return null
+  const match = tagName.trim().match(/^v?(\d+\.\d+(?:\.\d+)?)$/)
+  return match ? match[1] : null
+}
 
-    if (data.resultCount > 0) {
-      const { version, currentVersionReleaseDate: releaseDate } =
-        data.results[0]
-      return { version, releaseDate }
-    }
-    return null
+const validateReleasePayload = (payload) => {
+  if (!payload || typeof payload !== 'object') return null
+  if (payload.draft === true || payload.prerelease === true) return null
+
+  const version = normalizeTag(payload.tag_name)
+  if (!version) return null
+
+  const publishedAt = payload.published_at
+  if (typeof publishedAt !== 'string') return null
+  if (isNaN(new Date(publishedAt).getTime())) return null
+
+  return { version, publishedAt }
+}
+
+const fetchLatestRelease = async () => {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    VERSION_CHECK_CONFIG.FETCH_TIMEOUT_MS
+  )
+
+  try {
+    const response = await fetch(GITHUB_LATEST_RELEASE_URLS.MOBILE, {
+      // GitHub's API rejects requests without a User-Agent.
+      headers: {
+        'User-Agent': VERSION_CHECK_CONFIG.USER_AGENT,
+        Accept: 'application/vnd.github+json'
+      },
+      signal: controller.signal
+    })
+
+    if (!response.ok) return null
+    return validateReleasePayload(await response.json())
   } catch (error) {
-    logger.error('Error fetching iOS version:', error)
+    logger.error('Version check: GitHub fetch failed', error)
+    return null
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+const readCache = async () => {
+  try {
+    const raw = await AsyncStorage.getItem(VERSION_CHECK_CONFIG.CACHE_KEY)
+    if (!raw) return null
+
+    const { version, publishedAt, fetchedAt } = JSON.parse(raw)
+    if (
+      typeof version !== 'string' ||
+      typeof publishedAt !== 'string' ||
+      typeof fetchedAt !== 'number'
+    ) {
+      return null
+    }
+
+    const ageHours = (Date.now() - fetchedAt) / MS_PER_HOUR
+    if (ageHours >= VERSION_CHECK_CONFIG.CACHE_TTL_HOURS) return null
+
+    return { version, publishedAt }
+  } catch {
     return null
   }
 }
 
-/**
- * Fetches latest Android app version and release date from Play Store
- * @returns {Promise<{version: string, releaseDate: string|null}|null>}
- */
-const getAndroidVersion = async () => {
-  try {
-    const response = await fetch(
-      `${VERSION_CHECK_CONFIG.PLAY_STORE_URL}?id=${VERSION_CHECK_CONFIG.BUNDLE_ID}&hl=en`
-    )
-    const html = await response.text()
+const writeCache = (record) =>
+  AsyncStorage.setItem(
+    VERSION_CHECK_CONFIG.CACHE_KEY,
+    JSON.stringify({ ...record, fetchedAt: Date.now() })
+  ).catch(() => {})
 
-    const versionMatch = html.match(/\[\[\["(\d+\.\d+\.?\d*)"\]\]/)
-    if (!versionMatch) return null
+const evaluate = (record) => {
+  const currentVersion =
+    Constants.expoConfig?.version || Constants.expoConfig?.extra?.appVersion
 
-    const dateMatch = html.match(/Updated on<\/div><div[^>]*>([^<]+)</)
-    let releaseDate = null
-    if (dateMatch) {
-      const parsed = new Date(dateMatch[1])
-      if (!isNaN(parsed.getTime())) {
-        releaseDate = parsed.toISOString()
-      }
-    }
-
-    return { version: versionMatch[1], releaseDate }
-  } catch (error) {
-    logger.error('Error fetching Android version:', error)
-    return null
-  }
+  if (!currentVersion) return false
+  if (!compareVersions(currentVersion, record.version)) return false
+  return isPastGracePeriod(record.publishedAt)
 }
 
-/**
- * @typedef {Object} VersionCheckResult
- * @property {boolean} needsUpdate - Whether the app needs to be updated
- * @property {boolean} isChecking - Whether the version check is in progress
- */
-
-/**
- * Hook to check if app needs updating by comparing with store version
- * @returns {VersionCheckResult}
- */
+// Returns whether the app should prompt the user to update.
+// Any failure (network, malformed payload, timeout) resolves to needsUpdate=false
+// so the user is never locked out by an internal error.
 export const useVersionCheck = () => {
   const [needsUpdate, setNeedsUpdate] = useState(false)
-  const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
     let isMounted = true
-    let retryTimer = null
 
-    const checkVersion = async (retryCount = 0) => {
-      try {
-        const currentVersion =
-          Constants.expoConfig?.version ||
-          Constants.expoConfig?.extra?.appVersion
+    const run = async () => {
+      if (Platform.OS === 'android' && isFdroid()) return
 
-        let updateNeeded = false
-
-        if (Platform.OS === 'android' && isFdroid()) {
-          if (!isMounted) return
-          setNeedsUpdate(false)
-          setIsChecking(false)
-          return
-        }
-
-        if (Platform.OS === 'ios') {
-          const iosResult = await getIOSVersion()
-
-          if (!isMounted) return
-
-          if (iosResult) {
-            const { version: latestVersion, releaseDate } = iosResult
-            updateNeeded =
-              compareVersions(currentVersion, latestVersion) &&
-              !isWithinGracePeriod(releaseDate)
-            setNeedsUpdate(updateNeeded)
-            setIsChecking(false)
-          } else if (retryCount < 2) {
-            retryTimer = setTimeout(() => checkVersion(retryCount + 1), 2000)
-          } else {
-            setIsChecking(false)
-          }
-          return
-        }
-
-        const androidResult = await getAndroidVersion()
-
-        if (!isMounted) return
-
-        if (androidResult) {
-          const { version: latestVersion, releaseDate } = androidResult
-          updateNeeded =
-            compareVersions(currentVersion, latestVersion) &&
-            !isWithinGracePeriod(releaseDate)
-          setNeedsUpdate(updateNeeded)
-          setIsChecking(false)
-        } else if (retryCount < 2) {
-          retryTimer = setTimeout(() => checkVersion(retryCount + 1), 2000)
-        } else {
-          setIsChecking(false)
-        }
-      } catch (error) {
-        logger.error('Error checking version:', error)
-
-        if (!isMounted) return
-
-        if (retryCount < 2) {
-          retryTimer = setTimeout(() => checkVersion(retryCount + 1), 2000)
-        } else {
-          setIsChecking(false)
-        }
+      let record = await readCache()
+      if (!record) {
+        record = await fetchLatestRelease()
+        if (record) writeCache(record)
       }
+
+      if (!isMounted || !record) return
+      setNeedsUpdate(evaluate(record))
     }
 
-    const initialTimer = setTimeout(() => checkVersion(), 1000)
-
+    const timer = setTimeout(run, 1000)
     return () => {
       isMounted = false
-      clearTimeout(initialTimer)
-      if (retryTimer) clearTimeout(retryTimer)
+      clearTimeout(timer)
     }
   }, [])
 
-  return { needsUpdate, isChecking }
+  return { needsUpdate }
 }
