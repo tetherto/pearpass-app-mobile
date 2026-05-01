@@ -136,31 +136,47 @@ export const BottomSheetFolderSelectorContent = ({
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={<SheetHeader title={t`Folders`} onClose={collapse} />}
     >
-      {includeAllFolders && (
-        <NavbarListItem
-          icon={<FolderCopy color={theme.colors.colorTextPrimary} />}
-          iconSize={16}
-          label={t`All Folders`}
-          count={recordCountsByType?.all}
-          selected={activeFolder === 'allFolder'}
-          platform="mobile"
-          showDivider
-          onClick={() => handleSelect('allFolder')}
-        />
-      )}
+      {includeAllFolders &&
+        (() => {
+          const isAllSelected = activeFolder === 'allFolder'
+          const allColor = isAllSelected
+            ? theme.colors.colorTextPrimary
+            : theme.colors.colorTextSecondary
+          return (
+            <NavbarListItem
+              icon={<FolderCopy color={allColor} />}
+              iconSize={16}
+              label={t`All Folders`}
+              count={recordCountsByType?.all}
+              selected={isAllSelected}
+              variant={isAllSelected ? 'default' : 'secondary'}
+              platform="mobile"
+              showDivider
+              onClick={() => handleSelect('allFolder')}
+            />
+          )
+        })()}
 
-      {includeFavorites && (
-        <NavbarListItem
-          icon={<StarOutlined color={theme.colors.colorTextPrimary} />}
-          iconSize={16}
-          label={t`Favorites`}
-          count={folders?.favorites?.records?.length ?? 0}
-          selected={activeFolder === 'favorite'}
-          platform="mobile"
-          showDivider
-          onClick={handleSelectFavorites}
-        />
-      )}
+      {includeFavorites &&
+        (() => {
+          const isFavoriteSelected = activeFolder === 'favorite'
+          const favoriteColor = isFavoriteSelected
+            ? theme.colors.colorTextPrimary
+            : theme.colors.colorTextSecondary
+          return (
+            <NavbarListItem
+              icon={<StarOutlined color={favoriteColor} />}
+              iconSize={16}
+              label={t`Favorites`}
+              count={folders?.favorites?.records?.length ?? 0}
+              selected={isFavoriteSelected}
+              variant={isFavoriteSelected ? 'default' : 'secondary'}
+              platform="mobile"
+              showDivider
+              onClick={handleSelectFavorites}
+            />
+          )
+        })()}
 
       {customFolders.map(({ name: folderName, records }) => {
         const count = records?.filter((record) => !!record.data).length ?? 0
