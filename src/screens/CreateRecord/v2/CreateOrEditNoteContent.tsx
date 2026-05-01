@@ -253,17 +253,17 @@ export const CreateOrEditNoteContent = ({
           onChangeText={(value) => setValue('note', value)}
           testID="note-field"
         />
-
-        <FolderSelectField
-          value={values.folder}
-          onChange={(val) => setValue('folder', val)}
-        />
       </View>
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Additional`}
         </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
 
         <AttachmentFieldsV2<NoteAttachment>
           attachments={values.attachments}

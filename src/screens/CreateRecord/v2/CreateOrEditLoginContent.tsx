@@ -438,17 +438,17 @@ export const CreateOrEditLoginContent = ({
             />
           ))}
         </MultiSlotInput>
-
-        <FolderSelectField
-          value={values.folder}
-          onChange={(val) => setValue('folder', val)}
-        />
       </View>
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Additional`}
         </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
 
         <InputField
           label={t`Comment`}

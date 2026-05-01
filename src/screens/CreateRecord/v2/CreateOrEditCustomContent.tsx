@@ -237,19 +237,13 @@ export const CreateOrEditCustomContent = ({
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Details`}
+          {t`Additional`}
         </Text>
 
         <FolderSelectField
           value={values.folder}
           onChange={(val) => setValue('folder', val)}
         />
-      </View>
-
-      <View style={styles.section}>
-        <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Additional`}
-        </Text>
 
         <AttachmentFieldsV2<CustomAttachment>
           attachments={values.attachments}

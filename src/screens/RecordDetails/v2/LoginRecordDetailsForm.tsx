@@ -11,6 +11,7 @@ import {
   InputField,
   MultiSlotInput,
   PasswordField,
+  Text,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
@@ -245,37 +246,45 @@ export const LoginRecordDetailsForm = ({
           </MultiSlotInput>
         )}
 
-        {hasNote && (
-          <MultiSlotInput testID="comments-multi-slot-input">
-            <InputField
-              label={t`Comment`}
-              placeholder={t`Add comment`}
-              readOnly
-              copyable
-              onCopy={copyToClipboard}
-              isGrouped
-              testID="comments-multi-slot-input-slot-0"
-              {...toReadOnlyFieldProps(register('note'))}
-            />
-          </MultiSlotInput>
-        )}
+        {(hasNote || hasCustomFields) && (
+          <View style={styles.section}>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              {t`Additional`}
+            </Text>
 
-        {hasCustomFields && (
-          <MultiSlotInput testID="hidden-messages-multi-slot-input">
-            {values.customFields.map((field, index) => (
-              <PasswordField
-                key={`${field.type}-${index}`}
-                label={t`Hidden Message`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Hidden Message`}
-                readOnly
-                copyable
-                onCopy={copyToClipboard}
-                isGrouped
-                testID={`hidden-messages-multi-slot-input-slot-${index}`}
-              />
-            ))}
-          </MultiSlotInput>
+            {hasNote && (
+              <MultiSlotInput testID="comments-multi-slot-input">
+                <InputField
+                  label={t`Comment`}
+                  placeholder={t`Add comment`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="comments-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('note'))}
+                />
+              </MultiSlotInput>
+            )}
+
+            {hasCustomFields && (
+              <MultiSlotInput testID="hidden-messages-multi-slot-input">
+                {values.customFields.map((field, index) => (
+                  <PasswordField
+                    key={`${field.type}-${index}`}
+                    label={t`Hidden Message`}
+                    value={field.note ?? ''}
+                    placeholder={t`Enter Hidden Message`}
+                    readOnly
+                    copyable
+                    onCopy={copyToClipboard}
+                    isGrouped
+                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                  />
+                ))}
+              </MultiSlotInput>
+            )}
+          </View>
         )}
       </View>
 
@@ -298,5 +307,8 @@ const styles = StyleSheet.create({
   },
   topContent: {
     gap: rawTokens.spacing8
+  },
+  section: {
+    gap: rawTokens.spacing12
   }
 })

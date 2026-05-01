@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
@@ -250,6 +251,7 @@ export const BottomSheetReauthContent = ({
               onChange={passwordRegisterProps.onChange}
               error={passwordRegisterProps.error ?? undefined}
               data-testid="reauth-master-password-input"
+              as={BottomSheetTextInput}
             />
           </View>
 

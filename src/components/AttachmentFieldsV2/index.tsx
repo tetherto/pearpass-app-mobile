@@ -7,6 +7,7 @@ import {
   MultiSlotInput,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
+import { View } from 'react-native'
 import {
   Add,
   TrashOutlined,
@@ -199,7 +200,7 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
   )
 
   return (
-    <>
+    <View>
       <MultiSlotInput
         actions={
           <Button
@@ -224,6 +225,6 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
         }}
         onFileSelect={(file) => handleUploadSelect(file as T | null)}
       />
-    </>
+    </View>
   )
 }

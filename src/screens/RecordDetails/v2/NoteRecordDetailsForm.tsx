@@ -7,6 +7,7 @@ import {
   AttachmentField,
   InputField,
   MultiSlotInput,
+  PasswordField,
   Text,
   rawTokens,
   useTheme
@@ -118,9 +119,9 @@ export const NoteRecordDetailsForm = ({
 
             <MultiSlotInput testID="comments-multi-slot-input">
               <InputField
-                label={t`Comment`}
+                label={t`Note`}
                 value={values.note}
-                placeholder={t`Enter Comment`}
+                placeholder={t`Enter Note`}
                 readOnly
                 copyable
                 onCopy={copyToClipboard}
@@ -137,18 +138,18 @@ export const NoteRecordDetailsForm = ({
               {t`Additional`}
             </Text>
 
-            <MultiSlotInput testID="comments-multi-slot-input">
+            <MultiSlotInput testID="hidden-messages-multi-slot-input">
               {values.customFields.map((field, index) => (
-                <InputField
+                <PasswordField
                   key={`${field.type}-${index}`}
-                  label={t`Comment`}
+                  label={t`Hidden Message`}
                   value={field.note ?? ''}
-                  placeholder={t`Enter Comment`}
+                  placeholder={t`Enter Hidden Message`}
                   readOnly
                   copyable
                   onCopy={copyToClipboard}
                   isGrouped
-                  testID={`comments-multi-slot-input-slot-${index}`}
+                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
                 />
               ))}
             </MultiSlotInput>

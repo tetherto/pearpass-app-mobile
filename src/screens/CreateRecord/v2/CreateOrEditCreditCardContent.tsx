@@ -299,7 +299,7 @@ export const CreateOrEditCreditCardContent = ({
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Card Details`}
+          {t`Details`}
         </Text>
 
         <MultiSlotInput testID="card-details-multi-slot-input">
@@ -342,19 +342,13 @@ export const CreateOrEditCreditCardContent = ({
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Details`}
+          {t`Additional`}
         </Text>
 
         <FolderSelectField
           value={values.folder}
           onChange={(val) => setValue('folder', val)}
         />
-      </View>
-
-      <View style={styles.section}>
-        <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Additional`}
-        </Text>
 
         <InputField
           label={t`Comment`}

@@ -8,6 +8,7 @@ import {
   AttachmentField,
   InputField,
   MultiSlotInput,
+  PasswordField,
   Text,
   rawTokens
 } from '@tetherto/pearpass-lib-ui-kit'
@@ -253,12 +254,13 @@ export const IdentityRecordDetailsForm = ({
   )
   const hasAttachments = identityAttachmentSources.length > 0
 
-  const commentValues = [
-    ...(values?.note?.length ? [values.note] : []),
-    ...((values?.customFields as Array<{ type: string; note: string }>) ?? [])
-      .map((field) => field.note ?? '')
-      .filter(Boolean)
-  ]
+  const hasNote = !!values?.note?.length
+  const hiddenMessages = (
+    (values?.customFields as Array<{ type: string; note: string }>) ?? []
+  )
+    .map((field) => field.note ?? '')
+    .filter(Boolean)
+  const hasHiddenMessages = hiddenMessages.length > 0
 
   const handleAttachmentPress = async (attachment: Attachment) => {
     if (getMimeType(attachment.name).startsWith('image/')) {
@@ -664,25 +666,42 @@ export const IdentityRecordDetailsForm = ({
           </View>
         )}
 
-        {!!commentValues.length && (
+        {(hasNote || hasHiddenMessages) && (
           <View style={styles.section}>
             <Text variant="caption">{t`Additional`}</Text>
 
-            <MultiSlotInput testID="comments-multi-slot-input">
-              {commentValues.map((comment, index) => (
+            {hasNote && (
+              <MultiSlotInput testID="comments-multi-slot-input">
                 <InputField
-                  key={`comment-${index}`}
                   label={t`Comment`}
-                  value={comment}
+                  value={values.note}
                   placeholder={t`Enter Comment`}
                   readOnly
                   copyable
                   onCopy={copyToClipboard}
                   isGrouped
-                  testID={`comments-multi-slot-input-slot-${index}`}
+                  testID="comments-multi-slot-input-slot-0"
                 />
-              ))}
-            </MultiSlotInput>
+              </MultiSlotInput>
+            )}
+
+            {hasHiddenMessages && (
+              <MultiSlotInput testID="hidden-messages-multi-slot-input">
+                {hiddenMessages.map((message, index) => (
+                  <PasswordField
+                    key={`hidden-message-${index}`}
+                    label={t`Hidden Message`}
+                    value={message}
+                    placeholder={t`Enter Hidden Message`}
+                    readOnly
+                    copyable
+                    onCopy={copyToClipboard}
+                    isGrouped
+                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                  />
+                ))}
+              </MultiSlotInput>
+            )}
           </View>
         )}
       </View>

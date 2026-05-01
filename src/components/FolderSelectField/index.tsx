@@ -1,11 +1,15 @@
 import { useLingui } from '@lingui/react/macro'
 import {
+  Button,
   ContextMenu,
   MultiSlotInput,
   SelectField,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { KeyboardArrowBottom } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  Close,
+  KeyboardArrowBottom
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import { BottomSheetFolderSelectorContent } from '../../containers/BottomSheetFolderSelectorContent'
 
@@ -27,12 +31,10 @@ export const FolderSelectField = ({
 
   const handleSelect = (folder?: { name?: string }) => {
     if (!folder) return
-    if (folder.name === 'allFolder') {
-      onChange('')
-      return
-    }
     onChange(folder.name === value ? '' : (folder.name ?? ''))
   }
+
+  const hasValue = Boolean(value)
 
   return (
     <MultiSlotInput testID={multiSlotTestID}>
@@ -45,7 +47,20 @@ export const FolderSelectField = ({
             isGrouped
             testID={testID}
             rightSlot={
-              <KeyboardArrowBottom color={theme.colors.colorTextPrimary} />
+              <>
+                {hasValue && (
+                  <Button
+                    size="small"
+                    variant="tertiary"
+                    aria-label={t`Clear folder`}
+                    iconBefore={
+                      <Close color={theme.colors.colorTextPrimary} />
+                    }
+                    onClick={() => onChange('')}
+                  />
+                )}
+                <KeyboardArrowBottom color={theme.colors.colorTextPrimary} />
+              </>
             }
           />
         }
@@ -54,6 +69,7 @@ export const FolderSelectField = ({
           selectedFolder={value}
           onSelect={handleSelect}
           includeFavorites={false}
+          includeAllFolders={false}
         />
       </ContextMenu>
     </MultiSlotInput>

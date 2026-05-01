@@ -185,7 +185,7 @@ export const CreateOrEditWifiPasswordContent = ({
     >
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Credentials`}
+          {t`Details`}
         </Text>
 
         <MultiSlotInput
@@ -220,19 +220,13 @@ export const CreateOrEditWifiPasswordContent = ({
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Details`}
+          {t`Additional`}
         </Text>
 
         <FolderSelectField
           value={values.folder}
           onChange={(val) => setValue('folder', val)}
         />
-      </View>
-
-      <View style={styles.section}>
-        <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Additional`}
-        </Text>
 
         <InputField
           label={t`Comment`}
