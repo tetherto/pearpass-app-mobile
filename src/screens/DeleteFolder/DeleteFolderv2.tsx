@@ -22,8 +22,6 @@ import { styles } from './DeleteFolderv2Styles'
 export const DeleteFolderV2 = ({ route }) => {
   const { folderName } = route.params ?? {}
 
-  const [selected, setSelected] = useState('deleteFolderAndItems')
-
   const { t } = useLingui()
   const { theme } = useTheme()
   const { data: folders, deleteFolder } = useFolders()
@@ -35,6 +33,10 @@ export const DeleteFolderV2 = ({ route }) => {
     folders?.customFolders?.[folderName]?.records?.filter(
       (record) => record.data
     ).length ?? 0
+
+  const [selected, setSelected] = useState(
+    itemCount > 0 ? 'deleteFolderAndItems' : 'deleteFolder'
+  )
 
   const summaryText =
     itemCount === 1
@@ -61,14 +63,18 @@ export const DeleteFolderV2 = ({ route }) => {
           }
         ]
       : []),
-    {
-      value: 'deleteFolderAndItems',
-      label: 'Delete folder and items',
-      description:
-        itemCount === 1
-          ? `This will permanently remove the folder and all ${itemCount} item inside.\nThis action cannot be undone.`
-          : `This will permanently remove the folder and all ${itemCount} items inside.\nThis action cannot be undone.`
-    }
+    ...(itemCount > 0
+      ? [
+          {
+            value: 'deleteFolderAndItems',
+            label: 'Delete folder and items',
+            description:
+              itemCount === 1
+                ? `This will permanently remove the folder and all ${itemCount} item inside.\nThis action cannot be undone.`
+                : `This will permanently remove the folder and all ${itemCount} items inside.\nThis action cannot be undone.`
+          }
+        ]
+      : [])
   ]
 
   const isDeleteFolderOnlySelected = selected === 'deleteFolder'
