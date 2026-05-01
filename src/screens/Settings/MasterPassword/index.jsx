@@ -45,7 +45,7 @@ const getPasswordStrength = (value) => {
 
 const getRepeatIndicator = (newPassword, repeatPassword) => {
   if (!repeatPassword) return undefined
-  return newPassword === repeatPassword ? 'match' : 'vulnerable'
+  return newPassword === repeatPassword ? 'match' : undefined
 }
 
 export const MasterPassword = () => {
@@ -97,7 +97,11 @@ export const MasterPassword = () => {
     })
 
     if (!result.success) {
-      setErrors({ [result.field]: result.error })
+      const fieldError =
+        result.field === 'newPassword' && result.strengthResult?.errors?.length
+          ? result.strengthResult.errors[0]
+          : result.error
+      setErrors({ [result.field]: fieldError })
       if (result.field === 'newPassword') {
         setValue('repeatPassword', '')
       }
