@@ -46,7 +46,7 @@ const getPasswordStrength = (value) => {
 
 const getRepeatIndicator = (newPassword, repeatPassword) => {
   if (!repeatPassword) return undefined
-  return newPassword === repeatPassword ? 'match' : 'vulnerable'
+  return newPassword === repeatPassword ? 'match' : undefined
 }
 
 export const MasterPassword = () => {

@@ -39,7 +39,6 @@ interface LoginRecordDetailsFormValues {
   username: string
   password: string
   note: string
-  websites: string[]
   customFields: CustomField[]
   folder?: string
   attachments: Attachment[]
@@ -70,12 +69,13 @@ export const LoginRecordDetailsForm = ({
   const { copyToClipboard } = useCopyToClipboard()
   const { isPasswordChangeReminderEnabled } = usePasswordChangeReminder()
 
+  const websites = initialRecord?.data?.websites ?? []
+
   const initialValues = useMemo<LoginRecordDetailsFormValues>(
     () => ({
       username: initialRecord?.data?.username ?? '',
       password: initialRecord?.data?.password ?? '',
       note: initialRecord?.data?.note ?? '',
-      websites: initialRecord?.data?.websites ?? [],
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
       attachments: initialRecord?.attachments ?? [],
@@ -103,7 +103,7 @@ export const LoginRecordDetailsForm = ({
   const hasUsername = !!values.username.length
   const hasPassword = !!values.password.length
   const hasPasskey = !!values.credential
-  const hasWebsites = !!values.websites.length
+  const hasWebsites = websites.length > 0
   const hasNote = !!values.note.length
   const hasCustomFields = !!values.customFields.length
   const hasAttachments = !!values.attachments.length
@@ -180,7 +180,7 @@ export const LoginRecordDetailsForm = ({
 
         {hasWebsites && (
           <MultiSlotInput testID="website-multi-slot-input">
-            {values.websites.map((website, index) => (
+            {websites.map((website, index) => (
               <InputField
                 key={`${website}-${index}`}
                 label={t`Website`}
