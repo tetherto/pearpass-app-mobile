@@ -26,6 +26,7 @@ import Toast from 'react-native-toast-message'
 import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 
+import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { logger } from '../../../utils/logger'
 
 const STRENGTH_TO_INDICATOR = {
@@ -52,6 +53,7 @@ export const MasterPassword = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { updateMasterPassword } = useUserData()
+  const { refreshBiometricEncryption } = useBiometricsAuthentication()
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -113,6 +115,11 @@ export const MasterPassword = () => {
         newPassword: newPasswordBuffer,
         currentPassword: currentPasswordBuffer
       })
+
+      // Re-encrypt the biometric SecureStore entry with the rotated master
+      // encryption — without this, autofill biometric unlock keeps using the
+      // pre-rotation ciphertext and fails to open the vault.
+      await refreshBiometricEncryption()
 
       setValue('currentPassword', '')
       setValue('newPassword', '')

@@ -5,6 +5,7 @@
     android:id="@+id/ppInputContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:addStatesFromChildren="true"
     android:background="@drawable/pp_v2_input_bg"
     android:gravity="center_vertical"
     android:orientation="horizontal"
@@ -23,8 +24,8 @@
             android:id="@+id/ppInputLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.PearPass.V2.Label"
-            android:textColor="@color/pp_v2_text_secondary"
+            android:textAppearance="@style/TextAppearance.PearPass.V2.Caption"
+            android:textColor="@color/pp_v2_text_primary"
             tools:text="Email" />
 
         <EditText
@@ -39,8 +40,8 @@
             android:textColor="@color/pp_v2_text_primary"
             android:textColorHint="@color/pp_v2_text_secondary"
             android:textCursorDrawable="@null"
-            android:textSize="@dimen/pp_v2_font_s16"
-            android:textStyle="normal" />
+            android:textSize="@dimen/pp_v2_font_s14"
+            android:textFontWeight="500" />
     </LinearLayout>
 
     <ImageView

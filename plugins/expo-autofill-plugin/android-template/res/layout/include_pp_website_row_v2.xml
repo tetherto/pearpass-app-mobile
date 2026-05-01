@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single website row inside the unified websites card. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ppWebsiteRowRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/pp_v2_spacing_s12"
+    android:paddingEnd="@dimen/pp_v2_spacing_s12"
+    android:paddingTop="@dimen/pp_v2_spacing_s12"
+    android:paddingBottom="@dimen/pp_v2_spacing_s12">
+
+    <TextView
+        android:id="@+id/ppWebsiteRowLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Website"
+        android:textAppearance="@style/TextAppearance.PearPass.V2.Caption"
+        android:textColor="@color/pp_v2_text_primary" />
+
+    <EditText
+        android:id="@+id/ppWebsiteRowEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/pp_v2_spacing_s4"
+        android:background="@null"
+        android:fontFamily="@font/pp_v2_inter"
+        android:hint="Enter Website"
+        android:inputType="textUri"
+        android:minHeight="0dp"
+        android:padding="0dp"
+        android:textColor="@color/pp_v2_text_primary"
+        android:textColorHint="@color/pp_v2_text_secondary"
+        android:textCursorDrawable="@null"
+        android:textFontWeight="500"
+        android:textSize="@dimen/pp_v2_font_s14"
+        tools:text="https://example.com" />
+</LinearLayout>
