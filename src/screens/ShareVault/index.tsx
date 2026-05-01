@@ -2,7 +2,12 @@ import { useCallback, useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { useTheme, rawTokens, Text } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  AlertMessage,
+  useTheme,
+  rawTokens,
+  Text
+} from '@tetherto/pearpass-lib-ui-kit'
 import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { Pressable, StyleSheet, View } from 'react-native'
@@ -171,6 +176,14 @@ export const ShareVault = () => {
             </Pressable>
           </View>
         </View>
+
+        <AlertMessage
+          variant="info"
+          size="small"
+          title=""
+          description={t`Keep your vault private. Only pair with your own trusted devices. Pairing grants full access to your PearPass data.`}
+          testID="pairing-disclaimer"
+        />
       </View>
     </Layout>
   )
