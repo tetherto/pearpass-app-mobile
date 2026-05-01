@@ -124,16 +124,16 @@ export const useRecordMenuItems = ({ exclude } = {}) => {
           icon: WiFi
         },
         {
-          name: t`Other`,
-          type: RECORD_TYPES.CUSTOM,
-          description: t`Create your own entry with fully custom fields.`,
-          icon: GridView
-        },
-        {
           name: t`Password`,
           type: 'password',
           description: t`Create a safe password or passphrase`,
           icon: LockOutlined
+        },
+        {
+          name: t`Other`,
+          type: RECORD_TYPES.CUSTOM,
+          description: t`Create your own entry with fully custom fields.`,
+          icon: GridView
         }
       ].filter((item) => !exclude?.includes(item.type)),
     [t, exclude]

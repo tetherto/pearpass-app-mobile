@@ -33,6 +33,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     private ImageView togglePasswordVisibility;
     private boolean isAuthenticatingBiometric = false;
     private boolean isPasswordVisible = false;
+    // V2 spinner overlay shown over Continue while auth is in flight.
+    private android.widget.ProgressBar continueProgress;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -106,7 +108,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
         passwordInput = view.findViewById(R.id.ppPasswordEdit);
         unlockButton = view.findViewById(R.id.masterPwdContinue);
         togglePasswordVisibility = view.findViewById(R.id.ppPasswordToggle);
-        biometricButton = null;
+        biometricButton = view.findViewById(R.id.masterPwdBiometricButton);
+        continueProgress = view.findViewById(R.id.masterPwdContinueProgress);
 
         TextView passwordLabel = view.findViewById(R.id.ppPasswordLabel);
         if (passwordLabel != null) passwordLabel.setText("Password");
@@ -120,7 +123,11 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
         }
 
         TextView sheetTitle = view.findViewById(R.id.ppHeaderTitle);
-        if (sheetTitle != null) sheetTitle.setText("Add a passkey");
+        if (sheetTitle != null) {
+            // Sign in for assertion, Add a passkey for registration.
+            String title = (getActivity() instanceof AuthenticationActivity) ? "Sign in" : "Add a passkey";
+            sheetTitle.setText(title);
+        }
 
         unlockButton.setOnClickListener(v -> {
             String password = passwordInput.getText().toString();
@@ -132,6 +139,7 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
         });
 
         setupPasswordVisibilityToggle();
+        setupBiometricButton();
 
         return view;
     }
@@ -145,9 +153,14 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             return;
         }
 
-        // Disable the unlock button while authenticating
+        // V2 hides "Continue" + shows spinner; V1 swaps to "Unlocking...".
         unlockButton.setEnabled(false);
-        unlockButton.setText("Unlocking...");
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            unlockButton.setText("");
+            if (continueProgress != null) continueProgress.setVisibility(View.VISIBLE);
+        } else {
+            unlockButton.setText("Unlocking...");
+        }
 
         // Convert password to byte array for secure handling
         byte[] passwordBuffer = com.pears.pass.autofill.utils.SecureBufferUtils.stringToBuffer(password);
@@ -178,9 +191,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     SecureLog.w("MasterPasswordFragment", "Could not get master encryption for resume: " + e.getMessage());
                 }
 
-                // Authentication successful
+                // Authentication successful — silent navigation.
                 getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
                     if (navigationListener != null) {
                         navigationListener.navigateToVaultSelection();
                     }
@@ -192,7 +204,12 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Invalid master password", Toast.LENGTH_SHORT).show();
                     unlockButton.setEnabled(true);
-                    unlockButton.setText("Unlock");
+                    if (getResources().getInteger(R.integer.design_version) == 2) {
+                        unlockButton.setText("Continue");
+                        if (continueProgress != null) continueProgress.setVisibility(View.GONE);
+                    } else {
+                        unlockButton.setText("Unlock");
+                    }
                     passwordInput.setText("");
                 });
             } finally {
@@ -266,19 +283,26 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 ", canUse: " + canUse);
 
             if (isSupported && isEnabled && canUse) {
-                // Show biometric button
                 biometricButton.setVisibility(View.VISIBLE);
 
-                biometricButton.setText("Use Biometric");
+                // V2 retry link picks "Fingerprint" when device advertises one.
+                if (getResources().getInteger(R.integer.design_version) == 2) {
+                    boolean hasFingerprint = getContext() != null
+                            && getContext().getPackageManager().hasSystemFeature(
+                                    android.content.pm.PackageManager.FEATURE_FINGERPRINT);
+                    biometricButton.setText(hasFingerprint
+                            ? "Try again with Fingerprint"
+                            : "Try again with Biometrics");
+                } else {
+                    biometricButton.setText("Use Biometric");
+                }
 
-                // Set click listener for biometric authentication
                 biometricButton.setOnClickListener(v -> {
                     if (!isAuthenticatingBiometric) {
                         handleBiometricLogin();
                     }
                 });
             } else {
-                // Hide biometric button if not available
                 biometricButton.setVisibility(View.GONE);
             }
         }
@@ -377,7 +401,6 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
 
                 getActivity().runOnUiThread(() -> {
                     isAuthenticatingBiometric = false;
-                    Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
                     if (navigationListener != null) {
                         navigationListener.navigateToVaultSelection();
                     }

@@ -20,7 +20,7 @@ export const VaultDeleteScreen = ({ route }) => {
   const { t } = useLingui()
   const navigation = useNavigation()
 
-  const vaultName = route?.params?.vaultName || t`Personal Vault`
+  const vaultName = route?.params?.vaultName || t`Personal`
 
   const [masterPassword, setMasterPassword] = useState('')
 

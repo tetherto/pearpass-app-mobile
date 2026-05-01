@@ -30,15 +30,22 @@ import com.pears.pass.R;
 import com.pears.pass.autofill.data.CredentialItem;
 import com.pears.pass.autofill.data.PearPassVaultClient;
 import com.pears.pass.autofill.data.VaultItem;
+import com.pears.pass.autofill.jobs.AddPasskeyPayload;
+import com.pears.pass.autofill.jobs.Job;
+import com.pears.pass.autofill.jobs.JobEncryption;
+import com.pears.pass.autofill.jobs.JobFileManager;
+import com.pears.pass.autofill.jobs.UpdatePasskeyPayload;
 import com.pears.pass.autofill.utils.AutofillConstants;
 import com.pears.pass.autofill.utils.SecureBufferUtils;
 import com.pears.pass.autofill.utils.SecureLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -366,10 +373,23 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
                 }
                 List<CredentialItem> parsed = parseCredentials(records);
 
+                // Merge pending passkey jobs in assertion mode (registration handles its own).
+                if (MODE_ASSERTION.equals(mode)) {
+                    List<CredentialItem> pending = loadPendingPasskeysFromJobs(parsed, vault.getId());
+                    if (!pending.isEmpty()) {
+                        Set<String> pendingIds = new HashSet<>();
+                        for (CredentialItem p : pending) pendingIds.add(p.getId());
+                        // Job version supersedes DB row for the same id.
+                        parsed.removeIf(item -> pendingIds.contains(item.getId()));
+                        parsed.addAll(pending);
+                    }
+                }
+
                 if (getActivity() == null) return;
+                final List<CredentialItem> finalParsed = parsed;
                 getActivity().runOnUiThread(() -> {
                     allCredentials.clear();
-                    allCredentials.addAll(parsed);
+                    allCredentials.addAll(finalParsed);
                     hasUserSearched = false;
                     hidePasswordPrompt();
                     applyFilter(searchInput.getText().toString());
@@ -406,6 +426,15 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             out = filterInitial(allCredentials);
         } else {
             out = new ArrayList<>(allCredentials);
+        }
+
+        // Passkey assertion → keep only items with a passkey.
+        if (MODE_ASSERTION.equals(mode) && isPasskeyAssertionMode()) {
+            List<CredentialItem> passkeysOnly = new ArrayList<>();
+            for (CredentialItem c : out) {
+                if (c.hasPasskey()) passkeysOnly.add(c);
+            }
+            out = passkeysOnly;
         }
 
         if (out.isEmpty() && !allCredentials.isEmpty()) {
@@ -655,6 +684,11 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
         return parts[1] + "." + parts[0];
     }
 
+    private boolean isPasskeyAssertionMode() {
+        return getActivity() instanceof AuthenticationActivity
+                && ((AuthenticationActivity) getActivity()).isPasskeyAssertionMode();
+    }
+
     private boolean domainsMatch(String a, String b) {
         if (a == null || b == null) return false;
         if (a.equals(b)) return true;
@@ -667,5 +701,157 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             return am.equals(bm);
         }
         return false;
+    }
+
+    /** Surfaces pending ADD/UPDATE passkey jobs scoped to the current vault. */
+    @SuppressWarnings("unchecked")
+    private List<CredentialItem> loadPendingPasskeysFromJobs(List<CredentialItem> existingCredentials, String currentVaultId) {
+        List<CredentialItem> pendingPasskeys = new ArrayList<>();
+
+        if (getActivity() == null || vaultClient == null) {
+            return pendingPasskeys;
+        }
+
+        JobFileManager jobFileManager = new JobFileManager(getActivity());
+        if (!jobFileManager.jobFileExists()) {
+            return pendingPasskeys;
+        }
+
+        byte[] hashedPasswordBytes = null;
+        try {
+            Map<String, Object> masterEncryptionData = vaultClient.vaultsGet("masterEncryption").get();
+            String hashedPasswordHex = (String) masterEncryptionData.get("hashedPassword");
+            if (hashedPasswordHex == null || hashedPasswordHex.isEmpty()) {
+                SecureLog.d(TAG, "No hashed password available for job file decryption");
+                return pendingPasskeys;
+            }
+            hashedPasswordBytes = JobEncryption.hexToBytes(hashedPasswordHex);
+
+            Set<String> existingPasskeyIds = new HashSet<>();
+            for (CredentialItem item : existingCredentials) {
+                if (item.hasPasskey()) {
+                    existingPasskeyIds.add(item.getId());
+                }
+            }
+
+            List<Job> jobs = jobFileManager.readJobs(hashedPasswordBytes);
+
+            for (Job job : jobs) {
+                if (job.getStatus() != Job.JobStatus.PENDING && job.getStatus() != Job.JobStatus.IN_PROGRESS) {
+                    continue;
+                }
+                // Vault scope — drop jobs queued for a different vault so they
+                // don't leak into the active vault's credentials list.
+                if (currentVaultId != null && !currentVaultId.equals(job.getVaultId())) {
+                    continue;
+                }
+
+                try {
+                    if (job.getType() == Job.JobType.ADD_PASSKEY) {
+                        AddPasskeyPayload payload = AddPasskeyPayload.fromJSON(job.getPayload());
+
+                        if (existingPasskeyIds.contains(payload.getRecordId())) {
+                            continue;
+                        }
+
+                        Map<String, Object> credentialMap = buildCredentialMapFromPayload(
+                                payload.getCredentialId(), payload.getPublicKey(), payload.getPrivateKey(),
+                                payload.getClientDataJSON(), payload.getAttestationObject(),
+                                payload.getAuthenticatorData(), payload.getAlgorithm(),
+                                payload.getTransports(), payload.getUserId()
+                        );
+
+                        List<String> websites = payload.getWebsites();
+                        if (websites == null || websites.isEmpty()) {
+                            websites = new ArrayList<>();
+                            websites.add("https://" + payload.getRpId());
+                        }
+
+                        String title = payload.getTitle() != null ? payload.getTitle() : payload.getRpName();
+
+                        pendingPasskeys.add(new CredentialItem(
+                                payload.getRecordId(), title, payload.getUserName(), "",
+                                websites, true, payload.getCreatedAt(), credentialMap,
+                                payload.getPrivateKey(), payload.getUserId(), payload.getCredentialId()
+                        ));
+
+                    } else if (job.getType() == Job.JobType.UPDATE_PASSKEY) {
+                        UpdatePasskeyPayload payload = UpdatePasskeyPayload.fromJSON(job.getPayload());
+
+                        Map<String, Object> credentialMap = buildCredentialMapFromPayload(
+                                payload.getCredentialId(), payload.getPublicKey(), payload.getPrivateKey(),
+                                payload.getClientDataJSON(), payload.getAttestationObject(),
+                                payload.getAuthenticatorData(), payload.getAlgorithm(),
+                                payload.getTransports(), payload.getUserId()
+                        );
+
+                        String title = payload.getRpName();
+                        String username = payload.getUserName();
+                        List<String> websites = new ArrayList<>();
+                        websites.add("https://" + payload.getRpId());
+
+                        for (CredentialItem existing : existingCredentials) {
+                            if (existing.getId().equals(payload.getExistingRecordId())) {
+                                title = existing.getTitle();
+                                username = existing.getUsername();
+                                if (existing.getWebsites() != null && !existing.getWebsites().isEmpty()) {
+                                    websites = existing.getWebsites();
+                                }
+                                break;
+                            }
+                        }
+
+                        pendingPasskeys.add(new CredentialItem(
+                                payload.getExistingRecordId(), title, username, "",
+                                websites, true, payload.getCreatedAt(), credentialMap,
+                                payload.getPrivateKey(), payload.getUserId(), payload.getCredentialId()
+                        ));
+                    }
+                } catch (Exception e) {
+                    SecureLog.e(TAG, "Failed to parse job payload for job " + job.getId() + ": " + e.getMessage());
+                }
+            }
+
+            SecureLog.d(TAG, "Found " + pendingPasskeys.size() + " pending passkey(s) from job queue");
+        } catch (Exception e) {
+            SecureLog.e(TAG, "Failed to read pending jobs: " + e.getMessage());
+        } finally {
+            if (hashedPasswordBytes != null) {
+                JobEncryption.secureZero(hashedPasswordBytes);
+            }
+        }
+
+        return pendingPasskeys;
+    }
+
+    /** Credential map in the vault record format. */
+    private Map<String, Object> buildCredentialMapFromPayload(
+            String credentialId, String publicKey, String privateKey,
+            String clientDataJSON, String attestationObject, String authenticatorData,
+            int algorithm, List<String> transports, String userId) {
+        Map<String, Object> credentialMap = new HashMap<>();
+        credentialMap.put("id", credentialId);
+        credentialMap.put("rawId", credentialId);
+        credentialMap.put("type", "public-key");
+        credentialMap.put("_privateKeyBuffer", privateKey);
+        credentialMap.put("_userId", userId);
+        credentialMap.put("authenticatorAttachment", "platform");
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("clientDataJSON", clientDataJSON);
+        responseMap.put("attestationObject", attestationObject);
+        responseMap.put("authenticatorData", authenticatorData);
+        responseMap.put("publicKey", publicKey);
+        responseMap.put("publicKeyAlgorithm", algorithm);
+        responseMap.put("transports", transports);
+        credentialMap.put("response", responseMap);
+
+        Map<String, Object> clientExtResults = new HashMap<>();
+        Map<String, Object> credProps = new HashMap<>();
+        credProps.put("rk", true);
+        clientExtResults.put("credProps", credProps);
+        credentialMap.put("clientExtensionResults", clientExtResults);
+
+        return credentialMap;
     }
 }

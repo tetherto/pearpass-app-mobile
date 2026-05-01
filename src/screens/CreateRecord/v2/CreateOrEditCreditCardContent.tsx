@@ -27,6 +27,7 @@ import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { adaptRegister } from './CreateOrEditLoginContent'
 import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 
@@ -337,6 +338,17 @@ export const CreateOrEditCreditCardContent = ({
             {...adaptRegister(register('pinCode'))}
           />
         </MultiSlotInput>
+      </View>
+
+      <View style={styles.section}>
+        <Text variant="caption" color={theme.colors.colorTextSecondary}>
+          {t`Details`}
+        </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
       </View>
 
       <View style={styles.section}>

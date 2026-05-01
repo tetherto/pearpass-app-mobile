@@ -2,15 +2,10 @@ import { useCallback, useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import {
-  useTheme,
-  rawTokens,
-  Text,
-  Button
-} from '@tetherto/pearpass-lib-ui-kit'
+import { useTheme, rawTokens, Text } from '@tetherto/pearpass-lib-ui-kit'
 import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
-import { StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import Animated, {
   Easing,
   useAnimatedProps,
@@ -42,9 +37,17 @@ export const ShareVault = () => {
   const { svg, isExpired, formattedTime, secondsLeft, vaultLink, handleCopy } =
     useShareVault()
 
+  const vaultName = vault?.name ?? t`Vault`
+
   const handleBack = useCallback(() => {
     navigation.goBack()
   }, [navigation])
+
+  useEffect(() => {
+    if (isExpired) {
+      navigation.goBack()
+    }
+  }, [isExpired, navigation])
 
   const targetOffset = (1 - secondsLeft / EXPIRE_PERIOD) * TIMER_CIRCUMFERENCE
   const animatedOffset = useSharedValue(targetOffset)
@@ -63,7 +66,7 @@ export const ShareVault = () => {
   return (
     <Layout
       header={
-        <BackScreenHeader title={t`Share ${vault?.name ?? ''} Vault`} onBack={handleBack} />
+        <BackScreenHeader title={t`Share ${vaultName}`} onBack={handleBack} />
       }
       scrollable
       hideFooter
@@ -154,20 +157,18 @@ export const ShareVault = () => {
                 {vaultLink || t`Generating link...`}
               </Text>
             </View>
-            <Button
-              variant="tertiary"
-              size="small"
-              onClick={handleCopy}
-              aria-label="Copy"
-              data-testid="share-vault-copy-button"
-              iconBefore={
-                <ContentCopy
-                  width={24}
-                  height={24}
-                  color={theme.colors.colorTextPrimary}
-                />
-              }
-            />
+            <Pressable
+              onPress={handleCopy}
+              accessibilityLabel="Copy"
+              testID="share-vault-copy-button"
+              hitSlop={8}
+            >
+              <ContentCopy
+                width={24}
+                height={24}
+                color={theme.colors.colorTextPrimary}
+              />
+            </Pressable>
           </View>
         </View>
       </View>
@@ -212,7 +213,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: rawTokens.spacing16
+    paddingTop: rawTokens.spacing16,
+    paddingBottom: rawTokens.spacing16,
+    paddingLeft: rawTokens.spacing16,
+    paddingRight: rawTokens.spacing8
   },
   vaultLinkContent: {
     flex: 1,

@@ -5,8 +5,8 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
   ContextMenu,
-  NavbarListItem,
   PageHeader,
+  Radio,
   rawTokens,
   Text,
   useBottomSheetClose,
@@ -34,19 +34,13 @@ const LanguagePickerSheet = ({ options, selectedValue, onSelect }) => {
   return (
     <Layout
       mode="sheet"
-      contentStyle={{ padding: 0, paddingBottom: bottom }}
+      contentStyle={{
+        paddingHorizontal: rawTokens.spacing16,
+        paddingBottom: bottom + rawTokens.spacing24
+      }}
       header={<SheetHeader title={t`App Language`} onClose={collapse} />}
     >
-      {options.map((option, index) => (
-        <NavbarListItem
-          key={option.value}
-          label={option.label}
-          selected={option.value === selectedValue}
-          platform="mobile"
-          showDivider={index < options.length - 1}
-          onClick={() => handleSelect(option.value)}
-        />
-      ))}
+      <Radio options={options} value={selectedValue} onChange={handleSelect} />
     </Layout>
   )
 }

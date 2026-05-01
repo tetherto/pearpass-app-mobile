@@ -16,12 +16,14 @@ import {
   getPasswordValidationMessages,
   getPasswordsMatch
 } from '../../../utils/passwordPolicy'
+import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 import { Layout } from '../../Layout'
 import { BackScreenHeader } from '../../ScreenHeader/BackScreenHeader'
 import { ConfirmablePasswordFields } from '../shared/ConfirmablePasswordFields'
 
 export const StepIdentity = ({ initialData, onSubmit, onBack }) => {
   const { t } = useLingui()
+  const isVaultPasswordEnabled = unsupportedFeaturesEnabled()
 
   const [name, setName] = useState(initialData?.name ?? '')
   const [usePassword, setUsePassword] = useState(
@@ -95,7 +97,11 @@ export const StepIdentity = ({ initialData, onSubmit, onBack }) => {
     >
       <PageHeader
         title={t`Create New Vault`}
-        subtitle={t`Create your vault by giving it a name. Add an optional vault password if you want an extra layer of protection on top of your master password.`}
+        subtitle={
+          isVaultPasswordEnabled
+            ? t`Create your vault by giving it a name. Add an optional vault password if you want an extra layer of protection on top of your master password.`
+            : t`Create your vault by giving it a name.`
+        }
         subtitleTestID="new-vault-subtitle"
       />
 
@@ -108,42 +114,46 @@ export const StepIdentity = ({ initialData, onSubmit, onBack }) => {
           testID="new-vault-name-input"
         />
 
-        <ToggleSwitch
-          checked={usePassword}
-          onChange={handleTogglePassword}
-          label={t`Set Vault Password`}
-          description={t`Add extra password on top of your master password`}
-          aria-label={t`Set Vault Password`}
-          data-testid="new-vault-password-toggle"
-        />
+        {isVaultPasswordEnabled ? (
+          <>
+            <ToggleSwitch
+              checked={usePassword}
+              onChange={handleTogglePassword}
+              label={t`Set Vault Password`}
+              description={t`Add extra password on top of your master password`}
+              aria-label={t`Set Vault Password`}
+              data-testid="new-vault-password-toggle"
+            />
 
-        {usePassword ? (
-          <ConfirmablePasswordFields
-            testID="new-vault-password-form"
-            passwordField={{
-              label: t`Password`,
-              placeholderText: t`Enter vault password`,
-              value: password,
-              onChangeText: setPassword,
-              passwordIndicator: getPasswordIndicatorVariant(
-                password,
-                passwordErrors
-              ),
-              variant: passwordError ? 'error' : 'default',
-              errorMessage: passwordError,
-              testID: 'new-vault-password-input'
-            }}
-            confirmPasswordField={{
-              label: t`Repeat Password`,
-              placeholderText: t`Repeat vault password`,
-              value: passwordConfirm,
-              onChangeText: setPasswordConfirm,
-              passwordIndicator: passwordsMatch ? 'match' : undefined,
-              variant: passwordConfirmError ? 'error' : 'default',
-              errorMessage: passwordConfirmError,
-              testID: 'new-vault-password-confirm-input'
-            }}
-          />
+            {usePassword ? (
+              <ConfirmablePasswordFields
+                testID="new-vault-password-form"
+                passwordField={{
+                  label: t`Password`,
+                  placeholderText: t`Enter vault password`,
+                  value: password,
+                  onChangeText: setPassword,
+                  passwordIndicator: getPasswordIndicatorVariant(
+                    password,
+                    passwordErrors
+                  ),
+                  variant: passwordError ? 'error' : 'default',
+                  errorMessage: passwordError,
+                  testID: 'new-vault-password-input'
+                }}
+                confirmPasswordField={{
+                  label: t`Repeat Password`,
+                  placeholderText: t`Repeat vault password`,
+                  value: passwordConfirm,
+                  onChangeText: setPasswordConfirm,
+                  passwordIndicator: passwordsMatch ? 'match' : undefined,
+                  variant: passwordConfirmError ? 'error' : 'default',
+                  errorMessage: passwordConfirmError,
+                  testID: 'new-vault-password-confirm-input'
+                }}
+              />
+            ) : null}
+          </>
         ) : null}
       </View>
     </Layout>

@@ -4,6 +4,11 @@ import { fireEvent, render } from '@testing-library/react-native'
 
 import { StepIdentity } from './StepIdentity'
 import { messages } from '../../../locales/en/messages'
+import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
+
+jest.mock('../../../utils/unsupportedFeatures', () => ({
+  unsupportedFeaturesEnabled: jest.fn(() => true)
+}))
 
 i18n.load('en', messages)
 i18n.activate('en')
@@ -163,5 +168,15 @@ describe('StepIdentity', () => {
       password: 'StrongVault#2026',
       passwordConfirm: 'StrongVault#2026'
     })
+  })
+
+  it('hides the vault password toggle when unsupported features are disabled', () => {
+    unsupportedFeaturesEnabled.mockReturnValueOnce(false)
+
+    const { queryByTestId } = renderWithProviders(
+      <StepIdentity onSubmit={jest.fn()} onBack={jest.fn()} />
+    )
+
+    expect(queryByTestId('new-vault-password-toggle')).toBeNull()
   })
 })

@@ -68,6 +68,8 @@ struct V2HostView: View {
     @State private var loadedFolders: [String] = []
     @State private var formComment: String = ""
     @State private var formSaveError: String?
+    /// Inline error under the websites card on URL validation failure.
+    @State private var formWebsiteError: String? = nil
     @State private var isSavingPasskey: Bool = false
     /// Set when the user picks an existing matching record on registration —
     /// causes save to fire UPDATE_PASSKEY (or refresh a pending ADD) instead
@@ -307,6 +309,7 @@ struct V2HostView: View {
             attachments: $formAttachments,
             existingAttachments: $formExistingAttachments,
             fileSizeError: $formFileSizeError,
+            websiteError: $formWebsiteError,
             saveError: formSaveError,
             isSaving: isSavingPasskey,
             onBack: { showPasskeyForm = false },
@@ -623,6 +626,7 @@ struct V2HostView: View {
         formatter.dateStyle = .medium
         formPasskeyDate = formatter.string(from: Date())
         formSaveError = nil
+        formWebsiteError = nil
         showPasskeyForm = true
     }
 
@@ -648,6 +652,7 @@ struct V2HostView: View {
         formatter.dateStyle = .medium
         formPasskeyDate = formatter.string(from: Date())
         formSaveError = nil
+        formWebsiteError = nil
         showPasskeyForm = true
     }
 
@@ -666,6 +671,17 @@ struct V2HostView: View {
             return
         }
 
+        // Validate website entries — first malformed one blocks save.
+        formWebsiteError = nil
+        let trimmedWebsites = formWebsites.map { $0.trimmingCharacters(in: .whitespaces) }
+        for entry in trimmedWebsites where !entry.isEmpty {
+            let candidate = addHttps(entry)
+            guard let host = URL(string: candidate)?.host, host.contains(".") else {
+                formWebsiteError = NSLocalizedString("Wrong format of website", comment: "V2 website validation error")
+                return
+            }
+        }
+
         isSavingPasskey = true
         formSaveError = nil
 
@@ -679,12 +695,10 @@ struct V2HostView: View {
                     throw PasskeyJobError.noHashedPassword
                 }
 
-                // 3. Build form data — websites array filtered for empties so
-                //    placeholder rows don't end up in the saved record. Folder
-                //    is the user's pick from the form (if any).
-                let websites = formWebsites
-                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                // 3. Build form data — drop empty rows, normalize via addHttps.
+                let websites = trimmedWebsites
                     .filter { !$0.isEmpty }
+                    .map { self.addHttps($0) }
                 let formData = PasskeyFormData(
                     title: formTitleText,
                     username: formUsername,
@@ -841,6 +855,7 @@ struct V2HostView: View {
                 let pending = await loadPendingPasskeysFromJobs(
                     vaultClient: client,
                     existingRecords: records,
+                    currentVaultId: viewModel.selectedVault?.id,
                     filterRpId: mode == .registration ? registrationContext?.rpId : nil,
                     filterUserName: mode == .registration ? registrationContext?.userName : nil
                 )
@@ -929,6 +944,7 @@ struct V2HostView: View {
     private func loadPendingPasskeysFromJobs(
         vaultClient: PearPassVaultClient,
         existingRecords: [VaultRecord],
+        currentVaultId: String?,
         filterRpId: String? = nil,
         filterUserName: String? = nil
     ) async -> [VaultRecord] {
@@ -968,6 +984,10 @@ struct V2HostView: View {
             var pending: [VaultRecord] = []
 
             for job in jobs where job.status == .pending || job.status == .inProgress {
+                // Vault scope — drop jobs queued for a different vault.
+                if let currentVaultId = currentVaultId, job.vaultId != currentVaultId {
+                    continue
+                }
                 switch job.payload {
                 case .addPasskey(let payload):
                     guard !existingPasskeyIds.contains(payload.recordId) else { continue }
@@ -1201,6 +1221,15 @@ struct V2HostView: View {
         if let colon = s.firstIndex(of: ":") { s = String(s[..<colon]) }
         if s.hasPrefix("www.") { s = String(s.dropFirst(4)) }
         return s
+    }
+
+    /// Lowercases + prepends `https://` when no scheme is present.
+    private func addHttps(_ urlString: String) -> String {
+        let lower = urlString.lowercased()
+        if lower.hasPrefix("http://") || lower.hasPrefix("https://") {
+            return lower
+        }
+        return "https://\(lower)"
     }
 
     private func initials(for title: String?) -> String {
