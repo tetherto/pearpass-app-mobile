@@ -303,8 +303,11 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
         CompletableFuture.runAsync(() -> {
             try {
                 List<PearPassVaultClient.Vault> raw = vaultClient.listVaults().get();
+                // Most-recently-added first → autofill default.
+                List<PearPassVaultClient.Vault> sorted = new ArrayList<>(raw);
+                sorted.sort((a, b) -> b.createdAt.compareTo(a.createdAt));
                 List<VaultItem> items = new ArrayList<>();
-                for (PearPassVaultClient.Vault v : raw) {
+                for (PearPassVaultClient.Vault v : sorted) {
                     boolean locked = vaultClient.checkVaultIsProtected(v.id, raw).get();
                     String date = new java.text.SimpleDateFormat(AutofillConstants.DATE_FORMAT_PATTERN).format(v.updatedAt);
                     items.add(new VaultItem(v.id, v.name, locked, date));
