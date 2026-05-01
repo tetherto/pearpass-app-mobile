@@ -629,7 +629,7 @@ export const ImportItems = () => {
                     onClick={() => Linking.openURL(selectedOption.supportLink!)}
                     data-testid="import-support-link"
                   >
-                    {t`learn more about exporting data from ${selectedOption.title}`}
+                    {t`Learn more about exporting data from ${selectedOption.title}`}
                   </Link>
                   .
                 </>
