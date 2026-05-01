@@ -113,7 +113,7 @@ export function adaptRegister(reg: {
     value: reg.value,
     error: reg.error,
     name: reg.name,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => reg.onChange(e),
+    onChangeText: (value: string) => reg.onChange(value ?? ''),
   }
 }
 
