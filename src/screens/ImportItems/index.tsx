@@ -35,13 +35,7 @@ import {
   useCreateRecord
 } from '@tetherto/pearpass-lib-vault'
 import { useCallback, useState } from 'react'
-import {
-  ActivityIndicator,
-  Image,
-  Linking,
-  Pressable,
-  View
-} from 'react-native'
+import { ActivityIndicator, Linking, Pressable, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { Layout } from 'src/containers/Layout'
@@ -58,7 +52,6 @@ type ImportOption = {
   description: string
   testId: string
   accepts: string[]
-  imgKey: string
   supportLink?: string
 }
 
@@ -150,7 +143,7 @@ const importOptions: ImportOption[] = [
     supportLink: 'https://proton.me/support/pass-export'
   },
   {
-    title: 'Encrypted file',
+    title: 'PearPass Encrypted File',
     type: ImportOptionType.Encrypted,
     description: t`Upload a PearPass-encrypted JSON export file. You will need the password used to encrypt the file.`,
     testId: 'settings-import-encrypted',
@@ -160,7 +153,7 @@ const importOptions: ImportOption[] = [
       'https://docs.pass.pears.com/how-to-guides/how-to-export-your-vault/'
   },
   {
-    title: 'Unencrypted file',
+    title: 'PearPass Unencrypted File',
     type: ImportOptionType.Unencrypted,
     description: t`Upload an unencrypted PearPass export file in JSON or CSV format.`,
     testId: 'settings-import-unencrypted',
@@ -178,36 +171,6 @@ const isAllowedType = (fileType: string, accepts: string[]) =>
     }
     return fileType === accept
   })
-
-const images = {
-  [ImportOptionType.OnePassword]: Image.resolveAssetSource(
-    require('../../../assets/images/1password.png')
-  ).uri,
-  [ImportOptionType.Bitwarden]: Image.resolveAssetSource(
-    require('../../../assets/images/BitWarden.jpg')
-  ).uri,
-  [ImportOptionType.KeePass]: Image.resolveAssetSource(
-    require('../../../assets/images/KeePass.png')
-  ).uri,
-  [ImportOptionType.KeePassKDBX]: Image.resolveAssetSource(
-    require('../../../assets/images/KeePassXC.png')
-  ).uri,
-  [ImportOptionType.LastPass]: Image.resolveAssetSource(
-    require('../../../assets/images/LastPass.png')
-  ).uri,
-  [ImportOptionType.ProtonPass]: Image.resolveAssetSource(
-    require('../../../assets/images/ProtonPass.png')
-  ).uri,
-  [ImportOptionType.NordPass]: Image.resolveAssetSource(
-    require('../../../assets/images/NordPass.png')
-  ).uri,
-  [ImportOptionType.Unencrypted]: Image.resolveAssetSource(
-    require('../../../assets/images/VaultIcon.png')
-  ).uri,
-  [ImportOptionType.Encrypted]: Image.resolveAssetSource(
-    require('../../../assets/images/VaultIcon.png')
-  ).uri
-}
 
 export const ImportItems = () => {
   const navigation = useNavigation()
@@ -566,31 +529,6 @@ export const ImportItems = () => {
                       color={theme.colors.colorTextPrimary}
                     />
                   }
-                  icon={
-                    <View
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: rawTokens.radius8,
-                        overflow: 'hidden',
-                        backgroundColor: theme.colors.colorSurfaceHover,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <Image
-                        source={{
-                          uri: images[option.imgKey as keyof typeof images]
-                        }}
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: rawTokens.radius8
-                        }}
-                        resizeMode="contain"
-                      />
-                    </View>
-                  }
                   key={option.title}
                 />
               ))}
@@ -660,7 +598,6 @@ export const ImportItems = () => {
               uploadSuffixText={t`here`}
               formatsPrefix={t`Required formats:`}
               acceptedFormats={selectedOption.accepts}
-              image={images[selectedOption.imgKey as keyof typeof images]}
               testID="import-upload-field"
             />
           )}
