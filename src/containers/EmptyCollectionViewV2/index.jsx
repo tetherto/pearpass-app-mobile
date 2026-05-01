@@ -27,6 +27,7 @@ export const EmptyCollectionViewV2 = ({ recordType = 'all' }) => {
   const { state } = useSharedFilter()
 
   const isAllItems = recordType === 'all'
+  const isFavorites = !!state?.isFavorite
   const categoryLabel = menuItems.find((item) => item.type === recordType)?.name
   const selectedFolder =
     state?.folder && state.folder !== 'allFolder' && state.folder !== 'favorite'
@@ -34,6 +35,13 @@ export const EmptyCollectionViewV2 = ({ recordType = 'all' }) => {
       : undefined
 
   const { title, description } = useMemo(() => {
+    if (isFavorites) {
+      return {
+        title: t`No favorite items`,
+        description: t`Mark items as favorites`
+      }
+    }
+
     if (!isAllItems) {
       return {
         title: t`No item of type ${categoryLabel}`,
@@ -52,7 +60,7 @@ export const EmptyCollectionViewV2 = ({ recordType = 'all' }) => {
       title: t`No item saved`,
       description: t`Start using PearPass creating your first item or import your items from a different password manager`
     }
-  }, [isAllItems, categoryLabel, selectedFolder, t])
+  }, [isFavorites, isAllItems, categoryLabel, selectedFolder, t])
 
   const handleCreateRecord = (type) => {
     if (type === 'password') {
@@ -94,26 +102,30 @@ export const EmptyCollectionViewV2 = ({ recordType = 'all' }) => {
           {description}
         </Text>
       </View>
-      <View style={styles.buttonsContainer}>
-        {isAllItems ? (
-          <ContextMenu trigger={addItemButton}>
-            <BottomSheetCategorySelectorContent
-              variant="add-item"
-              onSelect={handleCreateRecord}
-            />
-          </ContextMenu>
-        ) : (
-          addItemButton
-        )}
-        <Button
-          variant="secondary"
-          fullWidth
-          iconBefore={<ImportOutlined color={theme.colors.colorTextPrimary} />}
-          onClick={() => navigation.navigate('ImportItems')}
-        >
-          {t`Import items`}
-        </Button>
-      </View>
+      {!isFavorites && (
+        <View style={styles.buttonsContainer}>
+          {isAllItems ? (
+            <ContextMenu trigger={addItemButton}>
+              <BottomSheetCategorySelectorContent
+                variant="add-item"
+                onSelect={handleCreateRecord}
+              />
+            </ContextMenu>
+          ) : (
+            addItemButton
+          )}
+          <Button
+            variant="secondary"
+            fullWidth
+            iconBefore={
+              <ImportOutlined color={theme.colors.colorTextPrimary} />
+            }
+            onClick={() => navigation.navigate('ImportItems')}
+          >
+            {t`Import items`}
+          </Button>
+        </View>
+      )}
     </View>
   )
 }
