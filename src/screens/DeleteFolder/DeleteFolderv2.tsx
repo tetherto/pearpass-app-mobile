@@ -65,7 +65,9 @@ export const DeleteFolderV2 = ({ route }) => {
       value: 'deleteFolderAndItems',
       label: 'Delete folder and items',
       description:
-        'This will permanently remove the folder and all 12 items inside.\nThis action cannot be undone.'
+        itemCount === 1
+          ? `This will permanently remove the folder and all ${itemCount} item inside.\nThis action cannot be undone.`
+          : `This will permanently remove the folder and all ${itemCount} items inside.\nThis action cannot be undone.`
     }
   ]
 
