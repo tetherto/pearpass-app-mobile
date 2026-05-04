@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import {
   Button,
@@ -10,8 +12,11 @@ import {
   Close,
   KeyboardArrowBottom
 } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Keyboard } from 'react-native'
 
 import { BottomSheetFolderSelectorContent } from '../../containers/BottomSheetFolderSelectorContent'
+
+const KEYBOARD_DISMISS_DELAY_MS = 250
 
 type Props = {
   value?: string
@@ -28,6 +33,16 @@ export const FolderSelectField = ({
 }: Props) => {
   const { t } = useLingui()
   const { theme } = useTheme()
+  const [open, setOpen] = useState(false)
+
+  const handleOpenChange = (next: boolean) => {
+    if (next) {
+      Keyboard.dismiss()
+      setTimeout(() => setOpen(true), KEYBOARD_DISMISS_DELAY_MS)
+      return
+    }
+    setOpen(false)
+  }
 
   const handleSelect = (folder?: { name?: string }) => {
     if (!folder) return
@@ -39,6 +54,8 @@ export const FolderSelectField = ({
   return (
     <MultiSlotInput testID={multiSlotTestID}>
       <ContextMenu
+        open={open}
+        onOpenChange={handleOpenChange}
         trigger={
           <SelectField
             label={t`Folder`}
