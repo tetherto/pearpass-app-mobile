@@ -17,6 +17,7 @@ import { Platform } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
+import { clearStaleVaultsDir } from '../../../utils/clearStaleVaultsDir'
 import { logger } from '../../../utils/logger'
 import {
   getPasswordIndicatorVariant,
@@ -149,6 +150,10 @@ export const usePasswordCreation = () => {
     try {
       submitInFlightRef.current = true
       setIsLoading(true)
+      // If a previous attempt was killed mid-flow, the vaults dir on disk
+      // is blind-encrypted with the old hashed password and would refuse
+      // to open with the new one we're about to derive.
+      await clearStaleVaultsDir()
       await createMasterPassword(passwordBuffer)
 
       // Create the default "Personal" vault right after master password setup
