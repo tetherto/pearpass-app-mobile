@@ -23,6 +23,7 @@ import { SvgXml } from 'react-native-svg'
 import { useShareVault } from './useShareVault'
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
+import { withAutoLockBypass } from '../../HOCs'
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle)
 
@@ -33,7 +34,7 @@ const TIMER_STROKE_WIDTH = 1.5
 const TIMER_CENTER = TIMER_SIZE / 2
 const TIMER_CIRCUMFERENCE = 2 * Math.PI * TIMER_RADIUS
 
-export const ShareVault = () => {
+const ShareVaultBase = () => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const navigation = useNavigation()
@@ -188,6 +189,8 @@ export const ShareVault = () => {
     </Layout>
   )
 }
+
+export const ShareVault = withAutoLockBypass(ShareVaultBase)
 
 const styles = StyleSheet.create({
   content: {
