@@ -7,6 +7,7 @@ import {
   AttachmentField,
   InputField,
   MultiSlotInput,
+  PasswordField,
   Text,
   rawTokens,
   useTheme
@@ -19,6 +20,7 @@ import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { getMimeType } from '../../../utils/getMimeType'
 import { handleDownloadFile } from '../../../utils/handleDownloadFile'
 import { Attachment, CustomField, CustomRecord } from './types'
+import { toReadOnlyFieldProps } from './utils'
 
 type ImagePreviewNavigation = {
   navigate: (
@@ -36,6 +38,7 @@ interface CustomRecordDetailsFormProps {
 }
 
 interface CustomRecordDetailsFormValues {
+  note: string
   customFields: CustomField[]
   folder?: string
   attachments: Attachment[]
@@ -57,12 +60,13 @@ export const CustomRecordDetailsForm = ({
     () => ({
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.attachments ?? []
+      attachments: initialRecord?.attachments ?? [],
+      note: initialRecord?.data?.note ?? ""
     }),
     [initialRecord, selectedFolder]
   )
 
-  const { setValues, values, setValue } = useForm<CustomRecordDetailsFormValues>({
+  const { register, setValues, values, setValue } = useForm<CustomRecordDetailsFormValues>({
     initialValues
   })
 
@@ -76,9 +80,10 @@ export const CustomRecordDetailsForm = ({
     setValues(initialValues)
   }, [initialValues, setValues])
 
+  const hasNote = !!values.note.length
   const hasCustomFields = !!values.customFields.length
   const hasAttachments = !!values.attachments.length
-
+  
   const handleAttachmentPress = async (attachment: Attachment) => {
     if (getMimeType(attachment.name).startsWith('image/')) {
       const imageUri = attachment.base64
@@ -107,27 +112,44 @@ export const CustomRecordDetailsForm = ({
   return (
     <View style={styles.container}>
       <View style={styles.topContent}>
-        {hasCustomFields && (
+        {(hasNote || hasCustomFields) && (
           <View style={styles.section}>
             <Text variant="caption" color={theme.colors.colorTextSecondary}>
-              {t`Details`}
+              {t`Additional`}
             </Text>
 
-            <MultiSlotInput testID="custom-fields-multi-slot-input">
-              {values.customFields.map((field, index) => (
+            {hasNote && (
+              <MultiSlotInput testID="comments-multi-slot-input">
                 <InputField
-                  key={`${field.type}-${index}`}
-                  label={t`Hidden Message`}
-                  value={field.note ?? ''}
-                  placeholder={t`Enter Hidden Message`}
+                  label={t`Comment`}
+                  placeholder={t`Add comment`}
                   readOnly
                   copyable
                   onCopy={copyToClipboard}
                   isGrouped
-                  testID={`custom-fields-multi-slot-input-slot-${index}`}
+                  testID="comments-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('note'))}
                 />
-              ))}
-            </MultiSlotInput>
+              </MultiSlotInput>
+            )}
+
+            {hasCustomFields && (
+              <MultiSlotInput testID="custom-fields-multi-slot-input">
+                {values.customFields.map((field, index) => (
+                  <PasswordField
+                    key={`${field.type}-${index}`}
+                    label={t`Hidden Message`}
+                    value={field.note ?? ''}
+                    placeholder={t`Enter Hidden Message`}
+                    readOnly
+                    copyable
+                    onCopy={copyToClipboard}
+                    isGrouped
+                    testID={`custom-fields-multi-slot-input-slot-${index}`}
+                  />
+                ))}
+              </MultiSlotInput>
+            )}
           </View>
         )}
 
