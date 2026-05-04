@@ -14,7 +14,9 @@ import {
   stringToBuffer
 } from '@tetherto/pearpass-lib-vault/src/utils/buffer'
 import { Platform } from 'react-native'
+import Toast from 'react-native-toast-message'
 
+import { TOAST_CONFIG } from '../../../constants/toast'
 import { logger } from '../../../utils/logger'
 import {
   getPasswordIndicatorVariant,
@@ -168,6 +170,12 @@ export const usePasswordCreation = () => {
       if (mountedRef.current) {
         setIsLoading(false)
       }
+      Toast.show({
+        type: 'baseToast',
+        text1: t`Couldn't create your Master password. Please try again.`,
+        position: 'bottom',
+        bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+      })
     } finally {
       submitInFlightRef.current = false
     }

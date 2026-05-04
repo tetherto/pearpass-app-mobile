@@ -117,9 +117,9 @@ export const CustomRecordDetailsForm = ({
               {values.customFields.map((field, index) => (
                 <InputField
                   key={`${field.type}-${index}`}
-                  label={t`Other Field`}
+                  label={t`Hidden Message`}
                   value={field.note ?? ''}
-                  placeholder={t`Enter Value`}
+                  placeholder={t`Enter Hidden Message`}
                   readOnly
                   copyable
                   onCopy={copyToClipboard}

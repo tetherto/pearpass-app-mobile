@@ -162,12 +162,12 @@ export const useRecordActionItems = ({
     () => ({
       [RECORD_TYPES.CREDIT_CARD]: [
         {
-          name: t`Copy Name on card`,
+          name: t`Copy Cardholder Name`,
           type: 'copy',
           click: () => handleCopy(record?.data?.name)
         },
         {
-          name: t`Copy Number on card`,
+          name: t`Copy Card Number`,
           type: 'copy',
           click: () => handleCopy(record?.data?.number)
         }
