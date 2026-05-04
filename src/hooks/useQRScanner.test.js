@@ -1,6 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
-import { act, renderHook } from '@testing-library/react-native'
+import { act, renderHook, waitFor } from '@testing-library/react-native'
+import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { Alert, Platform } from 'react-native'
 import { Camera, useCodeScanner } from 'react-native-vision-camera'
@@ -18,28 +19,16 @@ jest.mock('react-native-vision-camera', () => ({
     requestCameraPermission: jest.fn()
   },
   useCameraDevice: jest.fn(() => ({ id: 'back', position: 'back' })),
-  useCodeScanner: jest.fn((config) => config),
-  useFrameProcessor: jest.fn(() => jest.fn()),
-  VisionCameraProxy: { initFrameProcessorPlugin: jest.fn() }
-}))
-
-jest.mock('react-native-reanimated', () => ({
-  useSharedValue: jest.fn((val) => ({ value: val }))
-}))
-
-jest.mock('react-native-worklets-core', () => ({
-  Worklets: {
-    createRunOnJS: jest.fn((fn) => fn)
-  }
+  useCodeScanner: jest.fn((config) => config)
 }))
 
 jest.mock('vision-camera-zxing', () => ({
-  zxing: jest.fn(),
   decodeBase64: jest.fn()
 }))
 
 jest.mock('expo-file-system', () => ({
   readAsStringAsync: jest.fn(() => Promise.resolve('base64data')),
+  deleteAsync: jest.fn(() => Promise.resolve()),
   EncodingType: { Base64: 'base64' }
 }))
 
@@ -62,13 +51,10 @@ describe('useQRScanner', () => {
     onScanned = jest.fn()
     onError = jest.fn()
     jest.clearAllMocks()
-    jest.useFakeTimers()
     Camera.getCameraPermissionStatus.mockReturnValue('granted')
   })
 
   afterEach(() => {
-    jest.clearAllTimers()
-    jest.useRealTimers()
     Object.defineProperty(Platform, 'OS', {
       value: originalPlatform
     })
@@ -251,7 +237,6 @@ describe('useQRScanner', () => {
         onCodeScanned: expect.any(Function)
       })
     )
-    expect(result.current.frameProcessor).toBeUndefined()
 
     act(() => {
       result.current.codeScanner.onCodeScanned([
@@ -260,5 +245,88 @@ describe('useQRScanner', () => {
     })
 
     expect(onScanned).toHaveBeenCalledWith('ios-native-scan', 'qr')
+  })
+
+  it('should not expose a code scanner on android (uses snapshot polling instead)', () => {
+    Object.defineProperty(Platform, 'OS', {
+      value: 'android'
+    })
+
+    const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    expect(result.current.codeScanner).toBeUndefined()
+    expect(result.current.cameraRef).toBeDefined()
+    expect(result.current.cameraRef.current).toBeNull()
+  })
+
+  it('should poll the camera via takeSnapshot on android and decode QR codes', async () => {
+    Object.defineProperty(Platform, 'OS', {
+      value: 'android'
+    })
+
+    const takeSnapshot = jest
+      .fn()
+      .mockResolvedValue({ path: '/tmp/snap-1.jpg' })
+
+    decodeBase64.mockResolvedValue([
+      { barcodeText: 'android-poll-data', barcodeFormat: 'QR_CODE' }
+    ])
+
+    const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    // Attach a fake camera so the polling tick has something to call
+    result.current.cameraRef.current = { takeSnapshot }
+
+    await waitFor(() => {
+      expect(onScanned).toHaveBeenCalledWith('android-poll-data', 'qr')
+    })
+
+    expect(takeSnapshot).toHaveBeenCalledWith(
+      expect.objectContaining({ quality: expect.any(Number) })
+    )
+    expect(decodeBase64).toHaveBeenCalledWith('base64data')
+    expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+      '/tmp/snap-1.jpg',
+      expect.objectContaining({ idempotent: true })
+    )
+  })
+
+  it('should stop polling on android when scanning is paused', async () => {
+    Object.defineProperty(Platform, 'OS', {
+      value: 'android'
+    })
+
+    const takeSnapshot = jest
+      .fn()
+      .mockResolvedValue({ path: '/tmp/snap-2.jpg' })
+    decodeBase64.mockResolvedValue([])
+
+    const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    result.current.cameraRef.current = { takeSnapshot }
+
+    await waitFor(() => {
+      expect(takeSnapshot).toHaveBeenCalled()
+    })
+
+    act(() => {
+      result.current.pauseScanning()
+    })
+
+    const callsAfterPause = takeSnapshot.mock.calls.length
+    await new Promise((resolve) => setTimeout(resolve, 700))
+    expect(takeSnapshot.mock.calls.length).toBe(callsAfterPause)
   })
 })

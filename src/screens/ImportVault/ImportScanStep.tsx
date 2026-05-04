@@ -95,7 +95,7 @@ export const ImportScanStep = ({
     hasPermission,
     codeScanner,
     device,
-    frameProcessor,
+    cameraRef,
     pauseScanning,
     requestPermission
   } = useQRScanner({
@@ -169,11 +169,11 @@ export const ImportScanStep = ({
           <View style={styles.cameraInner}>
             {device ? (
               <Camera
+                ref={cameraRef}
                 device={device}
                 isActive
                 style={styles.camera}
                 codeScanner={codeScanner}
-                frameProcessor={frameProcessor}
               >
                 <View
                   style={[

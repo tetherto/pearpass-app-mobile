@@ -28,7 +28,7 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
     hasPermission,
     codeScanner,
     device,
-    frameProcessor,
+    cameraRef,
     pauseScanning,
     pickImageForScan,
     requestPermission
@@ -73,6 +73,7 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
             <Title>{t`Join Vault from QR code`}</Title>
             {device ? (
               <Camera
+                ref={cameraRef}
                 device={device}
                 isActive={true}
                 style={{
@@ -83,7 +84,6 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
                   margin: 16
                 }}
                 codeScanner={codeScanner}
-                frameProcessor={frameProcessor}
               >
                 <CameraSpot />
               </Camera>
