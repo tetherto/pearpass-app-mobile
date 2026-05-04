@@ -28,6 +28,7 @@ import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
 import { BiometricsLoginPromptSheet } from '../../../containers/BottomSheet/BiometricsLoginPromptSheet'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { logger } from '../../../utils/logger'
@@ -59,6 +60,7 @@ export const MasterPassword = () => {
   const { isBiometricsEnabled, enableBiometrics, disableBiometrics } =
     useBiometricsAuthentication()
   const { expand, collapse } = useBottomSheet()
+  const { setShouldBypassAutoLock } = useAutoLockContext()
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -151,6 +153,7 @@ export const MasterPassword = () => {
     const wasBiometricsEnabled = isBiometricsEnabled
 
     try {
+      setShouldBypassAutoLock(true)
       setIsLoading(true)
       await updateMasterPassword({
         newPassword: newPasswordBuffer,
@@ -178,6 +181,7 @@ export const MasterPassword = () => {
       setErrors({ currentPassword: t`Invalid password` })
     } finally {
       setIsLoading(false)
+      setShouldBypassAutoLock(false)
       clearBuffer(newPasswordBuffer)
       clearBuffer(currentPasswordBuffer)
     }

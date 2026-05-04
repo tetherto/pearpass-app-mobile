@@ -6,13 +6,14 @@ import { Button } from '@tetherto/pearpass-lib-ui-kit'
 
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
+import { withAutoLockBypass } from '../../HOCs'
 import { ImportPreviewStep } from './ImportPreviewStep'
 import { ImportScanStep } from './ImportScanStep'
 import { useImportVault } from './useImportVault'
 
 type Step = 'scan' | 'preview'
 
-export const ImportVault = () => {
+const ImportVaultBase = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const [step, setStep] = useState<Step>('scan')
@@ -104,3 +105,5 @@ export const ImportVault = () => {
     </Layout>
   )
 }
+
+export const ImportVault = withAutoLockBypass(ImportVaultBase)
