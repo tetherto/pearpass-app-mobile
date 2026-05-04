@@ -1,0 +1,21 @@
+diff --git a/node_modules/vision-camera-zxing/android/src/main/java/com/visioncamerazxing/ZXingFrameProcessorPlugin.java b/node_modules/vision-camera-zxing/android/src/main/java/com/visioncamerazxing/ZXingFrameProcessorPlugin.java
+index 41b62ed..556bc66 100644
+--- a/node_modules/vision-camera-zxing/android/src/main/java/com/visioncamerazxing/ZXingFrameProcessorPlugin.java
++++ b/node_modules/vision-camera-zxing/android/src/main/java/com/visioncamerazxing/ZXingFrameProcessorPlugin.java
+@@ -36,13 +36,14 @@ public class ZXingFrameProcessorPlugin extends FrameProcessorPlugin {
+       }
+     }
+     try {
+-      ByteBuffer buffer = frame.getImage().getPlanes()[0].getBuffer();
++      android.media.Image.Plane yPlane = frame.getImage().getPlanes()[0];
++      ByteBuffer buffer = yPlane.getBuffer();
+       int length = buffer.remaining();
+       byte[] bytes = new byte[length];
+       buffer.get(bytes);
+       PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(
+         bytes,
+-        frame.getWidth(),
++        yPlane.getRowStride(),
+         frame.getHeight(),
+         0,
+         0,
