@@ -16,6 +16,8 @@ import android.widget.inline.InlinePresentationSpec;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -244,9 +246,20 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
             }
             window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
             window.setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+            applyBottomNavBarInset();
         } catch (Exception e) {
             SecureLog.e(TAG, "Error applying partial-height window", e);
         }
+    }
+
+    private void applyBottomNavBarInset() {
+        android.view.View root = findViewById(R.id.fragment_container);
+        if (root == null) return;
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            int bottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), bottom);
+            return insets;
+        });
     }
 
     @Override

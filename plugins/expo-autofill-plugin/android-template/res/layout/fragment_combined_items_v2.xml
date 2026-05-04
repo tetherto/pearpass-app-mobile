@@ -225,7 +225,7 @@
             android:layout_marginStart="@dimen/pp_v2_spacing_s16"
             android:layout_marginEnd="@dimen/pp_v2_spacing_s16"
             android:layout_marginTop="@dimen/pp_v2_spacing_s16"
-            android:layout_marginBottom="@dimen/pp_v2_spacing_s32"
+            android:layout_marginBottom="@dimen/pp_v2_spacing_s16"
             android:background="@drawable/pp_v2_btn_primary"
             android:clickable="true"
             android:focusable="true"
