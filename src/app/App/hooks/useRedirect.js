@@ -9,12 +9,13 @@ import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 
 /**
  * Custom hook to determine the initial route for navigation.
+ * @param {{ enabled?: boolean }} [options] - Pass `enabled: false` to defer
  * @returns {{
  *  isLoading: boolean,
  *  initialRouteName: string | null
  * }} - An object containing the loading state and initial route name.
  */
-export const useRedirect = () => {
+export const useRedirect = ({ enabled = true } = {}) => {
   const { refetch: refetchUserData } = useUserData()
 
   const [isLoading, setIsLoading] = useState(true)
@@ -22,6 +23,8 @@ export const useRedirect = () => {
   const [initialRouteName, setInitialRouteName] = useState(null)
 
   useEffect(() => {
+    if (!enabled) return
+
     let timeout
 
     void (async () => {
@@ -64,7 +67,7 @@ export const useRedirect = () => {
     })()
 
     return () => clearTimeout(timeout)
-  }, [])
+  }, [enabled])
 
   return {
     isLoading,

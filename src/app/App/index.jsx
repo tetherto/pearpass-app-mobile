@@ -29,7 +29,11 @@ export const App = () => {
     }
   }, [needsUpdate])
 
-  const { initialRouteName, isLoading } = useRedirect()
+  // Gate the redirect on cleanup completion so init never races the
+  // recursive `pearpass/` delete inside useFirstLaunchCleanUp.
+  const { initialRouteName, isLoading } = useRedirect({
+    enabled: isFirstLaunchCleanupReady
+  })
 
   if (isLoading || !isFirstLaunchCleanupReady) {
     return null
