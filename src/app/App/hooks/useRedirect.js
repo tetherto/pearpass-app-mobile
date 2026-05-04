@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useUserData } from '@tetherto/pearpass-lib-vault'
 
 import { isV2 } from '../../../utils/designVersion'
+import { hasOrphanedVaultData } from '../../../utils/hasOrphanedVaultData'
 import { logger } from '../../../utils/logger'
 import * as SplashScreen from '../../../utils/SplashScreen'
 import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
@@ -36,6 +37,13 @@ export const useRedirect = ({ enabled = true } = {}) => {
         }
 
         if (!userData?.hasPasswordSet) {
+          if (await hasOrphanedVaultData()) {
+            logger.error(
+              'Auto-redirect: hasPasswordSet=false but vault data exists on disk'
+            )
+            setInitialRouteName('Error')
+            return
+          }
           setInitialRouteName(isV2() ? 'OnboardingV2' : 'Intro')
           return
         }
