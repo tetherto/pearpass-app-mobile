@@ -149,7 +149,7 @@ export const CreateOrEditLoginContent = ({
     ),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string(),
@@ -163,26 +163,26 @@ export const CreateOrEditLoginContent = ({
 
   const { register, handleSubmit, registerArray, values, setValue, errors } =
     useForm<FormValues>({
-    initialValues: {
-      title: initialRecord?.data?.title ?? '',
-      username: initialRecord?.data?.username ?? '',
-      password: initialRecord?.data?.password ?? '',
-      otpSecret:
-        initialRecord?.data?.otpInput ??
-        initialRecord?.data?.otp?.secret ??
-        '',
-      note: initialRecord?.data?.note ?? '',
-      websites: initialRecord?.data?.websites?.length
-        ? initialRecord.data.websites.map((website) => ({ website }))
-        : [{ website: '' }],
-      customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.attachments ?? [],
-      credential: initialRecord?.data?.credential?.id ?? '',
-      passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
-    },
-    validate: (formValues) => schema.validate(formValues)
-  })
+      initialValues: {
+        title: initialRecord?.data?.title ?? '',
+        username: initialRecord?.data?.username ?? '',
+        password: initialRecord?.data?.password ?? '',
+        otpSecret:
+          initialRecord?.data?.otpInput ??
+          initialRecord?.data?.otp?.secret ??
+          '',
+        note: initialRecord?.data?.note ?? '',
+        websites: initialRecord?.data?.websites?.length
+          ? initialRecord.data.websites.map((website) => ({ website }))
+          : [{ website: '' }],
+        customFields: initialRecord?.data?.customFields ?? [],
+        folder: selectedFolder ?? initialRecord?.folder,
+        attachments: initialRecord?.attachments ?? [],
+        credential: initialRecord?.data?.credential?.id ?? '',
+        passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
+      },
+      validate: (formValues) => schema.validate(formValues)
+    })
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -224,7 +224,10 @@ export const CreateOrEditLoginContent = ({
             }
           })
           .filter((website): website is string => !!website?.trim().length),
-        customFields: values.customFields,
+        customFields: (
+          (values.customFields as Array<{ type: string; note?: string }>) ??
+          []
+        ).filter((f) => f.note?.trim().length), 
         attachments: convertBase64FilesToUint8(
           values.attachments.filter(isUploadedLoginAttachment)
         ),
