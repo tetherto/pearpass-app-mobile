@@ -42,17 +42,17 @@ export const EmptyCollectionViewV2 = ({ recordType = 'all' }) => {
       }
     }
 
-    if (!isAllItems) {
-      return {
-        title: t`No item of type ${categoryLabel}`,
-        description: t`Start adding items of type ${categoryLabel} in your vault`
-      }
-    }
-
     if (selectedFolder) {
       return {
         title: t`Empty folder`,
         description: t`Start adding items or save existing ones in the ${selectedFolder} folder`
+      }
+    }
+
+    if (!isAllItems) {
+      return {
+        title: t`No item of type ${categoryLabel}`,
+        description: t`Start adding items of type ${categoryLabel} in your vault`
       }
     }
 
