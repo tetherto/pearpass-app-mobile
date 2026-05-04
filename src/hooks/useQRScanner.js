@@ -4,17 +4,17 @@ import { useLingui } from '@lingui/react/macro'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import { Alert, Linking, Platform } from 'react-native'
+import { useSharedValue } from 'react-native-reanimated'
 import {
   Camera,
   useCodeScanner,
-  useCameraDevice
+  useCameraDevice,
+  useFrameProcessor
 } from 'react-native-vision-camera'
-import { decodeBase64 } from 'vision-camera-zxing'
+import { Worklets } from 'react-native-worklets-core'
+import { zxing, decodeBase64 } from 'vision-camera-zxing'
 
 import { logger } from '../utils/logger'
-
-const ANDROID_SCAN_INTERVAL_MS = 500
-const ANDROID_SNAPSHOT_QUALITY = 50
 
 export const useQRScanner = ({
   onScanned,
@@ -41,7 +41,7 @@ export const useQRScanner = ({
 
   const cameraRef = useRef(null)
   const lastScanTimeRef = useRef(0)
-  const isTickInFlightRef = useRef(false)
+  const isScanningShared = useSharedValue(true)
 
   const device = useCameraDevice('back')
 
@@ -62,6 +62,7 @@ export const useQRScanner = ({
     return formatMap[type]
   }, [])
 
+  // Check current permission status on mount
   const checkCurrentPermissions = useCallback(() => {
     try {
       const status = Camera.getCameraPermissionStatus()
@@ -180,6 +181,28 @@ export const useQRScanner = ({
     return formatMap[zxingFormat] || zxingFormat.toLowerCase()
   }
 
+  const onCodeScannedJS = Worklets.createRunOnJS((results) => {
+    if (results.length > 0) {
+      const { barcodeText, barcodeFormat } = results[0]
+      handleBarCodeScanned({
+        type: mapFormat(barcodeFormat),
+        data: barcodeText
+      })
+    }
+  })
+
+  const frameProcessor = useFrameProcessor(
+    (frame) => {
+      'worklet'
+      if (!isScanningShared.value) return
+      const results = zxing(frame)
+      if (results && results.length > 0) {
+        onCodeScannedJS(results)
+      }
+    },
+    [onCodeScannedJS, isScanningShared]
+  )
+
   const codeScanner = useCodeScanner({
     codeTypes: supportedTypes
       .map(mapSupportedTypeToCodeScannerType)
@@ -199,82 +222,18 @@ export const useQRScanner = ({
   })
 
   const activeCodeScanner = Platform.OS === 'ios' ? codeScanner : undefined
+  const activeFrameProcessor =
+    Platform.OS === 'android' ? frameProcessor : undefined
 
   const pauseScanning = useCallback(() => {
     setIsScanning(false)
-  }, [])
+    isScanningShared.value = false
+  }, [isScanningShared])
 
   const resumeScanning = useCallback(() => {
     setIsScanning(true)
-  }, [])
-
-  // Lets the polling loop call the latest handler without restarting.
-  const handleBarCodeScannedRef = useRef(handleBarCodeScanned)
-  useEffect(() => {
-    handleBarCodeScannedRef.current = handleBarCodeScanned
-  }, [handleBarCodeScanned])
-
-  // Samsung's YUV layout breaks vision-camera-zxing's frame processor
-  // (preview renders but nothing decodes). Poll preview snapshots and reuse
-  // the gallery decode path instead.
-  useEffect(() => {
-    if (Platform.OS !== 'android') return
-    if (!isScanning || !hasPermission || !device) return
-
-    let cancelled = false
-    let timeoutId = null
-
-    const tick = async () => {
-      if (cancelled) return
-      if (isTickInFlightRef.current || !cameraRef.current) {
-        timeoutId = setTimeout(tick, ANDROID_SCAN_INTERVAL_MS)
-        return
-      }
-
-      isTickInFlightRef.current = true
-      let snapshotPath = null
-      try {
-        const snapshot = await cameraRef.current.takeSnapshot({
-          quality: ANDROID_SNAPSHOT_QUALITY
-        })
-        snapshotPath = snapshot?.path
-        if (cancelled || !snapshotPath) return
-
-        const base64 = await FileSystem.readAsStringAsync(snapshotPath, {
-          encoding: FileSystem.EncodingType.Base64
-        })
-        if (cancelled) return
-
-        const results = await decodeBase64(base64)
-        if (cancelled || !results || results.length === 0) return
-
-        const { barcodeText, barcodeFormat } = results[0]
-        handleBarCodeScannedRef.current({
-          type: mapFormat(barcodeFormat),
-          data: barcodeText
-        })
-      } catch (error) {
-        logger.error('QR snapshot scan tick failed:', error)
-      } finally {
-        isTickInFlightRef.current = false
-        if (snapshotPath) {
-          FileSystem.deleteAsync(snapshotPath, { idempotent: true }).catch(
-            () => {}
-          )
-        }
-        if (!cancelled) {
-          timeoutId = setTimeout(tick, ANDROID_SCAN_INTERVAL_MS)
-        }
-      }
-    }
-
-    timeoutId = setTimeout(tick, ANDROID_SCAN_INTERVAL_MS)
-
-    return () => {
-      cancelled = true
-      if (timeoutId) clearTimeout(timeoutId)
-    }
-  }, [isScanning, hasPermission, device])
+    isScanningShared.value = true
+  }, [isScanningShared])
 
   const scanBarcodeFromImage = useCallback(
     async (imageUri) => {
@@ -345,6 +304,7 @@ export const useQRScanner = ({
     }
   }, [enableGallery, onError, showPermissionAlert, t, scanBarcodeFromImage])
 
+  // Check permissions on mount
   useEffect(() => {
     checkCurrentPermissions()
   }, [checkCurrentPermissions])
@@ -355,6 +315,7 @@ export const useQRScanner = ({
     cameraRef,
     device,
     codeScanner: activeCodeScanner,
+    frameProcessor: activeFrameProcessor,
     pauseScanning,
     resumeScanning,
     pickImageForScan,

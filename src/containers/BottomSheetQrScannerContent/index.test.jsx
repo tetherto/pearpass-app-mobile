@@ -49,20 +49,17 @@ jest.mock('../../context/AutoLockContext', () => ({
   })
 }))
 
-jest.mock('../../hooks/useQRScanner', () => {
-  const { useRef } = require('react')
-  return {
-    useQRScanner: () => ({
-      hasPermission: true,
-      codeScanner: { onCodeScanned: jest.fn(), codeTypes: ['qr'] },
-      device: { id: 'back' },
-      cameraRef: useRef(null),
-      pauseScanning: mockPauseScanning,
-      pickImageForScan: mockPickImageForScan,
-      requestPermission: mockRequestPermission
-    })
-  }
-})
+jest.mock('../../hooks/useQRScanner', () => ({
+  useQRScanner: () => ({
+    hasPermission: true,
+    codeScanner: { onCodeScanned: jest.fn(), codeTypes: ['qr'] },
+    device: { id: 'back' },
+    frameProcessor: undefined,
+    pauseScanning: mockPauseScanning,
+    pickImageForScan: mockPickImageForScan,
+    requestPermission: mockRequestPermission
+  })
+}))
 
 jest.mock('../../libComponents', () => ({
   ButtonPrimary: ({ children }) => {
@@ -103,9 +100,9 @@ describe('BottomSheetQrScannerContent', () => {
           codeTypes: ['qr'],
           onCodeScanned: expect.any(Function)
         }),
+        frameProcessor: undefined,
         isActive: true
       })
     )
-    expect(mockCamera.mock.calls[0][0]).not.toHaveProperty('frameProcessor')
   })
 })

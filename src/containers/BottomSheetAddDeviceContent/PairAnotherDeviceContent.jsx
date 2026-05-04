@@ -45,7 +45,7 @@ export const PairAnotherDeviceContent = ({
     hasPermission,
     codeScanner,
     device,
-    cameraRef,
+    frameProcessor,
     pauseScanning,
     requestPermission
   } = useQRScanner({
@@ -105,11 +105,11 @@ export const PairAnotherDeviceContent = ({
               </View>
             ) : device ? (
               <Camera
-                ref={cameraRef}
                 device={device}
                 isActive={!isLoading}
                 style={styles.camera}
                 codeScanner={codeScanner}
+                frameProcessor={frameProcessor}
               >
                 <View style={styles.cameraSpot} />
               </Camera>

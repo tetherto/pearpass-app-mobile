@@ -82,19 +82,16 @@ jest.mock('../../hooks/useHapticFeedback', () => ({
   })
 }))
 
-jest.mock('../../hooks/useQRScanner', () => {
-  const { useRef } = require('react')
-  return {
-    useQRScanner: () => ({
-      hasPermission: true,
-      codeScanner: { onCodeScanned: jest.fn(), codeTypes: ['qr'] },
-      device: { id: 'back' },
-      cameraRef: useRef(null),
-      pauseScanning: jest.fn(),
-      requestPermission: jest.fn()
-    })
-  }
-})
+jest.mock('../../hooks/useQRScanner', () => ({
+  useQRScanner: () => ({
+    hasPermission: true,
+    codeScanner: { onCodeScanned: jest.fn(), codeTypes: ['qr'] },
+    device: { id: 'back' },
+    frameProcessor: undefined,
+    pauseScanning: jest.fn(),
+    requestPermission: jest.fn()
+  })
+}))
 
 jest.mock('../../libComponents', () => ({
   ButtonPrimary: ({ children }) => {
@@ -130,9 +127,9 @@ describe('PairAnotherDeviceContent', () => {
           codeTypes: ['qr'],
           onCodeScanned: expect.any(Function)
         }),
+        frameProcessor: undefined,
         isActive: true
       })
     )
-    expect(mockCamera.mock.calls[0][0]).not.toHaveProperty('frameProcessor')
   })
 })
