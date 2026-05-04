@@ -21,11 +21,14 @@ import {
   checkPasswordStrength,
   validatePasswordChange
 } from '@tetherto/pearpass-utils-password-check'
-import { StyleSheet, View } from 'react-native'
+import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 
+import { TOAST_CONFIG } from '../../../constants/toast'
+import { BiometricsLoginPromptSheet } from '../../../containers/BottomSheet/BiometricsLoginPromptSheet'
+import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { logger } from '../../../utils/logger'
 
@@ -53,9 +56,46 @@ export const MasterPassword = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { updateMasterPassword } = useUserData()
-  const { refreshBiometricEncryption } = useBiometricsAuthentication()
+  const { isBiometricsEnabled, enableBiometrics, disableBiometrics } =
+    useBiometricsAuthentication()
+  const { expand, collapse } = useBottomSheet()
 
   const [isLoading, setIsLoading] = useState(false)
+
+  const enableBiometricAuthentication = async () => {
+    try {
+      const { error } = await enableBiometrics()
+
+      if (error) {
+        logger.error('Failed to enable biometric authentication:', error)
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Failed to enable biometric authentication.`,
+          position: 'bottom',
+          bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+        })
+      }
+    } catch (error) {
+      logger.error('Error while enabling biometric authentication:', error)
+    }
+  }
+
+  const showBiometricsLoginPrompt = () => {
+    expand({
+      children: (
+        <BiometricsLoginPromptSheet
+          title={t`Continue using Biometric Access`}
+          description={t`Your password was updated, so biometric login was turned off. Enable it again to continue signing in with your biometrics.`}
+          onConfirm={async () => {
+            collapse()
+            await enableBiometricAuthentication()
+          }}
+          onDismiss={collapse}
+          onClose={collapse}
+        />
+      )
+    })
+  }
 
   const errors = {
     minLength: t`Password must be at least 8 characters long`,
@@ -108,6 +148,7 @@ export const MasterPassword = () => {
 
     const newPasswordBuffer = stringToBuffer(newPassword)
     const currentPasswordBuffer = stringToBuffer(currentPassword)
+    const wasBiometricsEnabled = isBiometricsEnabled
 
     try {
       setIsLoading(true)
@@ -116,21 +157,22 @@ export const MasterPassword = () => {
         currentPassword: currentPasswordBuffer
       })
 
-      // Re-encrypt the biometric SecureStore entry with the rotated master
-      // encryption — without this, autofill biometric unlock keeps using the
-      // pre-rotation ciphertext and fails to open the vault.
-      await refreshBiometricEncryption()
-
       setValue('currentPassword', '')
       setValue('newPassword', '')
       setValue('repeatPassword', '')
 
-      Toast.show({
-        type: 'baseToast',
-        text1: t`Master password updated successfully`,
-        position: 'bottom',
-        bottomOffset: 100
-      })
+      if (wasBiometricsEnabled) {
+        await disableBiometrics()
+        Keyboard.dismiss()
+        showBiometricsLoginPrompt()
+      } else {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Master password updated successfully`,
+          position: 'bottom',
+          bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+        })
+      }
     } catch (error) {
       logger.error('Error updating master password:', error)
       setErrors({ currentPassword: t`Invalid password` })
