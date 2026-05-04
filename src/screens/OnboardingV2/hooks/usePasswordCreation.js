@@ -13,7 +13,7 @@ import {
   clearBuffer,
   stringToBuffer
 } from '@tetherto/pearpass-lib-vault/src/utils/buffer'
-import { Platform } from 'react-native'
+import { Keyboard, Platform } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
@@ -130,6 +130,11 @@ export const usePasswordCreation = () => {
     if (submitInFlightRef.current) {
       return
     }
+
+    // Dismiss the keyboard so the bottom-positioned error toast (line below)
+    // isn't hidden behind the soft keyboard on Android, making the button
+    // appear unresponsive.
+    Keyboard.dismiss()
 
     const password = values.password
     const passwordConfirm = values.passwordConfirm

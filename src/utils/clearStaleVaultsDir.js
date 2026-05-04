@@ -21,9 +21,26 @@ export const clearStaleVaultsDir = async () => {
     }
 
     const vaultsPath = `${baseDirectory}/pearpass/vaults`
-    const info = await FileSystem.getInfoAsync(vaultsPath)
+    const vaultDataPath = `${baseDirectory}/pearpass/vault`
 
-    if (!info.exists) {
+    const [vaultsInfo, vaultDataInfo] = await Promise.all([
+      FileSystem.getInfoAsync(vaultsPath),
+      FileSystem.getInfoAsync(vaultDataPath)
+    ])
+
+    if (!vaultsInfo.exists) {
+      return
+    }
+
+    const hasVaultData =
+      vaultDataInfo.exists &&
+      (await FileSystem.readDirectoryAsync(vaultDataPath)).length > 0
+
+    if (hasVaultData) {
+      logger.log(
+        'clearStaleVaultsDir: refusing to delete pearpass/vaults — found existing user data',
+        { hasVaultData }
+      )
       return
     }
 

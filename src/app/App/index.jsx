@@ -11,7 +11,6 @@ import { useRedirect } from './hooks/useRedirect'
 import { ToastCard } from '../../components/ToastCard'
 import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
-import { useFirstLaunchCleanUp } from '../../hooks/useFirstLaunchCleanUp'
 import { useVersionCheck } from '../../hooks/useVersionCheck'
 
 export const App = () => {
@@ -20,8 +19,6 @@ export const App = () => {
   const { needsUpdate } = useVersionCheck()
   const hasOpenedUpdateModal = useRef(false)
 
-  const isFirstLaunchCleanupReady = useFirstLaunchCleanUp()
-
   useEffect(() => {
     if (needsUpdate && !hasOpenedUpdateModal.current) {
       hasOpenedUpdateModal.current = true
@@ -29,13 +26,9 @@ export const App = () => {
     }
   }, [needsUpdate])
 
-  // Gate the redirect on cleanup completion so init never races the
-  // recursive `pearpass/` delete inside useFirstLaunchCleanUp.
-  const { initialRouteName, isLoading } = useRedirect({
-    enabled: isFirstLaunchCleanupReady
-  })
+  const { initialRouteName, isLoading } = useRedirect()
 
-  if (isLoading || !isFirstLaunchCleanupReady) {
+  if (isLoading) {
     return null
   }
 

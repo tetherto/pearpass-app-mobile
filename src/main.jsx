@@ -31,6 +31,7 @@ import { ModalProvider } from './context/ModalContext'
 import { SharedFilterProvider } from './context/SharedFilterContext'
 import { VaultSelectorProvider } from './context/VaultSelectorContext'
 import { messages } from './locales/en/messages'
+import { runFirstLaunchCleanup } from './utils/firstLaunchCleanup'
 import { logger } from './utils/logger'
 import * as SplashScreen from './utils/SplashScreen'
 import { createPearpassVaultClient } from './worklet'
@@ -49,6 +50,14 @@ export const Main = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        // Cleanup must run BEFORE the worklet binds to `pearpass/` —
+        // otherwise the recursive delete races the worklet's open FDs
+        // and leaves the storage tree in a partially-deleted state.
+        const cleanup = await runFirstLaunchCleanup()
+        if (!cleanup.ok) {
+          throw cleanup.error
+        }
+
         const vaultClient = await createPearpassVaultClient({
           debugMode: process.env.NODE_ENV === 'development'
         })
