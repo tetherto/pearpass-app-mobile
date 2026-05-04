@@ -99,10 +99,6 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
 
       return client
     } catch (err) {
-      // Tear down the Worklet before clearing the cache. Otherwise the
-      // worker thread keeps running and holding fd-locks on the Corestore
-      // directories — the next caller would spawn a second Worklet that
-      // immediately fails on those same locks.
       if (worklet) {
         try {
           worklet.terminate()
