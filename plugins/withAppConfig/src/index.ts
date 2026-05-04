@@ -2,7 +2,6 @@ import { ConfigPlugin, withPlugins } from '@expo/config-plugins';
 import { withAppGroupHelper } from './ios/withAppGroupHelper';
 import { withAppBuildGradle } from './android/withAppBuildGradle';
 import { withMainActivity } from './android/withMainActivity';
-import { withMainActivityConfigChanges } from './android/withMainActivityConfigChanges';
 import { withMainApplication } from './android/withMainApplication';
 
 const withAppConfig: ConfigPlugin = (config) => {
@@ -12,7 +11,6 @@ const withAppConfig: ConfigPlugin = (config) => {
     // Android
     withAppBuildGradle,
     withMainActivity,
-    withMainActivityConfigChanges,
     withMainApplication,
   ]);
 };

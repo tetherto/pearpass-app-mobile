@@ -23,15 +23,18 @@ export const useFirstLaunchCleanUp = () => {
       try {
         const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY)
 
-        if (!hasLaunchedBefore) {
-          logger.log('First launch detected - clearing SecureStore data')
-          await clearSecureStoreData()
-          await clearVaultFileData()
-
-          await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true')
-        } else {
+        if (hasLaunchedBefore) {
           await retryFailedKeys()
+          return
         }
+
+        // Set the flag BEFORE the destructive ops. If clearVaultFileData
+        // throws (e.g. a file is held open by the worklet during a race),
+        // we don't want every subsequent launch to re-enter this branch
+        // and re-attempt the wipe — that's the self-perpetuating loop
+        await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true')
+        await clearSecureStoreData()
+        await clearVaultFileData()
       } catch (error) {
         logger.error('Error clearing data on first launch:', error)
       } finally {
