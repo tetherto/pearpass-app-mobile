@@ -7,7 +7,7 @@ import {
   MultiSlotInput,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { View } from 'react-native'
+import { Keyboard, View } from 'react-native'
 import {
   Add,
   TrashOutlined,
@@ -16,6 +16,8 @@ import {
 
 import { BottomSheetAttachmentActionsContentV2 } from '../../containers/BottomSheetAttachmentActionsContentV2/BottomSheetAttachmentActionsContentV2'
 import { BottomSheetUploadFileContentV2 } from '../../containers/BottomSheetUploadFileContent/BottomSheetUploadFileContentV2'
+
+const KEYBOARD_DISMISS_DELAY_MS = 250
 
 type AttachmentLike = {
   id?: string | number
@@ -111,7 +113,8 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
   }, [])
 
   const openUploadSheet = useCallback((item: AttachmentFieldItem<T>) => {
-    setActiveUploadTarget(item)
+    Keyboard.dismiss()
+    setTimeout(() => setActiveUploadTarget(item), KEYBOARD_DISMISS_DELAY_MS)
   }, [])
 
   const handleUploadSelect = useCallback(
