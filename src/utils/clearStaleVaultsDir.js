@@ -22,34 +22,24 @@ export const clearStaleVaultsDir = async () => {
 
     const vaultsPath = `${baseDirectory}/pearpass/vaults`
     const vaultDataPath = `${baseDirectory}/pearpass/vault`
-    const encryptionPath = `${baseDirectory}/pearpass/encryption`
 
-    const [vaultsInfo, vaultDataInfo, encryptionInfo] = await Promise.all([
+    const [vaultsInfo, vaultDataInfo] = await Promise.all([
       FileSystem.getInfoAsync(vaultsPath),
-      FileSystem.getInfoAsync(vaultDataPath),
-      FileSystem.getInfoAsync(encryptionPath)
+      FileSystem.getInfoAsync(vaultDataPath)
     ])
 
     if (!vaultsInfo.exists) {
       return
     }
 
-    // Safety guard: only safe to wipe `pearpass/vaults` when there is no
-    // sign of completed sign-up state on disk. If `pearpass/vault/<id>`
-    // (real records) or `pearpass/encryption` (master password store)
-    // has any children, deleting the vaults registry would orphan the
-    // user's records permanently.
     const hasVaultData =
       vaultDataInfo.exists &&
       (await FileSystem.readDirectoryAsync(vaultDataPath)).length > 0
-    const hasEncryption =
-      encryptionInfo.exists &&
-      (await FileSystem.readDirectoryAsync(encryptionPath)).length > 0
 
-    if (hasVaultData || hasEncryption) {
-      logger.warn(
+    if (hasVaultData) {
+      logger.log(
         'clearStaleVaultsDir: refusing to delete pearpass/vaults — found existing user data',
-        { hasVaultData, hasEncryption }
+        { hasVaultData }
       )
       return
     }
