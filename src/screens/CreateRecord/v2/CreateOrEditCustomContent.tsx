@@ -45,6 +45,7 @@ type CustomFieldValue = {
 type CustomContentRecord = {
   data?: {
     title?: string
+    note?: string
     customFields?: CustomFieldValue[]
   }
   folder?: string
@@ -59,6 +60,7 @@ type Props = {
 
 type FormValues = {
   title: string
+  note: string
   folder: string
   customFields: CustomFieldValue[]
   attachments: CustomAttachment[]
@@ -98,6 +100,7 @@ export const CreateOrEditCustomContent = ({
 
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
+    note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
         note: Validator.string().required(t`Hidden message is required`)
@@ -116,6 +119,7 @@ export const CreateOrEditCustomContent = ({
     useForm<FormValues>({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
+      note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder ?? '',
       attachments: initialRecord?.attachments ?? []
@@ -148,7 +152,8 @@ export const CreateOrEditCustomContent = ({
         customFields: formValues.customFields,
         attachments: convertBase64FilesToUint8(
           formValues.attachments.filter(isUploadedCustomAttachment)
-        )
+        ),
+        note: formValues.note
       }
     }
 
@@ -243,6 +248,14 @@ export const CreateOrEditCustomContent = ({
         <FolderSelectField
           value={values.folder}
           onChange={(val) => setValue('folder', val)}
+        />
+
+        <InputField
+          label={t`Comment`}
+          value={values.note}
+          placeholder={t`Enter Comment`}
+          onChangeText={(val) => setValue('note', val)}
+          testID="comments-multi-slot-input-slot-0"
         />
 
         <AttachmentFieldsV2<CustomAttachment>
