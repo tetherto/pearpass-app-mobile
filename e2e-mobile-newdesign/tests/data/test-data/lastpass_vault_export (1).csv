@@ -1,0 +1,13 @@
+url,username,password,totp,extra,name,grouping,fav
+https://fill.dev/form/login-simple,lastpass name,lastpass_password,,Lastpass note,Lastpass item,,0
+http://sn,,,,LastPass note,Lastpass secure,Secure notes,0
+http://sn,,,,"NoteType:Credit Card
+Language:en-US
+Expiration Date:October,2025
+Name on Card:lastpass name
+Number:1234565789980858555
+Security Code:125
+Start Date:October,2024
+Type:lastpass visa
+Notes:
+",Lastpass credit,Secure notes,0
