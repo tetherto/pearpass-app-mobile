@@ -4,34 +4,22 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { Button, useTheme, Text, Title } from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Asset } from 'expo-asset'
 import { useVideoPlayer as useExpoVideoPlayer, VideoView } from 'expo-video'
 import { Dimensions, Platform, StyleSheet, View } from 'react-native'
 
 import { OnboardingLayout } from '../components/OnboardingLayout'
 import { RadialGradientBackground } from '../components/RadialGradientBackground'
 
-let TransparentVideoView, useTransparentVideoPlayer, resolveAssetSource
+let TransparentVideoView, useTransparentVideoPlayer
 if (Platform.OS === 'android') {
   const transparentVideo = require('expo-transparent-video')
   TransparentVideoView = transparentVideo.TransparentVideoView
   useTransparentVideoPlayer = transparentVideo.useVideoPlayer
-  resolveAssetSource = transparentVideo.resolveAssetSource
 }
 
 const iosLoopSource = require('../../../../assets/videos/onboarding_lock_loop_ios.mov')
 const iosStartSource = require('../../../../assets/videos/onboarding_lock_start_ios.mov')
-const androidStartSource =
-  Platform.OS === 'android'
-    ? resolveAssetSource(
-        require('../../../../assets/videos/onboarding_lock_start_android.mp4')
-      )?.uri
-    : null
-const androidLoopSource =
-  Platform.OS === 'android'
-    ? resolveAssetSource(
-        require('../../../../assets/videos/onboarding_lock_loop_android.mp4')
-      )?.uri
-    : null
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -77,8 +65,8 @@ const IOSVideo = () => {
   )
 }
 
-const AndroidVideo = () => {
-  const [source, setSource] = useState(androidStartSource)
+const AndroidVideoPlayer = ({ startUri, loopUri }) => {
+  const [source, setSource] = useState(startUri)
   const player = useTransparentVideoPlayer(source)
 
   useEffect(() => {
@@ -88,8 +76,8 @@ const AndroidVideo = () => {
   }, [player])
 
   const handleEnd = () => {
-    setSource(androidLoopSource)
-    player.replace(androidLoopSource)
+    setSource(loopUri)
+    player.replace(loopUri)
     player.loop = true
     player.play()
   }
@@ -103,6 +91,39 @@ const AndroidVideo = () => {
       testID="onboarding-v2-data-local-media"
     />
   )
+}
+
+// expo-transparent-video only accepts URIs, not require()'d modules. In
+// release builds the bundled mp4 lives inside the APK at file:///android_asset/
+// which ExoPlayer's FileDataSource can't read, so we extract it via expo-asset
+// to a regular file path before handing it to the player.
+const AndroidVideo = () => {
+  const [uris, setUris] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const [start, loop] = await Promise.all([
+        Asset.fromModule(
+          require('../../../../assets/videos/onboarding_lock_start_android.mp4')
+        ).downloadAsync(),
+        Asset.fromModule(
+          require('../../../../assets/videos/onboarding_lock_loop_android.mp4')
+        ).downloadAsync()
+      ])
+      if (cancelled) return
+      setUris({
+        start: start.localUri ?? start.uri,
+        loop: loop.localUri ?? loop.uri
+      })
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (!uris) return <View style={styles.video} />
+  return <AndroidVideoPlayer startUri={uris.start} loopUri={uris.loop} />
 }
 
 const OnboardingVideo = Platform.OS === 'ios' ? IOSVideo : AndroidVideo
