@@ -84,7 +84,7 @@ export const CreateOrEditPassphraseContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string()
@@ -138,7 +138,7 @@ export const CreateOrEditPassphraseContent = ({
         title: formValues.title,
         passPhrase: formValues.passPhrase,
         note: formValues.note,
-        customFields: formValues.customFields
+        customFields: (formValues.customFields as Array<{ type: string; note?: string }>).filter((f) => f.note?.trim().length)
       }
     }
 
@@ -284,7 +284,7 @@ export const CreateOrEditPassphraseContent = ({
                 value=""
                 placeholder={t`Enter Hidden Message`}
                 onChangeText={(val) =>
-                  setValue('customFields', [{ type: 'note', note: val }])
+                  setValue('customFields', val ? [{ type: 'note', note: val }] : [])
                 }
                 isGrouped
                 testID="hidden-messages-multi-slot-input-slot-0"

@@ -84,7 +84,7 @@ export const CreateOrEditWifiPasswordContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string()
@@ -124,7 +124,7 @@ export const CreateOrEditWifiPasswordContent = ({
         title: formValues.title,
         password: formValues.password,
         note: formValues.note,
-        customFields: formValues.customFields
+        customFields: formValues.customFields.filter((f) => f.note?.trim().length)
       }
     }
 
@@ -150,7 +150,7 @@ export const CreateOrEditWifiPasswordContent = ({
   } = registerArray('customFields')
 
   const handleFirstHiddenMessageChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
+    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
   }
 
   const openPasswordGenerator = () => {
