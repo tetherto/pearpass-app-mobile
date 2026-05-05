@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -10,7 +10,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit'
 import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { Modal, Pressable, StyleSheet, View } from 'react-native'
 import Animated, {
   Easing,
   useAnimatedProps,
@@ -42,6 +42,8 @@ const ShareVaultBase = () => {
   const { data: vault } = useVault()
   const { svg, isExpired, formattedTime, secondsLeft, vaultLink, handleCopy } =
     useShareVault()
+
+  const [isQrFullscreen, setIsQrFullscreen] = useState(false)
 
   const vaultName = vault?.name ?? t`Vault`
 
@@ -92,11 +94,12 @@ const ShareVaultBase = () => {
           ]}
         >
           <View style={styles.qrSection}>
-            <View
-              style={[
-                styles.qrContainer,
-                { backgroundColor: theme.colors.colorSurfaceHover }
-              ]}
+            <Pressable
+              style={styles.qrContainer}
+              onPress={() => setIsQrFullscreen(true)}
+              accessibilityLabel={t`Expand QR code`}
+              testID="share-vault-qr-expand"
+              disabled={svg.length === 0}
             >
               {svg.length > 0 && (
                 <SvgXml
@@ -106,7 +109,11 @@ const ShareVaultBase = () => {
                   height="100%"
                 />
               )}
-            </View>
+            </Pressable>
+
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              {t`Tap the QR code to expand it`}
+            </Text>
 
             <View style={styles.timerRow}>
               <View style={styles.timerCircle}>
@@ -186,6 +193,26 @@ const ShareVaultBase = () => {
           testID="pairing-disclaimer"
         />
       </View>
+
+      <Modal
+        visible={isQrFullscreen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsQrFullscreen(false)}
+      >
+        <Pressable
+          style={styles.qrFullscreenBackdrop}
+          onPress={() => setIsQrFullscreen(false)}
+          accessibilityLabel={t`Close fullscreen QR code`}
+          testID="share-vault-qr-fullscreen-close"
+        >
+          <View style={styles.qrFullscreenContainer}>
+            {svg.length > 0 && (
+              <SvgXml xml={svg} width="100%" height="100%" />
+            )}
+          </View>
+        </Pressable>
+      </Modal>
     </Layout>
   )
 }
@@ -211,7 +238,8 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: rawTokens.spacing8,
     padding: 10,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF'
   },
   timerRow: {
     flexDirection: 'row',
@@ -237,5 +265,20 @@ const styles = StyleSheet.create({
   vaultLinkContent: {
     flex: 1,
     gap: 2
+  },
+  qrFullscreenBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: rawTokens.spacing24
+  },
+  qrFullscreenContainer: {
+    aspectRatio: 1,
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: '#FFFFFF',
+    borderRadius: rawTokens.spacing12,
+    padding: rawTokens.spacing24
   }
 })
