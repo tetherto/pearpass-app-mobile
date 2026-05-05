@@ -10,7 +10,7 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { Add, ImportOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 import { createStyles } from './styles'
 import { useSharedFilter } from '../../context/SharedFilterContext'
@@ -88,7 +88,12 @@ export const EmptyCollectionViewV2 = ({ recordType = 'all' }) => {
   )
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
       <ItemCardIllustration />
       <View style={styles.title}>
         <Title style={styles.textCenter}>{title}</Title>
@@ -126,6 +131,6 @@ export const EmptyCollectionViewV2 = ({ recordType = 'all' }) => {
           </Button>
         </View>
       )}
-    </View>
+    </ScrollView>
   )
 }
