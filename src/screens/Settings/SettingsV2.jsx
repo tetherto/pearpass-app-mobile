@@ -10,7 +10,6 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  Devices,
   BugReportFilled,
   SecurityFilled,
   LockOutlined,
@@ -51,7 +50,7 @@ export const SettingsV2 = () => {
           {
             key: 'app-preferences',
             label: t`App Preferences`,
-            screen: 'Security',
+            screen: 'AppPreferences',
             icon: SettingsApplicationsFilled
           },
           {
@@ -72,12 +71,6 @@ export const SettingsV2 = () => {
             label: t`Blind Peering`,
             screen: 'BlindPeering',
             icon: HubFilled
-          },
-          {
-            key: 'your-devices',
-            label: t`Your Devices`,
-            screen: 'MyDevices',
-            icon: Devices
           }
         ]
       },
@@ -242,19 +235,21 @@ export const SettingsV2 = () => {
                           }
                         ]}
                       />
-                      <NavbarListItem
-                        label={item.label}
-                        variant="secondary"
-                        size="big"
-                        icon={
-                          <ItemIcon color={theme.colors.colorTextSecondary} />
-                        }
-                        onClick={
-                          item.screen
-                            ? () => navigation.navigate(item.screen)
-                            : undefined
-                        }
-                      />
+                      <View style={styles.itemWrapper}>
+                        <NavbarListItem
+                          label={item.label}
+                          variant="secondary"
+                          size="big"
+                          icon={
+                            <ItemIcon color={theme.colors.colorTextSecondary} />
+                          }
+                          onClick={
+                            item.screen
+                              ? () => navigation.navigate(item.screen)
+                              : undefined
+                          }
+                        />
+                      </View>
                     </View>
                   )
                 })}
@@ -313,6 +308,10 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderBottomWidth: 1,
     borderBottomLeftRadius: rawTokens.spacing8
+  },
+  itemWrapper: {
+    borderRadius: rawTokens.radius8,
+    overflow: 'hidden'
   },
   emptyState: {
     paddingHorizontal: rawTokens.spacing16,

@@ -22,6 +22,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { createStyles } from './styles'
 import { useSharedFilter } from '../../context/SharedFilterContext'
+import { useRegisterVaultSelectorOpener } from '../../context/VaultSelectorContext'
 import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
 import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
@@ -82,6 +83,10 @@ export const ContentHeader = ({
   const { state } = useSharedFilter()
   const styles = createStyles(theme.colors)
   const menuItems = useRecordMenuItems({ exclude: ['password'] })
+  const [isVaultSelectorOpen, setIsVaultSelectorOpen] = useState(false)
+
+  const openVaultSelector = useCallback(() => setIsVaultSelectorOpen(true), [])
+  useRegisterVaultSelectorOpener(openVaultSelector)
 
   const bgColor = theme.colors.colorSurfacePrimary
   const vaultName = vaultData?.name || t`Personal Vault`
@@ -97,6 +102,11 @@ export const ContentHeader = ({
   const handleCreateVault = useCallback(() => {
     navigation.navigate('Welcome', { state: 'credentials' })
   }, [navigation])
+
+  const handleNavigate = useCallback(
+    (screen, params) => navigation.navigate(screen, params),
+    [navigation]
+  )
 
   const renderBreadcrumbPill = (icon, label) => (
     <Button
@@ -144,6 +154,8 @@ export const ContentHeader = ({
           ) : (
             <>
               <ContextMenu
+                open={isVaultSelectorOpen}
+                onOpenChange={setIsVaultSelectorOpen}
                 trigger={renderBreadcrumbPill(
                   <LockFilled
                     width={16}
@@ -155,6 +167,8 @@ export const ContentHeader = ({
               >
                 <BottomSheetVaultSelectorContent
                   onCreateVault={handleCreateVault}
+                  onRequestClose={() => setIsVaultSelectorOpen(false)}
+                  onNavigate={handleNavigate}
                 />
               </ContextMenu>
 

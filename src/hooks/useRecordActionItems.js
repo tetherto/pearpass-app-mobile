@@ -7,9 +7,13 @@ import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { SORT_KEYS } from '../constants/sortOptions'
+import { BottomSheetFolderListContent } from '../containers/BottomSheetFolderListContent'
 import { BottomSheetSortContent } from '../containers/BottomSheetSortContent'
+import { ConfirmModalContent } from '../containers/Modal/ConfirmModalContent'
 import { useBottomSheet } from '../context/BottomSheetContext'
+import { useModal } from '../context/ModalContext'
 import { useSharedFilter } from '../context/SharedFilterContext'
+import { isV2 } from '../utils/designVersion'
 
 /**
  * @param {{
@@ -39,20 +43,59 @@ export const useRecordActionItems = ({
 } = {}) => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const collapse = useBottomSheetClose()
-  const { expand } = useBottomSheet()
+  const { openModal, closeModal } = useModal()
+  const v2Collapse = useBottomSheetClose()
+  const { collapse: v1Collapse, expand } = useBottomSheet()
+
+  // Combined collapse for shared handlers (copy, favorite, edit, sort)
+  const collapse = useCallback(() => {
+    v1Collapse?.()
+    v2Collapse?.()
+  }, [v1Collapse, v2Collapse])
+
   const { copyToClipboard } = useCopyToClipboard()
-  const { updateFavoriteState } = useRecords()
+  const { deleteRecords, updateFavoriteState, updateFolder } = useRecords({
+    onCompleted: () => {
+      if (!isV2()) {
+        closeModal()
+        v1Collapse?.()
+        onDelete?.()
+      }
+    }
+  })
   const { setState } = useSharedFilter()
 
   const handleDelete = useCallback(() => {
-    collapse?.()
-    navigation.navigate('MultiSelectDelete', {
-      selectedRecordIds: [record?.id],
-      selectedRecordObjects: [record],
-      onComplete: onDelete
-    })
-  }, [record, onDelete, collapse, navigation])
+    if (isV2()) {
+      collapse?.()
+      navigation.navigate('MultiSelectDelete', {
+        selectedRecordIds: [record?.id],
+        selectedRecordObjects: [record],
+        onComplete: onDelete
+      })
+    } else {
+      v1Collapse?.()
+      openModal(
+        <ConfirmModalContent
+          title="Delete item"
+          text="Are you sure that you want to delete this item?"
+          secondaryAction={closeModal}
+          primaryAction={async () => {
+            await deleteRecords([record?.id])
+          }}
+        />
+      )
+    }
+  }, [
+    record,
+    onDelete,
+    collapse,
+    v1Collapse,
+    navigation,
+    openModal,
+    closeModal,
+    deleteRecords
+  ])
 
   const handleFavoriteToggle = useCallback(() => {
     updateFavoriteState([record?.id], !record?.isFavorite)
@@ -68,13 +111,32 @@ export const useRecordActionItems = ({
     collapse?.()
   }, [record, navigation, collapse])
 
+  const handleFolderMoveSelect = useCallback(
+    async (folder) => {
+      await updateFolder([record?.id], folder.name)
+    },
+    [record, updateFolder]
+  )
+
   const handleMoveClick = useCallback(() => {
-    collapse?.()
-    navigation.navigate('MultiSelectMove', {
-      selectedRecordIds: [record?.id],
-      selectedRecordObjects: [record]
-    })
-  }, [record, navigation, collapse])
+    if (isV2()) {
+      collapse?.()
+      navigation.navigate('MultiSelectMove', {
+        selectedRecordIds: [record?.id],
+        selectedRecordObjects: [record]
+      })
+    } else {
+      collapse?.()
+      expand({
+        children: (
+          <BottomSheetFolderListContent
+            onFolderSelect={handleFolderMoveSelect}
+          />
+        ),
+        snapPoints: ['10%', '25%', '25%']
+      })
+    }
+  }, [record, navigation, collapse, expand, handleFolderMoveSelect])
 
   const handleCopy = useCallback(
     (value) => {

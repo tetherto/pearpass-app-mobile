@@ -3,7 +3,7 @@
     "name": "PearPass",
     "slug": "pearpass",
     "icon": "./assets/images/appIcons/app-icon.png",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "android": {
       "package": "com.pears.pass",
       "permissions": [
@@ -59,9 +59,10 @@
     },
     "plugins": [
       [
-        "expo-camera",
+        "react-native-vision-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan QR codes for securely pairing your vault with another device."
+          "cameraPermissionText": "Allow $(PRODUCT_NAME) to access your camera to scan QR codes for securely pairing your vault with another device.",
+          "enableCodeScanner": false
         }
       ],
       [
@@ -70,7 +71,21 @@
           "fonts": [
             "assets/fonts/humble-nostalgia.otf",
             "assets/fonts/inter.ttf"
-          ]
+          ],
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "Humble Nostalgia",
+                "fontDefinitions": [
+                  {
+                    "path": "assets/fonts/humble-nostalgia.otf",
+                    "weight": 400,
+                    "style": "normal"
+                  }
+                ]
+              }
+            ]
+          }
         }
       ],
       "expo-asset",
@@ -85,7 +100,13 @@
             "usesCleartextTraffic": true
           },
           "ios": {
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "15.1",
+            "extraPods": [
+              {
+                "name": "ZXingObjC",
+                "modular_headers": true
+              }
+            ]
           }
         }
       ],
@@ -109,7 +130,7 @@
       "./plugins/withCustomSplashScreen"
     ],
     "extra": {
-      "appVersion": "1.6.0",
+      "appVersion": "1.6.1",
       "eas": {
         "projectId": "28facb62-e2a2-4b6c-bc3f-0f5469e79415",
         "build": {

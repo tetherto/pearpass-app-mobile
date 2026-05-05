@@ -65,6 +65,19 @@ describe('useRedirect', () => {
     expect(result.current.initialRouteName).toBe('Welcome')
   })
 
+  it('should set initialRouteName to "Welcome" if user is locked (v2)', async () => {
+    mockIsV2 = true
+    mockRefetchUserData.mockResolvedValue({
+      hasPasswordSet: true,
+      masterPasswordStatus: { isLocked: true, lockoutRemainingMs: 60000 }
+    })
+    const { result } = renderHook(() => useRedirect())
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(result.current.initialRouteName).toBe('Welcome')
+  })
+
   it('should set initialRouteName to "Error" if an error occurs', async () => {
     mockRefetchUserData.mockResolvedValue(new Error('fail'))
     mockRefetchUserData.mockRejectedValue(new Error('fail'))

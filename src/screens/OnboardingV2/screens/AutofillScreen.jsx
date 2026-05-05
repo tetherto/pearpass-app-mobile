@@ -101,6 +101,7 @@ export const AutofillScreen = () => {
               <Text
                 as="p"
                 color={theme.colors.colorTextSecondary}
+                style={styles.description}
                 data-testid="onboarding-v2-autofill-description"
               >
                 {t`Allow autofill to sign in instantly on apps and websites. PearPass fills your credentials securely, so you don't need to remember, copy, or retype passwords.`}
@@ -159,5 +160,8 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     alignItems: 'center',
     marginBottom: 30
+  },
+  description: {
+    textAlign: 'center'
   }
 })

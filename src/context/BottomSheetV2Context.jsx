@@ -13,6 +13,7 @@ import { Animated, View, useWindowDimensions } from 'react-native'
 
 import { BottomSheetContext } from './BottomSheetContext'
 import { BackDrop } from '../components/BottomSheetBackdrop'
+import { isV2 } from '../utils/designVersion'
 
 const BACKDROP_DURATION = 200
 
@@ -100,8 +101,14 @@ export const BottomSheetV2Provider = ({ children }) => {
 
   return (
     <BottomSheetV2Context.Provider value={ctx}>
-      <BottomSheetContext.Provider value={ctx}>
-        {children}
+      {isV2() ? (
+        <BottomSheetContext.Provider value={ctx}>
+          {children}
+        </BottomSheetContext.Provider>
+      ) : (
+        children
+      )}
+      {isV2() && (
         <BottomSheet
           ref={ref}
           index={-1}
@@ -132,7 +139,7 @@ export const BottomSheetV2Provider = ({ children }) => {
             </View>
           </BottomSheetView>
         </BottomSheet>
-      </BottomSheetContext.Provider>
+      )}
     </BottomSheetV2Context.Provider>
   )
 }

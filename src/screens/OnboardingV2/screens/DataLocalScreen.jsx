@@ -137,7 +137,8 @@ export const DataLocalScreen = () => {
             <View style={styles.descriptionContainer}>
               <Text
                 as="p"
-                color={theme.colors.colorTextSecondary}
+                color={theme.colors.colorTextPrimary}
+                style={styles.description}
                 data-testid="onboarding-v2-data-local-description"
               >
                 {t`Your items are stored locally, not on our servers.\nOnly you have access to them.`}
@@ -200,5 +201,8 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     alignItems: 'center',
     marginBottom: 30
+  },
+  description: {
+    textAlign: 'center'
   }
 })

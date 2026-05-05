@@ -115,6 +115,16 @@ public class PasskeyFormFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // v2 layout uses reusable input includes, so we bind via a helper
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            View view = inflater.inflate(R.layout.fragment_passkey_form_v2, container, false);
+            bindV2Views(view);
+            initializeForm();
+            setupListeners();
+            refreshAttachmentsDisplay();
+            return view;
+        }
+
         View view = inflater.inflate(R.layout.fragment_passkey_form, container, false);
 
         titleInput = view.findViewById(R.id.titleInput);
@@ -137,6 +147,91 @@ public class PasskeyFormFragment extends Fragment {
         refreshAttachmentsDisplay();
 
         return view;
+    }
+
+    /**
+     * Binds the v2 includes-based layout, resolving the shared ppInputEdit id inside each field
+     */
+    private void bindV2Views(View view) {
+        View titleField = view.findViewById(R.id.formTitleField);
+        titleInput = titleField.findViewById(R.id.ppInputEdit);
+        setInputFieldLabel(titleField, "Title*");
+        titleInput.setHint("Insert title");
+        titleInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        titleError = view.findViewById(R.id.formTitleError);
+
+        View usernameField = view.findViewById(R.id.formUsernameField);
+        usernameInput = usernameField.findViewById(R.id.ppInputEdit);
+        setInputFieldLabel(usernameField, "Email or username");
+        usernameInput.setHint("Email or username");
+        usernameInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                | android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        View passkeyField = view.findViewById(R.id.formPasskeyField);
+        passkeyDateText = passkeyField.findViewById(R.id.ppInputEdit);
+        setInputFieldLabel(passkeyField, "Passkey");
+        passkeyDateText.setFocusable(false);
+        passkeyDateText.setClickable(false);
+        passkeyDateText.setCursorVisible(false);
+        passkeyDateText.setKeyListener(null);
+
+        View websiteField = view.findViewById(R.id.formWebsiteField);
+        websiteInput = websiteField.findViewById(R.id.ppInputEdit);
+        setInputFieldLabel(websiteField, "Website");
+        websiteInput.setHint("https://");
+        websiteInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        websiteError = view.findViewById(R.id.formWebsiteError);
+
+        View commentField = view.findViewById(R.id.formCommentField);
+        commentInput = commentField.findViewById(R.id.ppInputEdit);
+        setInputFieldLabel(commentField, "Comment");
+        commentInput.setHint("Add comment");
+        commentInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+
+        View folderRow = view.findViewById(R.id.formFolderSelector);
+        folderSelector = folderRow.findViewById(R.id.ppListItemTitle);
+        View folderLeading = folderRow.findViewById(R.id.ppListItemLeading);
+        if (folderLeading != null) folderLeading.setVisibility(View.GONE);
+        folderRow.setOnClickListener(v -> showFolderPicker());
+
+        // attachments + upload file hidden; re-enable via edit flow later
+        // attachmentsContainer = view.findViewById(R.id.formAttachmentsContainer);
+        // uploadFileButton = view.findViewById(R.id.formUploadFileButton);
+        attachmentsContainer = null;
+        uploadFileButton = null;
+
+        saveError = view.findViewById(R.id.formSaveError);
+        // fileSizeError = view.findViewById(R.id.formFileSizeError);
+        fileSizeError = null;
+        saveButton = view.findViewById(R.id.formSaveButton);
+
+        View discard = view.findViewById(R.id.formDiscardButton);
+        cancelButton = null;
+        if (discard != null) discard.setOnClickListener(v -> triggerCancel());
+        View sheetHeader = view.findViewById(R.id.formSheetHeader);
+        if (sheetHeader != null) {
+            TextView headerTitle = sheetHeader.findViewById(R.id.ppHeaderTitle);
+            if (headerTitle != null) headerTitle.setText("Create Passkey");
+            View back = sheetHeader.findViewById(R.id.ppHeaderBack);
+            View close = sheetHeader.findViewById(R.id.ppHeaderClose);
+            if (back != null) back.setOnClickListener(v -> {
+                if (!getParentFragmentManager().popBackStackImmediate()) triggerCancel();
+            });
+            if (close != null) close.setOnClickListener(v -> triggerCancel());
+        }
+    }
+
+    private void setInputFieldLabel(View inputField, String labelText) {
+        TextView label = inputField.findViewById(R.id.ppInputLabel);
+        if (label != null) label.setText(labelText);
+    }
+
+    private void triggerCancel() {
+        if (getActivity() instanceof PasskeyRegistrationActivity) {
+            ((PasskeyRegistrationActivity) getActivity()).onCancel();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -200,6 +295,11 @@ public class PasskeyFormFragment extends Fragment {
     }
 
     private void setupListeners() {
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            setupListenersV2();
+            return;
+        }
+
         cancelButton.setOnClickListener(v -> {
             if (getActivity() instanceof PasskeyRegistrationActivity) {
                 ((PasskeyRegistrationActivity) getActivity()).onCancel();
@@ -225,6 +325,24 @@ public class PasskeyFormFragment extends Fragment {
         saveButton.setOnClickListener(v -> handleSave());
 
         uploadFileButton.setOnClickListener(v -> openFilePicker());
+    }
+
+    /**
+     * Cancel/folder/discard are wired in bindV2Views; this handles the rest
+     */
+    private void setupListenersV2() {
+        titleInput.addTextChangedListener(new SimpleTextWatcher(() -> {
+            if (titleError != null) titleError.setVisibility(View.GONE);
+        }));
+
+        websiteInput.addTextChangedListener(new SimpleTextWatcher(() -> {
+            if (websiteError != null) websiteError.setVisibility(View.GONE);
+        }));
+
+        saveButton.setOnClickListener(v -> handleSave());
+
+        // Upload file hidden in V2.
+        // uploadFileButton.setOnClickListener(v -> openFilePicker());
     }
 
     private void showFolderPicker() {
@@ -338,6 +456,8 @@ public class PasskeyFormFragment extends Fragment {
     }
 
     private void refreshAttachmentsDisplay() {
+        // attachmentsContainer is null in V2
+        if (attachmentsContainer == null) return;
         attachmentsContainer.removeAllViews();
 
         if (existingAttachments.isEmpty() && attachments.isEmpty()) {
@@ -438,7 +558,7 @@ public class PasskeyFormFragment extends Fragment {
 
         isSaving = true;
         saveButton.setEnabled(false);
-        uploadFileButton.setEnabled(false);
+        if (uploadFileButton != null) uploadFileButton.setEnabled(false);
 
         String title = titleInput.getText().toString().trim();
         String username = usernameInput.getText().toString();

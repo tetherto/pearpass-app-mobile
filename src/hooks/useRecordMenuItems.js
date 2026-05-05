@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
+import { MOBILE_DESIGN_VERSION } from '@tetherto/pearpass-lib-constants'
 import {
   Layers,
   AccountCircleOutlined,
@@ -139,5 +139,5 @@ export const useRecordMenuItems = ({ exclude } = {}) => {
     [t, exclude]
   )
 
-  return DESIGN_VERSION === 2 ? defaultV2Items : defaultItems
+  return MOBILE_DESIGN_VERSION === 2 ? defaultV2Items : defaultItems
 }

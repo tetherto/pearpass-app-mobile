@@ -203,7 +203,7 @@ export const AttachmentFieldsV2 = <T extends AttachmentLike>({
       <MultiSlotInput
         actions={
           <Button
-            variant="tertiary"
+            variant="tertiaryAccent"
             iconBefore={<Add />}
             onClick={addAttachmentPlaceholder}
           >

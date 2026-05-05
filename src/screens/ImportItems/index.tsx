@@ -35,7 +35,13 @@ import {
   useCreateRecord
 } from '@tetherto/pearpass-lib-vault'
 import { useCallback, useState } from 'react'
-import { ActivityIndicator, Image, Pressable, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Image,
+  Linking,
+  Pressable,
+  View
+} from 'react-native'
 import Toast from 'react-native-toast-message'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { Layout } from 'src/containers/Layout'
@@ -48,9 +54,12 @@ type ImportState = 'default' | 'upload' | 'inputPassword'
 
 type ImportOption = {
   title: string
-  type: string
+  type: ImportOptionType
+  description: string
+  testId: string
   accepts: string[]
   imgKey: string
+  supportLink?: string
 }
 
 type FileInfo = {
@@ -61,60 +70,104 @@ type FileInfo = {
   isEncrypted: boolean
 }
 
+enum ImportOptionType {
+  OnePassword = '1password',
+  Bitwarden = 'bitwarden',
+  KeePass = 'keepass',
+  KeePassKDBX = 'keepass-kdbx',
+  LastPass = 'lastpass',
+  NordPass = 'nordpass',
+  ProtonPass = 'protonpass',
+  Unencrypted = 'unencrypted',
+  Encrypted = 'encrypted'
+}
+
 const importOptions: ImportOption[] = [
   {
     title: '1Password',
-    type: '1password',
+    type: ImportOptionType.OnePassword,
+    description: t`To import data from 1Password, open the app, go to File > Export, and export your data as a CSV file. Once the export is complete, upload the file here.`,
+    testId: 'settings-import-1password',
     accepts: ['.csv'],
-    imgKey: '1password'
+    imgKey: '1password',
+    supportLink: 'https://support.1password.com/export'
   },
   {
     title: 'Bitwarden',
-    type: 'bitwarden',
+    type: ImportOptionType.Bitwarden,
+    description: t`To import data from Bitwarden, go to Tools > Export Vault in the web app, choose JSON or CSV format, and upload the exported file here.`,
+    testId: 'settings-import-bitwarden',
     accepts: ['.json', '.csv'],
-    imgKey: 'bitwarden'
+    imgKey: 'bitwarden',
+    supportLink: 'https://bitwarden.com/help/export-your-data/'
   },
   {
     title: 'KeePass',
-    type: 'keepass',
+    type: ImportOptionType.KeePass,
+    description: t`To import data from KeePass, open your database and export it via File > Export. KDBX files require your database password. Upload the exported file here.`,
+    testId: 'settings-import-keepass',
     accepts: ['.kdbx', '.csv', '.xml'],
-    imgKey: 'keepass'
+    imgKey: 'keepass',
+    supportLink: 'https://keepass.info/help/base/importexport.html'
   },
   {
     title: 'KeePassXC',
-    type: 'keepass',
+    type: ImportOptionType.KeePassKDBX,
+    description: t`To import data from KeePassXC, open your database and go to Database > Export to CSV or XML. Once done, upload the exported file here.`,
+    testId: 'settings-import-keepassxc',
     accepts: ['.csv', '.xml'],
-    imgKey: 'keepassxc'
+    imgKey: 'keepassxc',
+    supportLink:
+      'https://keepassxc.org/docs/KeePassXC_UserGuide#_exporting_databases'
   },
   {
     title: 'LastPass',
-    type: 'lastpass',
+    type: ImportOptionType.LastPass,
+    description: t`To import data from LastPass, go to Advanced Options > Export in your LastPass vault. Export as CSV and upload the file here.`,
+    testId: 'settings-import-lastpass',
     accepts: ['.csv'],
-    imgKey: 'lastpass'
+    imgKey: 'lastpass',
+    supportLink:
+      'https://support.lastpass.com/s/document-item?language=en_US&bundleId=lastpass&topicId=LastPass/export-web-vault.html&_LANG=enus'
   },
   {
     title: 'NordPass',
-    type: 'nordpass',
+    type: ImportOptionType.NordPass,
+    description: t`To import data from NordPass, open the app, go to Settings > Import & Export, and export your data as CSV. Upload the exported file here.`,
+    testId: 'settings-import-nordpass',
     accepts: ['.csv'],
-    imgKey: 'nordpass'
+    imgKey: 'nordpass',
+    supportLink:
+      'https://support.nordpass.com/hc/en-us/articles/360007646477-How-to-export-passwords-from-NordPass'
   },
   {
     title: 'Proton Pass',
-    type: 'protonpass',
+    type: ImportOptionType.ProtonPass,
+    description: t`To import data from Proton Pass, open the app, go to Settings, navigate to the Export tab, and choose your preferred export format. Once the export is complete, upload the file here.`,
+    testId: 'settings-import-protonpass',
     accepts: ['.csv', '.json'],
-    imgKey: 'protonpass'
+    imgKey: 'protonpass',
+    supportLink: 'https://proton.me/support/pass-export'
   },
   {
     title: 'Encrypted file',
-    type: 'encrypted',
+    type: ImportOptionType.Encrypted,
+    description: t`Upload a PearPass-encrypted JSON export file. You will need the password used to encrypt the file.`,
+    testId: 'settings-import-encrypted',
     accepts: ['.json'],
-    imgKey: 'encrypted'
+    imgKey: 'encrypted',
+    supportLink:
+      'https://docs.pass.pears.com/how-to-guides/how-to-export-your-vault/'
   },
   {
     title: 'Unencrypted file',
-    type: 'unencrypted',
+    type: ImportOptionType.Unencrypted,
+    description: t`Upload an unencrypted PearPass export file in JSON or CSV format.`,
+    testId: 'settings-import-unencrypted',
     accepts: ['.json', '.csv'],
-    imgKey: 'unencrypted'
+    imgKey: 'unencrypted',
+    supportLink:
+      'https://docs.pass.pears.com/how-to-guides/how-to-export-your-vault/'
   }
 ]
 
@@ -127,31 +180,31 @@ const isAllowedType = (fileType: string, accepts: string[]) =>
   })
 
 const images = {
-  '1password': Image.resolveAssetSource(
+  [ImportOptionType.OnePassword]: Image.resolveAssetSource(
     require('../../../assets/images/1password.png')
   ).uri,
-  bitwarden: Image.resolveAssetSource(
-    require('../../../assets/images/BitWarden.png')
+  [ImportOptionType.Bitwarden]: Image.resolveAssetSource(
+    require('../../../assets/images/BitWarden.jpg')
   ).uri,
-  keepass: Image.resolveAssetSource(
+  [ImportOptionType.KeePass]: Image.resolveAssetSource(
     require('../../../assets/images/KeePass.png')
   ).uri,
-  keepassxc: Image.resolveAssetSource(
+  [ImportOptionType.KeePassKDBX]: Image.resolveAssetSource(
     require('../../../assets/images/KeePassXC.png')
   ).uri,
-  lastpass: Image.resolveAssetSource(
+  [ImportOptionType.LastPass]: Image.resolveAssetSource(
     require('../../../assets/images/LastPass.png')
   ).uri,
-  protonpass: Image.resolveAssetSource(
+  [ImportOptionType.ProtonPass]: Image.resolveAssetSource(
     require('../../../assets/images/ProtonPass.png')
   ).uri,
-  nordpass: Image.resolveAssetSource(
+  [ImportOptionType.NordPass]: Image.resolveAssetSource(
     require('../../../assets/images/NordPass.png')
   ).uri,
-  unencrypted: Image.resolveAssetSource(
+  [ImportOptionType.Unencrypted]: Image.resolveAssetSource(
     require('../../../assets/images/VaultIcon.png')
   ).uri,
-  encrypted: Image.resolveAssetSource(
+  [ImportOptionType.Encrypted]: Image.resolveAssetSource(
     require('../../../assets/images/VaultIcon.png')
   ).uri
 }
@@ -247,14 +300,18 @@ export const ImportItems = () => {
     let resolvedType = type
 
     try {
-      if (resolvedType === 'keepass' && fileType === 'kdbx') {
+      if (
+        (resolvedType === ImportOptionType.KeePass ||
+          resolvedType === ImportOptionType.KeePassKDBX) &&
+        fileType === 'kdbx'
+      ) {
         if (!password)
           throw new Error('Password is required for encrypted files')
         dataToProcess = await decryptKeePassKdbx(fileContent, password)
-        resolvedType = 'keepass-kdbx'
+        resolvedType = ImportOptionType.KeePassKDBX
       }
 
-      if (resolvedType === 'encrypted') {
+      if (resolvedType === ImportOptionType.Encrypted) {
         if (!password)
           throw new Error('Password is required for encrypted files')
         const encryptedData = JSON.parse(fileContent as string)
@@ -268,31 +325,31 @@ export const ImportItems = () => {
 
     try {
       switch (resolvedType) {
-        case '1password':
+        case ImportOptionType.OnePassword:
           result = await parse1PasswordData(dataToProcess, fileType)
           break
-        case 'bitwarden':
+        case ImportOptionType.Bitwarden:
           result = await parseBitwardenData(dataToProcess, fileType)
           break
-        case 'lastpass':
+        case ImportOptionType.LastPass:
           result = await parseLastPassData(dataToProcess, fileType)
           break
-        case 'keepass':
+        case ImportOptionType.KeePass:
           result = await parseKeePassData(dataToProcess, fileType)
           break
-        case 'keepass-kdbx':
+        case ImportOptionType.KeePassKDBX:
           result = await parseKeePassData(dataToProcess, 'kdbx')
           break
-        case 'nordpass':
+        case ImportOptionType.NordPass:
           result = await parseNordPassData(dataToProcess, fileType)
           break
-        case 'protonpass':
+        case ImportOptionType.ProtonPass:
           result = await parseProtonPassData(dataToProcess, fileType)
           break
-        case 'unencrypted':
+        case ImportOptionType.Unencrypted:
           result = await parsePearPassData(dataToProcess, fileType)
           break
-        case 'encrypted':
+        case ImportOptionType.Encrypted:
           result = await parsePearPassData(dataToProcess, 'json')
           break
         default:
@@ -420,12 +477,20 @@ export const ImportItems = () => {
     if (state === 'upload') {
       if (!selectedFileInfo) {
         return (
-          <Button iconBefore={<UploadFileFilled />} onClick={handleFilePick}>
+          <Button
+            iconBefore={<UploadFileFilled />}
+            onClick={handleFilePick}
+            data-testid="import-upload-file-button"
+          >
             {t`Upload file`}
           </Button>
         )
       }
-      return <Button onClick={handleContinue}>{t`Import`}</Button>
+      return (
+        <Button onClick={handleContinue} data-testid="import-continue-button">
+          {t`Import`}
+        </Button>
+      )
     }
 
     if (state === 'inputPassword') {
@@ -438,6 +503,7 @@ export const ImportItems = () => {
         <Button
           disabled={!values.password}
           onClick={handleSubmit(handleImport)}
+          data-testid="import-submit-button"
         >
           {t`Import`}
         </Button>
@@ -455,6 +521,7 @@ export const ImportItems = () => {
       header={
         <BackScreenHeader title={t`Settings`} onBack={navigation.goBack} />
       }
+      contentStyle={styles.container}
       footer={renderFooter()}
     >
       {state === 'default' && (
@@ -479,6 +546,7 @@ export const ImportItems = () => {
                 <ListItem
                   platform="mobile"
                   title={option.title}
+                  testID={option.testId}
                   subtitle={
                     t`Required Format:` +
                     ' ' +
@@ -533,7 +601,11 @@ export const ImportItems = () => {
 
       {state !== 'default' && selectedOption && (
         <View style={styles.content}>
-          <Pressable style={styles.backButton} onPress={handleBack}>
+          <Pressable
+            style={styles.backButton}
+            onPress={handleBack}
+            testID="import-back-button"
+          >
             <KeyboardArrowLeftOutlined
               width={20}
               height={20}
@@ -546,10 +618,22 @@ export const ImportItems = () => {
               {t`Import from`} {selectedOption.title}
             </Title>
             <Text color={theme.colors.colorTextSecondary} variant="label">
-              {t`To import data from Proton Pass, open the app, go to Settings, navigate to the Export tab, and choose your preferred export format. Once the export is complete, upload the file here.`}{' '}
-              <Link>
-                {t`Additionally, learn more about exporting data from Proton Pass.`}
-              </Link>
+              {selectedOption.description}
+              {selectedOption.supportLink && (
+                <>
+                  {' '}
+                  {t`Additionally,`}{' '}
+                  <Link
+                    href={selectedOption.supportLink}
+                    isExternal
+                    onClick={() => Linking.openURL(selectedOption.supportLink!)}
+                    data-testid="import-support-link"
+                  >
+                    {t`Learn more about exporting data from ${selectedOption.title}`}
+                  </Link>
+                  .
+                </>
+              )}
             </Text>
           </View>
 
@@ -561,6 +645,7 @@ export const ImportItems = () => {
                 value={passwordField.value}
                 onChange={passwordField.onChange}
                 error={passwordField.error ?? undefined}
+                testID="import-file-password-field"
               />
               <Text color={theme.colors.colorTextSecondary} variant="caption">
                 {t`The Uploaded File is encrypted, put the Password file to continue`}
@@ -576,6 +661,7 @@ export const ImportItems = () => {
               formatsPrefix={t`Required formats:`}
               acceptedFormats={selectedOption.accepts}
               image={images[selectedOption.imgKey as keyof typeof images]}
+              testID="import-upload-field"
             />
           )}
         </View>

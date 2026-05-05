@@ -28,6 +28,16 @@ export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>()
 
   const handleCreateRecord = (recordType: string) => {
+    if (recordType === 'password') {
+      navigation.navigate('CreatePasswordItem')
+      return
+    }
+
+    if (recordType === 'authenticator') {
+      navigation.navigate('CreateRecord', { recordType: 'login' })
+      return
+    }
+
     navigation.navigate('CreateRecord', { recordType })
   }
 
@@ -66,8 +76,7 @@ export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
             }
           >
             <BottomSheetCategorySelectorContent
-              recordType={'all'}
-              exclude={['all', 'password']}
+              variant="add-item"
               onSelect={handleCreateRecord}
             />
           </ContextMenu>

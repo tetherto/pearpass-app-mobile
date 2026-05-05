@@ -1,6 +1,5 @@
 import { ReactNode, useState } from 'react'
 
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
 import { MAX_FILE_SIZE_MB } from '@tetherto/pearpass-lib-constants'
 import {
@@ -156,23 +155,19 @@ export const BottomSheetUploadFileBodyV2 = withAutoLockBypass(
 )
 
 export const BottomSheetUploadFileContentV2 = withAutoLockBypass(
-  ({ onFileSelect, trigger, open, onOpenChange, testID }: Props) => {
-    const { dismiss } = useBottomSheetModal()
-
-    return (
-      <ContextMenu
-        trigger={trigger}
-        open={open}
-        onOpenChange={onOpenChange}
-        testID={testID}
-      >
-        <BottomSheetUploadFileBodyV2
-          onFileSelect={onFileSelect}
-          onClose={dismiss}
-        />
-      </ContextMenu>
-    )
-  }
+  ({ onFileSelect, trigger, open, onOpenChange, testID }: Props) => (
+    <ContextMenu
+      trigger={trigger}
+      open={open}
+      onOpenChange={onOpenChange}
+      testID={testID}
+    >
+      <BottomSheetUploadFileBodyV2
+        onFileSelect={onFileSelect}
+        onClose={() => onOpenChange?.(false)}
+      />
+    </ContextMenu>
+  )
 )
 
 const styles = StyleSheet.create({

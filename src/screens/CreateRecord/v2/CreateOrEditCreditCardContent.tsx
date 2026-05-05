@@ -271,7 +271,7 @@ export const CreateOrEditCreditCardContent = ({
       contentStyle={styles.content}
       header={
         <BackScreenHeader
-          title={isEditing ? t`Edit Credit Card` : t`New Credit Card`}
+          title={isEditing ? t`Edit Credit Card Item` : t`New Credit Card Item`}
           onBack={() => navigation.goBack()}
         />
       }
@@ -280,7 +280,7 @@ export const CreateOrEditCreditCardContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !values.title.trim()}
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
@@ -303,21 +303,21 @@ export const CreateOrEditCreditCardContent = ({
 
         <MultiSlotInput testID="card-details-multi-slot-input">
           <InputField
-            label={t`Name on card`}
+            label={t`Cardholder Name`}
             value={values.name}
             placeholder={t`Enter Name`}
             onChangeText={(val) => setValue('name', val)}
             testID="name-on-card-input-field"
           />
           <InputField
-            label={t`Number on card`}
+            label={t`Card Number`}
             value={values.number}
             placeholder={t`Enter Card Number`}
             onChangeText={handleCardNumberChange}
             testID="number-on-card-input-field"
           />
           <DateField
-            label={t`Date of expire`}
+            label={t`Expiration Date`}
             value={values.expireDate}
             placeholder={t`Enter Expire Date`}
             onChangeText={handleExpireDateChange}
@@ -325,13 +325,13 @@ export const CreateOrEditCreditCardContent = ({
             testID="date-of-expire-input-field"
           />
           <PasswordField
-            label={t`Security code`}
+            label={t`Security Code`}
             placeholder={t`Enter Security Code`}
             testID="security-code-input-field"
             {...adaptRegister(register('securityCode'))}
           />
           <PasswordField
-            label={t`Pin code`}
+            label={t`PIN`}
             placeholder={t`Enter PIN`}
             testID="pin-code-input-field"
             {...adaptRegister(register('pinCode'))}
@@ -364,7 +364,7 @@ export const CreateOrEditCreditCardContent = ({
           actions={
             <Button
               size="small"
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >

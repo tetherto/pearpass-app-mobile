@@ -2,16 +2,18 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState
 } from 'react'
 
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet from '@gorhom/bottom-sheet'
 import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { Animated } from 'react-native'
+import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { BackDrop } from '../components/BottomSheetBackdrop'
+import { isV2 } from '../utils/designVersion'
 
 export const BottomSheetContext = createContext()
 
@@ -20,19 +22,21 @@ export const BottomSheetProvider = ({
   enableContentPanningGesture = true
 }) => {
   const bottomSheetRef = useRef(null)
-  const backdropAnim = useRef(new Animated.Value(1)).current
   const { theme } = useTheme()
 
   const [options, setOptions] = useState(null)
   const snapPoints = useMemo(() => options?.snapPoints || [0], [options])
 
-  const collapseBottomSheet = useCallback(() => {
-    bottomSheetRef.current?.close()
-  }, [])
+  // Original V1 behavior: collapse = setOptions(null) (synchronous).
+  // This allows collapse() + expand() to batch in a single React render,
+  // so expand() always wins and the new sheet content is shown correctly.
+  const collapseBottomSheet = useCallback(() => setOptions(null), [])
 
-  const handleClose = useCallback(() => {
-    setOptions(null)
-  }, [])
+  useEffect(() => {
+    if (!options) {
+      bottomSheetRef?.current?.collapse()
+    }
+  }, [options])
 
   const handleSheetchanges = useCallback(
     (index) => {
@@ -52,10 +56,8 @@ export const BottomSheetProvider = ({
   )
 
   const renderBackdrop = useCallback(
-    () => (
-      <BackDrop animatedOpacity={backdropAnim} onPress={collapseBottomSheet} />
-    ),
-    [backdropAnim, collapseBottomSheet]
+    () => <BackDrop animatedOpacity={1} onPress={collapseBottomSheet} />,
+    [collapseBottomSheet]
   )
 
   return (
@@ -73,20 +75,21 @@ export const BottomSheetProvider = ({
           handleComponent={null}
           backdropComponent={renderBackdrop}
           onChange={handleSheetchanges}
-          onClose={handleClose}
           backgroundStyle={{
-            backgroundColor: theme.colors.colorSurfacePrimary,
+            backgroundColor: isV2()
+              ? theme.colors.colorSurfacePrimary
+              : colors.grey500.mode1,
             borderTopLeftRadius: rawTokens.spacing16,
             borderTopRightRadius: rawTokens.spacing16,
             overflow: 'hidden',
             borderWidth: 1,
             borderBottomWidth: 0,
-            borderColor: theme.colors.colorSurfaceDisabled
+            borderColor: isV2()
+              ? theme.colors.colorSurfaceDisabled
+              : colors.primary100.mode1
           }}
         >
-          <BottomSheetView style={{ bottom: 0 }}>
-            {options.children}
-          </BottomSheetView>
+          {options.children}
         </BottomSheet>
       )}
     </BottomSheetContext.Provider>

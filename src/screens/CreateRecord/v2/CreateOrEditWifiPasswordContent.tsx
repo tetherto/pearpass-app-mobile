@@ -17,13 +17,14 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { StyleSheet, View } from 'react-native'
+import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
 import { logger } from '../../../utils/logger'
+import { getPasswordIndicatorVariant } from '../../../utils/passwordPolicy'
 
 type WifiRecord = {
   data?: {
@@ -152,6 +153,7 @@ export const CreateOrEditWifiPasswordContent = ({
   }
 
   const openPasswordGenerator = () => {
+    Keyboard.dismiss()
     navigation.navigate('CreatePasswordItem', {
       onPasswordInsert: (value: string) => setValue('password', value)
     })
@@ -173,7 +175,7 @@ export const CreateOrEditWifiPasswordContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !values.title.trim() || !values.password.trim()}
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
@@ -188,7 +190,7 @@ export const CreateOrEditWifiPasswordContent = ({
         <MultiSlotInput
           actions={
             <Button
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<SyncLock />}
               onClick={openPasswordGenerator}
             >
@@ -209,6 +211,7 @@ export const CreateOrEditWifiPasswordContent = ({
             placeholder={t`Enter Password`}
             value={values.password}
             onChangeText={(val) => setValue('password', val)}
+            passwordIndicator={getPasswordIndicatorVariant(values.password)}
             testID="wifi-password-input-field"
           />
         </MultiSlotInput>
@@ -231,7 +234,7 @@ export const CreateOrEditWifiPasswordContent = ({
           actions={
             <Button
               size="small"
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >

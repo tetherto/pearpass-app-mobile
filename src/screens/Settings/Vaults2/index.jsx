@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -9,6 +9,7 @@ import {
   useTheme,
   Text
 } from '@tetherto/pearpass-lib-ui-kit'
+import { Add } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import { Layout } from 'src/containers/Layout'
@@ -17,18 +18,19 @@ import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { VaultRow } from './VaultRow'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { VAULT_ACTION } from '../../../constants/vaultActions'
-import { BottomSheetAddDeviceContent } from '../../../containers/BottomSheetAddDeviceContent'
-import { ModifyVaultModalContent } from '../../../containers/Modal/ModifyVaultModalContent'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
+import { BottomSheetPairedDevicesContent } from '../../../containers/BottomSheetPairedDevicesContent'
+import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
 import { useModal } from '../../../context/ModalContext'
+import { useVaultSwitch } from '../../../hooks/useVaultSwitch'
 
 export const VaultsV2 = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const { theme } = useTheme()
-  const { expand } = useBottomSheet()
   const { openModal } = useModal()
+  const [pairedDevicesOpen, setPairedDevicesOpen] = useState(false)
   const { data: currentVault, refetch: refetchVault } = useVault()
+  const { switchVault } = useVaultSwitch()
   const { data: allVaults } = useVaults()
 
   useEffect(() => {
@@ -41,10 +43,7 @@ export const VaultsV2 = () => {
   )
 
   const handleAddMember = () => {
-    expand({
-      children: <BottomSheetAddDeviceContent />,
-      snapPoints: ['10%', '50%', '90%']
-    })
+    navigation.navigate('ShareVault')
   }
 
   const handleCreateNewVault = () => {
@@ -53,21 +52,14 @@ export const VaultsV2 = () => {
 
   const buildVaultActions = (vault) => ({
     onRename: () =>
-      openModal(
-        <ModifyVaultModalContent
-          vaultId={vault.id}
-          vaultName={vault.name}
-          action={VAULT_ACTION.NAME}
-        />
-      ),
-    onManageMembers: () =>
-      expand({
-        children: <BottomSheetAddDeviceContent />,
-        snapPoints: ['10%', '50%', '90%']
+      navigation.navigate('VaultRenameScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
       }),
+    onViewPairedDevices: () => setPairedDevicesOpen(true),
     onSetPassword: () =>
       openModal(
-        <ModifyVaultModalContent
+        <ModifyVaultModalContentV2
           vaultId={vault.id}
           vaultName={vault.name}
           action={VAULT_ACTION.PASSWORD}
@@ -88,6 +80,7 @@ export const VaultsV2 = () => {
       onAddMember={handleAddMember}
       isCurrentVault={isCurrentVault}
       vaultActions={buildVaultActions(vault)}
+      onClick={() => (!isCurrentVault ? switchVault(vault) : null)}
     />
   )
 
@@ -102,14 +95,24 @@ export const VaultsV2 = () => {
       }
       contentStyle={styles.content}
       footer={
-        <Button variant="primary" fullWidth onClick={handleCreateNewVault}>
-          {t`+ Create New Vault`}
+        <Button
+          variant="primary"
+          iconBefore={<Add />}
+          fullWidth
+          onClick={handleCreateNewVault}
+        >
+          {t`Create New Vault`}
         </Button>
       }
     >
       <PageHeader
         title={t`Your Vaults`}
-        subtitle={t`Manage your vaults, control access permissions, and take protective measures if needed.`}
+        subtitle={t`Manage your vaults. Select the vault you want to apply changes to.`}
+      />
+
+      <BottomSheetPairedDevicesContent
+        open={pairedDevicesOpen}
+        onOpenChange={setPairedDevicesOpen}
       />
 
       {currentVault && (
@@ -152,6 +155,7 @@ export const VaultsV2 = () => {
 const styles = StyleSheet.create({
   content: {
     padding: rawTokens.spacing16,
+    paddingTop: rawTokens.spacing24,
     gap: rawTokens.spacing20,
     flexGrow: 1
   },

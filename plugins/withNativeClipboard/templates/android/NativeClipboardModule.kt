@@ -5,8 +5,6 @@ import android.content.ClipboardManager
 import android.content.ClipDescription
 import android.content.Context
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.os.PersistableBundle
 import android.util.Log
 import androidx.work.ExistingWorkPolicy
@@ -21,8 +19,6 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
         const val TAG = "NativeClipboard"
         private const val CLEAR_CLIPBOARD_WORK_NAME = "ClearClipboard"
         private var lastCopiedText: String? = null
-        private var clearHandler: Handler? = null
-        private var clearRunnable: Runnable? = null
     }
 
     override fun getName(): String {
@@ -45,9 +41,22 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
             }
 
             clipboard.setPrimaryClip(clip)
-
             lastCopiedText = text
-            scheduleClearClipboard(text, (seconds * 1000).toLong())
+
+            // Schedule a single WorkManager job. ExistingWorkPolicy.REPLACE handles
+            // any previously enqueued clear for the same unique name atomically —
+            // no manual cancel-then-enqueue (which races with the REPLACE).
+            val clearClipboardRequest = OneTimeWorkRequestBuilder<ClearClipboardWorker>()
+                .setInitialDelay(seconds.toLong(), TimeUnit.SECONDS)
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                CLEAR_CLIPBOARD_WORK_NAME,
+                ExistingWorkPolicy.REPLACE,
+                clearClipboardRequest,
+            )
+
+            Log.d(TAG, "Scheduled WorkManager to clear clipboard in ${seconds}s")
 
             promise.resolve(true)
         } catch (e: Exception) {
@@ -69,7 +78,7 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
             }
 
             lastCopiedText = null
-            cancelScheduledClear()
+            WorkManager.getInstance(context).cancelUniqueWork(CLEAR_CLIPBOARD_WORK_NAME)
 
             promise.resolve(true)
         } catch (e: Exception) {
@@ -128,96 +137,5 @@ class NativeClipboardModule(reactContext: ReactApplicationContext) : ReactContex
     @ReactMethod
     fun isAvailable(promise: Promise) {
         promise.resolve(true)
-    }
-
-    private fun scheduleClearClipboard(text: String, delayMillis: Long) {
-        cancelScheduledClear()
-
-        // 1. Handler for in-app clearing (fast, immediate response when app is open)
-        // Only works when app is in foreground; WorkManager handles background clearing
-        clearHandler = Handler(Looper.getMainLooper())
-        clearRunnable = Runnable {
-            // Check if app is in foreground - on Android 10+, clipboard operations
-            // silently fail when in background (no exception thrown)
-            val currentActivity = currentActivity
-            val isInForeground = currentActivity?.hasWindowFocus() == true
-
-            if (!isInForeground) {
-                Log.d(TAG, "App not in foreground, deferring clipboard clear to WorkManager")
-                return@Runnable
-            }
-
-            // Clear unconditionally - no need to read/verify clipboard content because:
-            // 1. ExistingWorkPolicy.REPLACE resets the timer when user copies something new
-            // 2. Reading clipboard adds unnecessary complexity and potential failures
-            try {
-                val context = reactApplicationContext
-                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    clipboard.clearPrimaryClip()
-                } else {
-                    val clip = ClipData.newPlainText("", "")
-                    clipboard.setPrimaryClip(clip)
-                }
-                lastCopiedText = null
-                Log.d(TAG, "Clipboard cleared via Handler")
-
-                // Handler succeeded, cancel WorkManager
-                cancelWorkManager()
-            } catch (e: Exception) {
-                // Clipboard access failed - let WorkManager handle it
-                Log.d(TAG, "Handler clipboard clear failed, deferring to WorkManager", e)
-            }
-        }
-
-        clearHandler?.postDelayed(clearRunnable!!, delayMillis)
-
-        // 2. WorkManager for when app is closed (survives app termination)
-        // WorkManager provides proper execution context that can access clipboard
-        // even on Android 10+ where background clipboard access is restricted
-        scheduleWorkManager(delayMillis)
-    }
-
-    private fun scheduleWorkManager(delayMillis: Long) {
-        try {
-            val context = reactApplicationContext
-
-            val clearClipboardRequest = OneTimeWorkRequestBuilder<ClearClipboardWorker>()
-                .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
-                .build()
-
-            WorkManager.getInstance(context).enqueueUniqueWork(
-                CLEAR_CLIPBOARD_WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                clearClipboardRequest,
-            )
-
-            Log.d(TAG, "Scheduled WorkManager to clear clipboard in ${delayMillis}ms")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to schedule WorkManager for clipboard clear", e)
-        }
-    }
-
-    private fun cancelWorkManager() {
-        try {
-            val context = reactApplicationContext
-            WorkManager.getInstance(context).cancelUniqueWork(CLEAR_CLIPBOARD_WORK_NAME)
-            Log.d(TAG, "Cancelled clipboard clear WorkManager")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to cancel WorkManager", e)
-        }
-    }
-
-    private fun cancelScheduledClear() {
-        // Cancel Handler
-        clearRunnable?.let {
-            clearHandler?.removeCallbacks(it)
-            clearRunnable = null
-        }
-        clearHandler = null
-
-        // Cancel WorkManager
-        cancelWorkManager()
     }
 }

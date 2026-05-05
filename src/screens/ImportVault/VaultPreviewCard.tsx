@@ -14,15 +14,42 @@ import Animated, {
   Easing
 } from 'react-native-reanimated'
 
-import { RECORD_ICON_BY_TYPE } from '../../constants/recordIconByType'
+import { AvatarRecordV2 } from '../../components/AvatarRecordV2'
+
+type VaultWebsite = string | { website?: string }
 
 type VaultRecord = {
   id: string
   type: string
+  isFavorite?: boolean
   data?: {
     title?: string
     username?: string
+    email?: string
+    websites?: VaultWebsite[]
   }
+}
+
+function loginWebsiteUrl(record: VaultRecord): string {
+  if (record.type !== 'login') return ''
+  const first = record.data?.websites?.[0]
+  if (typeof first === 'string') return first
+  if (first && typeof first === 'object' && typeof first.website === 'string') {
+    return first.website
+  }
+  return ''
+}
+
+function getRecordSubtitle(record: VaultRecord): string | undefined {
+  const d = record.data
+  if (!d) return undefined
+  if (record.type === 'login') {
+    if (typeof d.username === 'string' && d.username) return d.username
+    if (typeof d.email === 'string' && d.email) return d.email
+    const url = loginWebsiteUrl(record)
+    if (url) return url
+  }
+  return d.username || undefined
 }
 
 type VaultPreviewCardProps = {
@@ -110,27 +137,21 @@ export const VaultPreviewCard = ({
           ]}
         >
           {records.map((record) => {
-            const IconComponent =
-              RECORD_ICON_BY_TYPE[record.type] || RECORD_ICON_BY_TYPE.all
+            const websiteDomain = loginWebsiteUrl(record)
 
             return (
               <ListItem
                 key={record.id}
                 icon={
-                  <View
-                    style={[
-                      styles.recordIconContainer,
-                      { backgroundColor: theme.colors.colorSurfaceElevatedOnInteraction }
-                    ]}
-                  >
-                    <IconComponent
-                      size={16}
-                      color={theme.colors.colorTextSecondary}
-                    />
-                  </View>
+                  <AvatarRecordV2
+                    record={record}
+                    size="md"
+                    websiteDomain={websiteDomain}
+                    testID={`import-vault-preview-avatar-${record.id}`}
+                  />
                 }
                 title={record.data?.title || t`Untitled`}
-                subtitle={record.data?.username || undefined}
+                subtitle={getRecordSubtitle(record)}
                 platform="mobile"
               />
             )
@@ -153,13 +174,6 @@ const styles = StyleSheet.create({
   chevronButton: {
     width: 32,
     height: 32,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  recordIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: rawTokens.spacing8,
     justifyContent: 'center',
     alignItems: 'center'
   },

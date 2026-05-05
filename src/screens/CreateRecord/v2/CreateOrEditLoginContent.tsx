@@ -20,7 +20,7 @@ import {
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { StyleSheet, View } from 'react-native'
+import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { FormGroup } from '../../../components/FormGroup'
 
@@ -33,6 +33,7 @@ import { addHttps } from '../../../utils/addHttps'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 import { logger } from '../../../utils/logger'
+import { getPasswordIndicatorVariant } from '../../../utils/passwordPolicy'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
 
 type LoginAttachment = {
@@ -268,6 +269,7 @@ export const CreateOrEditLoginContent = ({
   }
 
   const openPasswordGenerator = () => {
+    Keyboard.dismiss()
     navigation.navigate('CreatePasswordItem', {
       onPasswordInsert: (value: string) => setValue('password', value)
     })
@@ -275,6 +277,11 @@ export const CreateOrEditLoginContent = ({
 
   const handleFolderSelect = (folder?: { name?: string }) => {
     if (!folder) {
+      return
+    }
+
+    if (folder.name === 'allFolder') {
+      setValue('folder', '')
       return
     }
 
@@ -327,7 +334,7 @@ export const CreateOrEditLoginContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !values.title.trim()}
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
@@ -351,7 +358,7 @@ export const CreateOrEditLoginContent = ({
         <MultiSlotInput
           actions={
             <Button
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<SyncLock />}
               onClick={openPasswordGenerator}
             >
@@ -372,6 +379,7 @@ export const CreateOrEditLoginContent = ({
             value={values.password}
             placeholder={t`Enter Password`}
             onChangeText={(val) => setValue('password', val)}
+            passwordIndicator={getPasswordIndicatorVariant(values.password)}
             testID="credentials-multi-slot-input-slot-1"
           />
         </MultiSlotInput>
@@ -412,7 +420,7 @@ export const CreateOrEditLoginContent = ({
         <MultiSlotInput
           actions={
             <Button
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<Add />}
               onClick={() => addItem({ website: '' })}
             >
@@ -446,27 +454,7 @@ export const CreateOrEditLoginContent = ({
           ))}
         </MultiSlotInput>
 
-        <MultiSlotInput
-          actions={
-            <ContextMenu
-              trigger={
-                <Button
-                  variant="tertiary"
-                  iconBefore={<Add />}
-                >
-                  {t`Add Another Folder`}
-                </Button>
-              }
-            >
-              <BottomSheetFolderSelectorContent
-                selectedFolder={values.folder}
-                onSelect={handleFolderSelect}
-                includeAllFolders={false}
-              />
-            </ContextMenu>
-          }
-          testID="folder-multi-slot-input"
-        >
+        <MultiSlotInput testID="folder-multi-slot-input">
           <ContextMenu
             trigger={
               <SelectField
@@ -486,7 +474,6 @@ export const CreateOrEditLoginContent = ({
             <BottomSheetFolderSelectorContent
               selectedFolder={values.folder}
               onSelect={handleFolderSelect}
-              includeAllFolders={false}
             />
           </ContextMenu>
         </MultiSlotInput>
@@ -505,11 +492,19 @@ export const CreateOrEditLoginContent = ({
           testID="comments-multi-slot-input-slot-0"
         />
 
+        <AttachmentFieldsV2
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
+        />
+
         <MultiSlotInput
           actions={
             <Button
               size='small'
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >
@@ -526,7 +521,7 @@ export const CreateOrEditLoginContent = ({
                 label={t`Hidden Message`}
                 value={field.note ?? ''}
                 placeholder={t`Enter Hidden Message`}
-                onChange={(val) => setValue(`customFields[${index}].note`, val)}
+                onChangeText={(val) => setValue(`customFields[${index}].note`, val)}
                 isGrouped
                 testID={`hidden-messages-multi-slot-input-slot-${index}`}
                 rightSlot={
@@ -553,14 +548,6 @@ export const CreateOrEditLoginContent = ({
               />
             )}
         </MultiSlotInput>
-
-        <AttachmentFieldsV2
-          attachments={values.attachments}
-          isEditing={isEditing}
-          onAdd={handleFileUpload}
-          onReplace={handleAttachmentReplace}
-          onDelete={handleAttachmentDelete}
-        />
       </View>
     </Layout>
   )

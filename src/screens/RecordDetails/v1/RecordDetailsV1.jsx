@@ -111,7 +111,7 @@ export const RecordDetailsV1 = ({ route }) => {
                   <BottomSheetRecordActionsContent
                     record={record}
                     recordType={record.type}
-                    excludeTypes={['copy']}
+                    excludeTypes={['copy', 'edit']}
                     onDelete={() => navigation.goBack()}
                   />
                 ),

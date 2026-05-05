@@ -7,6 +7,7 @@ import {
   Button,
   InputField,
   MultiSlotInput,
+  PasswordField,
   Text,
   rawTokens,
   useTheme
@@ -222,7 +223,7 @@ export const CreateOrEditNoteContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !values.title.trim()}
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
@@ -234,7 +235,7 @@ export const CreateOrEditNoteContent = ({
           label={t`Title`}
           value={values.title}
           placeholder={t`Enter Title`}
-          onChange={(value) => setValue('title', value)}
+          onChangeText={(value) => setValue('title', value)}
           testID="title-field"
         />
       </View>
@@ -245,10 +246,10 @@ export const CreateOrEditNoteContent = ({
         </Text>
 
         <InputField
-          label={t`Comment`}
+          label={t`Note`}
           value={values.note}
-          placeholder={t`Enter Comment`}
-          onChange={(value) => setValue('note', value)}
+          placeholder={t`Enter Note`}
+          onChangeText={(value) => setValue('note', value)}
           testID="note-field"
         />
       </View>
@@ -258,15 +259,23 @@ export const CreateOrEditNoteContent = ({
           {t`Additional`}
         </Text>
 
+        <AttachmentFieldsV2<NoteAttachment>
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
+        />
+
         <MultiSlotInput
           actions={
             <Button
               size="small"
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >
-              {t`Add Another Note`}
+              {t`Add Another Message`}
             </Button>
           }
           errorMessage={
@@ -274,27 +283,27 @@ export const CreateOrEditNoteContent = ({
               errors as Record<string, { error?: { note?: string } }[]>
             )?.customFields?.find(Boolean)?.error?.note
           }
-          testID="comments-multi-slot-input"
+          testID="hidden-messages-multi-slot-input"
         >
           {customFieldsList.length ? (
             customFieldsList.map(
               (field, index) => (
-                <InputField
+                <PasswordField
                   key={`${field.type}-${index}`}
-                  label={t`Comment`}
+                  label={t`Hidden Message`}
                   value={field.note ?? ''}
-                  placeholder={t`Enter Comment`}
-                  onChange={(value) =>
+                  placeholder={t`Enter Hidden Message`}
+                  onChangeText={(value) =>
                     setValue(`customFields[${index}].note`, value)
                   }
                   isGrouped
-                  testID={`comments-multi-slot-input-slot-${index}`}
+                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
                   rightSlot={
                     customFieldsList.length > 1 ? (
                       <Button
                         size="small"
                         variant="tertiary"
-                        aria-label="Delete comment"
+                        aria-label="Delete hidden message"
                         iconBefore={
                           <TrashOutlined color={theme.colors.colorTextPrimary} />
                         }
@@ -306,24 +315,16 @@ export const CreateOrEditNoteContent = ({
               )
             )
           ) : (
-            <InputField
-              label={t`Comment`}
+            <PasswordField
+              label={t`Hidden Message`}
               value=""
-              placeholder={t`Enter Comment`}
+              placeholder={t`Enter Hidden Message`}
               onChangeText={handleFirstCustomFieldChange}
               isGrouped
-              testID="comments-multi-slot-input-slot-0"
+              testID="hidden-messages-multi-slot-input-slot-0"
             />
           )}
         </MultiSlotInput>
-
-        <AttachmentFieldsV2<NoteAttachment>
-          attachments={values.attachments}
-          isEditing={isEditing}
-          onAdd={handleFileUpload}
-          onReplace={handleAttachmentReplace}
-          onDelete={handleAttachmentDelete}
-        />
       </View>
     </Layout>
   )

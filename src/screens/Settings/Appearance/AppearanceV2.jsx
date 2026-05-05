@@ -129,7 +129,7 @@ export const AppearanceV2 = () => {
 const getStyles = (theme) =>
   StyleSheet.create({
     scrollContent: {
-      padding: rawTokens.spacing16,
+      paddingTop: rawTokens.spacing24,
       gap: rawTokens.spacing20,
       flexGrow: 1
     },

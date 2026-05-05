@@ -31,6 +31,7 @@ export const useRouteHelper = () => {
       route?.name === 'AuthV2MasterPassword' ||
       (route?.name === 'Welcome' &&
         (route?.params?.state === NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD ||
+          route?.params?.state === NAVIGATION_ROUTES.SCREEN_LOCKED ||
           !route?.params)),
     []
   )

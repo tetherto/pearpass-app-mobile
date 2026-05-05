@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ppListItemRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/pp_v2_list_item_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/pp_v2_spacing_s12"
+    android:paddingEnd="@dimen/pp_v2_spacing_s12"
+    android:paddingTop="@dimen/pp_v2_spacing_s12"
+    android:paddingBottom="@dimen/pp_v2_spacing_s12">
+
+    <ImageView
+        android:id="@+id/ppListItemLeading"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="@dimen/pp_v2_spacing_s8"
+        android:contentDescription="@null"
+        android:src="@drawable/pp_v2_ic_lock"
+        app:tint="@color/pp_v2_text_primary"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ppListItemTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.PearPass.V2.LabelEmphasized"
+            android:textColor="@color/pp_v2_text_primary"
+            tools:text="Personal Vault" />
+
+        <TextView
+            android:id="@+id/ppListItemSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.PearPass.V2.Label"
+            android:textColor="@color/pp_v2_text_secondary"
+            android:visibility="gone"
+            tools:text="subtitle"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ppListItemTrailing"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="@dimen/pp_v2_spacing_s8"
+        android:contentDescription="@null"
+        android:src="@drawable/pp_v2_ic_chevron_down"
+        app:tint="@color/pp_v2_text_primary"
+        tools:ignore="ContentDescription" />
+</LinearLayout>

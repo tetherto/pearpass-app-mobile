@@ -156,11 +156,12 @@ export const MasterPasswordScreen = () => {
     }
   }, [initVaults, navigation, t])
 
-  const biometricLabel = isFaceID
-    ? t`Try again with Face ID`
-    : isFingerprint
-      ? t`Try again with Fingerprint`
-      : null
+  const biometricLabel =
+    isFaceID && !isFingerprint
+      ? t`Try again with Face ID`
+      : isFingerprint
+        ? t`Try again with Fingerprint`
+        : null
 
   return (
     <OnboardingLayout topGradient avoidBottomInset={isKeyboardVisible}>
@@ -193,7 +194,7 @@ export const MasterPasswordScreen = () => {
                 data-testid="auth-v2-master-password-input"
               />
 
-              {failedAttempts >= 2 ? (
+              {failedAttempts >= 2 && unsupportedFeaturesEnabled() ? (
                 <AlertMessage
                   variant="warning"
                   title={t`Forgot your Master Password?`}
@@ -214,7 +215,7 @@ export const MasterPasswordScreen = () => {
           <View style={styles.linkContainer}>
             {isBiometricAvailable && biometricLabel ? (
               <Link
-                onPress={handleBiometricRetry}
+                onClick={handleBiometricRetry}
                 data-testid="auth-v2-biometric-retry"
               >
                 {biometricLabel}
@@ -253,7 +254,7 @@ const getStyles = (theme) =>
       paddingHorizontal: rawTokens.spacing16
     },
     topSection: {
-      paddingTop: rawTokens.spacing40,
+      paddingTop: rawTokens.spacing60,
       gap: rawTokens.spacing48
     },
     titleContainer: {

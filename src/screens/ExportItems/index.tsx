@@ -249,6 +249,7 @@ export const ExportItems = () => {
           />
         </ContextMenu>
       }
+      contentStyle={styles.container}
     >
       <View style={styles.content}>
         <View style={styles.captions}>

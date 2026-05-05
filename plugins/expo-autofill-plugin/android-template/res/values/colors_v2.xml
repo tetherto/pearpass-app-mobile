@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pp_v2_background">#FF080A05</color>
+    <color name="pp_v2_surface_primary">#FF15180E</color>
+    <color name="pp_v2_surface_search_field">#FF16181B</color>
+    <color name="pp_v2_surface_secondary">#FFFDCA40</color>
+
+    <color name="pp_v2_primary">#FFB0D944</color>
+    <color name="pp_v2_secondary">#FF8AE081</color>
+    <color name="pp_v2_accent_hover">#FFBAE061</color>
+    <color name="pp_v2_accent_active">#FF98C328</color>
+
+    <color name="pp_v2_text_primary">#FFFFFFFF</color>
+    <color name="pp_v2_on_primary">#FF08090C</color>
+    <color name="pp_v2_text_search_field">#FF67707E</color>
+    <color name="pp_v2_text_secondary">#FFBDC3AC</color>
+    <color name="pp_v2_text_tertiary">#FFF6F6F6</color>
+    <color name="pp_v2_text_disabled">#FF435123</color>
+
+    <color name="pp_v2_border_primary">#FF212814</color>
+    <color name="pp_v2_border_search_field">#FF252937</color>
+    <color name="pp_v2_border_secondary">#FF2C3618</color>
+
+    <color name="pp_v2_surface_hover">#FF212814</color>
+    <color name="pp_v2_surface_elevated_on_interaction">#FF2C3618</color>
+    <color name="pp_v2_surface_disabled">#FF212814</color>
+
+    <color name="pp_v2_surface_destructive_elevated">#FFD13B3D</color>
+    <color name="pp_v2_surface_destructive">#FF421010</color>
+    <color name="pp_v2_surface_error">#FFD1383D</color>
+    <color name="pp_v2_surface_warning">#FFD7D245</color>
+
+    <color name="pp_v2_focus_ring">#FFB0D944</color>
+    <color name="pp_v2_link_text">#FFBADE5B</color>
+    <color name="pp_v2_background_snackbar">#FFFFFFFF</color>
+</resources>

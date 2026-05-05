@@ -37,5 +37,10 @@
 	</dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Inter.ttf</string>
+		<string>HumbleNostalgia.otf</string>
+	</array>
 </dict>
 </plist>

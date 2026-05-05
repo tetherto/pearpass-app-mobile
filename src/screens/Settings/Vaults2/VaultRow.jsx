@@ -15,7 +15,8 @@ export const VaultRow = ({
   showDivider,
   onAddMember,
   vaultActions,
-  isCurrentVault
+  isCurrentVault,
+  onClick
 }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
@@ -24,6 +25,7 @@ export const VaultRow = ({
   return (
     <View>
       <ListItem
+        onClick={onClick}
         platform="mobile"
         icon={
           <View style={styles.iconBadge}>
@@ -37,17 +39,17 @@ export const VaultRow = ({
         title={vault?.name ?? vault?.id}
         subtitle={t`Private`}
         rightElement={
-          <View style={styles.actions}>
-            {isCurrentVault && (
+          isCurrentVault && (
+            <View style={styles.actions}>
               <Button
                 variant="tertiary"
                 size="small"
                 iconBefore={<PersonAdd color={theme.colors.colorTextPrimary} />}
                 onClick={onAddMember}
               />
-            )}
-            <VaultActionsMenu {...vaultActions} />
-          </View>
+              <VaultActionsMenu {...vaultActions} />
+            </View>
+          )
         }
       />
 

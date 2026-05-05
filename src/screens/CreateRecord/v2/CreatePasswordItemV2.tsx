@@ -60,12 +60,8 @@ const titleStyles = css.create({
   }
 })
 
-const renderHighlightedPassword = (
-  text: string,
-  primaryColor: string,
-  secondaryColor: string
-) => {
-  const parts = text.split(/(\d+|[^a-zA-Z\d\s])/g)
+const renderHighlightedPassword = (text: string, numberColor: string) => {
+  const parts = text.split(/(\d+)/g)
 
   return parts.map((part, index) => {
     if (!part) {
@@ -74,33 +70,17 @@ const renderHighlightedPassword = (
 
     if (/^\d+$/.test(part)) {
       return (
-        <Text
+        <Title
           key={`${part}-${index}`}
-          color={primaryColor}
-          variant="bodyEmphasized"
+          // inline style for dynamic theme color;
+          style={{ color: numberColor } as never}
         >
           {part}
-        </Text>
+        </Title>
       )
     }
 
-    if (/[^a-zA-Z\d\s]/.test(part)) {
-      return (
-        <Text
-          key={`${part}-${index}`}
-          color={secondaryColor}
-          variant="bodyEmphasized"
-        >
-          {part}
-        </Text>
-      )
-    }
-
-    return (
-      <Text key={`${part}-${index}`} variant="bodyEmphasized">
-        {part}
-      </Text>
-    )
+    return part
   })
 }
 
@@ -230,6 +210,7 @@ export const CreatePasswordItemV2 = ({ route }: CreatePasswordItemV2Props) => {
   return (
     <Layout
       scrollable
+      disableKeyboardAvoidance
       contentStyle={styles.content}
       header={
         <BackScreenHeader
@@ -276,8 +257,7 @@ export const CreatePasswordItemV2 = ({ route }: CreatePasswordItemV2Props) => {
               <Title as="h3" style={titleStyles.generatedPasswordTitle}>
                 {renderHighlightedPassword(
                   generatedValue,
-                  theme.colors.colorPrimary,
-                  theme.colors.colorTextSecondary
+                  theme.colors.colorPrimary
                 )}
               </Title>
             </View>
@@ -344,10 +324,10 @@ export const CreatePasswordItemV2 = ({ route }: CreatePasswordItemV2Props) => {
         >
           <View style={styles.sliderRow}>
             <View style={styles.sliderLabel}>
-              <Text variant="bodyEmphasized">
+              <Text variant="labelEmphasized" noWrap>
                 {selectedOption === PASSWORD_OPTIONS.passphrase
-                  ? `${selectedRules.passphrase.words} ${t`words`}`
-                  : `${selectedRules.password.characters} ${t`chars`}`}
+                  ? `${selectedRules.passphrase.words} ${t`Words`}`
+                  : `${selectedRules.password.characters} ${t`Chars`}`}
               </Text>
             </View>
 
@@ -516,7 +496,7 @@ const styles = StyleSheet.create({
     gap: rawTokens.spacing12
   },
   sliderLabel: {
-    width: 72
+    minWidth: 72
   },
   slider: {
     flex: 1,

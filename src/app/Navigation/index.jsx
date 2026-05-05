@@ -29,11 +29,16 @@ import {
 import { RecordDetails } from '../../screens/RecordDetails'
 import { AboutV2 } from '../../screens/Settings/About/AboutV2'
 import { AppearanceV2 } from '../../screens/Settings/Appearance/AppearanceV2'
+import { AppPreferences } from '../../screens/Settings/AppPreferences'
 import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
-import { MyDevices } from '../../screens/Settings/MyDevices'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
+import { VaultDeleteScreen } from '../../screens/Settings/VaultDeleteScreen'
+import { VaultPasswordScreen } from '../../screens/Settings/VaultPasswordScreen'
+import { VaultRenameScreen } from '../../screens/Settings/VaultRenameScreen'
 import { VaultsV2 } from '../../screens/Settings/Vaults2'
+import { VaultSettingsScreen } from '../../screens/Settings/VaultSettingsScreen'
+import { VaultShareScreen } from '../../screens/Settings/VaultShareScreen'
 import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
 import { isV2 } from '../../utils/designVersion'
@@ -115,6 +120,7 @@ export const Navigation = ({ initialRouteName }) => (
       name="CreateFolder"
       component={isV2() ? CreateFolderV2 : CreateFolder}
     />
+    <Stack.Screen name="AppPreferences" component={AppPreferences} />
     <Stack.Screen name="MasterPassword" component={MasterPassword} />
     <Stack.Screen name="BlindPeering" component={BlindPeeringSectionV2} />
     <Stack.Screen name="ImportVault" component={ImportVault} />
@@ -126,8 +132,12 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="AppearanceV2" component={AppearanceV2} />
     <Stack.Screen name="ImportItems" component={ImportItems} />
     <Stack.Screen name="Vaults2" component={VaultsV2} />
-    <Stack.Screen name="MyDevices" component={MyDevices} />
     <Stack.Screen name="ExportItems" component={ExportItems} />
     <Stack.Screen name="DeleteFolder" component={DeleteFolderV2} />
+    <Stack.Screen name="VaultSettingsScreen" component={VaultSettingsScreen} />
+    <Stack.Screen name="VaultRenameScreen" component={VaultRenameScreen} />
+    <Stack.Screen name="VaultPasswordScreen" component={VaultPasswordScreen} />
+    <Stack.Screen name="VaultDeleteScreen" component={VaultDeleteScreen} />
+    <Stack.Screen name="VaultShareScreen" component={VaultShareScreen} />
   </Stack.Navigator>
 )

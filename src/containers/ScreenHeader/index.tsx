@@ -56,7 +56,8 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: rawTokens.spacing16,
+    paddingHorizontal: rawTokens.spacing8,
+    paddingVertical: rawTokens.spacing16,
     gap: rawTokens.spacing8,
   },
   leftContainer: {

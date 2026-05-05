@@ -43,9 +43,11 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
         <RN.Text>{children}</RN.Text>
       </RN.Pressable>
     ),
+    AlertMessage: () => null,
     useTheme: () => ({
       theme: { colors: {} }
-    })
+    }),
+    rawTokens: new Proxy({}, { get: () => 0 })
   }
 })
 
@@ -57,6 +59,10 @@ jest.mock('../../../hooks/useKeyboardVisibility', () => ({
   useKeyboardVisibility: () => ({
     isKeyboardVisible: false
   })
+}))
+
+jest.mock('../../../utils/unsupportedFeatures', () => ({
+  unsupportedFeaturesEnabled: () => true
 }))
 
 jest.mock('../hooks/usePasswordCreation', () => ({

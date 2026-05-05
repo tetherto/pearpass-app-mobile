@@ -222,7 +222,52 @@ describe('useVersionCheck', () => {
     })
   })
 
-  it('should handle Android version check', async () => {
+  it('should set needsUpdate to true when Android store version is higher and past grace period', async () => {
+    Platform.OS = 'android'
+    const pastGracePeriod = 'Jan 1, 2025'
+    global.fetch.mockResolvedValue({
+      text: () =>
+        Promise.resolve(
+          `some html [[["2.0.0"]]] more html <div class="x">Updated on</div><div class="y">${pastGracePeriod}</div>`
+        )
+    })
+
+    const { result } = renderHook(() => useVersionCheck())
+
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    await waitFor(() => {
+      expect(result.current.needsUpdate).toBe(true)
+      expect(result.current.isChecking).toBe(false)
+    })
+  })
+
+  it('should set needsUpdate to false when Android store version is higher but within grace period', async () => {
+    Platform.OS = 'android'
+    const now = new Date()
+    const within = `${now.toLocaleString('en-US', { month: 'short' })} ${now.getDate()}, ${now.getFullYear()}`
+    global.fetch.mockResolvedValue({
+      text: () =>
+        Promise.resolve(
+          `some html [[["2.0.0"]]] more html <div class="x">Updated on</div><div class="y">${within}</div>`
+        )
+    })
+
+    const { result } = renderHook(() => useVersionCheck())
+
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    await waitFor(() => {
+      expect(result.current.needsUpdate).toBe(false)
+      expect(result.current.isChecking).toBe(false)
+    })
+  })
+
+  it('should set needsUpdate to true on Android when release date cannot be parsed from HTML', async () => {
     Platform.OS = 'android'
     global.fetch.mockResolvedValue({
       text: () => Promise.resolve('some html [[["2.0.0"]]] more html')
@@ -236,6 +281,28 @@ describe('useVersionCheck', () => {
 
     await waitFor(() => {
       expect(result.current.needsUpdate).toBe(true)
+      expect(result.current.isChecking).toBe(false)
+    })
+  })
+
+  it('should set needsUpdate to false when Android store version matches current', async () => {
+    Platform.OS = 'android'
+    global.fetch.mockResolvedValue({
+      text: () =>
+        Promise.resolve(
+          'some html [[["1.0.0"]]] more html <div class="x">Updated on</div><div class="y">Jan 1, 2025</div>'
+        )
+    })
+
+    const { result } = renderHook(() => useVersionCheck())
+
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    await waitFor(() => {
+      expect(result.current.needsUpdate).toBe(false)
+      expect(result.current.isChecking).toBe(false)
     })
   })
 

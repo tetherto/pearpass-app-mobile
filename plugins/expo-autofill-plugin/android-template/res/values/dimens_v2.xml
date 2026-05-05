@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="pp_v2_spacing_s2">2dp</dimen>
+    <dimen name="pp_v2_spacing_s4">4dp</dimen>
+    <dimen name="pp_v2_spacing_s6">6dp</dimen>
+    <dimen name="pp_v2_spacing_s8">8dp</dimen>
+    <dimen name="pp_v2_spacing_s10">10dp</dimen>
+    <dimen name="pp_v2_spacing_s12">12dp</dimen>
+    <dimen name="pp_v2_spacing_s16">16dp</dimen>
+    <dimen name="pp_v2_spacing_s20">20dp</dimen>
+    <dimen name="pp_v2_spacing_s24">24dp</dimen>
+    <dimen name="pp_v2_spacing_s32">32dp</dimen>
+    <dimen name="pp_v2_spacing_s40">40dp</dimen>
+    <dimen name="pp_v2_spacing_s48">48dp</dimen>
+
+    <dimen name="pp_v2_radius_r8">8dp</dimen>
+    <dimen name="pp_v2_radius_r16">16dp</dimen>
+    <dimen name="pp_v2_radius_r20">20dp</dimen>
+    <dimen name="pp_v2_radius_r26">26dp</dimen>
+
+    <dimen name="pp_v2_font_s12">12sp</dimen>
+    <dimen name="pp_v2_font_s14">14sp</dimen>
+    <dimen name="pp_v2_font_s16">16sp</dimen>
+    <dimen name="pp_v2_font_s24">24sp</dimen>
+    <dimen name="pp_v2_font_s28">28sp</dimen>
+</resources>

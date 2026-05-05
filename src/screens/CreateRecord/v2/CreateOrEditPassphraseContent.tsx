@@ -12,6 +12,7 @@ import {
   Button,
   InputField,
   MultiSlotInput,
+  PasswordField,
   Text,
   rawTokens,
   useTheme
@@ -181,7 +182,7 @@ export const CreateOrEditPassphraseContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !values.title.trim() || !values.passPhrase.trim()}
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
@@ -216,15 +217,23 @@ export const CreateOrEditPassphraseContent = ({
           {t`Additional`}
         </Text>
 
+        <InputField
+          label={t`Comment`}
+          value={values.note}
+          placeholder={t`Enter Comment`}
+          onChangeText={(val) => setValue('note', val)}
+          testID="comment-input-field"
+        />
+
         <MultiSlotInput
           actions={
             <Button
               size="small"
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >
-              {t`Add Another Note`}
+              {t`Add Another Message`}
             </Button>
           }
           errorMessage={
@@ -232,56 +241,49 @@ export const CreateOrEditPassphraseContent = ({
               errors as Record<string, { error?: { note?: string } }[]>
             )?.customFields?.find(Boolean)?.error?.note
           }
-          testID="comments-multi-slot-input"
+          testID="hidden-messages-multi-slot-input"
         >
-          <InputField
-            label={t`Comment`}
-            value={values.note}
-            placeholder={t`Enter Comment`}
-            onChangeText={(val) => setValue('note', val)}
-            isGrouped
-            testID="comments-multi-slot-input-slot-0"
-            rightSlot={
-              (values.note?.length ?? 0) > 0 ? (
-                <Button
-                  size="small"
-                  variant="tertiary"
-                  aria-label="Delete comment"
-                  iconBefore={
-                    <TrashOutlined color={theme.colors.colorTextPrimary} />
+          {(values.customFields as Array<{ type: string; note?: string }>).length
+            ? (values.customFields as Array<{ type: string; note?: string }>).map(
+              (field, index) => (
+                <PasswordField
+                  key={`${field.type}-${index}`}
+                  label={t`Hidden Message`}
+                  value={field.note ?? ''}
+                  placeholder={t`Enter Hidden Message`}
+                  onChangeText={(val) =>
+                    setValue(`customFields[${index}].note`, val)
                   }
-                  onClick={() => setValue('note', '')}
+                  isGrouped
+                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                  rightSlot={
+                    (values.customFields as Array<{ type: string; note?: string }>).length > 1 ? (
+                      <Button
+                        size="small"
+                        variant="tertiary"
+                        aria-label="Delete hidden message"
+                        iconBefore={
+                          <TrashOutlined color={theme.colors.colorTextPrimary} />
+                        }
+                        onClick={() => removeCustomField(index)}
+                      />
+                    ) : undefined
+                  }
                 />
-              ) : undefined
-            }
-          />
-
-          {(values.customFields as Array<{ type: string; note?: string }>).map(
-            (field, index) => (
-              <InputField
-                key={`${field.type}-${index}`}
-                label={t`Comment`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Comment`}
+              )
+            )
+            : (
+              <PasswordField
+                label={t`Hidden Message`}
+                value=""
+                placeholder={t`Enter Hidden Message`}
                 onChangeText={(val) =>
-                  setValue(`customFields[${index}].note`, val)
+                  setValue('customFields', [{ type: 'note', note: val }])
                 }
                 isGrouped
-                testID={`comments-multi-slot-input-slot-${index + 1}`}
-                rightSlot={
-                  <Button
-                    size="small"
-                    variant="tertiary"
-                    aria-label="Delete comment"
-                    iconBefore={
-                      <TrashOutlined color={theme.colors.colorTextPrimary} />
-                    }
-                    onClick={() => removeCustomField(index)}
-                  />
-                }
+                testID="hidden-messages-multi-slot-input-slot-0"
               />
-            )
-          )}
+            )}
         </MultiSlotInput>
       </View>
     </Layout>

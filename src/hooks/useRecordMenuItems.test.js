@@ -28,7 +28,7 @@ jest.mock('@tetherto/pearpass-lib-vault', () => ({
 
 let mockDesignVersion = 1
 jest.mock('@tetherto/pearpass-lib-constants', () => ({
-  get DESIGN_VERSION() {
+  get MOBILE_DESIGN_VERSION() {
     return mockDesignVersion
   },
   PROTECTED_VAULT_ENABLED: false

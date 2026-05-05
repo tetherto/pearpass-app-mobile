@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native'
 import {
   AlertMessage,
   Button,
-  PageHeader,
   PasswordField,
   rawTokens
 } from '@tetherto/pearpass-lib-ui-kit'
@@ -45,9 +44,8 @@ export const VaultDeleteScreen = ({ route }) => {
     <Layout
       header={
         <BackScreenHeader
-          title={t`Settings`}
+          title={t`Delete ${vaultName} vault`}
           onBack={() => navigation.goBack()}
-          style={styles.header}
         />
       }
       contentStyle={styles.content}
@@ -64,19 +62,13 @@ export const VaultDeleteScreen = ({ route }) => {
         </Button>
       }
     >
-      <PageHeader
-        title={t`Delete Personal Vault`}
-        subtitle={t`Are you sure you want to delete “${vaultName}”? All items in this vault will be permanently deleted. This cannot be undone.`}
-      />
-
       <View style={styles.fields}>
         <PasswordField
           label={t`Confirm With Master Password`}
           value={masterPassword}
-          placeholderText={t`Enter Master Password to Confirm Deletion`}
-          onChangeText={setMasterPassword}
+          placeholder={t`Enter Master Password to Confirm Deletion`}
+          onChange={(e) => setMasterPassword(e.target.value)}
           testID="vault-delete-master-password-input"
-          onSubmitEditing={handleDelete}
         />
 
         <AlertMessage
@@ -93,12 +85,8 @@ export const VaultDeleteScreen = ({ route }) => {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    paddingBottom: rawTokens.spacing16
-  },
   content: {
     flex: 1,
-    padding: rawTokens.spacing16,
     gap: rawTokens.spacing20
   },
   fields: {

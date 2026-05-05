@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pp_v2_background"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/formSheetHeader"
+        layout="@layout/include_pp_sheet_header_back_v2" />
+
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/pp_v2_content_card_bg"
+        android:orientation="vertical">
+
+    
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/pp_v2_spacing_s16"
+            android:paddingEnd="@dimen/pp_v2_spacing_s16"
+            android:paddingTop="@dimen/pp_v2_spacing_s16"
+            android:paddingBottom="@dimen/pp_v2_spacing_s16">
+
+            
+            <include
+                android:id="@+id/formTitleField"
+                layout="@layout/include_pp_input_field_v2" />
+
+            <TextView
+                android:id="@+id/formTitleError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_v2_spacing_s4"
+                android:textAppearance="@style/TextAppearance.PearPass.V2.Caption"
+                android:textColor="@color/pp_v2_surface_error"
+                android:visibility="gone"
+                tools:text="Title is required"
+                tools:visibility="visible" />
+
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_v2_spacing_s24"
+                android:layout_marginBottom="@dimen/pp_v2_spacing_s8"
+                android:text="Credentials"
+                android:textAppearance="@style/TextAppearance.PearPass.V2.Label"
+                android:textColor="@color/pp_v2_text_secondary" />
+
+            <include
+                android:id="@+id/formUsernameField"
+                layout="@layout/include_pp_input_field_v2" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/pp_v2_spacing_s8" />
+
+            <include
+                android:id="@+id/formPasskeyField"
+                layout="@layout/include_pp_input_field_v2" />
+
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_v2_spacing_s24"
+                android:layout_marginBottom="@dimen/pp_v2_spacing_s8"
+                android:text="Details"
+                android:textAppearance="@style/TextAppearance.PearPass.V2.Label"
+                android:textColor="@color/pp_v2_text_secondary" />
+
+            <include
+                android:id="@+id/formWebsiteField"
+                layout="@layout/include_pp_input_field_v2" />
+
+            <TextView
+                android:id="@+id/formWebsiteError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_v2_spacing_s4"
+                android:textAppearance="@style/TextAppearance.PearPass.V2.Caption"
+                android:textColor="@color/pp_v2_surface_error"
+                android:visibility="gone"
+                tools:text="Wrong format of website"
+                tools:visibility="visible" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/pp_v2_spacing_s8" />
+
+            <include
+                android:id="@+id/formCommentField"
+                layout="@layout/include_pp_input_field_v2" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/pp_v2_spacing_s8" />
+
+            
+            <include
+                android:id="@+id/formFolderSelector"
+                layout="@layout/include_pp_list_item_v2" />
+
+            <!-- Attachments + upload file temporarily hidden per team decision
+            <LinearLayout
+                android:id="@+id/formAttachmentsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_v2_spacing_s8"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/formFileSizeError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_v2_spacing_s4"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.PearPass.V2.Caption"
+                android:textColor="@color/pp_v2_surface_error"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/formUploadFileButton"
+                style="@style/Button.PearPass.V2.Tertiary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_v2_spacing_s12"
+                android:text="Upload File" />
+            -->
+        </LinearLayout>
+    </ScrollView>
+
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/pp_v2_spacing_s12"
+        android:layout_marginEnd="@dimen/pp_v2_spacing_s12"
+        android:background="@color/pp_v2_border_primary" />
+
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/pp_v2_spacing_s16"
+        android:paddingEnd="@dimen/pp_v2_spacing_s16"
+        android:paddingTop="@dimen/pp_v2_spacing_s16"
+        android:paddingBottom="@dimen/pp_v2_spacing_s32">
+
+        <TextView
+            android:id="@+id/formSaveError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/pp_v2_spacing_s8"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.PearPass.V2.Caption"
+            android:textColor="@color/pp_v2_surface_error"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/formSaveButton"
+            style="@style/Button.PearPass.V2.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save &amp; Add Login" />
+
+        <Button
+            android:id="@+id/formDiscardButton"
+            style="@style/Button.PearPass.V2.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/pp_v2_spacing_s8"
+            android:text="Discard" />
+    </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

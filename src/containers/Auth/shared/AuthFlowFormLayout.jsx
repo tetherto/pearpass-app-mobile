@@ -22,6 +22,7 @@ export const AuthFlowFormLayout = ({
   headerTitle,
   avoidBottomInset = false,
   showTitle = true,
+  showLogo,
   contentStyle,
   scrollContentStyle,
   titleTestID,
@@ -37,12 +38,17 @@ export const AuthFlowFormLayout = ({
     setIsScrollable(contentHeight.current > scrollViewHeight.current)
   }, [])
 
+  const resolvedShowLogo = showLogo ?? !onBack
+
   return (
-    <OnboardingLayout showLogo={false} avoidBottomInset={avoidBottomInset}>
+    <OnboardingLayout
+      showLogo={resolvedShowLogo}
+      avoidBottomInset={avoidBottomInset}
+    >
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 50 : 20}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 50 : 0}
       >
         <View style={styles.flex}>
           {onBack ? (
@@ -65,31 +71,38 @@ export const AuthFlowFormLayout = ({
               checkScrollable()
             }}
           >
-            <View style={[styles.content, contentStyle]}>
-              {showTitle ? (
-                <View style={styles.titleContainer}>
-                  <Title data-testid={titleTestID}>{title}</Title>
-                </View>
-              ) : null}
+            <View
+              style={[
+                styles.content,
+                avoidBottomInset && styles.contentKeyboardOpen,
+                contentStyle
+              ]}
+            >
+              {showTitle || subtitle ? (
+                <View style={styles.headerBlock}>
+                  {showTitle ? (
+                    <View style={styles.titleContainer}>
+                      <Title data-testid={titleTestID}>{title}</Title>
+                    </View>
+                  ) : null}
 
-              {subtitle ? (
-                <View
-                  style={[
-                    styles.subtitleContainer,
-                    onBack && styles.subtitleWithBackContainer
-                  ]}
-                >
-                  <Text
-                    as="p"
-                    color={
-                      onBack
-                        ? theme.colors.colorTextSecondary
-                        : theme.colors.colorTextPrimary
-                    }
-                    data-testid={subtitleTestID}
-                  >
-                    {subtitle}
-                  </Text>
+                  {subtitle ? (
+                    <View
+                      style={[
+                        styles.subtitleContainer,
+                        onBack && styles.subtitleWithBackContainer
+                      ]}
+                    >
+                      <Text
+                        as="p"
+                        color={theme.colors.colorTextPrimary}
+                        style={styles.subtitleText}
+                        data-testid={subtitleTestID}
+                      >
+                        {subtitle}
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
               ) : null}
 
@@ -103,7 +116,9 @@ export const AuthFlowFormLayout = ({
                 styles.bottomSection,
                 {
                   backgroundColor: theme.colors.colorSurfacePrimary,
-                  paddingBottom: Math.max(insets.bottom, rawTokens.spacing16),
+                  paddingBottom: !avoidBottomInset
+                    ? rawTokens.spacing24
+                    : Math.max(insets.bottom, rawTokens.spacing24),
                   borderTopColor: theme.colors.colorBorderPrimary,
                   shadowColor: theme.colors.colorTextPrimary
                 },
@@ -129,8 +144,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: rawTokens.spacing16
   },
   content: {
-    paddingTop: rawTokens.spacing20 * 2,
-    gap: rawTokens.spacing20
+    paddingTop: rawTokens.spacing60,
+    paddingBottom: rawTokens.spacing60,
+    gap: rawTokens.spacing32
+  },
+  contentKeyboardOpen: {
+    paddingTop: rawTokens.spacing40,
+    paddingBottom: rawTokens.spacing40
+  },
+  headerBlock: {
+    gap: rawTokens.spacing12
   },
   titleContainer: {
     alignItems: 'center'
@@ -140,6 +163,9 @@ const styles = StyleSheet.create({
   },
   subtitleWithBackContainer: {
     alignItems: 'flex-start'
+  },
+  subtitleText: {
+    textAlign: 'center'
   },
   bottomSection: {
     paddingHorizontal: rawTokens.spacing16,

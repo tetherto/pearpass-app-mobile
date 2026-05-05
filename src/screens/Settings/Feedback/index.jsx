@@ -169,6 +169,7 @@ export const Feedback = () => {
 const styles = StyleSheet.create({
   content: {
     padding: rawTokens.spacing16,
+    paddingTop: rawTokens.spacing24,
     gap: rawTokens.spacing8,
     flexGrow: 1
   },

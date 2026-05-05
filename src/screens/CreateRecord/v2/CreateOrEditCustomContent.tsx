@@ -7,6 +7,7 @@ import {
   Button,
   InputField,
   MultiSlotInput,
+  PasswordField,
   Text,
   rawTokens,
   useTheme
@@ -98,7 +99,7 @@ export const CreateOrEditCustomContent = ({
     title: Validator.string().required(t`Title is required`),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string().required(t`Hidden message is required`)
       })
     ),
     folder: Validator.string(),
@@ -216,7 +217,7 @@ export const CreateOrEditCustomContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !values.title.trim()}
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
@@ -235,18 +236,26 @@ export const CreateOrEditCustomContent = ({
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Details`}
+          {t`Additional`}
         </Text>
+
+        <AttachmentFieldsV2<CustomAttachment>
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
+        />
 
         <MultiSlotInput
           actions={
             <Button
               size="small"
-              variant="tertiary"
+              variant="tertiaryAccent"
               iconBefore={<Add />}
               onClick={() => addCustomField({ type: 'note', note: '' })}
             >
-              {t`Add Another Field`}
+              {t`Add Another Message`}
             </Button>
           }
           errorMessage={
@@ -254,27 +263,27 @@ export const CreateOrEditCustomContent = ({
               errors as Record<string, { error?: { note?: string } }[]>
             )?.customFields?.find(Boolean)?.error?.note
           }
-          testID="custom-fields-multi-slot-input"
+          testID="hidden-messages-multi-slot-input"
         >
           {values.customFields.length
             ? values.customFields.map(
                 (field, index) => (
-                  <InputField
+                  <PasswordField
                     key={`${field.type}-${index}`}
-                    label={t`Other Field`}
+                    label={t`Hidden Message`}
                     value={field.note ?? ''}
-                    placeholder={t`Enter Value`}
+                    placeholder={t`Enter Hidden Message`}
                     onChangeText={(value) =>
                       setValue(`customFields[${index}].note`, value)
                     }
                     isGrouped
-                    testID={`custom-fields-multi-slot-input-slot-${index}`}
+                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
                     rightSlot={
                       values.customFields.length > 1 ? (
                         <Button
                           size="small"
                           variant="tertiary"
-                          aria-label="Delete custom field"
+                          aria-label="Delete hidden message"
                           iconBefore={
                             <TrashOutlined
                               color={theme.colors.colorTextPrimary}
@@ -288,30 +297,16 @@ export const CreateOrEditCustomContent = ({
                 )
               )
             : (
-                <InputField
-                  label={t`Other Field`}
+                <PasswordField
+                  label={t`Hidden Message`}
                   value=""
-                  placeholder={t`Enter Value`}
+                  placeholder={t`Enter Hidden Message`}
                   onChangeText={handleFirstCustomFieldChange}
                   isGrouped
-                  testID="custom-fields-multi-slot-input-slot-0"
+                  testID="hidden-messages-multi-slot-input-slot-0"
                 />
               )}
         </MultiSlotInput>
-      </View>
-
-      <View style={styles.section}>
-        <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Additional`}
-        </Text>
-
-        <AttachmentFieldsV2<CustomAttachment>
-          attachments={values.attachments}
-          isEditing={isEditing}
-          onAdd={handleFileUpload}
-          onReplace={handleAttachmentReplace}
-          onDelete={handleAttachmentDelete}
-        />
       </View>
     </Layout>
   )

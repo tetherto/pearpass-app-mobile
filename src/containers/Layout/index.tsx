@@ -25,6 +25,7 @@ type LayoutProps = {
   hideFooter?: boolean
   scrollable?: boolean
   isBuiltin?: boolean
+  disableKeyboardAvoidance?: boolean
   style?: StyleProp<ViewStyle>
   contentStyle?: StyleProp<ViewStyle>
   footerStyle?: StyleProp<ViewStyle>
@@ -36,6 +37,7 @@ export const Layout = ({
   children,
   scrollable = false,
   isBuiltin = true,
+  disableKeyboardAvoidance = false,
   style,
   contentStyle,
   footerStyle,
@@ -46,11 +48,12 @@ export const Layout = ({
   const { bottom } = useSafeAreaInsets()
 
   const isSheetMode = mode === 'sheet'
+  const useKeyboardAvoidance = !isSheetMode && !disableKeyboardAvoidance
 
-  const CardWrapper = isSheetMode ? View : KeyboardAvoidingView
-  const cardWrapperProps = isSheetMode
-    ? {}
-    : { behavior: Platform.OS === 'ios' ? ('padding' as const) : ('height' as const) }
+  const CardWrapper = useKeyboardAvoidance ? KeyboardAvoidingView : View
+  const cardWrapperProps = useKeyboardAvoidance
+    ? { behavior: Platform.OS === 'ios' ? ('padding' as const) : ('height' as const) }
+    : {}
 
   const showFooter = !!footer && !hideFooter
   const isBuiltinApplied = isBuiltin && !isSheetMode

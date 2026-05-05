@@ -15,21 +15,22 @@ import {
 import * as SecureStore from 'expo-secure-store'
 
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
+import { isV2 } from '../utils/designVersion'
 import { logger } from '../utils/logger'
+
+const DEFAULT_TIMEOUT = isV2() ? 60000 : DEFAULT_AUTO_LOCK_TIMEOUT
 
 const AutoLockContext = createContext({
   shouldBypassAutoLock: false,
   setShouldBypassAutoLock: () => {},
-  autoLockTimeout: DEFAULT_AUTO_LOCK_TIMEOUT,
+  autoLockTimeout: DEFAULT_TIMEOUT,
   setAutoLockTimeout: () => {},
   isAutoLockEnabled: true
 })
 
 export const AutoLockProvider = ({ children }) => {
   const [shouldBypassAutoLock, setShouldBypassAutoLock] = useState(false)
-  const [autoLockTimeout, setAutoLockTimeoutState] = useState(
-    DEFAULT_AUTO_LOCK_TIMEOUT
-  )
+  const [autoLockTimeout, setAutoLockTimeoutState] = useState(DEFAULT_TIMEOUT)
   const [isLoaded, setIsLoaded] = useState(false)
 
   const interactionListenerRef = useRef(null)
@@ -38,7 +39,7 @@ export const AutoLockProvider = ({ children }) => {
     const loadSavedTimeout = async () => {
       try {
         if (!AUTO_LOCK_ENABLED) {
-          setAutoLockTimeoutState(DEFAULT_AUTO_LOCK_TIMEOUT)
+          setAutoLockTimeoutState(DEFAULT_TIMEOUT)
           setIsLoaded(true)
           return
         }

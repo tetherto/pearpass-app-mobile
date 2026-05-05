@@ -40,8 +40,10 @@ export const BiometricsScreen = () => {
 
   const biometricsChecked = useRef(false)
 
-  // Skip this screen if biometrics is not supported or already enabled
+  // Skip this screen if biometrics is not supported or already enabled.
+  // Only auto-skip when reached via the real onboarding flow (password param present).
   useEffect(() => {
+    if (!password) return
     if (biometricsChecked.current) return
     const timer = setTimeout(() => {
       biometricsChecked.current = true
@@ -51,7 +53,7 @@ export const BiometricsScreen = () => {
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [isBiometricsSupported, isBiometricsEnabled])
+  }, [isBiometricsSupported, isBiometricsEnabled, password])
 
   const title = isIOS
     ? t`Unlock faster with Face ID`
@@ -145,6 +147,7 @@ export const BiometricsScreen = () => {
               <Text
                 as="p"
                 color={theme.colors.colorTextSecondary}
+                style={styles.description}
                 data-testid="onboarding-v2-biometrics-description"
               >
                 {t`Use your fingerprint or face to securely unlock PearPass and confirm actions. It's faster than entering your Master Password and works only with your approval.`}
@@ -210,5 +213,8 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     alignItems: 'center',
     marginBottom: 30
+  },
+  description: {
+    textAlign: 'center'
   }
 })

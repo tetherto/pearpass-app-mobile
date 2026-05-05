@@ -7,12 +7,9 @@ import {
   PlusIcon
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
-import { Camera } from 'expo-camera'
 import { Alert, Pressable, Linking } from 'react-native'
+import { Camera } from 'react-native-vision-camera'
 
-import { useBottomSheet } from '../../context/BottomSheetContext'
-import { logger } from '../../utils/logger'
-import { BottomSheetUploadImageContent } from '../BottomSheetUploadImageContent'
 import {
   AddContainer,
   Body,
@@ -23,6 +20,9 @@ import {
   Title
 } from './styles'
 import { useAutoLockContext } from '../../context/AutoLockContext'
+import { useBottomSheet } from '../../context/BottomSheetContext'
+import { logger } from '../../utils/logger'
+import { BottomSheetUploadImageContent } from '../BottomSheetUploadImageContent'
 
 /**
  * @component
@@ -82,16 +82,15 @@ const ImagesFieldComponent = ({
   const handleAddClick = useCallback(async () => {
     try {
       setShouldBypassAutoLock(true)
-      const cameraPermission = await Camera.getCameraPermissionsAsync()
+      const cameraStatus = Camera.getCameraPermissionStatus()
+      let cameraGranted = cameraStatus === 'granted'
 
-      let cameraGranted = cameraPermission.status === 'granted'
-
-      if (!cameraGranted && cameraPermission.canAskAgain) {
-        const result = await Camera.requestCameraPermissionsAsync()
-        cameraGranted = result.status === 'granted'
+      if (!cameraGranted && cameraStatus === 'not-determined') {
+        const result = await Camera.requestCameraPermission()
+        cameraGranted = result === 'granted'
       }
 
-      if (!cameraGranted && !cameraPermission.canAskAgain) {
+      if (!cameraGranted) {
         Alert.alert(
           t`Permission Required`,
           t`Camera access is required to take photos. Please enable it in Settings.`,
@@ -102,15 +101,6 @@ const ImagesFieldComponent = ({
               onPress: () => Linking.openSettings()
             }
           ]
-        )
-        return
-      }
-
-      if (!cameraGranted) {
-        Alert.alert(
-          t`Permission Required`,
-          t`Camera access is required to take photos.`,
-          [{ text: t`OK` }]
         )
         return
       }

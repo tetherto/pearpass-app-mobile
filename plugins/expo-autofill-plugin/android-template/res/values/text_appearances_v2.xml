@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.PearPass.V2" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/pp_v2_inter</item>
+        <item name="android:textColor">@color/pp_v2_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.PearPass.V2.Caption" parent="TextAppearance.PearPass.V2">
+        <item name="android:textSize">@dimen/pp_v2_font_s12</item>
+    </style>
+
+    <style name="TextAppearance.PearPass.V2.Label" parent="TextAppearance.PearPass.V2">
+        <item name="android:textSize">@dimen/pp_v2_font_s14</item>
+    </style>
+
+    <style name="TextAppearance.PearPass.V2.LabelEmphasized" parent="TextAppearance.PearPass.V2">
+        <item name="android:textSize">@dimen/pp_v2_font_s14</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
+    <style name="TextAppearance.PearPass.V2.Body" parent="TextAppearance.PearPass.V2">
+        <item name="android:textSize">@dimen/pp_v2_font_s16</item>
+    </style>
+
+    <style name="TextAppearance.PearPass.V2.BodyEmphasized" parent="TextAppearance.PearPass.V2">
+        <item name="android:textSize">@dimen/pp_v2_font_s16</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
+    <style name="TextAppearance.PearPass.V2.Title" parent="TextAppearance.PearPass.V2">
+        <item name="android:fontFamily">@font/humble_nostalgia</item>
+        <item name="android:textSize">@dimen/pp_v2_font_s28</item>
+    </style>
+</resources>

@@ -39,13 +39,13 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
         <RN.Text>{subtitle}</RN.Text>
       </RN.View>
     ),
-    PasswordField: ({ label, value, onChangeText, testID }) => (
+    PasswordField: ({ label, value, onChange, testID }) => (
       <RN.View>
         <RN.Text>{label}</RN.Text>
         <RN.TextInput
           testID={testID}
           value={value}
-          onChangeText={onChangeText}
+          onChangeText={(text) => onChange?.({ target: { value: text } })}
         />
       </RN.View>
     ),
@@ -70,12 +70,15 @@ jest.mock('react-native-toast-message', () => ({
 jest.mock(
   'src/containers/ScreenHeader/BackScreenHeader',
   () => ({
-    BackScreenHeader: ({ onBack }) => {
-      const { Text, TouchableOpacity } = require('react-native')
+    BackScreenHeader: ({ title, onBack }) => {
+      const { Text, TouchableOpacity, View } = require('react-native')
       return (
-        <TouchableOpacity testID="vault-delete-back-button" onPress={onBack}>
-          <Text>Back</Text>
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity testID="vault-delete-back-button" onPress={onBack}>
+            <Text>Back</Text>
+          </TouchableOpacity>
+          <Text>{title}</Text>
+        </View>
       )
     }
   }),
@@ -114,10 +117,10 @@ describe('VaultDeleteScreen', () => {
   it('renders the destructive copy and warning', () => {
     const { getByText, getByTestId } = renderScreen()
 
-    expect(getByText('Delete Personal Vault')).toBeTruthy()
+    expect(getByText(/Delete Personal Vault/)).toBeTruthy()
     expect(
       getByText(
-        'Are you sure you want to delete “Personal Vault”? All items in this vault will be permanently deleted. This cannot be undone.'
+        'Deleting this vault permanently removes all data on this device. Vault deletion remains blocked until mobile SDK support is available.'
       )
     ).toBeTruthy()
     expect(getByTestId('vault-delete-warning')).toBeTruthy()

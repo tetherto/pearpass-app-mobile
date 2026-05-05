@@ -63,6 +63,11 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // v2 uses the new sheet layout + inter font
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            return onCreateViewV2(inflater, container);
+        }
+
         View view = inflater.inflate(R.layout.fragment_master_password, container, false);
 
         passwordInput = view.findViewById(R.id.passwordInput);
@@ -88,6 +93,45 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
 
         // Setup biometric button if available
         setupBiometricButton();
+
+        return view;
+    }
+
+    /**
+     * v2 sheet layout: header close button replaces the cancel row, no biometric button
+     */
+    private View onCreateViewV2(LayoutInflater inflater, ViewGroup container) {
+        View view = inflater.inflate(R.layout.fragment_master_password_v2, container, false);
+
+        passwordInput = view.findViewById(R.id.ppPasswordEdit);
+        unlockButton = view.findViewById(R.id.masterPwdContinue);
+        togglePasswordVisibility = view.findViewById(R.id.ppPasswordToggle);
+        biometricButton = null;
+
+        TextView passwordLabel = view.findViewById(R.id.ppPasswordLabel);
+        if (passwordLabel != null) passwordLabel.setText("Password");
+        if (passwordInput != null) passwordInput.setHint("Enter Master Password");
+
+        View cancelView = view.findViewById(R.id.ppHeaderClose);
+        if (cancelView != null) {
+            cancelView.setOnClickListener(v -> {
+                if (navigationListener != null) navigationListener.onCancel();
+            });
+        }
+
+        TextView sheetTitle = view.findViewById(R.id.ppHeaderTitle);
+        if (sheetTitle != null) sheetTitle.setText("Add a passkey");
+
+        unlockButton.setOnClickListener(v -> {
+            String password = passwordInput.getText().toString();
+            if (password.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter your master password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            authenticateWithMasterPassword(password);
+        });
+
+        setupPasswordVisibilityToggle();
 
         return view;
     }
@@ -162,24 +206,49 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
      * Setup password visibility toggle
      */
     private void setupPasswordVisibilityToggle() {
-        if (togglePasswordVisibility != null && passwordInput != null) {
-            togglePasswordVisibility.setOnClickListener(v -> {
-                isPasswordVisible = !isPasswordVisible;
+        if (togglePasswordVisibility == null || passwordInput == null) return;
 
-                if (isPasswordVisible) {
-                    // Show password
-                    passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    togglePasswordVisibility.setImageResource(R.drawable.eye_closed);
-                } else {
-                    // Hide password
-                    passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    togglePasswordVisibility.setImageResource(R.drawable.eye);
-                }
-
-                // Move cursor to end of text
-                passwordInput.setSelection(passwordInput.getText().length());
-            });
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            setupPasswordVisibilityToggleV2();
+            return;
         }
+
+        togglePasswordVisibility.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+
+            if (isPasswordVisible) {
+                // Show password
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                togglePasswordVisibility.setImageResource(R.drawable.eye_closed);
+            } else {
+                // Hide password
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                togglePasswordVisibility.setImageResource(R.drawable.eye);
+            }
+
+            // Move cursor to end of text
+            passwordInput.setSelection(passwordInput.getText().length());
+        });
+    }
+
+    /**
+     * Re-applies inter font on each toggle since Android switches to monospace
+     * when the input type flips to visible password
+     */
+    private void setupPasswordVisibilityToggleV2() {
+        final android.graphics.Typeface interFont =
+                androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.pp_v2_inter);
+
+        togglePasswordVisibility.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible) {
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+            if (interFont != null) passwordInput.setTypeface(interFont);
+            passwordInput.setSelection(passwordInput.getText().length());
+        });
     }
 
     /**

@@ -87,8 +87,8 @@ const getIOSVersion = async () => {
 }
 
 /**
- * Fetches latest Android app version from Play Store
- * @returns {Promise<string|null>}
+ * Fetches latest Android app version and release date from Play Store
+ * @returns {Promise<{version: string, releaseDate: string|null}|null>}
  */
 const getAndroidVersion = async () => {
   try {
@@ -97,11 +97,19 @@ const getAndroidVersion = async () => {
     )
     const html = await response.text()
 
-    const match = html.match(/\[\[\["(\d+\.\d+\.?\d*)"\]\]/)
-    if (match) {
-      return match[1]
+    const versionMatch = html.match(/\[\[\["(\d+\.\d+\.?\d*)"\]\]/)
+    if (!versionMatch) return null
+
+    const dateMatch = html.match(/Updated on<\/div><div[^>]*>([^<]+)</)
+    let releaseDate = null
+    if (dateMatch) {
+      const parsed = new Date(dateMatch[1])
+      if (!isNaN(parsed.getTime())) {
+        releaseDate = parsed.toISOString()
+      }
     }
-    return null
+
+    return { version: versionMatch[1], releaseDate }
   } catch (error) {
     logger.error('Error fetching Android version:', error)
     return null
@@ -161,12 +169,15 @@ export const useVersionCheck = () => {
           return
         }
 
-        const latestVersion = await getAndroidVersion()
+        const androidResult = await getAndroidVersion()
 
         if (!isMounted) return
 
-        if (latestVersion) {
-          updateNeeded = compareVersions(currentVersion, latestVersion)
+        if (androidResult) {
+          const { version: latestVersion, releaseDate } = androidResult
+          updateNeeded =
+            compareVersions(currentVersion, latestVersion) &&
+            !isWithinGracePeriod(releaseDate)
           setNeedsUpdate(updateNeeded)
           setIsChecking(false)
         } else if (retryCount < 2) {

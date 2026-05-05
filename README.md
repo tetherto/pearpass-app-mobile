@@ -1,76 +1,108 @@
 <p align="center">
-  <img src="assets/images/logo.png" alt="Pearpass logo" width="264" />
+  <img src="assets/images/logo.png" alt="Pearpass logo" width="264"/>
 </p>
 
-# pearpass-app-mobile
+# PearPass Mobile
 
-PearPass Mobile App is a secure and user-friendly password management solution designed for mobile devices. It allows users to store, generate, and manage their passwords across different platforms with strong encryption.
+> The mobile app for PearPass, an open-source, end-to-end encrypted password and identity manager built on Pear Runtime.
+
+---
 
 ## Table of Contents
 
+- [Introduction](#introduction)
 - [Features](#features)
 - [Installation](#installation)
-- [Project Architecture](#project-architecture)
+- [Usage Examples](#usage-examples)
+- [Architecture](#architecture)
 - [Starting the Application](#starting-the-application)
-- [Prebuild Instructions](#prebuild-instructions)
+- [Prebuild](#prebuild)
 - [Testing](#testing)
 - [Dependencies](#dependencies)
 - [Related Projects](#related-projects)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Introduction
+
+PearPass is an open-source, privacy-first password and identity manager that gives you full control over your sensitive information. It makes storing and managing your credentials simple, secure, and private. PearPass encrypts and stores all data locally on your device.
+
+Unlike traditional password managers that rely on centralized servers, PearPass is built on [Pear Runtime](https://pears.com/) and uses peer-to-peer technology to sync your credentials directly between your devices, ensuring they remain private, secure, and always under your control.
+
+---
 
 ## Features
 
-- Secure password, identity, and credit card, notes and custom fields storage
-- Biometric authentication (fingerprint and face recognition)
-- Cross-device and platform synchronization
-- Offline access to your credentials
-- Encryption for data security
-- Password strength analysis
-- Random password generator
-- Easy-to-use interface
+- **Encrypted-at-rest storage** — PearPass encrypts passwords, credit cards, secure notes, and custom fields before writing them to disk.
+- **Biometric authentication** — Unlock your vault with fingerprint or face recognition.
+- **Cross-device sync** — PearPass syncs credentials directly between your devices, with no central server.
+- **Offline access** — Access your vault anytime, even without a network connection.
+- **Password health** — Analyse password strength and identify weak passwords.
+- **Random password generator** — Generate strong, unique passwords.
+- **Easy-to-use interface** — a clean, intuitive design for managing your credentials on the go.
+
+---
 
 ## Installation
 
-**Node.js**: Ensure you have the correct Node.js version installed. You can check the required version in the `.nvmrc` file. And ensure it matches to your current node version by running:
+### Prerequisites
+
+- **Node.js** — check the required version in `.nvmrc` and verify with:
 
 ```bash
 node --version
 ```
 
+### Steps
+
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone git@github.com:tetherto/pearpass-app-mobile.git
 
-# Navigate to the project directory
+# 2. Go to the cloned directory
 cd pearpass-app-mobile
 
-# Install dependencies
+# 3. Install dependencies
 npm install
 
-# generate translation keys
+# 4. Generate translation keys
 npm run lingui:extract
-
 npm run lingui:compile
 
-# Generate worklet bundles
+# 5. Generate worklet bundles
 npm run bundle-bare
 
-# Generate native iOS and Android directories (see Prebuild Instructions below)
+# 6. Generate native iOS and Android directories (see Prebuild below)
 npx expo prebuild --clean
 ```
 
-## Project Architecture
+---
 
-This project uses **Expo Plugins** to manage native iOS and Android configurations. The `ios/` and `android/` directories are **not tracked in git** and are generated dynamically using Expo's prebuild system.
+## Usage Examples
+
+Visit the official PearPass documentation for step-by-step guides on setup, vault management, syncing across devices, browser extension usage, and all other PearPass features:
+
+**[docs.pass.pears.com](https://docs.pass.pears.com)**
+
+---
+
+## Architecture
+
+This project uses **Expo Plugins** to manage native iOS and Android configurations. Git does not track the `ios/` and `android/` directories — Expo's prebuild system generates them dynamically.
 
 ### Key Points:
-- Native directories (`ios/` and `android/`) are gitignored
-- All native configurations are managed through Expo plugins in the `plugins/` directory
-- Running `npx expo prebuild --clean` generates the native directories with all necessary configurations
 
+- Git ignores the native directories (`ios/` and `android/`).
+- Expo plugins in the `plugins/` directory manage all native configurations.
+- Running `npx expo prebuild --clean` generates the native directories with all necessary configurations.
+
+---
 
 ## Starting the Application
 
-Before starting the application, you need to build it first. The build command produces bundles for iOS, iOS extension, and Android, and also runs custom prebuild:
+Before starting the application, build it first. The build command produces bundles for iOS, iOS extension, and Android, and runs the custom prebuild:
 
 ```bash
 # Build the application
@@ -81,9 +113,11 @@ npm run ios      # For iOS
 npm run android  # For Android
 ```
 
-## Prebuild Instructions
+---
 
-This repo is Expo-managed. The native `android/` and `ios/` folders are generated by prebuild and are not committed.
+## Prebuild
+
+This repo is Expo-managed. Prebuild generates the native `android/` and `ios/` folders; they are not committed.
 
 ### Standard (Play/normal) Android prebuild
 
@@ -101,8 +135,10 @@ PEARPASS_DISTRIBUTION=fdroid npx expo prebuild --platform android --clean
 
 More details:
 
-- `docs/fdroid/build.md`
-- `docs/fdroid/version-check.md`
+- [`docs/fdroid/build.md`](docs/fdroid/build.md)
+- [`docs/fdroid/version-check.md`](docs/fdroid/version-check.md)
+
+---
 
 ## Testing
 
@@ -118,9 +154,7 @@ npm test
 
 PearPass uses Maestro for end-to-end testing. Maestro allows you to write UI tests in simple YAML format.
 
-#### Installation
-
-1. Install Maestro CLI:
+#### Install Maestro
 
 ```bash
 # macOS
@@ -128,34 +162,29 @@ brew tap mobile-dev-inc/tap
 brew install maestro
 ```
 
-2. Verify installation:
+Verify the installation:
 
 ```bash
 maestro --version
 ```
 
-#### Running E2E Tests
+#### Run E2E Tests
 
-Run a specific test flow:
+Run a specific flow:
 
 ```bash
 maestro test e2e/welcome/passwordCreate.yaml
 ```
 
-Run all test flows:
+Run all flows:
 
 ```bash
 maestro test -e e2e/
 ```
 
-#### Creating Maestro Tests
+#### Test file format
 
-Each test file must have:
-
-1. A config section with appId
-2. A commands section after the "---" separator
-
-Example:
+Each test file requires an `appId` block and a `---` separator before the commands:
 
 ```yaml
 appId: com.pears.pass
@@ -166,26 +195,40 @@ appId: com.pears.pass
     text: 'Master password'
 ```
 
-For more information, refer to the [Maestro documentation](https://maestro.mobile.dev/).
+For more information, see the [Maestro documentation](https://maestro.mobile.dev/).
+
+---
 
 ## Dependencies
 
 - [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/)
 - [React](https://reactjs.org/)
 - [React Navigation](https://reactnavigation.org/)
 - [Styled Components](https://styled-components.com/)
 - [Lingui](https://lingui.dev/)
-- [Expo](https://expo.dev/)
 - [Redux](https://redux.js.org/)
+
+---
 
 ## Related Projects
 
-- [@tetherto/pearpass-app-desktop](https://github.com/tetherto/pearpass-app-desktop) - A mobile app for PearPass, a password manager
-- [@tetherto/pearpass-lib-ui-react-native-components](https://github.com/tetherto/pearpass-lib-ui-react-native-components) - A library of React Native UI components for PearPass
-- [@tetherto/pearpass-lib-ui-react-components](https://github.com/tetherto/pearpass-lib-ui-react-components) - A library of React UI components for PearPass
-- [@tetherto/tether-dev-docs](https://github.com/tetherto/tether-dev-docs) - Documentations and guides for developers
-- [@tetherto/pearpass-lib-vault](https://github.com/tetherto/pearpass-lib-vault) - A library for managing password vaults
-- [@tetherto/pearpass-lib-vault-core](https://github.com/tetherto/pearpass-lib-vault-core) - A bare wrapper for Autopass and Corestore for password storage and encryption
+| Project                                                                                                          | Description                                |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| [`pearpass-app-desktop`](https://github.com/tetherto/pearpass-app-desktop)                                       | Desktop app for PearPass                   |
+| [`pearpass-lib-vault`](https://github.com/tetherto/pearpass-lib-vault)                                           | Vault management library                   |
+| [`pearpass-lib-vault-core`](https://github.com/tetherto/pearpass-lib-vault-core)                                 | Bare worker and client for PearPass vaults |
+| [`pearpass-lib-ui-react-native-components`](https://github.com/tetherto/pearpass-lib-ui-react-native-components) | React Native UI component library          |
+| [`pearpass-lib-ui-react-components`](https://github.com/tetherto/pearpass-lib-ui-react-components)               | React UI component library                 |
+| [`tether-dev-docs`](https://github.com/tetherto/tether-dev-docs)                                                 | Developer documentation and guides         |
+
+---
+
+## Contributing
+
+We welcome contributions. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the development workflow and coding conventions.
+
+---
 
 ## License
 

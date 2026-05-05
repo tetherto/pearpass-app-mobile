@@ -9,6 +9,16 @@ import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View } from 'react-native'
 
 const styles = {
+  handleArea: {
+    alignItems: 'center',
+    paddingTop: rawTokens.spacing12,
+    paddingBottom: rawTokens.spacing8
+  },
+  handle: {
+    width: 32,
+    height: 4,
+    borderRadius: 10
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -25,12 +35,22 @@ const styles = {
   }
 }
 
-export const SheetHeader = ({ title, onClose }) => {
+export const SheetHeader = ({ title, onClose, showHandle = false }) => {
   const { t } = useLingui()
   const { theme } = useTheme()
 
   return (
     <>
+      {showHandle && (
+        <View style={styles.handleArea}>
+          <View
+            style={[
+              styles.handle,
+              { backgroundColor: theme.colors.colorBorderSecondary }
+            ]}
+          />
+        </View>
+      )}
       <View style={styles.header}>
         <View style={styles.headerSpacer} />
         <Text variant="bodyEmphasized" style={styles.headerTitle}>

@@ -92,7 +92,9 @@ describe('useCopyToClipboard', () => {
   })
 
   it('should copy text to clipboard when opt-in is enabled', async () => {
-    SecureStore.getItemAsync.mockResolvedValue('true')
+    SecureStore.getItemAsync.mockImplementation((key) =>
+      Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+    )
 
     const { result } = renderWithI18n()
 
@@ -108,7 +110,9 @@ describe('useCopyToClipboard', () => {
   })
 
   it('should set isCopied back to false after timeout', async () => {
-    SecureStore.getItemAsync.mockResolvedValue('true')
+    SecureStore.getItemAsync.mockImplementation((key) =>
+      Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+    )
 
     const { result } = renderWithI18n()
 
@@ -127,7 +131,9 @@ describe('useCopyToClipboard', () => {
   })
 
   it('should not copy if text is empty, null or undefined', async () => {
-    SecureStore.getItemAsync.mockResolvedValue('true')
+    SecureStore.getItemAsync.mockImplementation((key) =>
+      Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+    )
 
     const { result } = renderWithI18n()
     await act(async () => {})
@@ -150,7 +156,9 @@ describe('useCopyToClipboard', () => {
   })
 
   it('should clear previous timeout when copying again', async () => {
-    SecureStore.getItemAsync.mockResolvedValue('true')
+    SecureStore.getItemAsync.mockImplementation((key) =>
+      Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+    )
 
     const { result } = renderWithI18n()
     await act(async () => {})
@@ -166,7 +174,9 @@ describe('useCopyToClipboard', () => {
   })
 
   it('should return true when copy is successful', async () => {
-    SecureStore.getItemAsync.mockResolvedValue('true')
+    SecureStore.getItemAsync.mockImplementation((key) =>
+      Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+    )
 
     const { result } = renderWithI18n()
     await act(async () => {})
@@ -180,7 +190,9 @@ describe('useCopyToClipboard', () => {
 
   describe('auto-clear clipboard', () => {
     it('should clear clipboard after 30 seconds if it still contains the same value', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
+      SecureStore.getItemAsync.mockImplementation((key) =>
+        Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+      )
       Clipboard.getStringAsync.mockResolvedValue('sensitive password')
 
       const { result } = renderWithI18n()
@@ -205,7 +217,9 @@ describe('useCopyToClipboard', () => {
     })
 
     it('should not clear clipboard if value has changed', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
+      SecureStore.getItemAsync.mockImplementation((key) =>
+        Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+      )
       Clipboard.getStringAsync.mockResolvedValue('different value')
 
       const { result } = renderWithI18n()
@@ -230,7 +244,9 @@ describe('useCopyToClipboard', () => {
     })
 
     it('should cancel previous clear timeout when copying again', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
+      SecureStore.getItemAsync.mockImplementation((key) =>
+        Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+      )
       Clipboard.getStringAsync.mockResolvedValue('second password')
 
       const { result } = renderWithI18n()
@@ -264,7 +280,9 @@ describe('useCopyToClipboard', () => {
     })
 
     it('should handle errors during clipboard clearing gracefully', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
+      SecureStore.getItemAsync.mockImplementation((key) =>
+        Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+      )
       Clipboard.getStringAsync.mockRejectedValue(
         new Error('Clipboard access failed')
       )
@@ -285,7 +303,9 @@ describe('useCopyToClipboard', () => {
     })
 
     it('should cancel clipboard clear timer on unmount', async () => {
-      SecureStore.getItemAsync.mockResolvedValue('true')
+      SecureStore.getItemAsync.mockImplementation((key) =>
+        Promise.resolve(key === 'copyToClipboard' ? 'true' : null)
+      )
       Clipboard.getStringAsync.mockResolvedValue('sensitive password')
 
       const { result, unmount } = renderWithI18n()

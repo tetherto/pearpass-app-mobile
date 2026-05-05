@@ -1,6 +1,6 @@
 {
   "name": "pearpass-app-mobile",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "main": "index.js",
   "type": "module",
   "license": "Apache-2.0",
@@ -8,6 +8,7 @@
     "start": "expo start --dev-client",
     "build": "npm run bundle-bare && npm run lingui:extract && npm run lingui:compile",
     "android": "expo run:android",
+    "android:fdroid": "PEARPASS_DISTRIBUTION=fdroid expo run:android --variant fdroidDebug",
     "ios": "expo run:ios",
     "lint:fix": "eslint --fix ./src",
     "lint": "eslint ./src",
@@ -60,7 +61,6 @@
     "@tetherto/pearpass-lib-ui-theme-provider": "git+https://github.com/tetherto/pearpass-lib-ui-theme-provider.git",
     "@tetherto/pearpass-lib-vault": "git+https://github.com/tetherto/pearpass-lib-vault.git",
     "@tetherto/pearpass-lib-vault-core": "git+https://github.com/tetherto/pearpass-lib-vault-core.git",
-    "@tetherto/pearpass-lib-vault-mobile": "git+https://github.com/tetherto/pearpass-lib-vault-core.git",
     "@tetherto/pearpass-utils-password-check": "git+https://github.com/tetherto/pearpass-utils-password-check.git",
     "@tetherto/pearpass-utils-password-generator": "git+https://github.com/tetherto/pearpass-utils-password-generator.git",
     "bare-pack": "1.4.1",
@@ -70,7 +70,6 @@
     "expo-av": "~15.1.7",
     "expo-blur": "~14.1.5",
     "expo-build-properties": "~0.14.8",
-    "expo-camera": "~16.1.11",
     "expo-clipboard": "~7.1.5",
     "expo-crypto": "~13.0.0",
     "expo-document-picker": "~13.1.6",
@@ -102,10 +101,13 @@
     "react-native-svg-transformer": "1.5.1",
     "react-native-toast-message": "2.3.3",
     "react-native-vector-icons": "10.2.0",
+    "react-native-vision-camera": "^4.7.3",
+    "react-native-worklets-core": "^1.6.3",
     "react-strict-dom": "^0.0.55",
     "rive-react-native": "9.3.4",
     "sodium-native": "5.0.9",
-    "styled-components": "6.1.19"
+    "styled-components": "6.1.19",
+    "vision-camera-zxing": "^0.1.1"
   },
   "devDependencies": {
     "@babel/core": "7.28.0",

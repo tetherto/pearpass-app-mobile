@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
 
+import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 import { OtpRefreshProvider } from '@tetherto/pearpass-lib-vault'
+import { View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { Navigation } from '../Navigation'
@@ -43,6 +45,13 @@ export const App = () => {
         config={{
           baseToast: ({ text1, renderLeadingIcon }) => (
             <ToastCard text1={text1} renderLeadingIcon={renderLeadingIcon} />
+          ),
+          alertToast: ({ props }) => (
+            <View
+              style={{ width: '100%', paddingHorizontal: rawTokens.spacing16 }}
+            >
+              {props?.render?.()}
+            </View>
           )
         }}
       />

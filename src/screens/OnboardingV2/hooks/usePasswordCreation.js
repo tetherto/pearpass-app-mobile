@@ -90,7 +90,11 @@ export const usePasswordCreation = () => {
     validateMasterPassword(val)
 
     if (values.passwordConfirm) {
-      setPasswordsMatch(getPasswordsMatch(val, values.passwordConfirm))
+      const match = getPasswordsMatch(val, values.passwordConfirm)
+      setPasswordsMatch(match)
+      if (match) {
+        setErrors((prev) => ({ ...prev, passwordConfirm: null }))
+      }
     }
   }
 

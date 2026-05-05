@@ -37,7 +37,8 @@ export const SyncScreen = () => {
             <View style={styles.descriptionContainer}>
               <Text
                 as="p"
-                color={theme.colors.colorTextSecondary}
+                color={theme.colors.colorTextPrimary}
+                style={styles.description}
                 data-testid="onboarding-v2-sync-description"
               >
                 {t`Your devices connect directly to each other using peer-to-peer technology.\n\nNo cloud. No copies. No middlemen.`}
@@ -97,5 +98,8 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     alignItems: 'center',
     marginBottom: 30
+  },
+  description: {
+    textAlign: 'center'
   }
 })

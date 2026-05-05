@@ -1,7 +1,14 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { TERMS_OF_USE } from '@tetherto/pearpass-lib-constants'
-import { Button, Link, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import {
+  AlertMessage,
+  Button,
+  Link,
+  Text,
+  rawTokens,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
 import { KeyboardArrowRightFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { Keyboard, StyleSheet, View } from 'react-native'
 
@@ -9,6 +16,7 @@ import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { AuthFlowFormLayout } from '../../../containers/Auth/shared/AuthFlowFormLayout'
 import { ConfirmablePasswordFields } from '../../../containers/Auth/shared/ConfirmablePasswordFields'
 import { useKeyboardVisibility } from '../../../hooks/useKeyboardVisibility'
+import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 import { usePasswordCreation } from '../hooks/usePasswordCreation'
 
 export const CreatePasswordScreen = () => {
@@ -48,13 +56,18 @@ export const CreatePasswordScreen = () => {
       subtitleTestID="onboarding-v2-create-password-subtitle"
       subtitle={
         <>
-          {t`This is the key to access PearPass. Already using PearPass?`}{' '}
-          <Link
-            onClick={handleTransferData}
-            data-testid="onboarding-v2-transfer-data-link"
-          >
-            {t`Transfer Data`}
-          </Link>
+          {t`This is the key to access PearPass.`}{' '}
+          {unsupportedFeaturesEnabled() ? (
+            <>
+              {t`Already using PearPass?`}
+              <Link
+                onClick={handleTransferData}
+                data-testid="onboarding-v2-transfer-data-link"
+              >
+                {t`Transfer Data`}
+              </Link>
+            </>
+          ) : null}
         </>
       }
       avoidBottomInset={isKeyboardVisible}
@@ -63,7 +76,9 @@ export const CreatePasswordScreen = () => {
           <View style={styles.termsContainer}>
             <Text
               as="p"
+              variant="caption"
               color={theme.colors.colorTextSecondary}
+              style={styles.termsText}
               data-testid="onboarding-v2-terms-text"
             >
               {t`By clicking Continue, you confirm that you have read and agree to the`}{' '}
@@ -93,34 +108,50 @@ export const CreatePasswordScreen = () => {
         </>
       }
     >
-      <ConfirmablePasswordFields
-        testID="onboarding-v2-password-form"
-        passwordField={{
-          label: t`Password`,
-          placeholderText: t`Enter Master Password`,
-          value: passwordRegisterProps.value,
-          onChangeText: handlePasswordChange,
-          passwordIndicator: passwordIndicatorVariant,
-          infoBox: t`Strong passwords are usually at least 8 characters long, hard to guess, use a mix of letters, numbers, and symbols, and aren't based on personal information.`,
-          testID: 'onboarding-v2-password-input'
-        }}
-        confirmPasswordField={{
-          label: t`Repeat Password`,
-          placeholderText: t`Repeat Master Password`,
-          value: passwordConfirmRegisterProps.value,
-          onChangeText: handlePasswordConfirmChange,
-          passwordIndicator: passwordsMatch ? 'match' : undefined,
-          variant: passwordConfirmRegisterProps.error ? 'error' : 'default',
-          errorMessage: passwordConfirmRegisterProps.error,
-          testID: 'onboarding-v2-password-confirm-input'
-        }}
-      />
+      <View style={styles.formContainer}>
+        <ConfirmablePasswordFields
+          testID="onboarding-v2-password-form"
+          passwordField={{
+            label: t`Password`,
+            placeholderText: t`Enter Master Password`,
+            value: passwordRegisterProps.value,
+            onChangeText: handlePasswordChange,
+            passwordIndicator: passwordIndicatorVariant,
+            infoBox: t`Strong passwords are usually at least 8 characters long, hard to guess, use a mix of letters, numbers, and symbols, and aren't based on personal information.`,
+            testID: 'onboarding-v2-password-input'
+          }}
+          confirmPasswordField={{
+            label: t`Repeat Password`,
+            placeholderText: t`Repeat Master Password`,
+            value: passwordConfirmRegisterProps.value,
+            onChangeText: handlePasswordConfirmChange,
+            passwordIndicator: passwordsMatch ? 'match' : undefined,
+            variant: passwordConfirmRegisterProps.error ? 'error' : 'default',
+            errorMessage: passwordConfirmRegisterProps.error,
+            testID: 'onboarding-v2-password-confirm-input'
+          }}
+        />
+        {passwordsMatch && (
+          <AlertMessage
+            variant="warning"
+            size="small"
+            description={t`Don't forget your Master password. It's the only way to access your vault.\nWe can't help recover it. Back it up securely.`}
+            testID="onboarding-v2-password-warning"
+          />
+        )}
+      </View>
     </AuthFlowFormLayout>
   )
 }
 
 const styles = StyleSheet.create({
+  formContainer: {
+    gap: rawTokens.spacing12
+  },
   termsContainer: {
     alignItems: 'center'
+  },
+  termsText: {
+    textAlign: 'center'
   }
 })

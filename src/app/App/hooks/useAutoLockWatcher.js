@@ -104,6 +104,8 @@ export const useAutoLockWatcher = () => {
     }
 
     resetState()
+    await refetchUser()
+    lockInProgressRef.current = false
   }, [
     collapse,
     closeModal,
@@ -266,13 +268,19 @@ export const useAutoLockWatcher = () => {
   useEffect(() => {
     if (!isAutoLockActive) return
 
-    const route = getCurrentRoute()
-
-    if (!isMasterPasswordScreen(route)) {
-      lockInProgressRef.current = false
-      resetAutoLockTimer(Date.now())
+    const handleRouteChange = () => {
+      const route = getCurrentRoute()
+      if (route && !isMasterPasswordScreen(route)) {
+        lockInProgressRef.current = false
+        resetAutoLockTimer(Date.now())
+      }
     }
+
+    handleRouteChange()
+    const unsubscribe = navigation.addListener('state', handleRouteChange)
+    return unsubscribe
   }, [
+    navigation,
     getCurrentRoute,
     isMasterPasswordScreen,
     resetAutoLockTimer,

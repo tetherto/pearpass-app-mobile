@@ -64,13 +64,6 @@ export const BottomSheetFolderMenuContentV2 = ({
         />
       </View>
 
-      <View
-        style={[
-          styles.divider,
-          { backgroundColor: theme.colors.colorBorderPrimary }
-        ]}
-      />
-
       <NavbarListItem
         platform="mobile"
         label={t`Rename`}
@@ -106,8 +99,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center'
   },
-  divider: {
-    height: 1,
-    marginHorizontal: rawTokens.spacing16
-  }
+
 })
