@@ -266,7 +266,7 @@ export const CreateOrEditLoginContent = ({
   } = registerArray('customFields')
 
   const handleFirstHiddenMessageChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
+    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
   }
 
   const openPasswordGenerator = () => {

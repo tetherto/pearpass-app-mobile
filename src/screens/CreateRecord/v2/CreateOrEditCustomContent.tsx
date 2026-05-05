@@ -103,7 +103,7 @@ export const CreateOrEditCustomContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Hidden message is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string(),
@@ -149,7 +149,7 @@ export const CreateOrEditCustomContent = ({
       isFavorite: initialRecord?.isFavorite,
       data: {
         title: formValues.title,
-        customFields: formValues.customFields,
+        customFields: formValues.customFields.filter((f) => f.note?.trim().length),
         attachments: convertBase64FilesToUint8(
           formValues.attachments.filter(isUploadedCustomAttachment)
         ),
@@ -174,7 +174,7 @@ export const CreateOrEditCustomContent = ({
   }
 
   const handleFirstCustomFieldChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
+    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
   }
 
   const handleFileUpload = (file?: CustomAttachment | null) => {
