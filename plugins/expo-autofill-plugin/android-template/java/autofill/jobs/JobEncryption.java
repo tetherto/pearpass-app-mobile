@@ -17,7 +17,7 @@ import java.util.Arrays;
  *
  * NOTE: The lazysodium-android dependency must be added to the app's build.gradle:
  *   implementation "com.goterl:lazysodium-android:5.1.0@aar"
- *   implementation "net.java.dev.jna:jna:5.14.0@aar"
+ *   implementation "net.java.dev.jna:jna:5.17.0@aar"
  */
 public class JobEncryption {
     private static final String TAG = "JobEncryption";
