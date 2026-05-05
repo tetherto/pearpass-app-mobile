@@ -103,7 +103,7 @@ export const MasterPasswordScreen = () => {
       const message =
         typeof error === 'string'
           ? error
-          : t`Incorrect Master Password. ${status?.remainingAttempts} ${status?.remainingAttempts === 1 ? t`try` : t`tries`} left.`
+          : t`Incorrect password. You have ${status?.remainingAttempts} ${status?.remainingAttempts === 1 ? t`attempt` : t`attempts`} before the app will be temporarily locked.`
 
       setErrors({ password: message })
       setFailedAttempts((prev) => prev + 1)
