@@ -27,6 +27,7 @@ import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { adaptRegister } from './CreateOrEditLoginContent'
 import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 
@@ -112,7 +113,7 @@ export const CreateOrEditCreditCardContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string(),
@@ -173,7 +174,7 @@ export const CreateOrEditCreditCardContent = ({
         securityCode: formValues.securityCode,
         pinCode: formValues.pinCode,
         note: formValues.note,
-        customFields: formValues.customFields,
+        customFields: formValues.customFields.filter((f) => f.note?.trim().length),
         attachments: convertBase64FilesToUint8(
           formValues.attachments.filter(isUploadedCreditCardAttachment)
         )
@@ -202,7 +203,7 @@ export const CreateOrEditCreditCardContent = ({
   } = registerArray('customFields')
 
   const handleFirstHiddenMessageChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
+    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
   }
 
   const handleExpireDateChange = (inputValue: string) => {
@@ -298,7 +299,7 @@ export const CreateOrEditCreditCardContent = ({
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Card Details`}
+          {t`Details`}
         </Text>
 
         <MultiSlotInput testID="card-details-multi-slot-input">
@@ -343,6 +344,11 @@ export const CreateOrEditCreditCardContent = ({
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Additional`}
         </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
 
         <InputField
           label={t`Comment`}

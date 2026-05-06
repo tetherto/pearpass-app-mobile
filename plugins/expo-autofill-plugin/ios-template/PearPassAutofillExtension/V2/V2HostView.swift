@@ -68,6 +68,8 @@ struct V2HostView: View {
     @State private var loadedFolders: [String] = []
     @State private var formComment: String = ""
     @State private var formSaveError: String?
+    /// Inline error under the websites card on URL validation failure.
+    @State private var formWebsiteError: String? = nil
     @State private var isSavingPasskey: Bool = false
     /// Set when the user picks an existing matching record on registration —
     /// causes save to fire UPDATE_PASSKEY (or refresh a pending ADD) instead
@@ -307,6 +309,7 @@ struct V2HostView: View {
             attachments: $formAttachments,
             existingAttachments: $formExistingAttachments,
             fileSizeError: $formFileSizeError,
+            websiteError: $formWebsiteError,
             saveError: formSaveError,
             isSaving: isSavingPasskey,
             onBack: { showPasskeyForm = false },
@@ -375,9 +378,10 @@ struct V2HostView: View {
             // directly to CombinedItemsV2View on the first vault.
             let vaults = try await client.listVaults()
             await MainActor.run {
-                viewModel.vaults = vaults
+                let sortedVaults = sortedByMostRecent(vaults)
+                viewModel.vaults = sortedVaults
                 viewModel.authenticateWithMasterPassword()
-                if let first = vaults.first {
+                if let first = sortedVaults.first {
                     viewModel.selectedVault = first
                     viewModel.currentFlow = .credentialsList(vault: first)
                     loadCredentials(for: first)
@@ -424,9 +428,10 @@ struct V2HostView: View {
 
                 await MainActor.run {
                     isAuthenticating = false
-                    viewModel.vaults = vaults
+                    let sortedVaults = sortedByMostRecent(vaults)
+                    viewModel.vaults = sortedVaults
                     viewModel.authenticateWithMasterPassword()
-                    if let first = vaults.first {
+                    if let first = sortedVaults.first {
                         viewModel.selectedVault = first
                         viewModel.currentFlow = .credentialsList(vault: first)
                         loadCredentials(for: first)
@@ -483,9 +488,10 @@ struct V2HostView: View {
 
                 await MainActor.run {
                     isAuthenticating = false
-                    viewModel.vaults = vaults
+                    let sortedVaults = sortedByMostRecent(vaults)
+                    viewModel.vaults = sortedVaults
                     viewModel.authenticateWithMasterPassword()
-                    if let first = vaults.first {
+                    if let first = sortedVaults.first {
                         viewModel.selectedVault = first
                         viewModel.currentFlow = .credentialsList(vault: first)
                         loadCredentials(for: first)
@@ -549,9 +555,10 @@ struct V2HostView: View {
 
                 await MainActor.run {
                     isAuthenticating = false
-                    viewModel.vaults = vaults
+                    let sortedVaults = sortedByMostRecent(vaults)
+                    viewModel.vaults = sortedVaults
                     viewModel.authenticateWithMasterPassword()
-                    if let first = vaults.first {
+                    if let first = sortedVaults.first {
                         viewModel.selectedVault = first
                         viewModel.currentFlow = .credentialsList(vault: first)
                         loadCredentials(for: first)
@@ -623,6 +630,7 @@ struct V2HostView: View {
         formatter.dateStyle = .medium
         formPasskeyDate = formatter.string(from: Date())
         formSaveError = nil
+        formWebsiteError = nil
         showPasskeyForm = true
     }
 
@@ -648,6 +656,7 @@ struct V2HostView: View {
         formatter.dateStyle = .medium
         formPasskeyDate = formatter.string(from: Date())
         formSaveError = nil
+        formWebsiteError = nil
         showPasskeyForm = true
     }
 
@@ -666,6 +675,17 @@ struct V2HostView: View {
             return
         }
 
+        // Validate website entries — first malformed one blocks save.
+        formWebsiteError = nil
+        let trimmedWebsites = formWebsites.map { $0.trimmingCharacters(in: .whitespaces) }
+        for entry in trimmedWebsites where !entry.isEmpty {
+            let candidate = addHttps(entry)
+            guard let host = URL(string: candidate)?.host, host.contains(".") else {
+                formWebsiteError = NSLocalizedString("Wrong format of website", comment: "V2 website validation error")
+                return
+            }
+        }
+
         isSavingPasskey = true
         formSaveError = nil
 
@@ -679,12 +699,10 @@ struct V2HostView: View {
                     throw PasskeyJobError.noHashedPassword
                 }
 
-                // 3. Build form data — websites array filtered for empties so
-                //    placeholder rows don't end up in the saved record. Folder
-                //    is the user's pick from the form (if any).
-                let websites = formWebsites
-                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                // 3. Build form data — drop empty rows, normalize via addHttps.
+                let websites = trimmedWebsites
                     .filter { !$0.isEmpty }
+                    .map { self.addHttps($0) }
                 let formData = PasskeyFormData(
                     title: formTitleText,
                     username: formUsername,
@@ -823,7 +841,11 @@ struct V2HostView: View {
     private func loadCredentials(for vault: Vault) {
         guard let client = vaultClient else { return }
         Task {
-            await MainActor.run { isLoadingCredentials = true }
+            // Spinner only on initial load — switches keep stale items visible until swap.
+            let showLoader = await MainActor.run { credentials.isEmpty }
+            if showLoader {
+                await MainActor.run { isLoadingCredentials = true }
+            }
             do {
                 let records = try await fetchVaultRecords(client: client, vault: vault)
 
@@ -841,6 +863,7 @@ struct V2HostView: View {
                 let pending = await loadPendingPasskeysFromJobs(
                     vaultClient: client,
                     existingRecords: records,
+                    currentVaultId: viewModel.selectedVault?.id,
                     filterRpId: mode == .registration ? registrationContext?.rpId : nil,
                     filterUserName: mode == .registration ? registrationContext?.userName : nil
                 )
@@ -862,38 +885,33 @@ struct V2HostView: View {
         }
     }
 
-    /// Fetch records, attempting the listing first (works when the vault is
-    /// already active after `initWithPassword`) and falling back to a manual
-    /// vault activation on failure. Mirrors V1 CredentialsListView two-stage
-    /// load — registration mode uses `searchLoginRecords` for rpId/username
-    /// scoped results, assertion mode uses the full `activeVaultList`.
+    /// Activate target vault first so dropdown switches rebind correctly,
+    /// then fetch (search for registration, full list for assertion).
     private func fetchVaultRecords(client: PearPassVaultClient, vault: Vault) async throws -> [VaultRecord] {
+        try await activateVault(client: client, vault: vault)
         if mode == .registration, let ctx = registrationContext {
-            do {
-                return try await client.searchLoginRecords(rpId: ctx.rpId, username: ctx.userName)
-            } catch {
-                try await activateVault(client: client, vault: vault)
-                return try await client.searchLoginRecords(rpId: ctx.rpId, username: ctx.userName)
-            }
+            return try await client.searchLoginRecords(rpId: ctx.rpId, username: ctx.userName)
         }
-        do {
-            return try await client.activeVaultList(filterKey: "record/")
-        } catch {
-            try await activateVault(client: client, vault: vault)
-            return try await client.activeVaultList(filterKey: "record/")
-        }
+        return try await client.activeVaultList(filterKey: "record/")
     }
 
-    /// Vault activation ladder mirroring V1: protected vaults open via
-    /// `getVaultById`; unprotected vaults decrypt their key from
-    /// `masterEncryption` then `activeVaultInit`. Throws on failure so the
-    /// caller can surface the empty state.
+    /// Protected vaults: `getVaultById` (handles close internally).
+    /// Unprotected: explicit `activeVaultClose` then `activeVaultInit`
+    /// so switches rebind instead of leaving the prior vault active.
     private func activateVault(client: PearPassVaultClient, vault: Vault) async throws {
+        // Already active — skip.
+        if let activeId = try? await currentActiveVaultId(client: client),
+           activeId == vault.id {
+            return
+        }
+
         let isProtected = try await client.checkVaultIsProtected(vaultId: vault.id)
         if isProtected {
             _ = try await client.getVaultById(vaultId: vault.id)
             return
         }
+        try? await client.activeVaultClose()
+
         let masterEncryption = try await client.vaultsGet(key: "masterEncryption")
         guard let hashedPassword = masterEncryption["hashedPassword"] as? String else {
             throw PearPassVaultError.unknown("No hashed password available in master encryption")
@@ -917,6 +935,14 @@ struct V2HostView: View {
         _ = try await client.activeVaultInit(id: vault.id, encryptionKey: encryptionKey)
     }
 
+    /// Currently-active vault id, or nil if none active.
+    private func currentActiveVaultId(client: PearPassVaultClient) async throws -> String? {
+        let status = try await client.activeVaultGetStatus()
+        guard status.isInitialized && !status.isLocked else { return nil }
+        let current = try await client.activeVaultGet(key: "vault")
+        return current["id"] as? String
+    }
+
     /// Decode pending ADD_PASSKEY / UPDATE_PASSKEY jobs from the encrypted job
     /// file into VaultRecord objects so newly-registered passkeys are visible
     /// before the main app processes the job queue. Mirror of V1
@@ -929,6 +955,7 @@ struct V2HostView: View {
     private func loadPendingPasskeysFromJobs(
         vaultClient: PearPassVaultClient,
         existingRecords: [VaultRecord],
+        currentVaultId: String?,
         filterRpId: String? = nil,
         filterUserName: String? = nil
     ) async -> [VaultRecord] {
@@ -968,6 +995,10 @@ struct V2HostView: View {
             var pending: [VaultRecord] = []
 
             for job in jobs where job.status == .pending || job.status == .inProgress {
+                // Vault scope — drop jobs queued for a different vault.
+                if let currentVaultId = currentVaultId, job.vaultId != currentVaultId {
+                    continue
+                }
                 switch job.payload {
                 case .addPasskey(let payload):
                     guard !existingPasskeyIds.contains(payload.recordId) else { continue }
@@ -1201,6 +1232,20 @@ struct V2HostView: View {
         if let colon = s.firstIndex(of: ":") { s = String(s[..<colon]) }
         if s.hasPrefix("www.") { s = String(s.dropFirst(4)) }
         return s
+    }
+
+    /// Lowercases + prepends `https://` when no scheme is present.
+    private func addHttps(_ urlString: String) -> String {
+        let lower = urlString.lowercased()
+        if lower.hasPrefix("http://") || lower.hasPrefix("https://") {
+            return lower
+        }
+        return "https://\(lower)"
+    }
+
+    /// Most-recently-created first, so `.first` = last-added vault default.
+    private func sortedByMostRecent(_ vaults: [Vault]) -> [Vault] {
+        vaults.sorted { $0.createdAt > $1.createdAt }
     }
 
     private func initials(for title: String?) -> String {

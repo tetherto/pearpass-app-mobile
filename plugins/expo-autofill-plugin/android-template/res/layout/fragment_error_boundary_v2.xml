@@ -20,8 +20,7 @@
         android:orientation="vertical"
         android:paddingStart="@dimen/pp_v2_spacing_s16"
         android:paddingEnd="@dimen/pp_v2_spacing_s16"
-        android:paddingTop="@dimen/pp_v2_spacing_s16"
-        android:paddingBottom="@dimen/pp_v2_spacing_s16">
+        android:paddingTop="@dimen/pp_v2_spacing_s16">
 
         
         <ImageView

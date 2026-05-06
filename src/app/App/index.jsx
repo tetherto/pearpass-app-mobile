@@ -10,28 +10,25 @@ import { useAutoLockWatcher } from './hooks/useAutoLockWatcher'
 import { useRedirect } from './hooks/useRedirect'
 import { ToastCard } from '../../components/ToastCard'
 import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
-import { useModal } from '../../context/ModalContext'
-import { useFirstLaunchCleanUp } from '../../hooks/useFirstLaunchCleanUp'
+import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useVersionCheck } from '../../hooks/useVersionCheck'
 
 export const App = () => {
   useAutoLockWatcher()
-  const { openModal } = useModal()
+  const { expand } = useBottomSheet()
   const { needsUpdate } = useVersionCheck()
   const hasOpenedUpdateModal = useRef(false)
-
-  const isFirstLaunchCleanupReady = useFirstLaunchCleanUp()
 
   useEffect(() => {
     if (needsUpdate && !hasOpenedUpdateModal.current) {
       hasOpenedUpdateModal.current = true
-      openModal(<UpdateModalContent />, { preventClose: true })
+      expand({ children: <UpdateModalContent />, locked: true })
     }
   }, [needsUpdate])
 
   const { initialRouteName, isLoading } = useRedirect()
 
-  if (isLoading || !isFirstLaunchCleanupReady) {
+  if (isLoading) {
     return null
   }
 

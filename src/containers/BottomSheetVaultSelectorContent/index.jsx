@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
@@ -44,6 +44,16 @@ export const BottomSheetVaultSelectorContent = ({
 
   const { data: vaultsData } = useVaults()
   const { data: activeVault } = useVault()
+
+  const sortedVaults = useMemo(
+    () =>
+      [...(vaultsData ?? [])].sort((a, b) =>
+        (a?.name ?? '').localeCompare(b?.name ?? '', undefined, {
+          sensitivity: 'base'
+        })
+      ),
+    [vaultsData]
+  )
 
   const closeSelector = () => {
     onRequestClose?.()
@@ -95,9 +105,6 @@ export const BottomSheetVaultSelectorContent = ({
         vaultName: vault.name
       })
     },
-    onMembers: () => {
-      onNavigateToShareVault(vault)
-    },
     onShare: () => {
       onNavigateToShareVault(vault)
     },
@@ -134,13 +141,24 @@ export const BottomSheetVaultSelectorContent = ({
       contentStyle={{ padding: 0, paddingBottom: bottom }}
       header={<SheetHeader title={t`Vaults`} onClose={closeSelector} />}
     >
-      {vaultsData?.map((vault) => {
+      {sortedVaults.map((vault) => {
         const isSelected = vault.id === activeVault?.id
+        const memberCount =
+          (isSelected ? activeVault?.devices?.length : undefined) ??
+          vault.devices?.length ??
+          0
         return (
           <ListItem
             key={vault.id}
             icon={<LockFilled color={theme.colors.colorTextPrimary} />}
             title={vault.name}
+            subtitle={
+              memberCount > 0
+                ? memberCount === 1
+                  ? t`${memberCount} Member`
+                  : t`${memberCount} Members`
+                : undefined
+            }
             selected={isSelected}
             showDivider
             iconSize={16}

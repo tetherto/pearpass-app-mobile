@@ -224,7 +224,6 @@ export const VaultSettingsScreen = ({ route }) => {
           vaultName={vaultName}
           onRename={handleRename}
           onPassword={handlePassword}
-          onMembers={handleMembers}
           onShare={handleShare}
           onDelete={handleDelete}
         />

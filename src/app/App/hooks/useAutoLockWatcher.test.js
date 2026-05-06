@@ -80,7 +80,8 @@ describe('useAutoLockWatcher', () => {
       .mockImplementation(() => ({ remove: addListenerRemoveMock }))
 
     useNavigation.mockReturnValue({
-      reset: resetMock
+      reset: resetMock,
+      addListener: jest.fn(() => jest.fn())
     })
     useVaults.mockReturnValue({ resetState: resetStateMock })
     useBottomSheet.mockReturnValue({ collapse: collapseMock })

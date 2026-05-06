@@ -96,6 +96,7 @@ export interface WifiPasswordData {
 export type WifiPasswordRecord = BaseRecord<WifiPasswordData>
 
 export interface CustomRecordData {
+  note?: string
   customFields?: CustomField[]
 }
 export type CustomRecord = BaseRecord<CustomRecordData>

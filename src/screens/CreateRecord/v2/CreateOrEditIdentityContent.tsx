@@ -30,6 +30,7 @@ import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
+import { FolderSelectField } from '../../../components/FolderSelectField'
 
 type AttachmentFile = {
   base64: string
@@ -215,7 +216,7 @@ export const CreateOrEditIdentityContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string(),
@@ -317,7 +318,7 @@ export const CreateOrEditIdentityContent = ({
   } = registerArray('customFields')
 
   const handleFirstHiddenMessageChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
+    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
   }
 
   const identityAttachmentSources = useMemo(
@@ -405,7 +406,7 @@ export const CreateOrEditIdentityContent = ({
         region: formValues.region,
         country: formValues.country,
         note: formValues.note,
-        customFields: formValues.customFields,
+        customFields: (formValues.customFields as Array<{ type: string; note?: string }>).filter((f) => f.note?.trim().length),
         passportFullName: formValues.passportFullName,
         passportNumber: formValues.passportNumber,
         passportIssuingCountry: formValues.passportIssuingCountry,
@@ -696,6 +697,11 @@ export const CreateOrEditIdentityContent = ({
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Additional`}
         </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
 
         <InputField
           label={t`Comment`}

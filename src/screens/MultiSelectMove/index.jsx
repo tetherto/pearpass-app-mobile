@@ -68,7 +68,10 @@ export const MultiSelectMove = () => {
   })
 
   const folderList = useMemo(
-    () => Object.values(folders?.customFolders ?? {}),
+    () =>
+      Object.values(folders?.customFolders ?? {}).sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+      ),
     [folders]
   )
 
@@ -77,11 +80,17 @@ export const MultiSelectMove = () => {
     await updateFolder(selectedRecordIds, selectedFolder)
   }
 
+  const isSingleRecord = selectedRecordIds.length === 1
+
   return (
     <Layout
       header={
         <BackScreenHeader
-          title={t`Move ${selectedRecordIds.length} Items`}
+          title={
+            isSingleRecord
+              ? t`Move ${selectedRecordIds.length} Item`
+              : t`Move ${selectedRecordIds.length} Items`
+          }
           onBack={() => navigation.goBack()}
         />
       }
@@ -93,7 +102,7 @@ export const MultiSelectMove = () => {
           disabled={!selectedFolder}
           onClick={handleMove}
         >
-          {t`Move Items`}
+          {isSingleRecord ? t`Move Item` : t`Move Items`}
         </Button>
       }
     >
@@ -109,7 +118,7 @@ export const MultiSelectMove = () => {
         >
           <View style={styles.sectionLabel}>
             <Text variant="caption" color={theme.colors.colorTextSecondary}>
-              {t`Selected items`}
+              {isSingleRecord ? t`Selected item` : t`Selected items`}
             </Text>
           </View>
           <ScrollView
@@ -158,7 +167,9 @@ export const MultiSelectMove = () => {
             onLayout={(e) => setFolderLabelHeight(e.nativeEvent.layout.height)}
           >
             <Text variant="caption" color={theme.colors.colorTextSecondary}>
-              {t`Choose the destination folder for these items`}
+              {isSingleRecord
+                ? t`Choose the destination folder for this item`
+                : t`Choose the destination folder for these items`}
             </Text>
           </View>
           <ScrollView

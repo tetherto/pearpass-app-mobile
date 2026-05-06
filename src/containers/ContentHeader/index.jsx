@@ -89,7 +89,7 @@ export const ContentHeader = ({
   useRegisterVaultSelectorOpener(openVaultSelector)
 
   const bgColor = theme.colors.colorSurfacePrimary
-  const vaultName = vaultData?.name || t`Personal Vault`
+  const vaultName = vaultData?.name || t`Personal`
   const categoryLabel =
     menuItems.find((item) => item.type === recordType)?.name ?? t`All Items`
   const folderLabel =

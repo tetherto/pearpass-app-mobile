@@ -1,8 +1,11 @@
 import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
 export const createStyles = () => ({
+  scroll: {
+    flex: 1
+  },
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: rawTokens.spacing16,

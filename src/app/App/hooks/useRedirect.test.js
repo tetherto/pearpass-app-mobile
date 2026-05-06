@@ -5,6 +5,7 @@ import { useRedirect } from './useRedirect'
 const { useUserData } = require('@tetherto/pearpass-lib-vault')
 const mockGetItemAsync = require('expo-secure-store').getItemAsync
 
+const { hasOrphanedVaultData } = require('../../../utils/hasOrphanedVaultData')
 const { logger } = require('../../../utils/logger')
 
 // Mocks
@@ -13,6 +14,9 @@ jest.mock('expo-secure-store', () => ({
 }))
 jest.mock('@tetherto/pearpass-lib-vault', () => ({
   useUserData: jest.fn()
+}))
+jest.mock('../../../utils/hasOrphanedVaultData', () => ({
+  hasOrphanedVaultData: jest.fn()
 }))
 jest.mock('../../../utils/logger', () => ({
   logger: { error: jest.fn() }
@@ -34,6 +38,7 @@ describe('useRedirect', () => {
     jest.clearAllMocks()
     mockIsV2 = false
     useUserData.mockReturnValue({ refetch: mockRefetchUserData })
+    hasOrphanedVaultData.mockResolvedValue(false)
   })
 
   it('should set initialRouteName to "Intro" if user has not set password (v1)', async () => {
@@ -75,6 +80,32 @@ describe('useRedirect', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
+    expect(result.current.initialRouteName).toBe('Welcome')
+  })
+
+  it('should set initialRouteName to "Error" if hasPasswordSet=false but vault data exists on disk', async () => {
+    mockRefetchUserData.mockResolvedValue({ hasPasswordSet: false })
+    hasOrphanedVaultData.mockResolvedValue(true)
+
+    const { result } = renderHook(() => useRedirect())
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(result.current.initialRouteName).toBe('Error')
+    expect(logger.error).toHaveBeenCalledWith(
+      'Auto-redirect: hasPasswordSet=false but vault data exists on disk'
+    )
+  })
+
+  it('should not check for orphaned vault data when hasPasswordSet=true', async () => {
+    mockRefetchUserData.mockResolvedValue({ hasPasswordSet: true })
+    mockGetItemAsync.mockResolvedValue('true')
+
+    const { result } = renderHook(() => useRedirect())
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+    expect(hasOrphanedVaultData).not.toHaveBeenCalled()
     expect(result.current.initialRouteName).toBe('Welcome')
   })
 

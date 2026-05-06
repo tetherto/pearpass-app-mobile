@@ -13,8 +13,11 @@ import {
   clearBuffer,
   stringToBuffer
 } from '@tetherto/pearpass-lib-vault/src/utils/buffer'
-import { Platform } from 'react-native'
+import { Keyboard, Platform } from 'react-native'
+import Toast from 'react-native-toast-message'
 
+import { TOAST_CONFIG } from '../../../constants/toast'
+import { clearStaleVaultsDir } from '../../../utils/clearStaleVaultsDir'
 import { logger } from '../../../utils/logger'
 import {
   getPasswordIndicatorVariant,
@@ -128,6 +131,11 @@ export const usePasswordCreation = () => {
       return
     }
 
+    // Dismiss the keyboard so the bottom-positioned error toast (line below)
+    // isn't hidden behind the soft keyboard on Android, making the button
+    // appear unresponsive.
+    Keyboard.dismiss()
+
     const password = values.password
     const passwordConfirm = values.passwordConfirm
 
@@ -147,13 +155,17 @@ export const usePasswordCreation = () => {
     try {
       submitInFlightRef.current = true
       setIsLoading(true)
+      // If a previous attempt was killed mid-flow, the vaults dir on disk
+      // is blind-encrypted with the old hashed password and would refuse
+      // to open with the new one we're about to derive.
+      await clearStaleVaultsDir()
       await createMasterPassword(passwordBuffer)
 
-      // Create the default "Personal vault" right after master password setup
+      // Create the default "Personal" vault right after master password setup
       const loginBuffer = stringToBuffer(password)
       await logIn({ password: loginBuffer })
       await initVaults({ password: loginBuffer })
-      await createVault({ name: t`Personal vault` })
+      await createVault({ name: t`Personal` })
       await addDevice(Platform.OS + ' ' + Platform.Version)
       clearBuffer(loginBuffer)
 
@@ -168,6 +180,12 @@ export const usePasswordCreation = () => {
       if (mountedRef.current) {
         setIsLoading(false)
       }
+      Toast.show({
+        type: 'baseToast',
+        text1: t`Couldn't create your Master password. Please try again.`,
+        position: 'bottom',
+        bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+      })
     } finally {
       submitInFlightRef.current = false
     }

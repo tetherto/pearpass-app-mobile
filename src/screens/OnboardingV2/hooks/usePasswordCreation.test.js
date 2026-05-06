@@ -121,6 +121,10 @@ jest.mock('../../../utils/logger', () => ({
   }
 }))
 
+jest.mock('../../../utils/clearStaleVaultsDir', () => ({
+  clearStaleVaultsDir: jest.fn(() => Promise.resolve())
+}))
+
 jest.mock('../../../utils/passwordPolicy', () => ({
   getPasswordIndicatorVariant: () => 'strong',
   getPasswordValidationMessages: () => ({

@@ -20,6 +20,7 @@ import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icon
 import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
@@ -83,7 +84,7 @@ export const CreateOrEditWifiPasswordContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string()
@@ -123,7 +124,7 @@ export const CreateOrEditWifiPasswordContent = ({
         title: formValues.title,
         password: formValues.password,
         note: formValues.note,
-        customFields: formValues.customFields
+        customFields: formValues.customFields.filter((f) => f.note?.trim().length)
       }
     }
 
@@ -149,7 +150,7 @@ export const CreateOrEditWifiPasswordContent = ({
   } = registerArray('customFields')
 
   const handleFirstHiddenMessageChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
+    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
   }
 
   const openPasswordGenerator = () => {
@@ -184,7 +185,7 @@ export const CreateOrEditWifiPasswordContent = ({
     >
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Credentials`}
+          {t`Details`}
         </Text>
 
         <MultiSlotInput
@@ -221,6 +222,11 @@ export const CreateOrEditWifiPasswordContent = ({
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Additional`}
         </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
 
         <InputField
           label={t`Comment`}

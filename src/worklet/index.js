@@ -30,6 +30,8 @@ const withTimeout = (promise, ms, label) => {
   })
 }
 
+let cachedClientPromise = null
+
 /**
  * @param {{
  *   debugMode?: boolean
@@ -37,55 +39,75 @@ const withTimeout = (promise, ms, label) => {
  * @returns {Promise<PearpassVaultClient>}
  */
 export const createPearpassVaultClient = async ({ debugMode } = {}) => {
-  logger.log('[pearpass] init: createPearpassVaultClient start')
-  const worklet = new Worklet()
-
-  logger.log('[pearpass] init: worklet created')
-
-  const bundle = Platform.select({
-    ios: require('../../bundles/app-ios.bundle.js'),
-    android: require('../../bundles/app-android.bundle.js')
-  })
-
-  if (!bundle) {
-    throw new Error('File URI is not available.')
+  if (cachedClientPromise) {
+    return cachedClientPromise
   }
 
-  worklet.start('/worklet.bundle', bundle)
+  cachedClientPromise = (async () => {
+    let worklet = null
 
-  logger.log('[pearpass] init: worklet started')
+    try {
+      logger.log('[pearpass] init: createPearpassVaultClient start')
+      worklet = new Worklet()
 
-  const sharedDirectory = await getSharedDirectoryPath()
+      logger.log('[pearpass] init: worklet created')
 
-  logger.log('[pearpass] init: shared directory resolved')
+      const bundle = Platform.select({
+        ios: require('../../bundles/app-ios.bundle.js'),
+        android: require('../../bundles/app-android.bundle.js')
+      })
 
-  const path = sharedDirectory
-    ? `file://${sharedDirectory}/pearpass`
-    : `${FileSystem.documentDirectory}pearpass`
+      if (!bundle) {
+        throw new Error('File URI is not available.')
+      }
 
-  await ensureDirectoryExist(path)
+      worklet.start('/worklet.bundle', bundle)
 
-  logger.log('[pearpass] init: storage path ensured')
+      logger.log('[pearpass] init: worklet started')
 
-  const client = new PearpassVaultClient(worklet.IPC, path, {
-    debugMode: debugMode
-  })
+      const sharedDirectory = await getSharedDirectoryPath()
 
-  logger.log('[pearpass] init: client created')
+      logger.log('[pearpass] init: shared directory resolved')
 
-  const jobStoragePath = sharedDirectory
-    ? `file://${sharedDirectory}/pearpass_jobs`
-    : `${FileSystem.documentDirectory}pearpass_jobs`
+      const path = sharedDirectory
+        ? `file://${sharedDirectory}/pearpass`
+        : `${FileSystem.documentDirectory}pearpass`
 
-  await ensureDirectoryExist(jobStoragePath)
-  logger.log('[pearpass] init: job storage path ensured')
-  await withTimeout(
-    client.setJobStoragePath(jobStoragePath),
-    30_000,
-    'setJobStoragePath'
-  )
+      await ensureDirectoryExist(path)
 
-  logger.log('[pearpass] init: job storage path set')
+      logger.log('[pearpass] init: storage path ensured')
 
-  return client
+      const client = new PearpassVaultClient(worklet.IPC, path, {
+        debugMode: debugMode
+      })
+
+      logger.log('[pearpass] init: client created')
+
+      const jobStoragePath = sharedDirectory
+        ? `file://${sharedDirectory}/pearpass_jobs`
+        : `${FileSystem.documentDirectory}pearpass_jobs`
+
+      await ensureDirectoryExist(jobStoragePath)
+      logger.log('[pearpass] init: job storage path ensured')
+      await withTimeout(
+        client.setJobStoragePath(jobStoragePath),
+        30_000,
+        'setJobStoragePath'
+      )
+
+      logger.log('[pearpass] init: job storage path set')
+
+      return client
+    } catch (err) {
+      if (worklet) {
+        try {
+          worklet.terminate()
+        } catch {}
+      }
+      cachedClientPromise = null
+      throw err
+    }
+  })()
+
+  return cachedClientPromise
 }

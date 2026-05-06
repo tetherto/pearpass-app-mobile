@@ -1,14 +1,10 @@
+import { useEffect, useRef } from 'react'
+
 import { useNavigation } from '@react-navigation/native'
 import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
-import {
-  Button,
-  rawTokens,
-  Text,
-  useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
-import { Share as ShareIcon } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { RECORD_TYPES, useRecordById } from '@tetherto/pearpass-lib-vault'
-import { Share, StyleSheet, View } from 'react-native'
+import { rawTokens, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { useRecordById } from '@tetherto/pearpass-lib-vault'
+import { StyleSheet, View } from 'react-native'
 
 import { RecordDetailsContent } from './RecordDetailsContentWrapper'
 import { HeaderContent } from './styles'
@@ -29,18 +25,20 @@ export const RecordDetailsV2 = ({ route }) => {
 
   const navigation = useNavigation()
 
+  const hadRecordRef = useRef(false)
+  useEffect(() => {
+    if (record) {
+      hadRecordRef.current = true
+      return
+    }
+
+    if (hadRecordRef.current && navigation.canGoBack()) {
+      navigation.goBack()
+    }
+  }, [record, navigation])
+
   if (!record) {
     return null
-  }
-
-  const handleShare = async () => {
-    const website =
-      record?.type === RECORD_TYPES.LOGIN ? record?.data?.websites?.[0] : null
-
-    await Share.share({
-      title: record?.data?.title || 'Record',
-      message: [record?.data?.title, website].filter(Boolean).join('\n')
-    })
   }
 
   return (
@@ -53,21 +51,12 @@ export const RecordDetailsV2 = ({ route }) => {
           title={record?.data?.title || ''}
           onBack={() => navigation.goBack()}
           rightActions={
-            <View style={styles.actionButtonsContainer}>
-              <Button
-                variant="tertiary"
-                size="medium"
-                aria-label="Share"
-                iconBefore={<ShareIcon color={theme.colors.colorTextPrimary} />}
-                onClick={handleShare}
-              />
-              <BottomSheetRecordActionsContentV2
-                record={record}
-                recordType={record.type}
-                excludeTypes={['copy']}
-                onDelete={() => navigation.goBack()}
-              />
-            </View>
+            <BottomSheetRecordActionsContentV2
+              record={record}
+              recordType={record.type}
+              excludeTypes={['copy']}
+              onDelete={() => navigation.goBack()}
+            />
           }
           centerSlot={
             <HeaderContent>
@@ -116,11 +105,6 @@ const styles = StyleSheet.create({
   },
   hiddenFooter: {
     display: 'none'
-  },
-  actionButtonsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: rawTokens.spacing4
   },
   headerIcon: {
     width: rawTokens.spacing24,
