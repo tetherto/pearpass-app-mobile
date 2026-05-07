@@ -8,12 +8,12 @@ import {
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
+  RECORD_TYPES,
   formatOtpCode,
   groupOtpRecords,
   isExpiring,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
-import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { isV2 } from 'src/utils/designVersion'

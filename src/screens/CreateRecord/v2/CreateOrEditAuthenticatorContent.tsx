@@ -92,7 +92,7 @@ export const CreateOrEditAuthenticatorContent = ({
     otpSecret: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string(),

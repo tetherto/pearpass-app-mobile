@@ -4,7 +4,7 @@ declare module '@tetherto/pearpass-lib-vault' {
   // ─── Constants ────────────────────────────────────────────────────────────
 
   export const RECORD_TYPES: {
-    readonly OTP: "otp",
+    readonly OTP: 'otp'
     readonly NOTE: 'note'
     readonly CREDIT_CARD: 'creditCard'
     readonly CUSTOM: 'custom'
