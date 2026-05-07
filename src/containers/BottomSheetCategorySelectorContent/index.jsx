@@ -58,7 +58,7 @@ export const BottomSheetCategorySelectorContent = (props = {}) => {
         ? [
             {
               name: t`Authenticator Code`,
-              type: 'authenticator',
+              type: RECORD_TYPES.OTP,
               icon: TwoFactorAuthenticationOutlined
             }
           ]

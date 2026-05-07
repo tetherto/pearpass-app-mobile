@@ -16,6 +16,7 @@ import { View, StyleSheet } from 'react-native'
 
 import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { ScreenHeader } from '../ScreenHeader'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
 interface HeaderV2Props {
   setSearchValue: (value: string) => void
@@ -33,8 +34,8 @@ export const HeaderV2 = ({ setSearchValue, searchValue }: HeaderV2Props) => {
       return
     }
 
-    if (recordType === 'authenticator') {
-      navigation.navigate('CreateRecord', { recordType: 'login' })
+    if (recordType === RECORD_TYPES.OTP) {
+      navigation.navigate('CreateRecord', { recordType: RECORD_TYPES.OTP })
       return
     }
 

@@ -1,6 +1,7 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
+import { CreateOrEditAuthenticatorContent } from './CreateOrEditAuthenticatorContent'
 import { CreateOrEditCreditCardContent } from './CreateOrEditCreditCardContent'
 import { CreateOrEditCustomContent } from './CreateOrEditCustomContent'
 import { CreateOrEditIdentityContent } from './CreateOrEditIdentityContent'
@@ -37,6 +38,8 @@ export const CreateRecordV2 = ({ route }: CreateRecordV2Props) => {
 
   const renderContent = () => {
     switch (recordType) {
+      case RECORD_TYPES.OTP:
+        return <CreateOrEditAuthenticatorContent initialRecord={initialRecord} selectedFolder={resolvedFolder} />
       case RECORD_TYPES.CREDIT_CARD:
         return <CreateOrEditCreditCardContent initialRecord={initialRecord} selectedFolder={resolvedFolder} />
       case RECORD_TYPES.CUSTOM:

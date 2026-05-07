@@ -13,6 +13,7 @@ import {
   isExpiring,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
+import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { isV2 } from 'src/utils/designVersion'
@@ -187,7 +188,9 @@ export const Authenticator = () => {
             <TouchableOpacity
               style={styles.emptyPrimaryButton}
               onPress={() =>
-                navigation.navigate('CreateRecord', { recordType: 'login' })
+                navigation.navigate('CreateRecord', {
+                  recordType: RECORD_TYPES.OTP
+                })
               }
             >
               <PlusIcon size="16" color={colors.grey500.mode1} />
