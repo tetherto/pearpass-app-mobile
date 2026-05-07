@@ -30,6 +30,7 @@ import { RecordDetails } from '../../screens/RecordDetails'
 import { AboutV2 } from '../../screens/Settings/About/AboutV2'
 import { AppearanceV2 } from '../../screens/Settings/Appearance/AppearanceV2'
 import { AppPreferences } from '../../screens/Settings/AppPreferences'
+import { Diagnostics } from '../../screens/Settings/Diagnostics'
 import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
@@ -128,6 +129,7 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="MultiSelectDelete" component={MultiSelectDelete} />
     <Stack.Screen name="MultiSelectMove" component={MultiSelectMove} />
     <Stack.Screen name="Feedback" component={Feedback} />
+    <Stack.Screen name="Diagnostics" component={Diagnostics} />
     <Stack.Screen name="AboutV2" component={AboutV2} />
     <Stack.Screen name="AppearanceV2" component={AppearanceV2} />
     <Stack.Screen name="ImportItems" component={ImportItems} />

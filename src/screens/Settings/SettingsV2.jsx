@@ -124,6 +124,12 @@ export const SettingsV2 = () => {
             icon: BugReportFilled
           },
           {
+            key: 'diagnostics',
+            label: t`Diagnostics`,
+            screen: 'Diagnostics',
+            icon: BugReportFilled
+          },
+          {
             key: 'app-version',
             label: t`App Version`,
             screen: 'AboutV2',

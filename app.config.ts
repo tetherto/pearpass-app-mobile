@@ -2,6 +2,8 @@ import { ConfigContext, ExpoConfig } from '@expo/config'
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   const distribution = process.env.PEARPASS_DISTRIBUTION || 'standard'
+  const isNightly = distribution === 'nightly'
+  const sentryDsn = isNightly ? process.env.PEARPASS_SENTRY_DSN || null : null
 
   const plugins = config.plugins ? [...config.plugins] : []
   plugins.push(['./plugins/withAndroidDistribution', { distribution }])
@@ -14,6 +16,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       extensionBundlePath: 'bundles/autofill.bundle',
     },
   ])
+  if (isNightly) {
+    plugins.push('@sentry/react-native/expo')
+  }
 
   return {
     ...config,
@@ -22,8 +27,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     plugins,
     extra: {
       ...(config.extra || {}),
-      distribution
+      distribution,
+      sentryDsn
     }
   }
 }
-
