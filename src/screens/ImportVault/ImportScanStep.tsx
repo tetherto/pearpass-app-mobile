@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import {
   useTheme,
@@ -8,12 +10,29 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit'
 import { ContentPaste } from '@tetherto/pearpass-lib-ui-kit/icons'
 import * as Clipboard from 'expo-clipboard'
-import { Dimensions, StyleSheet, View } from 'react-native'
+import {
+  Dimensions,
+  StyleSheet,
+  Text as RNText,
+  View
+} from 'react-native'
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming
+} from 'react-native-reanimated'
+import Svg, { Circle } from 'react-native-svg'
 import { Camera } from 'react-native-vision-camera'
 
 import { useQRScanner } from '../../hooks/useQRScanner'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
+const LOADING_ACCENT = '#BDC3AC'
+const SPINNER_SIZE = 20
+const SPINNER_STROKE = 2
 
 type ImportScanStepProps = {
   isLoading: boolean
@@ -21,6 +40,45 @@ type ImportScanStepProps = {
   inviteCode: string
   setInviteCode: (code: string) => void
   onCodeScanned: (data: string) => void
+}
+
+const LoadingArcSpinner = ({ color }: { color: string }) => {
+  const rotation = useSharedValue(0)
+
+  useEffect(() => {
+    rotation.value = 0
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 900, easing: Easing.linear }),
+      -1,
+      false
+    )
+    return () => cancelAnimation(rotation)
+  }, [rotation])
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }]
+  }))
+
+  const radius = (SPINNER_SIZE - SPINNER_STROKE) / 2
+  const circumference = 2 * Math.PI * radius
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <Svg width={SPINNER_SIZE} height={SPINNER_SIZE}>
+        <Circle
+          cx={SPINNER_SIZE / 2}
+          cy={SPINNER_SIZE / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={SPINNER_STROKE}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * 0.25}
+          strokeLinecap="round"
+        />
+      </Svg>
+    </Animated.View>
+  )
 }
 
 export const ImportScanStep = ({
@@ -58,13 +116,16 @@ export const ImportScanStep = ({
 
   const spotSize = SCREEN_WIDTH * 0.35
 
+  const showPermissionPrompt =
+    !isLoading && (hasPermission === false || hasPermission === null)
+
   return (
     <View style={styles.content}>
       <Text variant="caption" color={theme.colors.colorTextSecondary}>
         {t`Scan QR code`}
       </Text>
 
-      {hasPermission === false || hasPermission === null ? (
+      {showPermissionPrompt ? (
         <>
           <Text variant="caption" color={theme.colors.colorTextSecondary}>
             {t`Camera access is required to scan codes.`}
@@ -81,6 +142,23 @@ export const ImportScanStep = ({
             </Button>
           </View>
         </>
+      ) : isLoading ? (
+        <View
+          style={[
+            styles.cameraWrapper,
+            styles.loadingWrapper,
+            {
+              borderColor: theme.colors.colorBorderPrimary,
+              backgroundColor: theme.colors.colorSurfacePrimary
+            }
+          ]}
+          testID="import-vault-loading-panel"
+        >
+          <LoadingArcSpinner color={LOADING_ACCENT} />
+          <RNText style={[styles.loadingText, { color: LOADING_ACCENT }]}>
+            {t`Importing Vault...`}
+          </RNText>
+        </View>
       ) : (
         <View
           style={[
@@ -92,7 +170,7 @@ export const ImportScanStep = ({
             {device ? (
               <Camera
                 device={device}
-                isActive={!isLoading}
+                isActive
                 style={styles.camera}
                 codeScanner={codeScanner}
                 frameProcessor={frameProcessor}
@@ -178,5 +256,15 @@ const styles = StyleSheet.create({
   cameraSpot: {
     borderWidth: 2,
     borderRadius: rawTokens.spacing8
+  },
+  loadingWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: rawTokens.spacing12
+  },
+  loadingText: {
+    fontFamily: 'Inter',
+    fontSize: rawTokens.fontSize14,
+    fontWeight: '400'
   }
 })

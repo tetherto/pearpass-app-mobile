@@ -99,7 +99,8 @@ export const Home = () => {
       selectedRecords,
       setSelectedRecords,
       searchValue,
-      itemsFound: records?.length
+      itemsFound: records?.length,
+      recordType
     }
 
     return (
@@ -133,7 +134,9 @@ export const Home = () => {
           />
         )}
 
-        {!records.length && !searchValue.length && <EmptyCollectionViewV2 />}
+        {!records.length && !searchValue.length && (
+          <EmptyCollectionViewV2 recordType={recordType} />
+        )}
 
         {!records.length && !!searchValue.length && <EmptyResultsView />}
       </Layout>

@@ -11,11 +11,9 @@ import {
 } from '@tetherto/pearpass-lib-vault'
 import {
   Button,
-  ContextMenu,
   InputField,
   MultiSlotInput,
   PasswordField,
-  SelectField,
   Text,
   rawTokens,
   useTheme
@@ -24,7 +22,7 @@ import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { FormGroup } from '../../../components/FormGroup'
 
-import { BottomSheetFolderSelectorContent } from '../../../containers/BottomSheetFolderSelectorContent'
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
@@ -116,7 +114,7 @@ export function adaptRegister(reg: {
     value: reg.value,
     error: reg.error,
     name: reg.name,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => reg.onChange(e),
+    onChangeText: (value: string) => reg.onChange(value ?? ''),
   }
 }
 
@@ -152,7 +150,7 @@ export const CreateOrEditLoginContent = ({
     ),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string(),
@@ -166,26 +164,26 @@ export const CreateOrEditLoginContent = ({
 
   const { register, handleSubmit, registerArray, values, setValue, errors } =
     useForm<FormValues>({
-    initialValues: {
-      title: initialRecord?.data?.title ?? '',
-      username: initialRecord?.data?.username ?? '',
-      password: initialRecord?.data?.password ?? '',
-      otpSecret:
-        initialRecord?.data?.otpInput ??
-        initialRecord?.data?.otp?.secret ??
-        '',
-      note: initialRecord?.data?.note ?? '',
-      websites: initialRecord?.data?.websites?.length
-        ? initialRecord.data.websites.map((website) => ({ website }))
-        : [{ website: '' }],
-      customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.attachments ?? [],
-      credential: initialRecord?.data?.credential?.id ?? '',
-      passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
-    },
-    validate: (formValues) => schema.validate(formValues)
-  })
+      initialValues: {
+        title: initialRecord?.data?.title ?? '',
+        username: initialRecord?.data?.username ?? '',
+        password: initialRecord?.data?.password ?? '',
+        otpSecret:
+          initialRecord?.data?.otpInput ??
+          initialRecord?.data?.otp?.secret ??
+          '',
+        note: initialRecord?.data?.note ?? '',
+        websites: initialRecord?.data?.websites?.length
+          ? initialRecord.data.websites.map((website) => ({ website }))
+          : [{ website: '' }],
+        customFields: initialRecord?.data?.customFields ?? [],
+        folder: selectedFolder ?? initialRecord?.folder,
+        attachments: initialRecord?.attachments ?? [],
+        credential: initialRecord?.data?.credential?.id ?? '',
+        passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
+      },
+      validate: (formValues) => schema.validate(formValues)
+    })
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -227,7 +225,10 @@ export const CreateOrEditLoginContent = ({
             }
           })
           .filter((website): website is string => !!website?.trim().length),
-        customFields: values.customFields,
+        customFields: (
+          (values.customFields as Array<{ type: string; note?: string }>) ??
+          []
+        ).filter((f) => f.note?.trim().length), 
         attachments: convertBase64FilesToUint8(
           values.attachments.filter(isUploadedLoginAttachment)
         ),
@@ -266,7 +267,7 @@ export const CreateOrEditLoginContent = ({
   } = registerArray('customFields')
 
   const handleFirstHiddenMessageChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
+    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
   }
 
   const openPasswordGenerator = () => {
@@ -274,19 +275,6 @@ export const CreateOrEditLoginContent = ({
     navigation.navigate('CreatePasswordItem', {
       onPasswordInsert: (value: string) => setValue('password', value)
     })
-  }
-
-  const handleFolderSelect = (folder?: { name?: string }) => {
-    if (!folder) {
-      return
-    }
-
-    if (folder.name === 'allFolder') {
-      setValue('folder', '')
-      return
-    }
-
-    setValue('folder', folder.name === values.folder ? '' : (folder.name ?? ''))
   }
 
   const handleFileUpload = (file?: LoginAttachment | null) => {
@@ -456,36 +444,17 @@ export const CreateOrEditLoginContent = ({
             />
           ))}
         </MultiSlotInput>
-
-        <MultiSlotInput testID="folder-multi-slot-input">
-          <ContextMenu
-            trigger={
-              <SelectField
-                label={t`Folder`}
-                value={values.folder ?? ''}
-                placeholder={t`Choose Folder`}
-                isGrouped
-                testID="folder-field"
-                rightSlot={
-                  <KeyboardArrowBottom
-                    color={theme.colors.colorTextPrimary}
-                  />
-                }
-              />
-            }
-          >
-            <BottomSheetFolderSelectorContent
-              selectedFolder={values.folder}
-              onSelect={handleFolderSelect}
-            />
-          </ContextMenu>
-        </MultiSlotInput>
       </View>
 
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Additional`}
         </Text>
+
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
 
         <InputField
           label={t`Comment`}

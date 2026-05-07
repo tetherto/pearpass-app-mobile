@@ -8,7 +8,9 @@ import {
   InputField,
   MultiSlotInput,
   PasswordField,
-  rawTokens
+  Text,
+  rawTokens,
+  useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import { StyleSheet, View } from 'react-native'
 
@@ -53,6 +55,7 @@ export const CreditCardRecordDetailsForm = ({
 }: CreditCardRecordDetailsFormProps) => {
   const { t } = useLingui()
   const navigation = useNavigation() as ImagePreviewNavigation
+  const { theme } = useTheme()
   const { setShouldBypassAutoLock } = useAutoLockContext() as {
     setShouldBypassAutoLock: (value: boolean) => void
   }
@@ -133,7 +136,7 @@ export const CreditCardRecordDetailsForm = ({
           <MultiSlotInput testID="card-details-multi-slot-input">
             {hasName && (
               <InputField
-                label={t`Name on card`}
+                label={t`Cardholder Name`}
                 placeholder={t`John Smith`}
                 readOnly
                 copyable
@@ -146,7 +149,7 @@ export const CreditCardRecordDetailsForm = ({
 
             {hasNumber && (
               <InputField
-                label={t`Number on card`}
+                label={t`Card Number`}
                 placeholder={t`1234 1234 1234 1234`}
                 readOnly
                 copyable
@@ -159,7 +162,7 @@ export const CreditCardRecordDetailsForm = ({
 
             {hasExpireDate && (
               <InputField
-                label={t`Date of expire`}
+                label={t`Expiration Date`}
                 placeholder={t`MM YY`}
                 readOnly
                 copyable
@@ -172,7 +175,7 @@ export const CreditCardRecordDetailsForm = ({
 
             {hasSecurityCode && (
               <PasswordField
-                label={t`Security code`}
+                label={t`Security Code`}
                 placeholder={t`123`}
                 readOnly
                 copyable
@@ -185,7 +188,7 @@ export const CreditCardRecordDetailsForm = ({
 
             {hasPinCode && (
               <PasswordField
-                label={t`Pin code`}
+                label={t`PIN`}
                 placeholder={t`1234`}
                 readOnly
                 copyable
@@ -215,37 +218,45 @@ export const CreditCardRecordDetailsForm = ({
           </MultiSlotInput>
         )}
 
-        {hasNote && (
-          <MultiSlotInput testID="comments-multi-slot-input">
-            <InputField
-              label={t`Comment`}
-              placeholder={t`Add comment`}
-              readOnly
-              copyable
-              onCopy={copyToClipboard}
-              isGrouped
-              testID="comments-multi-slot-input-slot-0"
-              {...toReadOnlyFieldProps(register('note'))}
-            />
-          </MultiSlotInput>
-        )}
+        {(hasNote || hasCustomFields) && (
+          <View style={styles.section}>
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              {t`Additional`}
+            </Text>
 
-        {hasCustomFields && (
-          <MultiSlotInput testID="hidden-messages-multi-slot-input">
-            {values.customFields.map((field, index) => (
-              <PasswordField
-                key={`${field.type}-${index}`}
-                label={t`Hidden Message`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Hidden Message`}
-                readOnly
-                copyable
-                onCopy={copyToClipboard}
-                isGrouped
-                testID={`hidden-messages-multi-slot-input-slot-${index}`}
-              />
-            ))}
-          </MultiSlotInput>
+            {hasNote && (
+              <MultiSlotInput testID="comments-multi-slot-input">
+                <InputField
+                  label={t`Comment`}
+                  placeholder={t`Add comment`}
+                  readOnly
+                  copyable
+                  onCopy={copyToClipboard}
+                  isGrouped
+                  testID="comments-multi-slot-input-slot-0"
+                  {...toReadOnlyFieldProps(register('note'))}
+                />
+              </MultiSlotInput>
+            )}
+
+            {hasCustomFields && (
+              <MultiSlotInput testID="hidden-messages-multi-slot-input">
+                {values.customFields.map((field, index) => (
+                  <PasswordField
+                    key={`${field.type}-${index}`}
+                    label={t`Hidden Message`}
+                    value={field.note ?? ''}
+                    placeholder={t`Enter Hidden Message`}
+                    readOnly
+                    copyable
+                    onCopy={copyToClipboard}
+                    isGrouped
+                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                  />
+                ))}
+              </MultiSlotInput>
+            )}
+          </View>
         )}
       </View>
     </View>
@@ -259,5 +270,8 @@ const styles = StyleSheet.create({
   },
   topContent: {
     gap: rawTokens.spacing8
+  },
+  section: {
+    gap: rawTokens.spacing12
   }
 })

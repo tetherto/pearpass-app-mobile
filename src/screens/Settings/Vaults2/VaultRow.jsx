@@ -22,6 +22,19 @@ export const VaultRow = ({
   const { theme } = useTheme()
 
   const styles = getStyles(theme)
+  const itemCount = vault?.records?.length ?? 0
+  const deviceCount = vault?.devices?.length ?? 0
+  const subtitle =
+    itemCount || deviceCount
+      ? {
+          primary:
+            itemCount === 1 ? t`${itemCount} Item` : t`${itemCount} Items`,
+          secondary:
+            deviceCount === 1
+              ? t`${deviceCount} Device`
+              : t`${deviceCount} Devices`
+        }
+      : undefined
   return (
     <View>
       <ListItem
@@ -37,7 +50,7 @@ export const VaultRow = ({
           </View>
         }
         title={vault?.name ?? vault?.id}
-        subtitle={t`Private`}
+        subtitle={subtitle}
         rightElement={
           isCurrentVault && (
             <View style={styles.actions}>

@@ -6,19 +6,20 @@ import { Button } from '@tetherto/pearpass-lib-ui-kit'
 
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
+import { withAutoLockBypass } from '../../HOCs'
 import { ImportPreviewStep } from './ImportPreviewStep'
 import { ImportScanStep } from './ImportScanStep'
 import { useImportVault } from './useImportVault'
 
 type Step = 'scan' | 'preview'
 
-export const ImportVault = () => {
+const ImportVaultBase = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
   const [step, setStep] = useState<Step>('scan')
   const [inviteCode, setInviteCode] = useState('')
 
-  const { isLoading, error, pairWithCode, cancelPairing } = useImportVault()
+  const { isLoading, error, pairWithCode } = useImportVault()
 
   const navigateToHome = useCallback(() => {
     navigation.dispatch(
@@ -66,12 +67,11 @@ export const ImportVault = () => {
         variant="primary"
         size="medium"
         fullWidth
-        onClick={isLoading ? cancelPairing : handleContinue}
-        disabled={!isLoading && !inviteCode.trim().length}
-        isLoading={isLoading}
+        onClick={handleContinue}
+        disabled={isLoading || !inviteCode.trim().length}
         data-testid="import-vault-continue-button"
       >
-        {isLoading ? t`Cancel Pairing` : t`Continue`}
+        {t`Continue`}
       </Button>
     ) : (
       <Button
@@ -105,3 +105,5 @@ export const ImportVault = () => {
     </Layout>
   )
 }
+
+export const ImportVault = withAutoLockBypass(ImportVaultBase)

@@ -5,7 +5,6 @@ import { AppState } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { LockedScreenV2 } from './LockedScreenV2'
-import { NAVIGATION_ROUTES } from '../../constants/navigation'
 import { messages } from '../../locales/en/messages'
 
 i18n.load('en', messages)
@@ -287,9 +286,7 @@ describe('LockedScreenV2', () => {
     })
 
     expect(mockRefreshMasterPasswordStatus).toHaveBeenCalled()
-    expect(mockReplace).toHaveBeenCalledWith('Welcome', {
-      state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD
-    })
+    expect(mockReplace).toHaveBeenCalledWith('AuthV2MasterPassword')
     expect(Toast.show).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'baseToast',

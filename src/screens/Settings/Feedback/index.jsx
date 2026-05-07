@@ -29,6 +29,7 @@ import {
   GOOGLE_FORM_MAPPING,
   SLACK_WEBHOOK_URL_PATH
 } from '../../../constants/feedback'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { logger } from '../../../utils/logger'
 
 const isEmailSupported = false
@@ -37,6 +38,7 @@ export const Feedback = () => {
   const navigation = useNavigation()
   const { theme } = useTheme()
   const colors = theme.colors
+  const { setShouldBypassAutoLock } = useAutoLockContext()
   const [message, setMessage] = useState('')
   const [email, setEmail] = useState('')
 
@@ -46,6 +48,7 @@ export const Feedback = () => {
     if (!message?.length) return
 
     try {
+      setShouldBypassAutoLock(true)
       setIsLoading(true)
 
       const payload = {
@@ -98,6 +101,7 @@ export const Feedback = () => {
       })
     } finally {
       setIsLoading(false)
+      setShouldBypassAutoLock(false)
     }
   }
   const isDisabled = isLoading || !message.length
@@ -107,6 +111,7 @@ export const Feedback = () => {
   return (
     <Layout
       scrollable
+      disableKeyboardAvoidance
       header={
         <BackScreenHeader
           title={t`Settings`}

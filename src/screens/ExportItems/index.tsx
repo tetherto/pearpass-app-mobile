@@ -203,7 +203,7 @@ export const ExportItems = () => {
       value: 'json',
       label: 'JSON (Recommended)',
       description:
-        'JSON preserves all data, including custom fields, attachments, and metadata, ensuring a complete export'
+        'JSON preserves all data, including custom fields and metadata, ensuring a complete export'
     },
     {
       value: 'csv',
@@ -231,6 +231,9 @@ export const ExportItems = () => {
       }
       footer={
         <ContextMenu
+          keyboardBehavior="interactive"
+          keyboardBlurBehavior="restore"
+          android_keyboardInputMode="adjustResize"
           trigger={
             <Button
               disabled={

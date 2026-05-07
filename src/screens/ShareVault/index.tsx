@@ -1,16 +1,16 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
+  AlertMessage,
   useTheme,
   rawTokens,
-  Text,
-  Button
+  Text
 } from '@tetherto/pearpass-lib-ui-kit'
 import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
-import { StyleSheet, View } from 'react-native'
+import { Modal, Pressable, StyleSheet, View } from 'react-native'
 import Animated, {
   Easing,
   useAnimatedProps,
@@ -23,6 +23,7 @@ import { SvgXml } from 'react-native-svg'
 import { useShareVault } from './useShareVault'
 import { Layout } from '../../containers/Layout'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
+import { withAutoLockBypass } from '../../HOCs'
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle)
 
@@ -33,7 +34,7 @@ const TIMER_STROKE_WIDTH = 1.5
 const TIMER_CENTER = TIMER_SIZE / 2
 const TIMER_CIRCUMFERENCE = 2 * Math.PI * TIMER_RADIUS
 
-export const ShareVault = () => {
+const ShareVaultBase = () => {
   const { t } = useLingui()
   const { theme } = useTheme()
   const navigation = useNavigation()
@@ -42,9 +43,19 @@ export const ShareVault = () => {
   const { svg, isExpired, formattedTime, secondsLeft, vaultLink, handleCopy } =
     useShareVault()
 
+  const [isQrFullscreen, setIsQrFullscreen] = useState(false)
+
+  const vaultName = vault?.name ?? t`Vault`
+
   const handleBack = useCallback(() => {
     navigation.goBack()
   }, [navigation])
+
+  useEffect(() => {
+    if (isExpired) {
+      navigation.goBack()
+    }
+  }, [isExpired, navigation])
 
   const targetOffset = (1 - secondsLeft / EXPIRE_PERIOD) * TIMER_CIRCUMFERENCE
   const animatedOffset = useSharedValue(targetOffset)
@@ -63,7 +74,7 @@ export const ShareVault = () => {
   return (
     <Layout
       header={
-        <BackScreenHeader title={t`Share ${vault?.name ?? ''} Vault`} onBack={handleBack} />
+        <BackScreenHeader title={t`Share ${vaultName}`} onBack={handleBack} />
       }
       scrollable
       hideFooter
@@ -83,11 +94,12 @@ export const ShareVault = () => {
           ]}
         >
           <View style={styles.qrSection}>
-            <View
-              style={[
-                styles.qrContainer,
-                { backgroundColor: theme.colors.colorSurfaceHover }
-              ]}
+            <Pressable
+              style={styles.qrContainer}
+              onPress={() => setIsQrFullscreen(true)}
+              accessibilityLabel={t`Expand QR code`}
+              testID="share-vault-qr-expand"
+              disabled={svg.length === 0}
             >
               {svg.length > 0 && (
                 <SvgXml
@@ -97,7 +109,11 @@ export const ShareVault = () => {
                   height="100%"
                 />
               )}
-            </View>
+            </Pressable>
+
+            <Text variant="caption" color={theme.colors.colorTextSecondary}>
+              {t`Tap the QR code to expand it`}
+            </Text>
 
             <View style={styles.timerRow}>
               <View style={styles.timerCircle}>
@@ -154,26 +170,54 @@ export const ShareVault = () => {
                 {vaultLink || t`Generating link...`}
               </Text>
             </View>
-            <Button
-              variant="tertiary"
-              size="small"
-              onClick={handleCopy}
-              aria-label="Copy"
-              data-testid="share-vault-copy-button"
-              iconBefore={
-                <ContentCopy
-                  width={24}
-                  height={24}
-                  color={theme.colors.colorTextPrimary}
-                />
-              }
-            />
+            <Pressable
+              onPress={handleCopy}
+              accessibilityLabel="Copy"
+              testID="share-vault-copy-button"
+              hitSlop={8}
+            >
+              <ContentCopy
+                width={24}
+                height={24}
+                color={theme.colors.colorTextPrimary}
+              />
+            </Pressable>
           </View>
         </View>
+
+        <AlertMessage
+          variant="info"
+          size="small"
+          title=""
+          description={t`Keep your vault private. Only pair with your own trusted devices. Pairing grants full access to your PearPass data.`}
+          testID="pairing-disclaimer"
+        />
       </View>
+
+      <Modal
+        visible={isQrFullscreen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsQrFullscreen(false)}
+      >
+        <Pressable
+          style={styles.qrFullscreenBackdrop}
+          onPress={() => setIsQrFullscreen(false)}
+          accessibilityLabel={t`Close fullscreen QR code`}
+          testID="share-vault-qr-fullscreen-close"
+        >
+          <View style={styles.qrFullscreenContainer}>
+            {svg.length > 0 && (
+              <SvgXml xml={svg} width="100%" height="100%" />
+            )}
+          </View>
+        </Pressable>
+      </Modal>
     </Layout>
   )
 }
+
+export const ShareVault = withAutoLockBypass(ShareVaultBase)
 
 const styles = StyleSheet.create({
   content: {
@@ -194,7 +238,8 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: rawTokens.spacing8,
     padding: 10,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF'
   },
   timerRow: {
     flexDirection: 'row',
@@ -212,10 +257,28 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: rawTokens.spacing16
+    paddingTop: rawTokens.spacing16,
+    paddingBottom: rawTokens.spacing16,
+    paddingLeft: rawTokens.spacing16,
+    paddingRight: rawTokens.spacing8
   },
   vaultLinkContent: {
     flex: 1,
     gap: 2
+  },
+  qrFullscreenBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: rawTokens.spacing24
+  },
+  qrFullscreenContainer: {
+    aspectRatio: 1,
+    width: '100%',
+    maxWidth: 480,
+    backgroundColor: '#FFFFFF',
+    borderRadius: rawTokens.spacing12,
+    padding: rawTokens.spacing24
   }
 })

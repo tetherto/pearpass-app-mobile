@@ -117,7 +117,7 @@ export const CreatePasswordScreen = () => {
             value: passwordRegisterProps.value,
             onChangeText: handlePasswordChange,
             passwordIndicator: passwordIndicatorVariant,
-            infoBox: t`Strong passwords are usually at least 8 characters long, hard to guess, use a mix of letters, numbers, and symbols, and aren't based on personal information.`,
+            infoBox: t`Strong passwords are usually at least 8 characters long, hard to guess, use a mix of uppercase and lowercase letters, numbers, and symbols, and aren't based on personal information.`,
             testID: 'onboarding-v2-password-input'
           }}
           confirmPasswordField={{

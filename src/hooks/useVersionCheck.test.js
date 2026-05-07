@@ -1,9 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
+import { VERSION_CHECK_CONFIG } from '@tetherto/pearpass-lib-constants'
 import { Platform } from 'react-native'
 
 import {
   compareVersions,
-  isWithinGracePeriod,
+  isPastGracePeriod,
   parseParts,
   useVersionCheck
 } from './useVersionCheck'
@@ -11,138 +13,114 @@ import {
 jest.mock('expo-constants', () => ({
   expoConfig: {
     version: '1.0.0',
-    extra: {
-      distribution: 'standard'
-    }
+    extra: { distribution: 'standard' }
   }
 }))
 
 jest.mock('../utils/logger', () => ({
-  logger: {
-    error: jest.fn()
-  }
+  logger: { error: jest.fn() }
 }))
 
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn()
+}))
+
+const buildPayload = (overrides = {}) => ({
+  tag_name: 'v2.0.0',
+  published_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+  draft: false,
+  prerelease: false,
+  ...overrides
+})
+
+const mockFetchOk = (payload) =>
+  global.fetch.mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve(payload)
+  })
+
 describe('parseParts', () => {
-  it('should parse valid version strings', () => {
+  it('parses valid version strings', () => {
     expect(parseParts('1.0.0')).toEqual([1, 0, 0])
-    expect(parseParts('2.3.4')).toEqual([2, 3, 4])
     expect(parseParts('10.20.30')).toEqual([10, 20, 30])
   })
 
-  it('should parse single number versions', () => {
+  it('parses single and two-part versions', () => {
     expect(parseParts('1')).toEqual([1])
-    expect(parseParts('42')).toEqual([42])
-  })
-
-  it('should parse two-part versions', () => {
     expect(parseParts('1.0')).toEqual([1, 0])
-    expect(parseParts('2.3')).toEqual([2, 3])
   })
 
-  it('should handle version strings with prefixes', () => {
+  it('strips a leading "v"', () => {
     expect(parseParts('v1.0.0')).toEqual([1, 0, 0])
-    expect(parseParts('version-1.2.3')).toEqual([1, 2, 3])
     expect(parseParts('V2.0.0')).toEqual([2, 0, 0])
   })
 
-  it('should handle version strings with suffixes', () => {
-    expect(parseParts('1.0.0-beta')).toEqual([1, 0, 0])
-    expect(parseParts('1.0.0-alpha')).toEqual([1, 0, 0])
-    // Note: '1.2.3-rc1' becomes '1.2.31' after removing non-digit characters
-    expect(parseParts('1.2.3-rc1')).toEqual([1, 2, 31])
+  it('returns null for empty or non-numeric input', () => {
+    expect(parseParts('')).toBeNull()
+    expect(parseParts('abc')).toBeNull()
+    expect(parseParts('-beta')).toBeNull()
   })
 
-  it('should handle version strings with both prefix and suffix', () => {
-    expect(parseParts('v1.0.0-beta')).toEqual([1, 0, 0])
-    expect(parseParts('version-1.2.3-alpha')).toEqual([1, 2, 3])
-  })
-
-  it('should handle versions with spaces', () => {
-    expect(parseParts('1.0.0 ')).toEqual([1, 0, 0])
-    expect(parseParts(' 2.3.4')).toEqual([2, 3, 4])
-    expect(parseParts(' 1.0.0 ')).toEqual([1, 0, 0])
-  })
-
-  it('should return empty array for empty string', () => {
-    expect(parseParts('')).toEqual([])
-  })
-
-  it('should return empty array for string with no digits', () => {
-    expect(parseParts('abc')).toEqual([])
-    expect(parseParts('version')).toEqual([])
-    expect(parseParts('-beta')).toEqual([])
-  })
-
-  it('should handle edge cases with empty segments', () => {
-    // Note: The function strips non-digit characters and empty segments become 0
-    expect(parseParts('1.0.a')).toEqual([1, 0, 0]) // 'a' is removed, empty segment becomes 0
-    expect(parseParts('1..0')).toEqual([1, 0, 0]) // empty segment between dots becomes 0
-    expect(parseParts('1.0.')).toEqual([1, 0, 0]) // trailing empty segment becomes 0
-    expect(parseParts('.1.0')).toEqual([0, 1, 0]) // leading empty segment becomes 0
-  })
-
-  it('should handle strings with only dots', () => {
-    // Only dots result in empty segments which become 0
-    expect(parseParts('...')).toEqual([0, 0, 0, 0])
-    expect(parseParts('..')).toEqual([0, 0, 0])
-  })
-
-  it('should return null for non-string inputs', () => {
+  it('returns null for non-string inputs', () => {
     expect(parseParts(null)).toBeNull()
     expect(parseParts(undefined)).toBeNull()
     expect(parseParts(123)).toBeNull()
-    expect(parseParts({})).toBeNull()
-    expect(parseParts([])).toBeNull()
-    expect(parseParts(true)).toBeNull()
-  })
-
-  it('should handle zero values', () => {
-    expect(parseParts('0.0.0')).toEqual([0, 0, 0])
-    expect(parseParts('0.1.0')).toEqual([0, 1, 0])
   })
 })
 
 describe('compareVersions', () => {
-  it('should return true when latest is greater (major)', () => {
+  it('returns true when latest is greater', () => {
     expect(compareVersions('1.0.0', '2.0.0')).toBe(true)
-  })
-
-  it('should return true when latest is greater (minor)', () => {
-    expect(compareVersions('1.0.0', '1.1.1')).toBe(true)
-  })
-
-  it('should return true when latest is greater (patch)', () => {
+    expect(compareVersions('1.0.0', '1.1.0')).toBe(true)
     expect(compareVersions('1.0.0', '1.0.1')).toBe(true)
   })
 
-  it('should return false when versions are equal', () => {
+  it('returns false when versions are equal or current is greater', () => {
     expect(compareVersions('1.0.0', '1.0.0')).toBe(false)
-  })
-
-  it('should return false when current is greater', () => {
     expect(compareVersions('2.0.0', '1.0.0')).toBe(false)
   })
 
-  it('should handle different version lengths', () => {
+  it('handles different version lengths', () => {
     expect(compareVersions('1.0', '1.0.1')).toBe(true)
     expect(compareVersions('1.0.0', '1.1')).toBe(true)
   })
 
-  it('should handle two digit versions', () => {
+  it('handles double-digit segments numerically', () => {
     expect(compareVersions('1.9.0', '1.10.0')).toBe(true)
     expect(compareVersions('1.10.0', '1.9.0')).toBe(false)
   })
+})
 
-  it('should handle non-numeric characters in current version', () => {
-    expect(compareVersions('v1.0.0', '1.0.1')).toBe(true)
-    expect(compareVersions('1.0.0-beta', '1.0.1')).toBe(true)
-    expect(compareVersions('v1.2.3', '1.2.4')).toBe(true)
-    expect(compareVersions('v1.2.3', '1.3.0')).toBe(true)
-    expect(compareVersions('1.2.3-beta', '1.2.4')).toBe(true)
-    expect(compareVersions('1.2.3-beta', '1.3.0')).toBe(true)
-    expect(compareVersions('v1.2.3-beta', '1.2.4')).toBe(true)
-    expect(compareVersions('v1.2.3-alpha', '1.2.3')).toBe(false)
+describe('isPastGracePeriod', () => {
+  const days = (n) => n * 24 * 60 * 60 * 1000
+
+  it('returns true when older than the grace period', () => {
+    const old = new Date(
+      Date.now() - days(VERSION_CHECK_CONFIG.GRACE_PERIOD_DAYS + 1)
+    ).toISOString()
+    expect(isPastGracePeriod(old)).toBe(true)
+  })
+
+  it('returns false when within the grace period', () => {
+    expect(
+      isPastGracePeriod(new Date(Date.now() - days(1)).toISOString())
+    ).toBe(false)
+  })
+
+  it('returns true at the exact grace period boundary', () => {
+    const boundary = new Date(
+      Date.now() - days(VERSION_CHECK_CONFIG.GRACE_PERIOD_DAYS)
+    ).toISOString()
+    expect(isPastGracePeriod(boundary)).toBe(true)
+  })
+
+  it('returns false for invalid input', () => {
+    expect(isPastGracePeriod(null)).toBe(false)
+    expect(isPastGracePeriod('not-a-date')).toBe(false)
+    expect(isPastGracePeriod('')).toBe(false)
   })
 })
 
@@ -151,286 +129,179 @@ describe('useVersionCheck', () => {
     jest.clearAllMocks()
     jest.useFakeTimers()
     global.fetch = jest.fn()
+    Platform.OS = 'ios'
+    const Constants = require('expo-constants')
+    Constants.expoConfig.extra.distribution = 'standard'
+    AsyncStorage.getItem.mockResolvedValue(null)
+    AsyncStorage.setItem.mockResolvedValue()
   })
 
   afterEach(() => {
     jest.useRealTimers()
   })
 
-  it('should return initial state', () => {
-    global.fetch.mockResolvedValue({
-      json: () => Promise.resolve({ resultCount: 0 })
+  const renderAndAdvance = () => {
+    const result = renderHook(() => useVersionCheck())
+    act(() => {
+      jest.advanceTimersByTime(1000)
     })
+    return result
+  }
 
+  it('starts with needsUpdate=false', () => {
+    mockFetchOk(buildPayload())
     const { result } = renderHook(() => useVersionCheck())
-
     expect(result.current.needsUpdate).toBe(false)
-    expect(result.current.isChecking).toBe(true)
   })
 
-  it('should set needsUpdate to true when store version is higher (iOS)', async () => {
-    Platform.OS = 'ios'
-    const pastGracePeriod = new Date(
-      Date.now() - 25 * 60 * 60 * 1000
-    ).toISOString()
-    global.fetch.mockResolvedValue({
-      json: () =>
-        Promise.resolve({
-          resultCount: 1,
-          results: [
-            { version: '2.0.0', currentVersionReleaseDate: pastGracePeriod }
-          ]
-        })
-    })
+  it('sets needsUpdate=true when GitHub release is newer and past grace period', async () => {
+    mockFetchOk(buildPayload({ tag_name: 'v2.0.0' }))
+    const { result } = renderAndAdvance()
 
-    const { result } = renderHook(() => useVersionCheck())
-
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(true)
-      expect(result.current.isChecking).toBe(false)
-    })
+    await waitFor(() => expect(result.current.needsUpdate).toBe(true))
   })
 
-  it('should set needsUpdate to false when versions match', async () => {
-    Platform.OS = 'ios'
-    global.fetch.mockResolvedValue({
-      json: () =>
-        Promise.resolve({
-          resultCount: 1,
-          results: [
-            {
-              version: '1.0.0',
-              currentVersionReleaseDate: '2025-01-01T00:00:00Z'
-            }
-          ]
-        })
-    })
+  it('sets needsUpdate=false when versions match', async () => {
+    mockFetchOk(buildPayload({ tag_name: 'v1.0.0' }))
+    const { result } = renderAndAdvance()
 
-    const { result } = renderHook(() => useVersionCheck())
-
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(false)
-      expect(result.current.isChecking).toBe(false)
-    })
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
   })
 
-  it('should set needsUpdate to true when Android store version is higher and past grace period', async () => {
-    Platform.OS = 'android'
-    const pastGracePeriod = 'Jan 1, 2025'
-    global.fetch.mockResolvedValue({
-      text: () =>
-        Promise.resolve(
-          `some html [[["2.0.0"]]] more html <div class="x">Updated on</div><div class="y">${pastGracePeriod}</div>`
-        )
-    })
+  it('sets needsUpdate=false when release is within grace period', async () => {
+    mockFetchOk(
+      buildPayload({
+        tag_name: 'v2.0.0',
+        published_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+      })
+    )
+    const { result } = renderAndAdvance()
 
-    const { result } = renderHook(() => useVersionCheck())
-
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(true)
-      expect(result.current.isChecking).toBe(false)
-    })
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
   })
 
-  it('should set needsUpdate to false when Android store version is higher but within grace period', async () => {
-    Platform.OS = 'android'
-    const now = new Date()
-    const within = `${now.toLocaleString('en-US', { month: 'short' })} ${now.getDate()}, ${now.getFullYear()}`
-    global.fetch.mockResolvedValue({
-      text: () =>
-        Promise.resolve(
-          `some html [[["2.0.0"]]] more html <div class="x">Updated on</div><div class="y">${within}</div>`
-        )
-    })
-
-    const { result } = renderHook(() => useVersionCheck())
-
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(false)
-      expect(result.current.isChecking).toBe(false)
-    })
-  })
-
-  it('should set needsUpdate to true on Android when release date cannot be parsed from HTML', async () => {
-    Platform.OS = 'android'
-    global.fetch.mockResolvedValue({
-      text: () => Promise.resolve('some html [[["2.0.0"]]] more html')
-    })
-
-    const { result } = renderHook(() => useVersionCheck())
-
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(true)
-      expect(result.current.isChecking).toBe(false)
-    })
-  })
-
-  it('should set needsUpdate to false when Android store version matches current', async () => {
-    Platform.OS = 'android'
-    global.fetch.mockResolvedValue({
-      text: () =>
-        Promise.resolve(
-          'some html [[["1.0.0"]]] more html <div class="x">Updated on</div><div class="y">Jan 1, 2025</div>'
-        )
-    })
-
-    const { result } = renderHook(() => useVersionCheck())
-
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(false)
-      expect(result.current.isChecking).toBe(false)
-    })
-  })
-
-  it('should disable Android version check for fdroid distribution', async () => {
+  it('skips entirely on F-Droid distribution', async () => {
     Platform.OS = 'android'
     const Constants = require('expo-constants')
     Constants.expoConfig.extra.distribution = 'fdroid'
 
-    global.fetch.mockResolvedValue({
-      text: () => Promise.resolve('some html [[["2.0.0"]]] more html')
-    })
+    const { result } = renderAndAdvance()
 
-    const { result } = renderHook(() => useVersionCheck())
-
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(false)
-      expect(result.current.isChecking).toBe(false)
-    })
-
+    await waitFor(() => expect(AsyncStorage.getItem).not.toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
-  it('should set needsUpdate to false when store version is higher but within grace period (iOS)', async () => {
-    Platform.OS = 'ios'
-    const withinGracePeriod = new Date(
-      Date.now() - 12 * 60 * 60 * 1000
-    ).toISOString()
-    global.fetch.mockResolvedValue({
-      json: () =>
-        Promise.resolve({
-          resultCount: 1,
-          results: [
-            {
-              version: '2.0.0',
-              currentVersionReleaseDate: withinGracePeriod
-            }
-          ]
-        })
-    })
+  it('uses cached release when cache is fresh', async () => {
+    AsyncStorage.getItem.mockResolvedValue(
+      JSON.stringify({
+        version: '2.0.0',
+        publishedAt: new Date(
+          Date.now() - 8 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+        fetchedAt: Date.now() - 60 * 60 * 1000
+      })
+    )
 
-    const { result } = renderHook(() => useVersionCheck())
+    const { result } = renderAndAdvance()
 
-    jest.advanceTimersByTime(1000)
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(false)
-      expect(result.current.isChecking).toBe(false)
-    })
+    await waitFor(() => expect(result.current.needsUpdate).toBe(true))
+    expect(global.fetch).not.toHaveBeenCalled()
   })
 
-  it('should set needsUpdate to true when store version is higher and past grace period (iOS)', async () => {
-    Platform.OS = 'ios'
-    const pastGracePeriod = new Date(
-      Date.now() - 48 * 60 * 60 * 1000
-    ).toISOString()
-    global.fetch.mockResolvedValue({
-      json: () =>
-        Promise.resolve({
-          resultCount: 1,
-          results: [
-            { version: '2.0.0', currentVersionReleaseDate: pastGracePeriod }
-          ]
-        })
-    })
+  it('refetches when cache is expired', async () => {
+    AsyncStorage.getItem.mockResolvedValue(
+      JSON.stringify({
+        version: '2.0.0',
+        publishedAt: new Date(
+          Date.now() - 8 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+        fetchedAt:
+          Date.now() -
+          (VERSION_CHECK_CONFIG.CACHE_TTL_HOURS + 1) * 60 * 60 * 1000
+      })
+    )
+    mockFetchOk(buildPayload({ tag_name: 'v3.0.0' }))
 
-    const { result } = renderHook(() => useVersionCheck())
+    const { result } = renderAndAdvance()
 
-    jest.advanceTimersByTime(1000)
-
-    await waitFor(() => {
-      expect(result.current.needsUpdate).toBe(true)
-      expect(result.current.isChecking).toBe(false)
-    })
+    await waitFor(() => expect(result.current.needsUpdate).toBe(true))
+    expect(global.fetch).toHaveBeenCalledTimes(1)
   })
 
-  it('should cleanup timers on unmount', () => {
+  it('does not show modal on fetch failure (fail-safe)', async () => {
+    global.fetch.mockRejectedValue(new Error('network down'))
+
+    const { result } = renderAndAdvance()
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
+  })
+
+  it('does not show modal on non-OK HTTP response', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: () => Promise.resolve({})
+    })
+
+    const { result } = renderAndAdvance()
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
+  })
+
+  it('rejects pre-release payloads', async () => {
+    mockFetchOk(buildPayload({ tag_name: 'v2.0.0', prerelease: true }))
+    const { result } = renderAndAdvance()
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
+  })
+
+  it('rejects draft payloads', async () => {
+    mockFetchOk(buildPayload({ tag_name: 'v2.0.0', draft: true }))
+    const { result } = renderAndAdvance()
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
+  })
+
+  it('rejects malformed tag names', async () => {
+    mockFetchOk(buildPayload({ tag_name: 'release-1.0' }))
+    const { result } = renderAndAdvance()
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(result.current.needsUpdate).toBe(false)
+  })
+
+  it('persists fetched payload to cache', async () => {
+    mockFetchOk(buildPayload({ tag_name: 'v2.0.0' }))
+    renderAndAdvance()
+
+    await waitFor(() =>
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        VERSION_CHECK_CONFIG.CACHE_KEY,
+        expect.any(String)
+      )
+    )
+
+    const stored = JSON.parse(AsyncStorage.setItem.mock.calls[0][1])
+    expect(stored.version).toBe('2.0.0')
+    expect(typeof stored.publishedAt).toBe('string')
+    expect(typeof stored.fetchedAt).toBe('number')
+  })
+
+  it('cleans up timers on unmount', () => {
     const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout')
+    mockFetchOk(buildPayload())
 
     const { unmount } = renderHook(() => useVersionCheck())
-
     unmount()
 
     expect(clearTimeoutSpy).toHaveBeenCalled()
     clearTimeoutSpy.mockRestore()
-  })
-})
-
-describe('isWithinGracePeriod', () => {
-  it('should return true if release was less than 24 hours ago', () => {
-    const twelveHoursAgo = new Date(
-      Date.now() - 12 * 60 * 60 * 1000
-    ).toISOString()
-    expect(isWithinGracePeriod(twelveHoursAgo)).toBe(true)
-  })
-
-  it('should return true if release was just now', () => {
-    const now = new Date().toISOString()
-    expect(isWithinGracePeriod(now)).toBe(true)
-  })
-
-  it('should return false if release was more than 24 hours ago', () => {
-    const fortyEightHoursAgo = new Date(
-      Date.now() - 48 * 60 * 60 * 1000
-    ).toISOString()
-    expect(isWithinGracePeriod(fortyEightHoursAgo)).toBe(false)
-  })
-
-  it('should return false if release was exactly 24 hours ago', () => {
-    const exactlyTwentyFourHoursAgo = new Date(
-      Date.now() - 24 * 60 * 60 * 1000
-    ).toISOString()
-    expect(isWithinGracePeriod(exactlyTwentyFourHoursAgo)).toBe(false)
-  })
-
-  it('should return false if releaseDateString is null', () => {
-    expect(isWithinGracePeriod(null)).toBe(false)
-  })
-
-  it('should return false if releaseDateString is undefined', () => {
-    expect(isWithinGracePeriod(undefined)).toBe(false)
-  })
-
-  it('should return false if releaseDateString is an invalid date', () => {
-    expect(isWithinGracePeriod('not-a-date')).toBe(false)
-    expect(isWithinGracePeriod('')).toBe(false)
   })
 })

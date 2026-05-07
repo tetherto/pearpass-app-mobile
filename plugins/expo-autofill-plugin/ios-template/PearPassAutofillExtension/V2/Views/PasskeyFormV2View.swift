@@ -34,6 +34,8 @@ struct PasskeyFormV2View: View {
     /// Inline error from the file picker — fires when an upload exceeds the
     /// 6 MB cap. Cleared on a fresh successful upload.
     @Binding var fileSizeError: String?
+    /// Inline error under the websites card on URL validation failure.
+    @Binding var websiteError: String?
 
     var saveError: String? = nil
     /// Disables Save/Discard while the passkey is being generated and the
@@ -96,20 +98,14 @@ struct PasskeyFormV2View: View {
                                 .padding(.top, PPSpacing.s24)
                                 .padding(.bottom, PPSpacing.s8)
 
-                            // Unified websites card — all input rows + the
-                            // "+ Add Another Website" button share one
-                            // rounded border, with horizontal dividers
-                            // between rows. Empty entries are filtered at
-                            // save time so blank rows don't pollute the
-                            // record's websites array.
+                            // Unified websites card — rows + "+ Add Another Website" share one border.
                             VStack(spacing: 0) {
                                 ForEach(websites.indices, id: \.self) { idx in
+                                    if idx > 0 { websitesDivider }
                                     websiteRow(index: idx)
-
-                                    Rectangle()
-                                        .fill(PPColors.borderPrimary)
-                                        .frame(height: 1)
                                 }
+
+                                websitesDivider
 
                                 Button(action: {
                                     withAnimation(.easeInOut(duration: 0.2)) {
@@ -138,6 +134,13 @@ struct PasskeyFormV2View: View {
                                         .strokeBorder(PPColors.borderPrimary, lineWidth: 1)
                                 }
                             )
+
+                            if let websiteError = websiteError {
+                                Text(websiteError)
+                                    .font(PPTypography.caption)
+                                    .foregroundColor(PPColors.surfaceError)
+                                    .padding(.top, PPSpacing.s4)
+                            }
 
                             Spacer().frame(height: PPSpacing.s16)
 
@@ -172,14 +175,14 @@ struct PasskeyFormV2View: View {
                                 placeholder: NSLocalizedString("Optional", comment: "V2 comment placeholder")
                             )
 
-                            // Spacer().frame(height: PPSpacing.s16)
-                            //
-                            // PPButton(
-                            //     title: NSLocalizedString("Upload File", comment: "V2 upload file button"),
-                            //     variant: .secondary,
-                            //     isEnabled: !isSaving,
-                            //     action: { showFilePicker = true }
-                            // )
+                            Spacer().frame(height: PPSpacing.s16)
+
+                            PPButton(
+                                title: NSLocalizedString("Upload File", comment: "V2 upload file button"),
+                                variant: .secondary,
+                                isEnabled: !isSaving,
+                                action: { showFilePicker = true }
+                            )
 
                             if !existingAttachments.isEmpty || !attachments.isEmpty {
                                 Spacer().frame(height: PPSpacing.s16)
@@ -374,6 +377,13 @@ struct PasskeyFormV2View: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    /// 1pt divider used between rows and above "+ Add Another Website".
+    private var websitesDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.08))
+            .frame(maxWidth: .infinity, minHeight: 1, maxHeight: 1)
     }
 
     /// Single website row inside the unified websites card. No own border —

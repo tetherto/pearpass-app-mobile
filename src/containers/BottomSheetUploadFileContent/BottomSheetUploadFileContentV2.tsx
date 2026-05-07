@@ -119,7 +119,6 @@ const BottomSheetUploadFileBodyV2Content = ({
             variant="primary"
             size="medium"
             fullWidth
-            disabled={loadingAction !== null}
             isLoading={loadingAction === PickerAction.File}
             onClick={() =>
               launchPicker(PickerAction.File, () =>
@@ -134,7 +133,6 @@ const BottomSheetUploadFileBodyV2Content = ({
             variant="primary"
             size="medium"
             fullWidth
-            disabled={loadingAction !== null}
             isLoading={loadingAction === PickerAction.Media}
             onClick={() =>
               launchPicker(PickerAction.Media, () =>
