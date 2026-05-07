@@ -135,4 +135,12 @@
 /* V2 — accessibility labels */
 "Close" = "Close";
 "Back" = "Back";
-"Toggle password visibility" = "Toggle password visibility";"Try again with Face ID" = "Try again with Face ID";
+"Toggle password visibility" = "Toggle password visibility";
+
+/* V2 — biometric retry link */
+"Try again with Face ID" = "Try again with Face ID";
+"Try again with Touch ID" = "Try again with Touch ID";
+"Try again with Biometrics" = "Try again with Biometrics";
+
+/* V2 — passkey form validation */
+"Wrong format of website" = "Wrong format of website";

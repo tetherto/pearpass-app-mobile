@@ -39,7 +39,7 @@ export const AboutV2 = () => {
       <PageHeader
         title={t`App version`}
         subtitle={
-          <Text as="span" variant="label">
+          <>
             {t`Here you can find all the info about your app.`}
             {'\n'}
             {t`Check here to see the `}
@@ -67,7 +67,7 @@ export const AboutV2 = () => {
               {t`visit our website`}
             </Link>
             .
-          </Text>
+          </>
         }
       />
 
@@ -79,7 +79,6 @@ export const AboutV2 = () => {
       >
         <NavbarListItem
           label={t`App version`}
-          variant="secondary"
           size="big"
           additionalItems={
             <Text variant="label" color={theme.colors.colorPrimary}>

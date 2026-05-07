@@ -1,54 +1,46 @@
-import { useEffect, useState } from 'react'
-
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as FileSystem from 'expo-file-system'
 import * as SecureStore from 'expo-secure-store'
 
+import { getSharedDirectoryPath } from './AppGroupHelper'
+import { logger } from './logger'
 import { ASYNC_STORAGE_KEYS } from '../constants/asyncStorageKeys'
 import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
-import { getSharedDirectoryPath } from '../utils/AppGroupHelper'
-import { logger } from '../utils/logger'
 
 const { FIRST_LAUNCH_KEY, FAILED_KEYS_KEY } = ASYNC_STORAGE_KEYS
 const STORAGE_DIRECTORIES = ['pearpass', 'pearpass_jobs']
 
 /**
- * Custom hook to detect first launch after app installation and clear expo-secure-store data.
+ * Runs first-launch cleanup of expo-secure-store and on-disk vault
+ * directories. Must run BEFORE the Bare worklet binds to `pearpass/`,
+ * otherwise the recursive delete races the worklet's open file
+ * descriptors and leaves the storage tree in a partially-deleted state.
+ *
+ * @returns {Promise<{ ok: boolean, error?: Error }>}
  */
-export const useFirstLaunchCleanUp = () => {
-  const [isReady, setIsReady] = useState(false)
+export const runFirstLaunchCleanup = async () => {
+  try {
+    const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY)
 
-  useEffect(() => {
-    const clearDataOnFirstLaunch = async () => {
-      try {
-        const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY)
-
-        if (!hasLaunchedBefore) {
-          logger.log('First launch detected - clearing SecureStore data')
-          await clearSecureStoreData()
-          await clearVaultFileData()
-
-          await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true')
-        } else {
-          await retryFailedKeys()
-        }
-      } catch (error) {
-        logger.error('Error clearing data on first launch:', error)
-      } finally {
-        setIsReady(true)
-      }
+    if (hasLaunchedBefore) {
+      await retryFailedKeys()
+      return { ok: true }
     }
 
-    clearDataOnFirstLaunch()
-  }, [])
-
-  return isReady
+    // Set the flag BEFORE the destructive ops. If clearVaultFileData
+    // throws (e.g. a file is held open during a race), we don't want
+    // every subsequent launch to re-enter this branch and re-attempt
+    // the wipe — that's the self-perpetuating loop.
+    await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true')
+    await clearSecureStoreData()
+    await clearVaultFileData()
+    return { ok: true }
+  } catch (error) {
+    logger.error('Error clearing data on first launch:', error)
+    return { ok: false, error }
+  }
 }
 
-/**
- * Clears all known SecureStore data on first launch.
- * Tracks any keys that fail to clear for retry on next launch.
- */
 const clearSecureStoreData = async () => {
   const failedKeys = []
 
@@ -92,9 +84,6 @@ const clearVaultFileData = async () => {
   }
 }
 
-/**
- * Retries clearing any failed keys from previous attempts.
- */
 const retryFailedKeys = async () => {
   try {
     const failedKeysJson = await AsyncStorage.getItem(FAILED_KEYS_KEY)

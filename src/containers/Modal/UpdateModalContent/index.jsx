@@ -1,102 +1,89 @@
-import { useEffect, useState } from 'react'
-
 import { useLingui } from '@lingui/react/macro'
 import { APP_STORE_URL, PLAY_STORE_URL } from '@tetherto/pearpass-lib-constants'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { View, Text, StyleSheet, Platform, Linking } from 'react-native'
+import { Button, rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { Linking, Platform, StyleSheet, Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { isFdroid } from '../../../constants/distribution'
-import { VERSION_CHECK_CONFIG } from '../../../constants/versionCheck'
-import { ButtonPrimary } from '../../../libComponents'
-
-export const UpdateModalContent = ({}) => {
+export const UpdateModalContent = () => {
   const { t } = useLingui()
-  const [timeLeft, setTimeLeft] = useState(
-    VERSION_CHECK_CONFIG.REDIRECT_TIMER_SECONDS
-  )
+  const { theme } = useTheme()
+  const { bottom } = useSafeAreaInsets()
 
   const handleNavigation = () => {
-    if (Platform.OS === 'ios') {
-      Linking.openURL(APP_STORE_URL)
-    } else {
-      if (isFdroid()) {
-        return
-      }
-      Linking.openURL(PLAY_STORE_URL)
-    }
-  }
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timer)
-          handleNavigation()
-          setTimeLeft(VERSION_CHECK_CONFIG.REDIRECT_TIMER_SECONDS)
-          return VERSION_CHECK_CONFIG.REDIRECT_TIMER_SECONDS
-        }
-        return prevTime - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+    Linking.openURL(Platform.OS === 'ios' ? APP_STORE_URL : PLAY_STORE_URL)
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{t`Update required`}</Text>
-      <Text style={[styles.text, styles.description]}>
-        {t`Find out what exciting features and updates await you in this version.`}
-      </Text>
-      <View style={styles.timerContainer}>
-        <Text style={[styles.text, styles.timerDescription]}>
-          {t`App will restart in:`}
-        </Text>
-        <Text style={[styles.text, styles.timerText]}>
-          {formatTime(timeLeft)}
-        </Text>
+    <View style={[styles.container, { paddingBottom: bottom }]}>
+      <View style={styles.handleArea}>
+        <View style={styles.handle} />
       </View>
-      <ButtonPrimary stretch onPress={handleNavigation}>
-        {t`Update App`}
-      </ButtonPrimary>
+
+      <View style={styles.body}>
+        <Text
+          style={[styles.title, { color: theme.colors.colorTextPrimary }]}
+          numberOfLines={1}
+        >
+          {t`Update App`}
+        </Text>
+
+        <Text
+          style={[
+            styles.description,
+            { color: theme.colors.colorTextSecondary }
+          ]}
+        >
+          {t`A newer version of PearPass is available. Please update to the latest version to continue using the app.`}
+        </Text>
+
+        <View style={styles.footer}>
+          <Button
+            variant="primary"
+            size="medium"
+            fullWidth
+            onClick={handleNavigation}
+          >
+            {t`Update App`}
+          </Button>
+        </View>
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.grey400.mode1,
-    padding: 20,
-    borderRadius: 10,
-    gap: 10,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: colors.grey300.mode1
+    width: '100%'
   },
-  text: {
-    color: colors.white.mode1,
+  handleArea: {
+    alignItems: 'center',
+    paddingTop: rawTokens.spacing12,
+    paddingBottom: rawTokens.spacing12
+  },
+  handle: {
+    width: 32,
+    height: 4,
+    borderRadius: 10,
+    backgroundColor: '#2C3618'
+  },
+  body: {
+    paddingHorizontal: rawTokens.spacing16
+  },
+  title: {
+    fontFamily: 'Inter',
     fontSize: 16,
-    alignSelf: 'flex-start'
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: rawTokens.spacing16
   },
   description: {
-    color: colors.grey100.mode1
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: '400',
+    alignSelf: 'stretch',
+    marginBottom: rawTokens.spacing16
   },
-  timerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  timerDescription: {
-    fontSize: 14
-  },
-  timerText: {
-    color: colors.primary400.dark,
-    fontWeight: 'bold'
+  footer: {
+    width: '100%'
   }
 })

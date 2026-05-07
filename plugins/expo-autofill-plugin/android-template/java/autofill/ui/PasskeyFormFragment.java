@@ -51,7 +51,7 @@ public class PasskeyFormFragment extends Fragment {
 
     private EditText titleInput;
     private EditText usernameInput;
-    private EditText websiteInput;
+    private EditText websiteInput; // V1 only — V2 uses websiteInputs list
     private EditText commentInput;
     private TextView titleError;
     private TextView websiteError;
@@ -63,6 +63,14 @@ public class PasskeyFormFragment extends Fragment {
     private Button saveButton;
     private Button uploadFileButton;
     private LinearLayout attachmentsContainer;
+
+    // V2 multi-website rows; V1 keeps the single websiteInput.
+    private LinearLayout websitesRowContainer;
+    private View addWebsiteButton;
+    private final List<EditText> websiteInputs = new ArrayList<>();
+
+    // V2 spinner overlay shown over Save while the passkey is being written.
+    private android.widget.ProgressBar saveProgress;
 
     private static final String STATE_SELECTED_FOLDER = "selected_folder";
     private static final String STATE_PASSKEY_CREATED_AT = "passkey_created_at";
@@ -175,12 +183,9 @@ public class PasskeyFormFragment extends Fragment {
         passkeyDateText.setCursorVisible(false);
         passkeyDateText.setKeyListener(null);
 
-        View websiteField = view.findViewById(R.id.formWebsiteField);
-        websiteInput = websiteField.findViewById(R.id.ppInputEdit);
-        setInputFieldLabel(websiteField, "Website");
-        websiteInput.setHint("https://");
-        websiteInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT
-                | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        // V2: unified websites card; rows added via addWebsiteRow.
+        websitesRowContainer = view.findViewById(R.id.formWebsitesRowContainer);
+        addWebsiteButton = view.findViewById(R.id.formAddWebsiteButton);
         websiteError = view.findViewById(R.id.formWebsiteError);
 
         View commentField = view.findViewById(R.id.formCommentField);
@@ -196,16 +201,13 @@ public class PasskeyFormFragment extends Fragment {
         if (folderLeading != null) folderLeading.setVisibility(View.GONE);
         folderRow.setOnClickListener(v -> showFolderPicker());
 
-        // attachments + upload file hidden; re-enable via edit flow later
-        // attachmentsContainer = view.findViewById(R.id.formAttachmentsContainer);
-        // uploadFileButton = view.findViewById(R.id.formUploadFileButton);
-        attachmentsContainer = null;
-        uploadFileButton = null;
+        attachmentsContainer = view.findViewById(R.id.formAttachmentsContainer);
+        uploadFileButton = view.findViewById(R.id.formUploadFileButton);
 
         saveError = view.findViewById(R.id.formSaveError);
-        // fileSizeError = view.findViewById(R.id.formFileSizeError);
-        fileSizeError = null;
+        fileSizeError = view.findViewById(R.id.formFileSizeError);
         saveButton = view.findViewById(R.id.formSaveButton);
+        saveProgress = view.findViewById(R.id.formSaveProgress);
 
         View discard = view.findViewById(R.id.formDiscardButton);
         cancelButton = null;
@@ -244,6 +246,9 @@ public class PasskeyFormFragment extends Fragment {
         // Always use current time since this is a new passkey being created
         passkeyCreatedAt = System.currentTimeMillis();
 
+        boolean isV2 = getResources().getInteger(R.integer.design_version) == 2;
+        List<String> initialWebsites = new ArrayList<>();
+
         if (existingRecord != null) {
             // Pre-populate from existing record
             Map<String, Object> data = null;
@@ -256,8 +261,10 @@ public class PasskeyFormFragment extends Fragment {
                 usernameInput.setText(data.get("username") != null ? (String) data.get("username") : "");
 
                 Object websitesObj = data.get("websites");
-                if (websitesObj instanceof List && !((List<?>) websitesObj).isEmpty()) {
-                    websiteInput.setText((String) ((List<?>) websitesObj).get(0));
+                if (websitesObj instanceof List) {
+                    for (Object item : (List<?>) websitesObj) {
+                        if (item instanceof String) initialWebsites.add((String) item);
+                    }
                 }
 
                 commentInput.setText(data.get("note") != null ? (String) data.get("note") : "");
@@ -282,7 +289,17 @@ public class PasskeyFormFragment extends Fragment {
             // Pre-populate from passkey request
             titleInput.setText(activity.getRpName());
             usernameInput.setText(activity.getUserName());
-            websiteInput.setText("https://" + activity.getRpId());
+            initialWebsites.add("https://" + activity.getRpId());
+        }
+
+        if (isV2) {
+            if (initialWebsites.isEmpty()) {
+                addWebsiteRow("");
+            } else {
+                for (String w : initialWebsites) addWebsiteRow(w);
+            }
+        } else if (websiteInput != null && !initialWebsites.isEmpty()) {
+            websiteInput.setText(initialWebsites.get(0));
         }
 
         // Update folder display
@@ -328,21 +345,53 @@ public class PasskeyFormFragment extends Fragment {
     }
 
     /**
-     * Cancel/folder/discard are wired in bindV2Views; this handles the rest
+     * Cancel/folder/discard are wired in bindV2Views; this handles the rest.
+     * Website TextWatcher is attached per-row by addWebsiteRow.
      */
     private void setupListenersV2() {
         titleInput.addTextChangedListener(new SimpleTextWatcher(() -> {
             if (titleError != null) titleError.setVisibility(View.GONE);
         }));
 
-        websiteInput.addTextChangedListener(new SimpleTextWatcher(() -> {
-            if (websiteError != null) websiteError.setVisibility(View.GONE);
-        }));
+        if (addWebsiteButton != null) {
+            addWebsiteButton.setOnClickListener(v -> {
+                if (isSaving) return;
+                addWebsiteRow("");
+            });
+        }
 
         saveButton.setOnClickListener(v -> handleSave());
 
-        // Upload file hidden in V2.
-        // uploadFileButton.setOnClickListener(v -> openFilePicker());
+        if (uploadFileButton != null) {
+            uploadFileButton.setOnClickListener(v -> openFilePicker());
+        }
+    }
+
+    /** Appends a website row + divider (between-rows) to the unified card. */
+    private void addWebsiteRow(String initialText) {
+        if (websitesRowContainer == null || getContext() == null) return;
+
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+
+        // Divider between rows (skip before first).
+        if (!websiteInputs.isEmpty()) {
+            View divider = new View(getContext());
+            divider.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    Math.max(1, (int) getResources().getDisplayMetrics().density)));
+            divider.setBackgroundColor(0x14FFFFFF);
+            websitesRowContainer.addView(divider);
+        }
+
+        View row = inflater.inflate(R.layout.include_pp_website_row_v2, websitesRowContainer, false);
+        EditText edit = row.findViewById(R.id.ppWebsiteRowEdit);
+        if (initialText != null) edit.setText(initialText);
+        edit.addTextChangedListener(new SimpleTextWatcher(() -> {
+            if (websiteError != null) websiteError.setVisibility(View.GONE);
+        }));
+
+        websitesRowContainer.addView(row);
+        websiteInputs.add(edit);
     }
 
     private void showFolderPicker() {
@@ -538,14 +587,26 @@ public class PasskeyFormFragment extends Fragment {
             isValid = false;
         }
 
-        // Website optional but must be valid if provided
-        String website = websiteInput.getText().toString().trim();
-        if (!website.isEmpty()) {
-            String urlString = addHttps(website);
+        // V2 collects from every row; V1 falls back to single websiteInput.
+        List<String> entriesToCheck = new ArrayList<>();
+        if (!websiteInputs.isEmpty()) {
+            for (EditText e : websiteInputs) {
+                entriesToCheck.add(e.getText().toString().trim());
+            }
+        } else if (websiteInput != null) {
+            entriesToCheck.add(websiteInput.getText().toString().trim());
+        }
+
+        for (String entry : entriesToCheck) {
+            if (entry.isEmpty()) continue;
+            String urlString = addHttps(entry);
             if (!urlString.contains(".")) {
-                websiteError.setText("Wrong format of website");
-                websiteError.setVisibility(View.VISIBLE);
+                if (websiteError != null) {
+                    websiteError.setText("Wrong format of website");
+                    websiteError.setVisibility(View.VISIBLE);
+                }
                 isValid = false;
+                break;
             }
         }
 
@@ -558,16 +619,27 @@ public class PasskeyFormFragment extends Fragment {
 
         isSaving = true;
         saveButton.setEnabled(false);
+        // V2: hide button label, show spinner overlay.
+        if (saveProgress != null) {
+            saveButton.setText("");
+            saveProgress.setVisibility(View.VISIBLE);
+        }
         if (uploadFileButton != null) uploadFileButton.setEnabled(false);
 
         String title = titleInput.getText().toString().trim();
         String username = usernameInput.getText().toString();
-        String website = websiteInput.getText().toString().trim();
         String comment = commentInput.getText().toString();
 
+        // Drop empty rows + normalize each via addHttps before save.
         List<String> websites = new ArrayList<>();
-        if (!website.isEmpty()) {
-            websites.add(addHttps(website));
+        if (!websiteInputs.isEmpty()) {
+            for (EditText e : websiteInputs) {
+                String w = e.getText().toString().trim();
+                if (!w.isEmpty()) websites.add(addHttps(w));
+            }
+        } else if (websiteInput != null) {
+            String w = websiteInput.getText().toString().trim();
+            if (!w.isEmpty()) websites.add(addHttps(w));
         }
 
         String existingRecordId = null;

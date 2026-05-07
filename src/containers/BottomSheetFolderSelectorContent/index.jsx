@@ -12,9 +12,12 @@ import {
   CreateNewFolder,
   Folder,
   FolderCopy,
-  MoreVert
+  MoreVert,
+  StarOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
+import { View, useWindowDimensions } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useSharedFilter } from '../../context/SharedFilterContext'
@@ -25,7 +28,8 @@ import { Layout } from '../Layout'
 export const BottomSheetFolderSelectorContent = ({
   selectedFolder,
   onSelect,
-  includeAllFolders = true
+  includeAllFolders = true,
+  includeFavorites = true
 }) => {
   const { t } = useLingui()
   const navigation = useNavigation()
@@ -33,12 +37,15 @@ export const BottomSheetFolderSelectorContent = ({
   const collapse = useBottomSheetClose()
   const { state, setState } = useSharedFilter()
   const { bottom } = useSafeAreaInsets()
+  const { height: screenHeight } = useWindowDimensions()
   const [menuFolderName, setMenuFolderName] = useState(null)
 
   const { data: folders } = useFolders()
   const { data: recordCountsByType } = useRecordCountsByType({})
 
-  const customFolders = Object.values(folders?.customFolders ?? {})
+  const customFolders = Object.values(folders?.customFolders ?? {}).sort(
+    (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+  )
   const activeFolder = selectedFolder ?? state.folder
 
   const navigateAfterClose = (routeName, params) => {
@@ -58,6 +65,20 @@ export const BottomSheetFolderSelectorContent = ({
       })
     } else {
       setState((prev) => ({ ...prev, folder: folderId, isFavorite: false }))
+    }
+
+    collapse()
+  }
+
+  const handleSelectFavorites = () => {
+    if (onSelect) {
+      onSelect({
+        id: 'favorite',
+        name: 'favorite',
+        isFavorite: true
+      })
+    } else {
+      setState((prev) => ({ ...prev, folder: 'favorite', isFavorite: true }))
     }
 
     collapse()
@@ -114,59 +135,99 @@ export const BottomSheetFolderSelectorContent = ({
   return (
     <Layout
       mode="sheet"
-      scrollable
-      contentStyle={{ padding: 0, paddingBottom: bottom }}
+      contentStyle={{ padding: 0 }}
       header={<SheetHeader title={t`Folders`} onClose={collapse} />}
     >
-      {includeAllFolders && (
-        <NavbarListItem
-          icon={<FolderCopy color={theme.colors.colorTextPrimary} />}
-          iconSize={16}
-          label={t`All Folders`}
-          count={recordCountsByType?.all}
-          selected={activeFolder === 'allFolder'}
-          platform="mobile"
-          showDivider
-          onClick={() => handleSelect('allFolder')}
-        />
-      )}
+      <View style={{ maxHeight: screenHeight * 0.85 }}>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: bottom }}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
+        >
+          {includeAllFolders &&
+            (() => {
+              const isAllSelected = activeFolder === 'allFolder'
+              const allColor = isAllSelected
+                ? theme.colors.colorTextPrimary
+                : theme.colors.colorTextSecondary
+              return (
+                <NavbarListItem
+                  icon={<FolderCopy color={allColor} />}
+                  iconSize={16}
+                  label={t`All Folders`}
+                  count={recordCountsByType?.all}
+                  selected={isAllSelected}
+                  variant={isAllSelected ? 'default' : 'secondary'}
+                  platform="mobile"
+                  showDivider
+                  onClick={() => handleSelect('allFolder')}
+                />
+              )
+            })()}
 
-      {customFolders.map(({ name: folderName, records }) => {
-        const count = records?.filter((record) => !!record.data).length ?? 0
-        const isSelected = activeFolder === folderName
+          {includeFavorites &&
+            (() => {
+              const isFavoriteSelected = activeFolder === 'favorite'
+              const favoriteColor = isFavoriteSelected
+                ? theme.colors.colorTextPrimary
+                : theme.colors.colorTextSecondary
+              return (
+                <NavbarListItem
+                  icon={<StarOutlined color={favoriteColor} />}
+                  iconSize={16}
+                  label={t`Favorites`}
+                  count={folders?.favorites?.records?.length ?? 0}
+                  selected={isFavoriteSelected}
+                  variant={isFavoriteSelected ? 'default' : 'secondary'}
+                  platform="mobile"
+                  showDivider
+                  onClick={handleSelectFavorites}
+                />
+              )
+            })()}
 
-        return (
-          <NavbarListItem
-            key={folderName}
-            icon={<Folder color={theme.colors.colorTextPrimary} />}
-            iconSize={16}
-            label={folderName}
-            count={count}
-            selected={isSelected}
-            platform="mobile"
-            showDivider
-            onClick={() => handleSelect(folderName)}
-            additionalItems={
-              <Button
-                variant="tertiary"
-                size="small"
-                aria-label={t`Folder actions`}
-                iconBefore={<MoreVert color={theme.colors.colorTextPrimary} />}
-                onClick={() => setMenuFolderName(folderName)}
+          {customFolders.map(({ name: folderName, records }) => {
+            const count = records?.filter((record) => !!record.data).length ?? 0
+            const isSelected = activeFolder === folderName
+            const itemColor = isSelected
+              ? theme.colors.colorTextPrimary
+              : theme.colors.colorTextSecondary
+
+            return (
+              <NavbarListItem
+                key={folderName}
+                icon={<Folder color={itemColor} />}
+                iconSize={16}
+                label={folderName}
+                count={count}
+                selected={isSelected}
+                variant={isSelected ? 'default' : 'secondary'}
+                platform="mobile"
+                showDivider
+                onClick={() => handleSelect(folderName)}
+                additionalItems={
+                  <Button
+                    variant="tertiary"
+                    size="small"
+                    aria-label={t`Folder actions`}
+                    iconBefore={<MoreVert color={itemColor} />}
+                    onClick={() => setMenuFolderName(folderName)}
+                  />
+                }
               />
-            }
-          />
-        )
-      })}
+            )
+          })}
 
-      <NavbarListItem
-        icon={<CreateNewFolder color={theme.colors.colorTextPrimary} />}
-        iconSize={16}
-        label={t`Add New Folder`}
-        platform="mobile"
-        showDivider={false}
-        onClick={handleCreateFolder}
-      />
+          <NavbarListItem
+            icon={<CreateNewFolder color={theme.colors.colorTextPrimary} />}
+            iconSize={16}
+            label={t`Add New Folder`}
+            platform="mobile"
+            showDivider={false}
+            onClick={handleCreateFolder}
+          />
+        </ScrollView>
+      </View>
     </Layout>
   )
 }

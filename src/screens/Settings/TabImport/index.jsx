@@ -26,7 +26,6 @@ import {
   AcceptedFormats,
   Description,
   Container as ImportContainer,
-  ImportOptionImage,
   ImportOptionItem,
   ImportOptionsList,
   SubTitle
@@ -85,13 +84,13 @@ const importOptions = [
     imgKey: 'protonpass'
   },
   {
-    title: 'Encrypted file',
+    title: 'PearPass Encrypted File',
     type: 'encrypted',
     accepts: ['.json'],
     imgKey: 'encrypted'
   },
   {
-    title: 'Unencrypted file',
+    title: 'PearPass Unencrypted File',
     type: 'unencrypted',
     accepts: ['.json', '.csv'],
     imgKey: 'unencrypted'
@@ -105,18 +104,6 @@ const isAllowedType = (fileType, accepts) =>
     }
     return fileType === accept
   })
-
-const images = {
-  '1password': require('../../../../assets/images/1password.png'),
-  bitwarden: require('../../../../assets/images/BitWarden.jpg'),
-  keepass: require('../../../../assets/images/KeePass.png'),
-  keepassxc: require('../../../../assets/images/KeePassXC.png'),
-  lastpass: require('../../../../assets/images/LastPass.png'),
-  protonpass: require('../../../../assets/images/ProtonPass.png'),
-  nordpass: require('../../../../assets/images/NordPass.png'),
-  unencrypted: require('../../../../assets/images/VaultIcon.png'),
-  encrypted: require('../../../../assets/images/VaultIcon.png')
-}
 
 export const ImportSection = () => {
   const { t } = useLingui()
@@ -320,8 +307,8 @@ export const ImportSection = () => {
                   children: (
                     <BottomSheetImportVaultContent
                       passwordManagerName={
-                        option.title === 'Encrypted file' ||
-                        option.title === 'Unencrypted file'
+                        option.type === 'encrypted' ||
+                        option.type === 'unencrypted'
                           ? 'PearPass'
                           : option.title
                       }
@@ -348,11 +335,6 @@ export const ImportSection = () => {
                 expand(bottomSheetOptions)
               }}
             >
-              {option.imgKey ? (
-                <ImportOptionImage source={images[option.imgKey]} />
-              ) : (
-                <option.icon width={32} height={32} />
-              )}
               <SubTitle>{option.title}</SubTitle>
               <AcceptedFormats>{option.accepts.join(', ')}</AcceptedFormats>
             </ImportOptionItem>

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import {
@@ -131,16 +132,6 @@ export const BottomSheetReauthContent = ({
     }
   }, [isLoading, hapticSuccess, hapticError, initVaults, onConfirm, t])
 
-  // Auto-trigger biometric auth on mount
-  useEffect(() => {
-    if (isBiometricAvailable) {
-      const timer = setTimeout(() => {
-        handleBiometricAuth()
-      }, 500)
-      return () => clearTimeout(timer)
-    }
-  }, [isBiometricAvailable])
-
   const handlePadPress = useCallback(
     (digit: string) => {
       if (pin.length >= PIN_LENGTH) return
@@ -247,9 +238,10 @@ export const BottomSheetReauthContent = ({
               label={t`Password`}
               placeholder={t`Enter Master Password`}
               value={passwordRegisterProps.value}
-              onChange={passwordRegisterProps.onChange}
+              onChangeText={passwordRegisterProps.onChange}
               error={passwordRegisterProps.error ?? undefined}
               data-testid="reauth-master-password-input"
+              as={BottomSheetTextInput}
             />
           </View>
 

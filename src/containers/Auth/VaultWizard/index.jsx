@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { useCreateVault, useVault } from '@tetherto/pearpass-lib-vault'
 import { Platform, View, StyleSheet, ActivityIndicator } from 'react-native'
 import Toast from 'react-native-toast-message'
@@ -14,6 +14,7 @@ import { logger } from '../../../utils/logger'
 export const VaultWizard = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
   const [formData, setFormData] = useState({
     name: '',
     password: '',
@@ -60,8 +61,13 @@ export const VaultWizard = () => {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary400.mode1} />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.colors.colorSurfacePrimary }
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.colorPrimary} />
       </View>
     )
   }

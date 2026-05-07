@@ -174,6 +174,17 @@ public class CredentialsListFragment extends BaseAutofillFragment {
         }
         // If hasUserSearched is true and query is empty, show all credentials (no filtering)
 
+        // Passkey assertion → keep only items with a passkey.
+        boolean passkeyMode = (getActivity() instanceof AuthenticationActivity)
+                && ((AuthenticationActivity) getActivity()).isPasskeyAssertionMode();
+        if (passkeyMode) {
+            List<CredentialItem> passkeysOnly = new ArrayList<>();
+            for (CredentialItem c : filtered) {
+                if (c.hasPasskey()) passkeysOnly.add(c);
+            }
+            filtered = passkeysOnly;
+        }
+
         return filtered;
     }
 
@@ -359,6 +370,10 @@ public class CredentialsListFragment extends BaseAutofillFragment {
 
             for (Job job : jobs) {
                 if (job.getStatus() != Job.JobStatus.PENDING && job.getStatus() != Job.JobStatus.IN_PROGRESS) {
+                    continue;
+                }
+                // Vault scope — only show jobs queued for the active vault.
+                if (vaultId != null && !vaultId.equals(job.getVaultId())) {
                     continue;
                 }
 

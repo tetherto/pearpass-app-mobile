@@ -4,11 +4,11 @@ import * as path from 'path';
 import { AutofillPluginOptions } from '../index';
 
 const FLAGS_MODULE = '@tetherto/pearpass-lib-constants/src/constants/flags.js';
-const FLAG_NAME = 'DESIGN_VERSION';
+const FLAG_NAME = 'MOBILE_DESIGN_VERSION';
 const DEFAULT_DESIGN_VERSION = 1;
 const PLIST_KEY = 'PEARPASS_DESIGN_VERSION';
 
-// Reads DESIGN_VERSION from the shared flags module so the autofill extension
+// Reads MOBILE_DESIGN_VERSION from the shared flags module so the autofill extension
 // can read it at runtime via Bundle.main.object(forInfoDictionaryKey:).
 function readDesignVersion(projectRoot: string): number {
   const flagsPath = path.join(projectRoot, 'node_modules', FLAGS_MODULE);

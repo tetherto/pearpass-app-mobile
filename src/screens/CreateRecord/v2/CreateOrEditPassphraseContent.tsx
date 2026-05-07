@@ -20,6 +20,7 @@ import {
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
+import { FolderSelectField } from '../../../components/FolderSelectField'
 import { PassPhraseV2 } from '../../../containers/PassPhrase/PassPhraseV2'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
@@ -83,7 +84,7 @@ export const CreateOrEditPassphraseContent = ({
     note: Validator.string(),
     customFields: Validator.array().items(
       Validator.object({
-        note: Validator.string().required(t`Comment is required`)
+        note: Validator.string()
       })
     ),
     folder: Validator.string()
@@ -137,7 +138,7 @@ export const CreateOrEditPassphraseContent = ({
         title: formValues.title,
         passPhrase: formValues.passPhrase,
         note: formValues.note,
-        customFields: formValues.customFields
+        customFields: (formValues.customFields as Array<{ type: string; note?: string }>).filter((f) => f.note?.trim().length)
       }
     }
 
@@ -217,6 +218,11 @@ export const CreateOrEditPassphraseContent = ({
           {t`Additional`}
         </Text>
 
+        <FolderSelectField
+          value={values.folder}
+          onChange={(val) => setValue('folder', val)}
+        />
+
         <InputField
           label={t`Comment`}
           value={values.note}
@@ -278,7 +284,7 @@ export const CreateOrEditPassphraseContent = ({
                 value=""
                 placeholder={t`Enter Hidden Message`}
                 onChangeText={(val) =>
-                  setValue('customFields', [{ type: 'note', note: val }])
+                  setValue('customFields', val ? [{ type: 'note', note: val }] : [])
                 }
                 isGrouped
                 testID="hidden-messages-multi-slot-input-slot-0"

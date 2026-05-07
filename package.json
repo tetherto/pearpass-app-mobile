@@ -1,6 +1,6 @@
 {
   "name": "pearpass-app-mobile",
-  "version": "1.6.1",
+  "version": "2.0.0",
   "main": "index.js",
   "type": "module",
   "license": "Apache-2.0",
@@ -14,7 +14,7 @@
     "lint": "eslint ./src",
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
-    "postinstall": "node scripts/build-plugins.cjs && npm run barekit:link-ios-addons",
+    "postinstall": "patch-package && node scripts/build-plugins.cjs && npm run barekit:link-ios-addons",
     "build-plugins": "node scripts/build-plugins.cjs",
     "barekit:link-ios-addons": "node node_modules/react-native-bare-kit/ios/link.mjs",
     "pods:install": "cd ios && pod install",
@@ -29,7 +29,7 @@
     "fdroid:patches:prebuild": "node scripts/fdroid/apply-patches.mjs prebuild",
     "fdroid:patches:build": "node scripts/fdroid/apply-patches.mjs build",
     "eas-build-pre-install": "node -v && npm -v && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
-    "eas-build-post-install": "npm run build-plugins && npm run barekit:link-ios-addons && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
+    "eas-build-post-install": "npx patch-package && npm run build-plugins && npm run barekit:link-ios-addons && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
@@ -135,6 +135,7 @@
     "husky": "^9.1.7",
     "jest": "29.7.0",
     "jest-environment-jsdom": "^30.2.0",
+    "patch-package": "^8.0.1",
     "prettier": "^3.8.1",
     "react-test-renderer": "19.0.0",
     "typescript": "~5.8.3"

@@ -1,7 +1,7 @@
 type ReadOnlyRegisterResult = {
   name: string
   value: string
-  error?: string
+  error?: string | null
   onChange?: (e: unknown) => void
 }
 
