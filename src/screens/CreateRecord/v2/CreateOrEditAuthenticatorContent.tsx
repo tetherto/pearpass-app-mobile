@@ -17,6 +17,7 @@ import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
+import { OtpSecretScanButton } from './OtpSecretScanButton'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
@@ -233,6 +234,9 @@ export const CreateOrEditAuthenticatorContent = ({
           value={values.otpSecret}
           placeholder={t`Enter Secret Key (TOTP)`}
           onChangeText={(value) => setValue('otpSecret', value)}
+          rightSlot={
+            <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
+          }
           testID="otp-secret-field"
         />
       </View>
@@ -273,7 +277,7 @@ export const CreateOrEditAuthenticatorContent = ({
                     <Button
                       size="small"
                       variant="tertiary"
-                      aria-label="Delete note"
+                      aria-label={t`Delete note`}
                       iconBefore={<TrashOutlined color={theme.colors.colorTextPrimary} />}
                       onClick={() => removeCustomField(index)}
                     />
