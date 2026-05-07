@@ -231,3 +231,28 @@ export async function restartAndNavigateToCreateLoginItemPage(): Promise<void> {
   await home.tapOnLoginsField();
   await createLogin.verifyCreateNewLoginItemPageDisplayed();
 }
+
+export async function addFileToCreateLoginItemPage(): Promise<void> {
+  const { createLogin } = Pages;
+
+  await createLogin.swipe('up');
+  await createLogin.verifyFileAndPhotoFieldDisplayed();
+  await createLogin.tapOnFileAndPhotoField();
+  await createLogin.verifyFileAndPhotoFieldPopupWithAllElementsDisplayed();
+  await createLogin.tapOnChooseFileButton();
+  await createLogin.chooseDownloadsFolder();
+  await createLogin.chooseFile('ownersManualFile');
+  await createLogin.verifyOwnersManualFileDisplayedInAttachmentField();
+  await createLogin.verifyDeleteAttachmentButtonDisplayed();
+}
+
+export async function addAnotherMessageToCreateLoginItemPage(): Promise<void> {
+  const { createLogin } = Pages;
+
+  await createLogin.swipe('up');
+  await createLogin.verifyAddAnotherMessageButtonDisplayed();
+  await createLogin.tapOnAddAnotherMessageButton();
+  await createLogin.swipe('up');
+  await createLogin.verifyNewHiddenMessageWithAllElementsDisplayed();
+  await createLogin.verifyDeleteHiddenMessageButtonAppearsOnHiddenMessageField();
+}

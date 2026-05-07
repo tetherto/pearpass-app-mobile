@@ -17,6 +17,16 @@ const systemLocators = {
     unencryptedFileJsonFile: '//android.widget.TextView[@text="PearPass_ytgiu_2025_12_02T10_41_25_523Z.json"]',
     encryptedFileJsonFile: '//android.widget.TextView[@resource-id="android:id/title" and starts-with(@text, "PearPass_") and contains(@text, ".json")]',
 
+    ownersManualFile: '//android.widget.TextView[@resource-id="android:id/title" and @text="owners-manual.pdf"]',
+    largeFile: '//android.widget.TextView[@resource-id="android:id/title" and @text="LargeFile.pdf"]',
+    testDocxFile: '//android.widget.TextView[@resource-id="android:id/title" and @text="Test.docx"]',
+    passportTemplateFile: '//android.widget.TextView[@resource-id="android:id/title" and @text="passport-template.jpg"]',
+    idCardTemplateFile: '//android.widget.TextView[@resource-id="android:id/title" and @text="id-card-template.jpg"]',
+    drivinhLicenseTemplateFile: '//android.widget.TextView[@resource-id="android:id/title" and @text="driving-license-template.jpg"]',
+    
+
+
+
     /* ----- PHONE SETTINGS → Security → fingerprint setup ----- */
     settingsButton: '(//android.widget.TextView[@content-desc="Settings"])[1]',
     securityAndPrivacyButton: '//*[@text="Security & privacy"]',
@@ -52,5 +62,13 @@ export type SystemFileKey =
   | 'unencryptedFileCsvFile'
   | 'unencryptedFileJsonFile'
   | 'encryptedFileJsonFile';
+
+export type AttachmentFileKey =
+  | 'ownersManualFile'
+  | 'largeFile'
+  | 'testDocxFile'
+  | 'passportTemplateFile'
+  | 'idCardTemplateFile'
+  | 'drivinhLicenseTemplateFile';
 
 export default systemLocators

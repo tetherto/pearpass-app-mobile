@@ -1,5 +1,6 @@
 const createLoginLocators = {
     backButton: '~Go back',
+    closeButton: '~Close',
 
     createLoginPageTitle: '//android.widget.TextView[@text="New Login Item"]',
 
@@ -50,7 +51,6 @@ const createLoginLocators = {
     foldersPopupAddNewFolderText: '//android.widget.TextView[@text="Add New Folder"]',
     foldersPopupAddNewFolderIcon: '//android.widget.Button[@content-desc="Add New Folder"]/android.view.ViewGroup',
 
-
     testFolderField: '~Test Folder, 0 items, ￼',
     testFolderFieldText: '(//android.widget.TextView[@text="Test Folder"])[1]',
     testFolderFieldItemsCount: '~0 items',
@@ -65,7 +65,6 @@ const createLoginLocators = {
     testFolderActionsPopupDeleteFolderButton: '~Delete Folder',
     testFolderActionsPopupDeleteFolderButtonText: '//android.widget.TextView[@text="Delete Folder"]',
     testFolderActionsPopupDeleteFolderButtonIcon: '//android.widget.Button[@content-desc="Delete Folder"]/android.view.ViewGroup',
-
 
     /* ============================
         CREATE NEW FOLDER PAGE
@@ -82,6 +81,7 @@ const createLoginLocators = {
     /* ============================
         RENAME FOLDER PAGE
     ============================ */
+
     renameFolderPageTitle: '//android.widget.TextView[@text="Rename Folder"]',
     renameFolderPageNameField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]',
     renameFolderPageNameFieldTitle: '//android.widget.TextView[@text="Folder Name"]',
@@ -103,8 +103,9 @@ const createLoginLocators = {
     deleteButton: '~Delete Folder',
     deleteButtonText: '(//android.widget.TextView[@text="Delete Folder"])[3]',
 
-
-
+    /* ============================
+        ADDITIONAL BLOCK
+    ============================ */
     additionalTitle: '//android.widget.TextView[@text="Additional"]',
     commentField: '//android.view.ViewGroup[@resource-id="comments-multi-slot-input-slot-0"]',
     commentFieldTitle: '//android.widget.TextView[@text="Comment"]',
@@ -115,6 +116,14 @@ const createLoginLocators = {
     hiddenMessagesFieldInput: '//android.widget.EditText[@text="Enter Hidden Message"]',
     hiddenMessagesFieldShowPasswordButton: '~Show Password',
     hiddenMessagesFieldHidePasswordButton: '~Hide Password',
+    hiddenMessagesFieldDeleteButton: '(//android.widget.Button[@content-desc="Delete hidden message"])[1]',
+
+    newHiddenMessageField: '//android.view.ViewGroup[@resource-id="hidden-messages-multi-slot-input-slot-1"]',
+    newHiddenMessageFieldTitle: '(//android.widget.TextView[@text="Hidden Message"])[2]',
+    newHiddenMessageFieldInput: '(//android.widget.EditText[@text="Enter Hidden Message"])[2]',
+    newHiddenMessageFieldDeleteButton: '(//android.widget.Button[@content-desc="Delete hidden message"])[2]',
+    newHiddenMessageFieldShowPasswordButton: '(//android.widget.Button[@content-desc="Show password"])[2]',
+    newHiddenMessageFieldHidePasswordButton: '(//android.widget.Button[@content-desc="Hide password"])[2]',
 
     addAnotherMessageButton: '~Add Another Message',
     addAnotherMessageButtonText: '//android.widget.TextView[@text="Add Another Message"]',
@@ -125,6 +134,10 @@ const createLoginLocators = {
     attachmentsFieldText: '//android.widget.TextView[@text="Add File / Photos Here"]',
     uploadAttachmentButton: '~Upload attachment',
 
+    ownersManualFileInAttachmentField: '//android.widget.TextView[@text="owners-manual.pdf"]',
+    ownersManualFileIconInAttachmentField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[10]/android.view.ViewGroup[2]/android.view.ViewGroup/com.horcrux.svg.SvgView',
+    deleteAttachmentButton: '~Delete attachment',
+
     addAnotherAttachmentButton: '~Add Another Attachment',
     addAnotherAttachmentButtonText: '//android.widget.TextView[@text="Add Another Attachment"]',
     addAnotherAttachmentButtonIcon: '//android.widget.Button[@content-desc="Add Another Attachment"]/com.horcrux.svg.SvgView',
@@ -132,25 +145,22 @@ const createLoginLocators = {
     uploadAttachmentPopup: '(//android.widget.SeekBar[@content-desc="Bottom Sheet"])[2]/android.view.ViewGroup',
     uploadAttachmentPopupTitle: '//android.widget.TextView[@text="Upload Attachment"]',
     uploadAttachmentPopupText: '//android.widget.TextView[@text="Maximum file size: 6MB"]',
+    uploadAttachmentPopupErrorMessage: `//android.widget.TextView[@text="Your file is too large. Please upload one that’s 6MB or smaller."]`,
     uploadAttachmentPopupChooseFileButton: '~Choose File',
     uploadAttachmentPopupChooseFileButtonText: '//android.widget.TextView[@text="Choose File"]',
-    uploadAttachmentPopupChoosePhotoVidoeButton: '~Choose Photo / Video',
-    uploadAttachmentPopupChoosePhotoVidoeButtonText: '//android.widget.TextView[@text="Choose Photo / Video"]',
+    uploadAttachmentPopupChoosePhotoVideoButton: '~Choose Photo / Video',
+    uploadAttachmentPopupChoosePhotoVideoButtonText: '//android.widget.TextView[@text="Choose Photo / Video"]',
 
-    
-    
+    photoVideoPopup: '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View',
+    passportTemplatePhoto: '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View[5]/android.view.View[2]/android.view.View[2]/android.view.View',
+    idCardTemplatePhoto: '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View[5]/android.view.View[3]/android.view.View[2]/android.view.View',
+    drivingLicenseTemplatePhoto: '',
 
+    passportTemplatePhotoInAttachmentField: '//android.widget.TextView[@text="42.jpg"]',
+    passportTemplatePhotoIconInAttachmentField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[10]/android.view.ViewGroup[2]/android.view.ViewGroup/com.horcrux.svg.SvgView',
 
     addItemButton: '~Add Item',
     addItemButtonText: '//android.widget.TextView[@text="Add Item"]',
-   
-
-
-
-
-
-
-
 } as const
 
 export default createLoginLocators;

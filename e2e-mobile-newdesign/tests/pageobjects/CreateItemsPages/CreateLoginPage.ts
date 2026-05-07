@@ -1,10 +1,11 @@
 import BasePage from '@pages/BasePage';
 import createLoginLocators from '@locators/CreateItems/CreateLoginLocators';
+import systemLocators, { type AttachmentFileKey } from '@locators/SystemLocators';
 import { CREATE_LOGIN_PAGE } from '@data/create-items-data/createLogin.data';
 
 
 export class CreateLoginPage extends BasePage {
-  protected selectors = createLoginLocators;
+  protected selectors = { ...createLoginLocators, ...systemLocators };
 
   async verifyCreateNewLoginItemPageDisplayed(): Promise<this> {
     await this.waitForDisplayed('createLoginPageTitle', 20000);
@@ -136,6 +137,64 @@ export class CreateLoginPage extends BasePage {
     return this.self;
   }
 
+  async verifyAddAnotherMessageButtonDisplayed(): Promise<this> {
+    await this.waitForDisplayed('addAnotherMessageButton', 20000);
+    await this.expectDisplayed('addAnotherMessageButton');
+    return this.self;
+  }
+
+  async verifyDeleteHiddenMessageButtonAppearsOnHiddenMessageField(): Promise<this> {
+    await this.waitForDisplayed('hiddenMessagesFieldDeleteButton', 20000);
+    await this.expectDisplayed('hiddenMessagesFieldDeleteButton');
+    return this.self;
+  }
+
+  async verifyDeleteHiddenMessageButtonNotDisplayedOnHiddenMessageField(): Promise<this> {
+    await this.expectDisplayed('hiddenMessagesFieldDeleteButton', false);
+    return this.self;
+  }
+
+  async tapOnAddAnotherMessageButton(): Promise<this> {
+    await this.waitForDisplayed('addAnotherMessageButton', 20000);
+    await this.tap('addAnotherMessageButton');
+    return this.self;
+  }
+
+  async tapOnNewHiddenMessageFieldDeleteButton(): Promise<this> {
+    await this.waitForDisplayed('newHiddenMessageFieldDeleteButton', 20000);
+    await this.tap('newHiddenMessageFieldDeleteButton');
+    return this.self;
+  }
+
+  async verifyNewHiddenMessageFieldNotDisplayed(): Promise<this> {
+    await this.expectDisplayed('newHiddenMessageField', false);
+    return this.self;
+  }
+
+  async verifyNewHiddenMessageWithAllElementsDisplayed(): Promise<this> {
+    const { hiddenMessagesField } = CREATE_LOGIN_PAGE.additional;
+
+    await this.waitForDisplayed('newHiddenMessageField', 20000);
+    await this.expectDisplayed('newHiddenMessageField');
+
+    await this.expectDisplayed('newHiddenMessageFieldTitle');
+    await this.expectExactText(
+      'newHiddenMessageFieldTitle',
+      hiddenMessagesField.title,
+    );
+
+    await this.expectDisplayed('newHiddenMessageFieldInput');
+    await this.expectExactText(
+      'newHiddenMessageFieldInput',
+      hiddenMessagesField.inputPlaceholder,
+    );
+
+    await this.expectDisplayed('newHiddenMessageFieldDeleteButton');
+    await this.expectDisplayed('newHiddenMessageFieldShowPasswordButton');
+
+    return this.self;
+  }
+
   async addItemButtonDisplayed(): Promise<this> {
     await this.waitForDisplayed('addItemButton', 20000);
     await this.expectDisplayed('addItemButton');
@@ -147,6 +206,185 @@ export class CreateLoginPage extends BasePage {
   async tapOnAddItemButton(): Promise<this> {
     await this.waitForDisplayed('addItemButton', 20000);
     await this.tap('addItemButton');
+    return this.self;
+  }
+
+  async verifyAddItemButtonIsInactiveByDefault(): Promise<this> {
+    await this.waitForDisplayed('addItemButton', 20000);
+    await this.expectEnabled('addItemButton', false);
+    return this.self;
+  }
+
+  async verifyFileAndPhotoFieldDisplayed(): Promise<this> {
+    await this.waitForDisplayed('attachmentsField', 20000);
+    await this.expectDisplayed('attachmentsField');
+    return this.self;
+  }
+
+  async tapOnFileAndPhotoField(): Promise<this> {
+    await this.waitForDisplayed('attachmentsField', 20000);
+    await this.tap('attachmentsField');
+    return this.self;
+  }
+
+  async tapOnChooseFileButton(): Promise<this> {
+    await this.waitForDisplayed('uploadAttachmentPopupChooseFileButton', 20000);
+    await this.tap('uploadAttachmentPopupChooseFileButton');
+    return this.self;
+  }
+
+  async tapOnChoosePhotoVideoButton(): Promise<this> {
+    await this.waitForDisplayed('uploadAttachmentPopupChoosePhotoVideoButton', 20000);
+    await this.tap('uploadAttachmentPopupChoosePhotoVideoButton');
+    return this.self;
+  }
+
+  async verifyPhotoVideoPopupDisplayed(): Promise<this> {
+    await this.waitForDisplayed('photoVideoPopup', 20000);
+    await this.expectDisplayed('photoVideoPopup');
+    return this.self;
+  }
+
+  async verifyErrorMessageDisplayed(): Promise<this> {
+    const { errorMessage } = CREATE_LOGIN_PAGE.uploadAttachmentPopup;
+
+    await this.waitForDisplayed('uploadAttachmentPopupErrorMessage', 20000);
+    await this.expectDisplayed('uploadAttachmentPopupErrorMessage');
+    await this.expectExactText(
+      'uploadAttachmentPopupErrorMessage',
+      errorMessage.fileTooLarge,
+    );
+
+    return this.self;
+  }
+
+  async tapOnPassportTemplatePhoto(): Promise<this> {
+    await this.waitForDisplayed('passportTemplatePhoto', 20000);
+    await this.tap('passportTemplatePhoto');
+    return this.self;
+  }
+
+  async verifyDeleteAttachmentButtonDisplayed(): Promise<this> {
+    await this.waitForDisplayed('deleteAttachmentButton', 20000);
+    await this.expectDisplayed('deleteAttachmentButton');
+    return this.self;
+  }
+
+  async verifyDeleteAttachmentButtonNotDisplayedOnAttachmentField(): Promise<this> {
+    await this.expectDisplayed('deleteAttachmentButton', false);
+    return this.self;
+  }
+
+  async tapOnDeleteAttachmentButton(): Promise<this> {
+    await this.waitForDisplayed('deleteAttachmentButton', 20000);
+    await this.tap('deleteAttachmentButton');
+    return this.self;
+  }
+
+  async verifyOwnersManualFileNotDisplayedInAttachmentField(): Promise<this> {
+    await this.expectDisplayed('ownersManualFileInAttachmentField', false);
+    return this.self;
+  }
+
+  async verifyOwnersManualFileIconNotDisplayedInAttachmentField(): Promise<this> {
+    await this.expectDisplayed('ownersManualFileIconInAttachmentField', false);
+    return this.self;
+  }
+
+  async verifyOwnersManualFileDisplayedInAttachmentField(): Promise<this> {
+    const { ownersManualFile } = CREATE_LOGIN_PAGE.attachmentField;
+
+    await this.waitForDisplayed('ownersManualFileInAttachmentField', 20000);
+    await this.expectDisplayed('ownersManualFileInAttachmentField');
+    await this.expectExactText(
+      'ownersManualFileInAttachmentField',
+      ownersManualFile.text,
+    );
+    await this.expectDisplayed('ownersManualFileIconInAttachmentField');
+
+    return this.self;
+  }
+
+  async verifyPassportTemplatePhotoDisplayedInAttachmentField(): Promise<this> {
+    const { passportTemplatePhoto } = CREATE_LOGIN_PAGE.attachmentField;
+
+    await this.waitForDisplayed('passportTemplatePhotoInAttachmentField', 20000);
+    await this.expectDisplayed('passportTemplatePhotoInAttachmentField');
+    await this.expectExactText(
+      'passportTemplatePhotoInAttachmentField',
+      passportTemplatePhoto.text,
+    );
+    await this.expectDisplayed('passportTemplatePhotoIconInAttachmentField');
+    await this.expectDisplayed('deleteAttachmentButton');
+
+    return this.self;
+  }
+
+  async chooseFile(fileKey: AttachmentFileKey): Promise<this> {
+    const maxAttempts = 5;
+    const waitTimeout = 20000;
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        await this.waitForDisplayed(fileKey, waitTimeout);
+        await this.tap(fileKey);
+        return this.self;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        if (attempt < maxAttempts - 1) {
+          await this.swipe('up');
+        }
+      }
+    }
+
+    throw (
+      lastError ??
+      new Error(
+        `File "${fileKey}" not found after ${maxAttempts} attempts (scrolling up).`,
+      )
+    );
+  }
+
+  async chooseDownloadsFolder(): Promise<this> {
+    await this.waitForDisplayed('downloadsFolderTitle', 10000);
+    await this.tap('menuButton');
+    await this.waitForDisplayed('openFromTitle', 10000);
+    await this.tap('downloadsButton');
+    return this.self;
+  }
+
+  async verifyFileAndPhotoFieldPopupWithAllElementsDisplayed(): Promise<this> {
+    const { uploadAttachmentPopup } = CREATE_LOGIN_PAGE;
+
+    await this.waitForDisplayed('uploadAttachmentPopup', 20000);
+    await this.expectDisplayed('uploadAttachmentPopup');
+    await this.expectDisplayed('uploadAttachmentPopupTitle');
+    await this.expectExactText(
+      'uploadAttachmentPopupTitle',
+      uploadAttachmentPopup.title,
+    );
+    await this.expectDisplayed('uploadAttachmentPopupText');
+    await this.expectExactText(
+      'uploadAttachmentPopupText',
+      uploadAttachmentPopup.text,
+    );
+    await this.expectDisplayed('closeButton');
+
+    await this.expectDisplayed('uploadAttachmentPopupChooseFileButton');
+    await this.expectDisplayed('uploadAttachmentPopupChooseFileButtonText');
+    await this.expectExactText(
+      'uploadAttachmentPopupChooseFileButtonText',
+      uploadAttachmentPopup.chooseFile.text,
+    );
+
+    await this.expectDisplayed('uploadAttachmentPopupChoosePhotoVideoButton');
+    await this.expectDisplayed('uploadAttachmentPopupChoosePhotoVideoButtonText');
+    await this.expectExactText(
+      'uploadAttachmentPopupChoosePhotoVideoButtonText',
+      uploadAttachmentPopup.choosePhotoVideo.text,
+    );
+
     return this.self;
   }
 

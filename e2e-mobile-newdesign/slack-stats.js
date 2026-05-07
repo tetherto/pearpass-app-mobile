@@ -36,12 +36,6 @@ async function sendSlackStats() {
       passedTests = 33;
       failedTests = 0;
       break;
-    case 'sidebar':
-    case 'sidebarOnly':
-      totalTests = 19;
-      passedTests = 18;
-      failedTests = 1;
-      break;
     case 'all':
       totalTests = 57;
       passedTests = 56;

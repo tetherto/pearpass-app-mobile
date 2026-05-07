@@ -89,6 +89,28 @@ export const CREATE_LOGIN_PAGE = {
       text: 'Create New Folder',
     },
   },
+  uploadAttachmentPopup: {
+    title: 'Upload Attachment',
+    text: 'Maximum file size: 6MB',
+    chooseFile: {
+      text: 'Choose File',
+    },
+    choosePhotoVideo: {
+      text: 'Choose Photo / Video',
+    },
+    errorMessage: {
+      fileTooLarge:
+        'Your file is too large. Please upload one that’s 6MB or smaller.',
+    },
+  },
+  attachmentField: {
+    ownersManualFile: {
+      text: 'owners-manual.pdf',
+    },
+    passportTemplatePhoto: {
+      text: '42.jpg',
+    },
+  },
   addItemButton: {
     text: 'Add Item',
   },

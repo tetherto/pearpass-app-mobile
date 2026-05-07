@@ -310,9 +310,9 @@ function parseCTRFStats() {
             let suiteName = 'Unknown Suite';
             if (file.includes('OnboardingTests')) suiteName = 'Onboarding Flow';
             else if (file.includes('SignUpTests')) suiteName = 'Sign Up Flow';
-            else if (file.includes('SidebarTests')) suiteName = 'Sidebar Flow';
             else if (file.includes('SettingsTests')) suiteName = 'Settings Flow';
             else if (file.includes('HomeTests')) suiteName = 'Home Flow';
+            else if (file.includes('CreateLoginItemTests')) suiteName = 'Create Login Item Flow';
             
             // Keep first match per suite name only
             if (!suiteStats[suiteName]) {
@@ -371,12 +371,7 @@ export const config: Options.Testrunner & {
     signup: [
       './tests/specs/SignUpTests.ts',
     ],
-    
-    // Sidebar tests - independent, sets up its own state
-    sidebar: [
-      './tests/specs/SidebarTests.ts',
-    ],
-    
+
     // Settings tests - independent, sets up its own state
     settings: [
       './tests/specs/SettingsTests.ts',
@@ -403,21 +398,6 @@ export const config: Options.Testrunner & {
       './tests/specs/SignUpTests.ts',
     ],
 
-    // Onboarding + SignUp + Sidebar (matches npm script test:onboarding-signup-sidebar)
-    onboardingSignupSidebar: [
-      './tests/specs/OnboardingTests.ts',
-      './tests/specs/SignUpTests.ts',
-      './tests/specs/SidebarTests.ts',
-    ],
-
-    // Onboarding + SignUp + Sidebar + Settings (matches npm script test:onboarding-signup-sidebar-settings)
-    onboardingSignupSidebarSettings: [
-      './tests/specs/OnboardingTests.ts',
-      './tests/specs/SignUpTests.ts',
-      './tests/specs/SidebarTests.ts',
-      './tests/specs/SettingsTests.ts',
-    ],
-    
     // All tests
     all: [
       './tests/specs/OnboardingTests.ts',
@@ -436,9 +416,6 @@ export const config: Options.Testrunner & {
     ],
     settingsOnly: [
       './tests/specs/SettingsTests.ts',
-    ],
-    sidebarOnly: [
-      './tests/specs/SidebarTests.ts',
     ],
     homeOnly: [
       './tests/specs/HomeTests.ts',

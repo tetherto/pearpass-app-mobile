@@ -20,6 +20,9 @@ allure-report/
 ctrl/
 ctrf/
 
+# Qase runtime results (written by tests/helpers/qase-sync.ts)
+.qase-results.json
+
 # Environment files
 .env
 *.env.local

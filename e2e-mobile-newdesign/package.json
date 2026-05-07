@@ -1,7 +1,7 @@
 {
-  "name": "e2e-mobile-tests",
+  "name": "e2e-mobile-newdesign",
   "version": "1.1.1",
-  "description": "End-to-end mobile automation tests for PearPass (Android & iOS, BrowserStack & local)",
+  "description": "End-to-end mobile automation tests for the redesigned PearPass mobile app (Android, local emulator)",
   "main": "index.js",
   "scripts": {
     "postinstall": "patch-package",
@@ -34,6 +34,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",
     "expect-webdriverio": "^5.5.0",
+    "form-data": "^4.0.0",
     "patch-package": "^8.0.0",
     "slack-ctrf": "^0.0.31",
     "ts-node": "^10.9.2",

@@ -1,6 +1,6 @@
 import 'mocha';
 import { Pages } from '@support/page-factory';
-import { restartAndNavigateToCreateLoginItemPage } from '@helpers/test-setup';
+import { restartAndNavigateToCreateLoginItemPage, addFileToCreateLoginItemPage, addAnotherMessageToCreateLoginItemPage } from '@helpers/test-setup';
 
 describe('Home Page - Main Navigation', () => {
   
@@ -19,11 +19,10 @@ describe('Home Page - Main Navigation', () => {
     await createLogin.addItemButtonDisplayed();
   });
 
-  it('[] Verify that Title required error message is displayed when Title is not entered', async () => {
+  it('[] Verify that Add Item button is inactive by default', async () => {
     const { createLogin } = Pages;
 
-    await createLogin.tapOnAddItemButton();
-    await createLogin.verifyTitleRequiredErrorMessageDisplayed();
+    await createLogin.verifyAddItemButtonIsInactiveByDefault();
   });
 
   it('[] User redirect to New Password Item page when Generate Password button is tapped', async () => {
@@ -100,5 +99,75 @@ describe('Home Page - Main Navigation', () => {
     await createLogin.tapOnDeleteFolderButton();
     await createLogin.deleteFolderPageWithAllElementsDisplayed();
     await createLogin.tapOnDeleteButton();
+  });
+
+  it('[] User can add file', async () => {
+    const { createLogin } = Pages;
+
+    await createLogin.swipe('up');
+    await createLogin.verifyFileAndPhotoFieldDisplayed();
+    await createLogin.tapOnFileAndPhotoField();
+    await createLogin.verifyFileAndPhotoFieldPopupWithAllElementsDisplayed();
+    await createLogin.tapOnChooseFileButton();
+    await createLogin.chooseDownloadsFolder();
+    await createLogin.chooseFile('ownersManualFile');
+    await createLogin.verifyOwnersManualFileDisplayedInAttachmentField();
+    await createLogin.verifyDeleteAttachmentButtonDisplayed();
+  });
+
+  it('[] User can delete file when Delete button is tapped', async () => {
+    const { createLogin } = Pages;
+
+    await addFileToCreateLoginItemPage();
+    await createLogin.tapOnDeleteAttachmentButton();
+    await createLogin.verifyOwnersManualFileNotDisplayedInAttachmentField();
+    await createLogin.verifyOwnersManualFileIconNotDisplayedInAttachmentField();
+    await createLogin.verifyDeleteAttachmentButtonNotDisplayedOnAttachmentField();
+  });
+
+  it('[] User can add Photo/Video', async () => {
+    const { createLogin } = Pages;
+
+    await createLogin.swipe('up');
+    await createLogin.verifyFileAndPhotoFieldDisplayed();
+    await createLogin.tapOnFileAndPhotoField();
+    await createLogin.verifyFileAndPhotoFieldPopupWithAllElementsDisplayed();
+    await createLogin.tapOnChoosePhotoVideoButton();
+    await createLogin.verifyPhotoVideoPopupDisplayed();
+    await createLogin.tapOnPassportTemplatePhoto();
+    await createLogin.verifyPassportTemplatePhotoDisplayedInAttachmentField();
+  });
+
+  it('[] User can add Another Hidden Message field when Add Another Message button is tapped', async () => {
+    const { createLogin } = Pages;
+
+    await createLogin.swipe('up');
+    await createLogin.verifyAddAnotherMessageButtonDisplayed();
+    await createLogin.tapOnAddAnotherMessageButton();
+    await createLogin.swipe('up');
+    await createLogin.verifyNewHiddenMessageWithAllElementsDisplayed();
+    await createLogin.verifyDeleteHiddenMessageButtonAppearsOnHiddenMessageField();
+  });
+
+  it('[] User can delete Hidden Message field when Delete button is tapped', async () => {
+    const { createLogin } = Pages;
+
+    await addAnotherMessageToCreateLoginItemPage();
+    await createLogin.tapOnNewHiddenMessageFieldDeleteButton();
+    await createLogin.verifyNewHiddenMessageFieldNotDisplayed();
+    await createLogin.verifyDeleteHiddenMessageButtonNotDisplayedOnHiddenMessageField();
+  });
+
+  it('[] It is impposible to load file larger than 6MB', async () => {
+    const { createLogin } = Pages;
+
+    await createLogin.swipe('up');
+    await createLogin.verifyFileAndPhotoFieldDisplayed();
+    await createLogin.tapOnFileAndPhotoField();
+    await createLogin.verifyFileAndPhotoFieldPopupWithAllElementsDisplayed();
+    await createLogin.tapOnChooseFileButton();
+    await createLogin.chooseDownloadsFolder();
+    await createLogin.chooseFile('largeFile');
+    await createLogin.verifyErrorMessageDisplayed();
   });
 });
