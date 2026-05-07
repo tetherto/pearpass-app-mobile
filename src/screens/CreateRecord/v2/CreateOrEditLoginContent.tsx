@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { Add, KeyboardArrowBottom, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   RECORD_TYPES,
   useCreateRecord,

@@ -38,7 +38,7 @@ export const HeaderV2 = ({
       return
     }
 
-    navigation.navigate('CreateRecord', { recordType })
+    navigation.navigate('CreateRecord', { recordType: type })
   }
 
   const isAllItems = recordType === 'all'
