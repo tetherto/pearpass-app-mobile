@@ -38,11 +38,6 @@ export const HeaderV2 = ({
       return
     }
 
-    if (type === 'authenticator') {
-      navigation.navigate('CreateRecord', { recordType: 'login' })
-      return
-    }
-
     navigation.navigate('CreateRecord', { recordType: type })
   }
 

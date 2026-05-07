@@ -8,6 +8,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
+  RECORD_TYPES,
   formatOtpCode,
   groupOtpRecords,
   isExpiring,
@@ -187,7 +188,9 @@ export const Authenticator = () => {
             <TouchableOpacity
               style={styles.emptyPrimaryButton}
               onPress={() =>
-                navigation.navigate('CreateRecord', { recordType: 'login' })
+                navigation.navigate('CreateRecord', {
+                  recordType: RECORD_TYPES.OTP
+                })
               }
             >
               <PlusIcon size="16" color={colors.grey500.mode1} />

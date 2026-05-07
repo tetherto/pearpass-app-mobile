@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { Add, QrCode, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   RECORD_TYPES,
   useCreateRecord,
@@ -33,6 +33,7 @@ import { formatPasskeyDate } from '../../../utils/formatPasskeyDate'
 import { logger } from '../../../utils/logger'
 import { getPasswordIndicatorVariant } from '../../../utils/passwordPolicy'
 import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
+import { OtpSecretScanButton } from './OtpSecretScanButton'
 
 type LoginAttachment = {
   base64?: string
@@ -377,7 +378,9 @@ export const CreateOrEditLoginContent = ({
             <PasswordField
               label={t`Authenticator Secret Key`}
               placeholder={t`Enter Secret Key (TOTP)`}
-              rightSlot={<QrCode color={theme.colors.colorTextPrimary} />}
+              rightSlot={
+                <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
+              }
               testID="otp-secret-field"
               {...adaptRegister(register('otpSecret'))}
             />
