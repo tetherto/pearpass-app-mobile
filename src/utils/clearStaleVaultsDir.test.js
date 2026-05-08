@@ -18,19 +18,18 @@ jest.mock('./AppGroupHelper', () => ({
 
 jest.mock('./logger', () => ({
   logger: {
+    log: jest.fn(),
     warn: jest.fn()
   }
 }))
 
 const VAULTS_PATH = 'file:///documents/pearpass/vaults'
 const VAULT_DATA_PATH = 'file:///documents/pearpass/vault'
-const ENCRYPTION_PATH = 'file:///documents/pearpass/encryption'
 
-const mockInfo = ({ vaults, vault, encryption }) => {
+const mockInfo = ({ vaults, vault }) => {
   FileSystem.getInfoAsync.mockImplementation(async (path) => {
     if (path === VAULTS_PATH) return vaults
     if (path === VAULT_DATA_PATH) return vault
-    if (path === ENCRYPTION_PATH) return encryption
     return { exists: false }
   })
 }
@@ -40,8 +39,7 @@ describe('clearStaleVaultsDir', () => {
     jest.clearAllMocks()
     mockInfo({
       vaults: { exists: false },
-      vault: { exists: false },
-      encryption: { exists: false }
+      vault: { exists: false }
     })
     FileSystem.readDirectoryAsync.mockResolvedValue([])
     FileSystem.deleteAsync.mockResolvedValue()
@@ -51,8 +49,7 @@ describe('clearStaleVaultsDir', () => {
   it('deletes the vaults dir under the document directory when it exists and no user data is present', async () => {
     mockInfo({
       vaults: { exists: true },
-      vault: { exists: false },
-      encryption: { exists: false }
+      vault: { exists: false }
     })
 
     await clearStaleVaultsDir()
@@ -82,8 +79,7 @@ describe('clearStaleVaultsDir', () => {
   it('does nothing when the vaults dir does not exist', async () => {
     mockInfo({
       vaults: { exists: false },
-      vault: { exists: false },
-      encryption: { exists: false }
+      vault: { exists: false }
     })
 
     await clearStaleVaultsDir()
@@ -115,8 +111,7 @@ describe('clearStaleVaultsDir', () => {
   it('refuses to delete when pearpass/vault has children', async () => {
     mockInfo({
       vaults: { exists: true },
-      vault: { exists: true },
-      encryption: { exists: false }
+      vault: { exists: true }
     })
     FileSystem.readDirectoryAsync.mockImplementation(async (path) => {
       if (path === VAULT_DATA_PATH) return ['some-vault-id']
@@ -126,54 +121,16 @@ describe('clearStaleVaultsDir', () => {
     await clearStaleVaultsDir()
 
     expect(FileSystem.deleteAsync).not.toHaveBeenCalled()
-    expect(logger.warn).toHaveBeenCalledWith(
+    expect(logger.log).toHaveBeenCalledWith(
       'clearStaleVaultsDir: refusing to delete pearpass/vaults — found existing user data',
-      { hasVaultData: true, hasEncryption: false }
+      { hasVaultData: true }
     )
   })
 
-  it('refuses to delete when pearpass/encryption has children', async () => {
+  it('deletes when pearpass/vault exists but is empty', async () => {
     mockInfo({
       vaults: { exists: true },
-      vault: { exists: false },
-      encryption: { exists: true }
-    })
-    FileSystem.readDirectoryAsync.mockImplementation(async (path) => {
-      if (path === ENCRYPTION_PATH) return ['db']
-      return []
-    })
-
-    await clearStaleVaultsDir()
-
-    expect(FileSystem.deleteAsync).not.toHaveBeenCalled()
-    expect(logger.warn).toHaveBeenCalledWith(
-      'clearStaleVaultsDir: refusing to delete pearpass/vaults — found existing user data',
-      { hasVaultData: false, hasEncryption: true }
-    )
-  })
-
-  it('refuses to delete when both pearpass/vault and pearpass/encryption have children', async () => {
-    mockInfo({
-      vaults: { exists: true },
-      vault: { exists: true },
-      encryption: { exists: true }
-    })
-    FileSystem.readDirectoryAsync.mockImplementation(async (path) => {
-      if (path === VAULT_DATA_PATH) return ['some-vault-id']
-      if (path === ENCRYPTION_PATH) return ['db']
-      return []
-    })
-
-    await clearStaleVaultsDir()
-
-    expect(FileSystem.deleteAsync).not.toHaveBeenCalled()
-  })
-
-  it('deletes when pearpass/vault and pearpass/encryption exist but are empty', async () => {
-    mockInfo({
-      vaults: { exists: true },
-      vault: { exists: true },
-      encryption: { exists: true }
+      vault: { exists: true }
     })
     FileSystem.readDirectoryAsync.mockResolvedValue([])
 
@@ -201,8 +158,7 @@ describe('clearStaleVaultsDir', () => {
     const error = new Error('delete failed')
     mockInfo({
       vaults: { exists: true },
-      vault: { exists: false },
-      encryption: { exists: false }
+      vault: { exists: false }
     })
     FileSystem.deleteAsync.mockRejectedValueOnce(error)
 
