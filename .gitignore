@@ -58,3 +58,7 @@ src/locales/
 
 # Plugin build outputs
 plugins/*/build/
+
+# F-Droid: bare-kit + addons from-source build cache
+# Created by scripts/fdroid/build-bare-from-source.sh — multi-GB, regenerable.
+.bare-build/
