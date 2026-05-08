@@ -70,6 +70,8 @@ install_to() {
 
 check_prereqs() {
   [ -d "$RNBK_DIR" ]    || fatal "react-native-bare-kit not in node_modules; run 'npm ci' first"
+  [ -d "$PROJECT_DIR/node_modules/bare-link" ] \
+                        || fatal "bare-link not in node_modules; run 'npm ci' first"
   [ -n "$NDK" ]         || fatal "ANDROID_NDK_ROOT (or ANDROID_NDK_HOME) is not set"
   [ -d "$NDK" ]         || fatal "NDK directory does not exist: $NDK"
   [ -n "$SDK" ]         || fatal "ANDROID_HOME (or ANDROID_SDK_ROOT) is not set"
