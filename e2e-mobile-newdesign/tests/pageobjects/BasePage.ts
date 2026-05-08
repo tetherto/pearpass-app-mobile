@@ -39,6 +39,7 @@ export default abstract class BasePage {
   private readonly WAIT_INTERVAL: number;
 
   private readonly selectorCache: Map<string, string> = new Map();
+  private selectorsCached = false;
 
   constructor() {
     this.platform = this.detectPlatform();
@@ -47,7 +48,6 @@ export default abstract class BasePage {
     this.deviceName = process.env.ANDROID_DEVICE_NAME || process.env.IOS_DEVICE_NAME || 'unknown';
     this.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT_MS;
     this.WAIT_INTERVAL = WAIT_INTERVAL_MS;
-    this.cacheSelectors();
   }
 
   /* ==================== PLATFORM ==================== */
@@ -62,11 +62,16 @@ export default abstract class BasePage {
 
   /* ==================== SELECTOR CACHING ==================== */
   private cacheSelectors(): void {
+    // NOTE: Child classes initialize `selectors` after `super()` returns.
+    // This must be called lazily (not in the BasePage constructor),
+    // otherwise `this.selectors` is still undefined and the cache remains empty.
+    if (this.selectorsCached) return;
     for (const key in this.selectors) {
       if (Object.prototype.hasOwnProperty.call(this.selectors, key)) {
         this.selectorCache.set(key, this.selectors[key]);
       }
     }
+    this.selectorsCached = true;
   }
 
   /* ==================== SELECTORS ==================== */
@@ -82,6 +87,7 @@ export default abstract class BasePage {
   }
 
   private resolveSelector(name: string): string {
+    this.cacheSelectors();
     const cached = this.selectorCache.get(name);
     if (cached) {
       return cached;

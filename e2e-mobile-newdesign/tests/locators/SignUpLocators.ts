@@ -6,24 +6,26 @@ const signUpLocators = {
   ============================ */
   createMasterPasswordTitle: '//android.view.View[@resource-id="onboarding-v2-create-password-title"]',
   createMasterPasswordDescription: '//android.widget.TextView[@resource-id="onboarding-v2-create-password-subtitle"]',
-  createMasterPasswordTransferDataLink: '~Transfer Data',
 
-  enterMasterPasswordField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[4]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup',
+  enterMasterPasswordField: '//android.view.ViewGroup[@resource-id="onboarding-v2-password-input"]',
   enterMasterPasswordFieldTitle: '//android.widget.TextView[@text="Password"]',
   enterMasterPasswordFieldInput: '//android.widget.EditText[@text="Enter Master Password"]',
   enterMasterPasswordFieldShowPasswordButton: '(//android.widget.Button[@content-desc="Show password"])[1]',
   enterMasterPasswordFieldHidePasswordButton: '~Hide password',
 
-  enterMasterPasswordFieldPasswordIndicatorStrong: '',
-  enterMasterPasswordFieldPasswordIndicatorDecent: '',
-  enterMasterPasswordFieldPasswordIndicatorVulnerable: '',
+  enterMasterPasswordFieldPasswordIndicatorStrong: '//android.widget.TextView[@text="Strong"]',
+  enterMasterPasswordFieldPasswordIndicatorStrongIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[1]',
+  enterMasterPasswordFieldPasswordIndicatorDecent: '//android.widget.TextView[@text="Decent"]',
+  enterMasterPasswordFieldPasswordIndicatorDecentIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[1]',
+  enterMasterPasswordFieldPasswordIndicatorVulnerable: '//android.widget.TextView[@text="Vulnerable"]',
+  enterMasterPasswordFieldPasswordIndicatorVulnerableIcon: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[1]',
 
   enterMasterPasswordFieldInfoBox: '//android.view.ViewGroup[@resource-id="password-field-info-box"]',
-  enterMasterPasswordFieldInfoBoxText: `//android.widget.TextView[@text="Strong passwords are usually at least 8 characters long, hard to guess, use a mix of letters, numbers, and symbols, and aren't based on personal information."]`,
+  enterMasterPasswordFieldInfoBoxText: `//android.widget.TextView[@text="Strong passwords are usually at least 8 characters long, hard to guess, use a mix of uppercase and lowercase letters, numbers, and symbols, and aren't based on personal information."]`,
   enterMasterPasswordFieldInfoBoxIcon: '//android.view.ViewGroup[@resource-id="password-field-info-box"]/com.horcrux.svg.SvgView',
 
 
-  repeatMasterPasswordField: '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[4]/android.view.ViewGroup',
+  repeatMasterPasswordField: '//android.view.ViewGroup[@resource-id="onboarding-v2-password-confirm-input"]',
   repeatMasterPasswordFieldTitle: '//android.widget.TextView[@text="Repeat Password"]',
   repeatMasterPasswordFieldInput: '//android.widget.EditText[@text="Repeat Master Password"]',
   repeatMasterPasswordFieldShowPasswordButton: '~Show password',

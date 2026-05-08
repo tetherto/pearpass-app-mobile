@@ -325,7 +325,7 @@ describe('Settings - Syncing - Blind Peering Page', () => {
     await settings.verifyManualBlindPeersEnterPeerCodeFieldNotDisplayed(5);
   });
 
-  it('[PAS-3043] User can see error for invalid blind peer code', async () => {
+  it('[] User can see error for invalid blind peer code', async () => {
     const { settings } = Pages;
 
     await settings.enterPeerCodeForBlindPeer(TEST_PASSWORDS.blindPeerCodeInvalid);
@@ -333,7 +333,7 @@ describe('Settings - Syncing - Blind Peering Page', () => {
     await settings.verifyErrorToastMessageDisplayed();
   });
 
-  it('[PAS-1453] User can add valid code for blind peer', async () => {
+  it('[] User can add valid code for blind peer', async () => {
     const { settings } = Pages;
 
     await settings.clearPeerCodeForBlindPeerField();

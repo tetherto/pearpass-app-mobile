@@ -34,7 +34,6 @@ export class SignUpPage extends BasePage {
     await this.expectExactText('createMasterPasswordTitle', CREATE_MASTER_PASSWORD_PAGE.title);
     await this.expectDisplayed('createMasterPasswordDescription');
     await this.expectExactText('createMasterPasswordDescription', CREATE_MASTER_PASSWORD_PAGE.description);
-    await this.expectDisplayed('createMasterPasswordTransferDataLink');
 
     await this.expectDisplayed('enterMasterPasswordField');
     await this.expectDisplayed('enterMasterPasswordFieldTitle');

@@ -1,13 +1,12 @@
 export const CREATE_MASTER_PASSWORD_PAGE = {
   title: 'Create Master password',
-  description: 'This is the key to access PearPass. Already using PearPass? Transfer Data',
-  transferDataLink: 'Transfer Data',
+  description: 'This is the key to access PearPass. ',
 
   passwordField: {
     title: 'Password',
     placeholder: 'Enter Master Password',
     hintText:
-      "Strong passwords are usually at least 8 characters long, hard to guess, use a mix of letters, numbers, and symbols, and aren't based on personal information.",
+      "Strong passwords are usually at least 8 characters long, hard to guess, use a mix of uppercase and lowercase letters, numbers, and symbols, and aren't based on personal information.",
   },
   repeatPasswordField: {
     title: 'Repeat Password',

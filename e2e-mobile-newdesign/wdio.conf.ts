@@ -113,11 +113,11 @@ function getVersion(p: string): string | undefined {
  * installed it just logs and exits.
  *
  * Env overrides:
- *   - APP_PACKAGE  (default: com.pears.pass.nightly)
+ *   - APP_PACKAGE  (default: com.pears.pass)
  *   - APP_APK      (default: apps/android/PearPass.apk)
  */
 function ensureAppInstalled(): void {
-  const appPackage = process.env.APP_PACKAGE || 'com.pears.pass.nightly';
+  const appPackage = process.env.APP_PACKAGE || 'com.pears.pass';
   const apkPath = process.env.APP_APK
     ? path.resolve(process.env.APP_APK)
     : path.resolve(__dirname, 'apps', 'android', 'PearPass.apk');
@@ -491,8 +491,8 @@ export const config: Options.Testrunner & {
             'appium:platformVersion': process.env.EMULATOR_VERSION || '16',
             // PearPass is launched manually in the `before` hook after
             // the phone-system fingerprint setup completes (see wdio.conf.ts).
-            // Default package is `com.pears.pass.nightly`; override with APP_PACKAGE env var.
-            // 'appium:appPackage': 'com.pears.pass.nightly',
+            // Default package is `com.pears.pass`; override with APP_PACKAGE env var.
+            // 'appium:appPackage': 'com.pears.pass',
             'appium:autoLaunch': false,
             'appium:noReset': true,
             'appium:fullReset': false,
@@ -625,9 +625,11 @@ export const config: Options.Testrunner & {
   async before() {
     if (RUN_TARGET !== 'local_emulator') return;
 
-    const pearPassPackage = process.env.APP_PACKAGE || 'com.pears.pass.nightly';
+    const pearPassPackage = process.env.APP_PACKAGE || 'com.pears.pass';
 
-    if (process.env.SKIP_FINGERPRINT_SETUP !== 'true') {
+    // Default: do NOT enroll a fingerprint via Android Settings.
+    // Enable only when a test explicitly requires biometric auth.
+    if (process.env.ENABLE_FINGERPRINT_SETUP === 'true') {
       const { default: OnboardingPage } = await import('./tests/pageobjects/OnboardingPage');
       const onboardingPage = new OnboardingPage();
       try {
@@ -639,7 +641,7 @@ export const config: Options.Testrunner & {
         );
       }
     } else {
-      console.log('⏭️  SKIP_FINGERPRINT_SETUP=true — skipping phone-system fingerprint enrollment');
+      console.log('⏭️  ENABLE_FINGERPRINT_SETUP!=true — skipping phone-system fingerprint enrollment');
     }
 
     console.log(`🚀 Launching ${pearPassPackage}...`);

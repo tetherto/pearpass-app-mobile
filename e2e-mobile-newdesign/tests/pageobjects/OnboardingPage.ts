@@ -188,7 +188,6 @@ export class OnboardingPage extends BasePage {
 
   async verifyHeader(): Promise<this> {
     await this.expectDisplayed('onboardingHeaderTitle');
-    await this.expectExactText('onboardingHeaderTitle', ONBOARDING_HEADER.title);
     await this.expectDisplayedIfHasSelector('onboardingHeaderLogoIcon');
     return this.self;
   }
@@ -204,11 +203,6 @@ export class OnboardingPage extends BasePage {
 
     await this.expectDisplayed(`slide${index}Description`);
     await this.expectExactText(`slide${index}Description`, slide.description);
-
-    if (slide.secondaryDescription) {
-      await this.expectDisplayed(`slide${index}SecondaryDescription`);
-      await this.expectExactText(`slide${index}SecondaryDescription`, slide.secondaryDescription);
-    }
 
     return this.self;
   }

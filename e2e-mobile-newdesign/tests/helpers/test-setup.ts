@@ -1,7 +1,7 @@
 import { browser, $ } from '@wdio/globals';
 import { Pages } from '@support/page-factory';
 
-const APP_PACKAGE = process.env.APP_PACKAGE || 'com.pears.pass.nightly';
+const APP_PACKAGE = process.env.APP_PACKAGE || 'com.pears.pass';
 
 export async function clearAppData(): Promise<void> {
   try {
