@@ -20,12 +20,19 @@
 #   ANDROID_NDK_ROOT (or ANDROID_NDK_HOME) — pointing at NDK r27+
 #   ANDROID_HOME (or ANDROID_SDK_ROOT)     — for android.jar (classes.jar build)
 #
+# Optional positional argument:
+#   $1                 single ABI to build (arm64-v8a | armeabi-v7a | x86 | x86_64).
+#                      When omitted, builds all four (default for local dev). The
+#                      F-Droid recipe passes the ABI of the current versionCode so
+#                      each build only compiles what it needs.
+#
 # Optional environment:
 #   BARE_KIT_VERSION   git ref to clone (default: v2.0.0 — matches the
 #                      prebuilts shipped by react-native-bare-kit 0.13.0)
 #   BARE_BUILD_DIR     workspace root    (default: <project>/.bare-build)
 #   ANDROID_PLATFORM   min API level     (default: 29)
-#   ABIS               space-separated   (default: "arm64-v8a armeabi-v7a x86 x86_64")
+#   ABIS               space-separated   (default: "arm64-v8a armeabi-v7a x86 x86_64";
+#                                         overridden by $1 when given)
 #   JOBS               cmake parallelism (default: nproc)
 
 set -euo pipefail
@@ -36,6 +43,13 @@ BARE_BUILD_DIR="${BARE_BUILD_DIR:-$PROJECT_DIR/.bare-build}"
 ANDROID_PLATFORM="${ANDROID_PLATFORM:-29}"
 ABIS="${ABIS:-arm64-v8a armeabi-v7a x86 x86_64}"
 JOBS="${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)}"
+
+if [ "${1:-}" != "" ]; then
+  case "$1" in
+    arm64-v8a|armeabi-v7a|x86|x86_64) ABIS="$1" ;;
+    *) printf '[bare-build] ERROR: unknown ABI argument: %s\n' "$1" >&2; exit 1 ;;
+  esac
+fi
 
 NDK="${ANDROID_NDK_ROOT:-${ANDROID_NDK_HOME:-}}"
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
