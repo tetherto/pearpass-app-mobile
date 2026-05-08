@@ -19,6 +19,7 @@ import { VaultRow } from './VaultRow'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { VAULT_ACTION } from '../../../constants/vaultActions'
 import { BottomSheetPairedDevicesContent } from '../../../containers/BottomSheetPairedDevicesContent'
+import { DeleteVaultModalContentV2 } from '../../../containers/Modal/DeleteVaultModalContentV2'
 import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
 import { useModal } from '../../../context/ModalContext'
 import { useVaultSwitch } from '../../../hooks/useVaultSwitch'
@@ -65,7 +66,14 @@ export const VaultsV2 = () => {
           action={VAULT_ACTION.PASSWORD}
         />
       ),
-    onDelete: () => {}
+    onDelete: () =>
+      openModal(
+        <DeleteVaultModalContentV2
+          vaultId={vault.id}
+          vaultName={vault.name}
+          onDeviceCountPress={() => setPairedDevicesOpen(true)}
+        />
+      )
   })
 
   const renderVaultItem = (
