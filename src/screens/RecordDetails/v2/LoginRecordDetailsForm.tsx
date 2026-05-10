@@ -18,8 +18,7 @@ import {
 import { OpenInNew } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { Linking, StyleSheet, View } from 'react-native'
 
-import { OtpCodeField } from '../../../components/OtpCodeField'
-import { FormGroup } from '../../../components/FormGroup'
+import { OtpCodeFieldV2 } from '../../../components/OtpCodeFieldV2'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
@@ -149,7 +148,7 @@ export const LoginRecordDetailsForm = ({
   return (
     <View style={styles.container}>
       <View style={styles.topContent}>
-        {(hasUsername || hasPassword) && (
+        {(hasUsername || hasPassword || !!initialRecord?.otpPublic) && (
           <MultiSlotInput testID="credentials-multi-slot-input">
             {hasUsername && (
               <InputField
@@ -174,6 +173,14 @@ export const LoginRecordDetailsForm = ({
                 isGrouped
                 testID="credentials-multi-slot-input-slot-1"
                 {...toReadOnlyFieldProps(register('password'))}
+              />
+            )}
+
+            {!!initialRecord?.otpPublic && initialRecord?.id && (
+              <OtpCodeFieldV2
+                key={initialRecord.id}
+                recordId={initialRecord.id}
+                otpPublic={initialRecord.otpPublic}
               />
             )}
           </MultiSlotInput>
@@ -208,16 +215,6 @@ export const LoginRecordDetailsForm = ({
               />
             ))}
           </MultiSlotInput>
-        )}
-
-        {!!initialRecord?.otpPublic && initialRecord?.id && (
-          <FormGroup>
-            <OtpCodeField
-              key={initialRecord.id}
-              recordId={initialRecord.id}
-              otpPublic={initialRecord.otpPublic}
-            />
-          </FormGroup>
         )}
 
         {hasPasskey && (
