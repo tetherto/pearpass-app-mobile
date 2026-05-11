@@ -1,3 +1,4 @@
+/* global __DEV__ */
 import * as Sentry from '@sentry/react-native'
 
 import { registerErrorReporter } from './errorReporter'
@@ -11,6 +12,8 @@ import { logger } from './logger'
 // supported escape hatch is `defaultIntegrations: false` + an explicit list of
 // only the integrations we actually use.
 export function initSentry() {
+  if (__DEV__) return
+
   const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN
   if (!dsn) return
 
