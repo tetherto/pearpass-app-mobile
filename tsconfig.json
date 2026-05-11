@@ -25,6 +25,7 @@
     "build",
     "dist",
     "e2e-mobile-tests",
+    "e2e-mobile-newdesign",
     "**/*.test.ts",
     "**/*.test.tsx"
   ],

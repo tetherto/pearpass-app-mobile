@@ -1,10 +1,3 @@
-import { PearpassVaultClient } from '@tetherto/pearpass-lib-vault-core'
-import * as FileSystem from 'expo-file-system'
-import { Platform } from 'react-native'
-import { Worklet } from 'react-native-bare-kit'
-
-import { createPearpassVaultClient } from './index'
-
 jest.mock('expo-file-system', () => ({
   getInfoAsync: jest.fn(),
   makeDirectoryAsync: jest.fn(),
@@ -53,9 +46,21 @@ jest.mock('../utils/AppGroupHelper.js', () => ({
   getSharedDirectoryPath: jest.fn().mockResolvedValue('/test-dir')
 }))
 
+let PearpassVaultClient
+let FileSystem
+let Platform
+let Worklet
+let createPearpassVaultClient
+
 describe('createPearpassVaultClient', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetModules()
+    PearpassVaultClient =
+      require('@tetherto/pearpass-lib-vault-core').PearpassVaultClient
+    FileSystem = require('expo-file-system')
+    Platform = require('react-native').Platform
+    Worklet = require('react-native-bare-kit').Worklet
+    createPearpassVaultClient = require('./index').createPearpassVaultClient
   })
 
   it('should create a client for iOS', async () => {

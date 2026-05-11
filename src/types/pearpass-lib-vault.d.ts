@@ -56,9 +56,10 @@ declare module '@tetherto/pearpass-lib-vault' {
         type?: string
         folder?: string
         isFavorite?: boolean
+        hasOtp?: boolean
       }
       sort?: {
-        field: string
+        field?: string
         direction: 'asc' | 'desc'
         key: string
       }
@@ -66,7 +67,7 @@ declare module '@tetherto/pearpass-lib-vault' {
   }): {
     isLoading: boolean
     isInitialized: boolean
-    data: unknown
+    data: Array<Record<string, any>>
     deleteRecords: (recordIds: string[]) => Promise<void>
     updateRecords: (records: unknown[], onError?: (error: Error) => void) => Promise<void>
     updateFolder: (recordIds: string[], folder: string) => Promise<void>
@@ -86,7 +87,14 @@ declare module '@tetherto/pearpass-lib-vault' {
     variables?: { searchPattern?: string }
   }): {
     isLoading: boolean
-    data: unknown[]
+    data: {
+      favorites: { records: Array<Record<string, any>> }
+      noFolder: { records: Array<Record<string, any>> }
+      customFolders: Record<
+        string,
+        { name: string; records: Array<Record<string, any>> }
+      >
+    }
     renameFolder: (name: string, newName: string) => Promise<void>
     deleteFolder: (name: string) => Promise<void>
   }
@@ -95,7 +103,7 @@ declare module '@tetherto/pearpass-lib-vault' {
     variables?: { id: string }
   }): {
     isLoading: boolean
-    data: unknown
+    data: Record<string, any>
   }
 
   export function useRecordCountsByType(options?: {
@@ -107,7 +115,7 @@ declare module '@tetherto/pearpass-lib-vault' {
     }
   }): {
     isLoading: boolean
-    data: unknown
+    data: Record<string, any>
   }
 
   export function useVault(options?: {
@@ -116,9 +124,9 @@ declare module '@tetherto/pearpass-lib-vault' {
   }): {
     isLoading: boolean
     isInitialized: boolean
-    data: unknown
+    data: Record<string, any>
     refetch: (
-      vaultId: string,
+      vaultId?: string,
       params?: {
         password?: string
         ciphertext?: string
@@ -184,7 +192,7 @@ declare module '@tetherto/pearpass-lib-vault' {
 
   export function useInvite(): {
     isLoading: boolean
-    data: unknown
+    data: { publicKey?: string } | null
     createInvite: () => Promise<void>
     deleteInvite: () => Promise<void>
   }
@@ -210,8 +218,12 @@ declare module '@tetherto/pearpass-lib-vault' {
     recordId: string
     otpPublic: OtpPublic | null | undefined
   }): {
+    code: string | null
+    timeRemaining: number | null
+    type: 'TOTP' | 'HOTP' | null
+    period: number | null
+    generateNext: (() => Promise<void>) | null
     isLoading: boolean
-    generateNext: () => Promise<void>
   }
 
   export function useOtpRefresh(): (() => void) | null
@@ -238,12 +250,12 @@ declare module '@tetherto/pearpass-lib-vault' {
   export function setPearpassVaultClient(client: unknown): void
   export function setStoragePath(path: string): void
   export function authoriseCurrentProtectedVault(params: unknown): Promise<unknown>
-  export function getVaultById(vaultId: string): Promise<unknown>
+  export function getVaultById(vaultId: string): Promise<Record<string, any>>
   export function getCurrentProtectedVaultEncryption(): Promise<unknown>
   export function getMasterEncryption(): Promise<unknown>
   export function getDefaultFavicon(): Promise<unknown>
   export function encryptExportData(data: unknown): Promise<unknown>
-  export function decryptExportData(data: unknown): Promise<unknown>
+  export function decryptExportData(data: unknown, password?: string): Promise<unknown>
 
   // ─── Utils ────────────────────────────────────────────────────────────────
 
@@ -252,7 +264,7 @@ declare module '@tetherto/pearpass-lib-vault' {
     callback: () => void,
     period: number
   ): () => void
-  export function isExpiring(timeRemaining: number, period: number): boolean
+  export function isExpiring(timeRemaining: number | null): boolean
   export const EXPIRY_THRESHOLD_SECONDS: number
   export function groupOtpRecords(
     records: Array<{ otpPublic?: OtpPublic }>
