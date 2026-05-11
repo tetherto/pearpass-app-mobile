@@ -49,7 +49,10 @@ export const Authenticator = () => {
   )
 
   const handleRecordPress = (record) => {
-    navigation.navigate('RecordDetails', { recordId: record.id })
+    navigation.navigate('RecordDetails', {
+      recordId: record.id,
+      recordType: RECORD_TYPES.OTP
+    })
   }
 
   const sections = useMemo(() => {
