@@ -4,7 +4,7 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { useCreateVault, useVault } from '@tetherto/pearpass-lib-vault'
-import { Platform, View, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, StyleSheet, ActivityIndicator } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { StepIdentity } from './StepIdentity'
@@ -38,7 +38,7 @@ export const VaultWizard = () => {
         name: data.name,
         password: data.usePassword ? data.password : undefined
       })
-      await addDevice(Platform.OS + ' ' + Platform.Version)
+      await addDevice()
       Toast.show({
         type: 'baseToast',
         text1: t`Vault created`,
