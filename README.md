@@ -232,14 +232,14 @@ We welcome contributions. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the dev
 
 ## Logging
 
-Off by default. When enabled, logs are written to the app's cache directory — `main.log` from the JS host (React Native side) and `core-logs.txt` from the Bare vault worker. The worker's sink redacts known sensitive fields (passwords, keys, tokens, etc.) before writing to `core-logs.txt`. The host logger does not redact, so treat anything passed to `logger.*` on the JS side as on-disk-visible in `main.log`.
+Loggin is off by default. When enabled, logs are written to the app's cache directory — `main.log` from the JS host (React Native side) and `core.txt` from the Bare vault worker. The worker's sink redacts known sensitive fields (passwords, keys, tokens, etc.) before writing to `core.txt`. The host logger does not redact, so treat anything passed to `logger.*` on the JS side as on-disk-visible in `main.log`.
 
 Two ways to enable:
 
 - **In-app toggle** (Settings → Diagnostics → **Enable logs**). Persists across launches. Toggling off stops writes but keeps existing log files; toggling back on resumes appending to the same files, so a session can span multiple toggles.
 - **Nightly builds** (`PearPass-nightly`): logging defaults to `debug` on first launch so testers don't have to opt in. The toggle still works to disable it.
 
-Diagnostics screen has a **Share logs** action that zips both files plus a small metadata file (app version, distribution channel) and hands it off to the system share sheet (email, Files, AirDrop, etc.).
+Logs can be shared via Diagnostics screen **Share logs** action that zips both files plus a small metadata file (app version, distribution channel).
 
 ---
 
@@ -250,11 +250,8 @@ Diagnostics screen has a **Share logs** action that zips both files plus a small
 Verifying:
 
 - The gate is `isNightly()` from `src/constants/distribution.js`. Returns `false` unless the distribution channel is `nightly`.
-- The Expo config plugin for Sentry is only loaded when `PEARPASS_DISTRIBUTION=nightly` at build time. See `app.config.ts`.
-- The DSN comes from `EXPO_PUBLIC_SENTRY_DSN` (inlined into the bundle at build time). If unset, `initSentry()` returns early and no events are sent — even on a nightly build.
+- The Expo config plugin for Sentry is only loaded when `PEARPASS_DISTRIBUTION=nightly` at build time. `app.config.ts`. `app.json` has no Sentry plugin entry, so standard / F-Droid builds never include it.
 - The Bare-side Sentry SDK (`sentry-bare`) is an optional peer dependency of `pearpass-lib-vault-core` — public builds don't install it.
-
-What's collected on nightly: uncaught exceptions, unhandled promise rejections, error stack traces, OS/device context. **No vault contents, no passwords, no user-identifiable data** — the redaction layer (`pearpass-lib-vault-core/src/worklet/utils/redact.js`) scrubs sensitive fields before any Sentry capture.
 
 ---
 

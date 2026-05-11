@@ -23,7 +23,7 @@ const SEVERITY = {
   debug: 0
 }
 
-export const coreLogsFileURI = `${Paths.cache.uri}core-logs.txt`
+export const coreLogsFileURI = `${Paths.cache.uri}core.txt`
 export const mainLogsFileURI = `${Paths.cache.uri}main.log`
 
 const MAX_CONSOLE_ENTRY_LENGTH = 12000
