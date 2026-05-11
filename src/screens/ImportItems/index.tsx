@@ -52,6 +52,7 @@ type ImportOption = {
   description: string
   testId: string
   accepts: string[]
+  imgKey: string
   supportLink?: string
 }
 

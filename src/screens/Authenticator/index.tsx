@@ -89,7 +89,14 @@ export const Authenticator = () => {
   const { state } = useSharedFilter() as {
     state: { sort: keyof typeof SORT_BY_TYPE }
   }
-  const sort = useMemo(() => SORT_BY_TYPE[state.sort], [state.sort])
+  const sort = useMemo(
+    () =>
+      SORT_BY_TYPE[state.sort] as {
+        key: string
+        direction: 'asc' | 'desc'
+      },
+    [state.sort]
+  )
 
   const [searchValue, setSearchValue] = useState('')
 
@@ -102,7 +109,7 @@ export const Authenticator = () => {
       },
       sort
     }
-  }) as { data: RecordWithOtp[] | undefined }
+  }) as unknown as { data: RecordWithOtp[] | undefined }
 
   const otpRecords = useMemo(
     () => (records ?? []).filter((r) => r.otpPublic),
