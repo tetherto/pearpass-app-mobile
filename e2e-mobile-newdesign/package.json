@@ -17,6 +17,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "overrides": {
+    "request": {
+      "form-data": ">=2.5.4"
+    }
+  },
   "devDependencies": {
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",

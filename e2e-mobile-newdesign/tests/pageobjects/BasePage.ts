@@ -770,9 +770,9 @@ export default abstract class BasePage {
 
   getCurrentDeviceId = async (): Promise<string> => {
     try {
-      const caps = await browser.getCapabilities();
+      const caps = browser.capabilities as Record<string, unknown>;
       if (caps['appium:udid']) return caps['appium:udid'] as string;
-      if (caps.udid) return caps.udid as string;
+      if (caps['udid']) return caps['udid'] as string;
   
       const deviceInfo = await browser.execute('mobile: getDeviceInfo');
       if (deviceInfo?.udid) return deviceInfo.udid;
