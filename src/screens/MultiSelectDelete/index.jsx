@@ -93,7 +93,11 @@ export const MultiSelectDelete = () => {
               : () => deleteRecords(selectedRecordIds)
           }
         >
-          {isSingleRecord ? t`Delete Item` : t`Delete Items`}
+          {isSingleLoginInOtpContext
+            ? t`Remove`
+            : isSingleRecord
+              ? t`Delete Item`
+              : t`Delete Items`}
         </Button>
       }
     >
@@ -153,9 +157,11 @@ export const MultiSelectDelete = () => {
           onLayout={(e) => setConfirmTextHeight(e.nativeEvent.layout.height)}
         >
           <Text variant="caption" style={styles.confirmText}>
-            {isSingleRecord
-              ? t`Are you sure to delete the selected item?`
-              : t`Are you sure to delete the selected items?`}
+            {isSingleLoginInOtpContext
+              ? t`Are you sure you want to remove the authenticator code from this login record?`
+              : isSingleRecord
+                ? t`Are you sure to delete the selected item?`
+                : t`Are you sure to delete the selected items?`}
           </Text>
         </View>
       </View>
