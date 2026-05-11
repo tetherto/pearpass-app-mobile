@@ -17,7 +17,6 @@ import {
   ImportOutlined,
   SwapVert
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   RECORD_TYPES,
   formatOtpCode,
@@ -36,7 +35,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { isV2 } from 'src/utils/designVersion'
 
-import { getTimerColor } from '../../components/OtpCodeField/utils'
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { TimerCircle } from '../../components/TimerCircle'
 import { SORT_BY_TYPE } from '../../constants/sortOptions'
@@ -185,7 +183,11 @@ export const Authenticator = () => {
             <Text
               style={[
                 styles.groupTimeValue,
-                { color: getTimerColor(expiring) }
+                {
+                  color: expiring
+                    ? theme.colors.colorTextDestructive
+                    : theme.colors.colorPrimary
+                }
               ]}
             >
               {timeRemaining !== null
@@ -235,6 +237,7 @@ export const Authenticator = () => {
           subtitle={getRecordSubtitle(record) || undefined}
           subtitleStyle={styles.itemSubtitle as object}
           onClick={() => handleRecordPress(record)}
+          testID={`authenticator-record-${record.id}`}
           rightElement={
             <View style={styles.recordRightSlot}>
               <UIKitText variant="labelEmphasized" numberOfLines={1}>
@@ -244,6 +247,7 @@ export const Authenticator = () => {
                 onPress={() => code && copyToClipboard(code)}
                 accessibilityLabel={t`Copy code`}
                 hitSlop={8}
+                testID={`authenticator-copy-code-${record.id}`}
               >
                 <ContentCopy
                   width={16}
@@ -298,6 +302,7 @@ export const Authenticator = () => {
                     <SwapVert color={theme.colors.colorTextPrimary} />
                   }
                   aria-label={t`Sort items`}
+                  data-testid="authenticator-sort-button"
                 />
               }
             >
@@ -324,7 +329,7 @@ export const Authenticator = () => {
               color={theme.colors.colorTextSecondary}
               style={styles.textCenter as object}
             >
-              {t`Save your first authenticator code  or import your codes from another authenticator app.`}
+              {t`Save your first authenticator code or import your codes from another authenticator app.`}
             </UIKitText>
           </View>
           <View style={styles.emptyButtonsContainer}>
@@ -337,6 +342,7 @@ export const Authenticator = () => {
                   recordType: RECORD_TYPES.OTP
                 })
               }
+              data-testid="authenticator-add-code-button"
             >
               {t`Add Code`}
             </Button>
@@ -347,6 +353,7 @@ export const Authenticator = () => {
                 <ImportOutlined color={theme.colors.colorTextPrimary} />
               }
               onClick={() => navigation.navigate('ImportItems')}
+              data-testid="authenticator-import-codes-button"
             >
               {t`Import Codes`}
             </Button>
@@ -380,7 +387,12 @@ export const Authenticator = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: theme.colors.colorSurfacePrimary }
+      ]}
+    >
       {headerEl}
       {body}
     </SafeAreaView>
@@ -390,9 +402,8 @@ export const Authenticator = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 8,
-    paddingHorizontal: 16,
-    backgroundColor: colors.grey500.mode1
+    paddingTop: rawTokens.spacing8,
+    paddingHorizontal: rawTokens.spacing16
   },
   screenTitleBar: {
     flexDirection: 'row',
@@ -447,11 +458,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: rawTokens.spacing4
   },
   groupLabelText: {
-    fontSize: 14,
+    fontSize: rawTokens.fontSize14,
     fontWeight: '500'
   },
   groupTimeValue: {
-    fontSize: 14,
+    fontSize: rawTokens.fontSize14,
     fontWeight: '600'
   },
   groupDivider: {
@@ -470,12 +481,10 @@ const styles = StyleSheet.create({
     gap: rawTokens.spacing4
   },
   itemTitle: {
-    fontWeight: '500',
-    lineClamp: 1
-  } as object,
+    fontWeight: '500'
+  },
   itemSubtitle: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineClamp: 1
-  } as object
+    fontSize: rawTokens.fontSize14,
+    fontWeight: '400'
+  }
 })

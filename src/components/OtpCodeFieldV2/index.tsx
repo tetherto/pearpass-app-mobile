@@ -114,6 +114,7 @@ export const OtpCodeFieldV2 = ({
           aria-label={t`Copy code`}
           iconBefore={<ContentCopy color={theme.colors.colorTextPrimary} />}
           onClick={() => code && copyToClipboard(code)}
+          data-testid="otp-code-field-copy-button"
         />
       </View>
 
@@ -149,6 +150,7 @@ export const OtpCodeFieldV2 = ({
           fullWidth
           disabled={isLoading}
           onClick={generateNext}
+          data-testid="otp-code-field-next-code-button"
         >
           {t`Next Code`}
         </Button>

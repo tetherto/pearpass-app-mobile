@@ -181,6 +181,7 @@ export const LoginRecordDetailsForm = ({
                 key={initialRecord.id}
                 recordId={initialRecord.id}
                 otpPublic={initialRecord.otpPublic}
+                isGrouped
               />
             )}
           </MultiSlotInput>
