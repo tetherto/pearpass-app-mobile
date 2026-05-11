@@ -115,7 +115,10 @@ export const Authenticator = () => {
   )
 
   const handleRecordPress = (record: RecordWithOtp) => {
-    navigation.navigate('RecordDetails', { recordId: record.id })
+    navigation.navigate('RecordDetails', {
+      recordId: record.id,
+      recordType: RECORD_TYPES.OTP
+    })
   }
 
   const sections = useMemo<Section[]>(() => {
@@ -148,13 +151,7 @@ export const Authenticator = () => {
     return result
   }, [otpRecords])
 
-  const renderItem = ({
-    item,
-    index
-  }: {
-    item: Section
-    index: number
-  }) => {
+  const renderItem = ({ item, index }: { item: Section; index: number }) => {
     if (item.type === 'totp-header') {
       const firstRecord = item.records[0]
       const timeRemaining = firstRecord?.otpPublic?.timeRemaining ?? null
@@ -190,9 +187,7 @@ export const Authenticator = () => {
                 }
               ]}
             >
-              {timeRemaining !== null
-                ? `${timeRemaining}s`
-                : `${item.period}s`}
+              {timeRemaining !== null ? `${timeRemaining}s` : `${item.period}s`}
             </Text>
           </View>
         </View>
@@ -321,7 +316,9 @@ export const Authenticator = () => {
         >
           <ItemCardIllustration />
           <View style={styles.emptyTitle}>
-            <Title style={styles.textCenter as object}>{t`No codes saved`}</Title>
+            <Title
+              style={styles.textCenter as object}
+            >{t`No codes saved`}</Title>
           </View>
           <View style={styles.emptyDescription}>
             <UIKitText
@@ -376,11 +373,7 @@ export const Authenticator = () => {
 
   if (isV2()) {
     return (
-      <Layout
-        header={headerEl}
-        contentStyle={{ padding: 0 }}
-        isBuiltin={false}
-      >
+      <Layout header={headerEl} contentStyle={{ padding: 0 }} isBuiltin={false}>
         {body}
       </Layout>
     )
