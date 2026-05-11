@@ -26,7 +26,7 @@ function formatContext(context) {
 }
 
 export function captureException(error, context, opts) {
-  if (!opts?.silent && logSinkImpl) {
+  if (!opts?.silent && logSinkImpl && captureExceptionImpl) {
     try {
       const detail =
         error instanceof Error
@@ -41,7 +41,7 @@ export function captureException(error, context, opts) {
 }
 
 export function captureMessage(message, level, opts) {
-  if (!opts?.silent && logSinkImpl) {
+  if (!opts?.silent && logSinkImpl && captureMessageImpl) {
     try {
       logSinkImpl(level || 'error', `[reported] ${String(message)}`)
     } catch {}

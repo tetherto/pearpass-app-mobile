@@ -22,6 +22,7 @@ export async function loadLogConfiguration() {
   const stored = await AsyncStorage.getItem(KEY)
   cached = LOG_LEVELS.includes(stored) ? stored : getDefaultLevel()
   initialized = true
+  for (const fn of listeners) fn(cached)
 }
 
 export function getLogLevelSync() {

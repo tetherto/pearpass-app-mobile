@@ -232,7 +232,7 @@ We welcome contributions. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the dev
 
 ## Logging
 
-Loggin is off by default. When enabled, logs are written to the app's cache directory — `main.log` from the JS host (React Native side) and `core.txt` from the Bare vault worker. The worker's sink redacts known sensitive fields (passwords, keys, tokens, etc.) before writing to `core.txt`. The host logger does not redact, so treat anything passed to `logger.*` on the JS side as on-disk-visible in `main.log`.
+Logging is off by default. When enabled, logs are written to the app's cache directory — `main.log` from the JS host (React Native side) and `core-logs.txt` from the Bare vault worker. The worker's sink redacts known sensitive fields (passwords, keys, tokens, etc.) before writing to `core-logs.txt`. The host logger does not redact, so treat anything passed to `logger.*` on the JS side as on-disk-visible in `main.log`.
 
 Two ways to enable:
 
