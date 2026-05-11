@@ -127,20 +127,18 @@ export const BottomSheetVaultAction = ({
             label: t`Share Personal Vault`,
             icon: <Share color={theme.colors.colorTextPrimary} />,
             onClick: () => closeAndRun(onShare)
-          },
-          {
-            key: 'delete',
-            label: t`Delete Vault`,
-            icon: (
-              <TrashOutlined
-                color={theme.colors.colorSurfaceDestructiveElevated}
-              />
-            ),
-            variant: 'destructive',
-            onClick: () => closeAndRun(onDelete)
           }
         ]
-      : [])
+      : []),
+    {
+      key: 'delete',
+      label: t`Delete Vault`,
+      icon: (
+        <TrashOutlined color={theme.colors.colorSurfaceDestructiveElevated} />
+      ),
+      variant: 'destructive',
+      onClick: () => closeAndRun(onDelete)
+    }
   ]
 
   return (

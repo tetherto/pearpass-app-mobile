@@ -14,8 +14,17 @@ import {
   ToggleSwitch,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { useUserData, useVault, useVaults } from '@tetherto/pearpass-lib-vault'
-import { StyleSheet, View } from 'react-native'
+import {
+  useCreateVault,
+  useUserData,
+  useVault,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
+import {
+  clearBuffer,
+  stringToBuffer
+} from '@tetherto/pearpass-lib-vault/src/utils/buffer'
+import { Platform, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
@@ -39,9 +48,10 @@ export const DeleteVaultModalContentV2 = ({
   const { t } = useLingui()
   const { theme } = useTheme()
 
-  const { data: vaultData, deleteVaultLocal } = useVault()
+  const { data: vaultData, deleteVaultLocal, addDevice } = useVault()
   const { data: allVaults } = useVaults()
   const { logIn } = useUserData()
+  const { createVault } = useCreateVault()
   const { switchVault } = useVaultSwitch()
 
   const devices = vaultData?.devices
@@ -76,14 +86,17 @@ export const DeleteVaultModalContentV2 = ({
     }
 
     setSubmitError(null)
+    const passwordBuffer = stringToBuffer(formValues.masterPassword)
     setIsLoading(true)
 
     try {
       try {
-        await logIn({ password: formValues.masterPassword })
+        await logIn({ password: passwordBuffer })
       } catch {
         setSubmitError(t`Invalid master password`)
         return
+      } finally {
+        clearBuffer(passwordBuffer)
       }
 
       // TODO: broadcast deleteVault action to other devices when toggle is on.
@@ -102,13 +115,32 @@ export const DeleteVaultModalContentV2 = ({
 
       closeModal()
       Toast.show({
-        ...TOAST_CONFIG,
-        text1: t`"${vaultName}" was deleted from this device`
+        type: 'baseToast',
+        text1: t`"${vaultName}" was deleted from this device`,
+        position: 'bottom',
+        bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
       })
 
       const nextVault = (allVaults ?? []).find((v) => v.id !== vaultId)
       if (nextVault) {
         await switchVault(nextVault)
+      } else {
+        try {
+          await createVault({ name: t`Personal` })
+          await addDevice(Platform.OS + ' ' + Platform.Version)
+          Toast.show({
+            type: 'baseToast',
+            text1: t`A new "Personal" vault was created`,
+            position: 'bottom',
+            bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+          })
+        } catch (error) {
+          logger.error(
+            'DeleteVaultModalContentV2',
+            'failed to create fallback Personal vault:',
+            error
+          )
+        }
       }
     } finally {
       setIsLoading(false)
