@@ -53,6 +53,8 @@ export const MultiSelectDelete = () => {
     delete data.otpInput
     delete data.otp
     const updatedRecord = { ...record }
+    // otpPublic is computed at read time and never stored, but explicitly removing it
+    // prevents any accidental write-through if the vault layer changes its whitelist.
     delete updatedRecord.otpPublic
     try {
       await updateRecords([{ ...updatedRecord, data }])
