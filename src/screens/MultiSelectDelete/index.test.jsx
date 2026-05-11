@@ -195,4 +195,29 @@ describe('MultiSelectDelete — strip OTP path', () => {
 
     expect(mockUpdateRecords).not.toHaveBeenCalled()
   })
+
+  describe('isSingleLoginInOtpContext copy', () => {
+    it('shows OTP-specific header, button label, and caption when isSingleLoginInOtpContext', () => {
+      const { getByText } = render(<MultiSelectDelete />)
+
+      expect(getByText('Remove Authenticator Code')).toBeTruthy()
+      expect(getByText('Remove')).toBeTruthy()
+      expect(
+        getByText(
+          'Are you sure you want to remove the authenticator code from this login record?'
+        )
+      ).toBeTruthy()
+    })
+
+    it('shows delete copy when isOtpContext is false', () => {
+      Object.assign(mockParams, { isOtpContext: false })
+
+      const { getByText } = render(<MultiSelectDelete />)
+
+      expect(getByText('Delete Item')).toBeTruthy()
+      expect(
+        getByText('Are you sure to delete the selected item?')
+      ).toBeTruthy()
+    })
+  })
 })
