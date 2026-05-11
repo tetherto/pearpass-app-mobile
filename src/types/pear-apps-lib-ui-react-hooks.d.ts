@@ -20,7 +20,7 @@ declare module '@tetherto/pear-apps-lib-ui-react-hooks' {
 
   interface UseFormParams<TValues extends Record<string, any>> {
     initialValues?: TValues
-    validate?: (values: TValues) => Record<string, unknown> | null
+    validate?: (values: TValues) => string | Record<string, unknown> | null
   }
 
   interface UseFormResult<TValues extends Record<string, any>> {
@@ -39,7 +39,7 @@ declare module '@tetherto/pear-apps-lib-ui-react-hooks' {
 
   export function useForm(params: {
     initialValues?: Record<string, any>
-    validate?: (values: Record<string, any>) => Record<string, unknown>
+    validate?: (values: Record<string, any>) => string | Record<string, unknown> | null
   }): UseFormResult<Record<string, any>>
 
   export function useForm<TValues extends Record<string, any>>(

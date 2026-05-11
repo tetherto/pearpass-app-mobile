@@ -24,7 +24,11 @@ export const ImportPreviewStep = ({ error }: ImportPreviewStepProps) => {
     }
   })
 
-  const recordList = Array.isArray(records) ? records : []
+  const recordList = (Array.isArray(records) ? records : []) as Array<{
+    id: string
+    type: string
+    data?: { title?: string; username?: string; websites?: string[] }
+  }>
 
   return (
     <View style={styles.content}>
