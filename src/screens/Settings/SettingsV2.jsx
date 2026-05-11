@@ -25,7 +25,8 @@ import {
   Translate,
   KeyboardArrowRightFilled,
   InfoOutlined,
-  KeyboardArrowBottom
+  KeyboardArrowBottom,
+  TerminalTone
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 
@@ -127,7 +128,7 @@ export const SettingsV2 = () => {
             key: 'diagnostics',
             label: t`Diagnostics`,
             screen: 'Diagnostics',
-            icon: BugReportFilled
+            icon: TerminalTone
           },
           {
             key: 'app-version',
