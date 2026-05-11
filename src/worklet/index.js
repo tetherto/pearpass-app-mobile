@@ -1,6 +1,5 @@
 /* global __DEV__ */
 import { PearpassVaultClient } from '@tetherto/pearpass-lib-vault-core'
-import Constants from 'expo-constants'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
@@ -93,7 +92,7 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
       const corePath = coreLogsFileURI.replace(/^file:\/\//, '')
       const sentryDsn =
         isNightly() && !__DEV__
-          ? (Constants.expoConfig?.extra?.sentryDsn ?? null)
+          ? (process.env.EXPO_PUBLIC_SENTRY_DSN ?? null)
           : null
 
       // null logFile closes vault-core's file sink; string opens/swaps it.

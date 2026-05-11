@@ -251,6 +251,7 @@ Verifying:
 
 - The gate is `isNightly()` from `src/constants/distribution.js`. Returns `false` unless the distribution channel is `nightly`.
 - The Expo config plugin for Sentry is only loaded when `PEARPASS_DISTRIBUTION=nightly` at build time. See `app.config.ts`.
+- The DSN comes from `EXPO_PUBLIC_SENTRY_DSN` (inlined into the bundle at build time). If unset, `initSentry()` returns early and no events are sent — even on a nightly build.
 - The Bare-side Sentry SDK (`sentry-bare`) is an optional peer dependency of `pearpass-lib-vault-core` — public builds don't install it.
 
 What's collected on nightly: uncaught exceptions, unhandled promise rejections, error stack traces, OS/device context. **No vault contents, no passwords, no user-identifiable data** — the redaction layer (`pearpass-lib-vault-core/src/worklet/utils/redact.js`) scrubs sensitive fields before any Sentry capture.

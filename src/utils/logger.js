@@ -3,6 +3,11 @@ import { File, Paths } from 'expo-file-system/next'
 import * as Sharing from 'expo-sharing'
 import JSZip from 'jszip'
 
+import {
+  captureException,
+  captureMessage,
+  registerLogSink
+} from './errorReporter'
 import { getLogLevelSync } from './logConfigurationStorage.js'
 
 // Higher number = more severe. We write when the writer's severity is >=
@@ -101,6 +106,11 @@ export const createFileLogger = (fileUri) => {
 
 const writeMainLog = createFileLogger(mainLogsFileURI)
 
+// Let errorReporter mirror captureException/captureMessage payloads to
+// main.log. Done here (not at the top of the file) so writeMainLog exists
+// by the time the sink fires.
+registerLogSink((level, message) => writeMainLog(level, message))
+
 const safeFileSize = (fileUri) => {
   try {
     const file = new File(fileUri)
@@ -193,6 +203,13 @@ export class Logger {
       console.error(...args)
     }
     writeMainLog('error', ...args)
+    const errArg = args.find((a) => a instanceof Error)
+    if (errArg) {
+      const rest = args.filter((a) => a !== errArg)
+      captureException(errArg, rest.length ? { args: rest } : undefined)
+    } else if (args.length) {
+      captureMessage(args.map(String).join(' '), 'error', { silent: true })
+    }
   }
 }
 export const logger = new Logger()
