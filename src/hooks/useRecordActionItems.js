@@ -39,7 +39,8 @@ export const useRecordActionItems = ({
   excludeTypes = [],
   recordType,
   record,
-  onDelete
+  onDelete,
+  isOtpContext: isOtpContextProp = false
 } = {}) => {
   const { t } = useLingui()
   const navigation = useNavigation()
@@ -65,13 +66,18 @@ export const useRecordActionItems = ({
   })
   const { setState } = useSharedFilter()
 
+  const isOtpContext = isOtpContextProp || recordType === RECORD_TYPES.OTP
+  const isAuthenticatorLoginRecord =
+    isOtpContext && record?.type === RECORD_TYPES.LOGIN
+
   const handleDelete = useCallback(() => {
     if (isV2()) {
       collapse?.()
       navigation.navigate('MultiSelectDelete', {
         selectedRecordIds: [record?.id],
         selectedRecordObjects: [record],
-        onComplete: onDelete
+        onComplete: onDelete,
+        isOtpContext: isAuthenticatorLoginRecord
       })
     } else {
       v1Collapse?.()
@@ -88,6 +94,8 @@ export const useRecordActionItems = ({
     }
   }, [
     record,
+    recordType,
+    isOtpContextProp,
     onDelete,
     collapse,
     v1Collapse,
@@ -105,11 +113,11 @@ export const useRecordActionItems = ({
   const handleEdit = useCallback(() => {
     navigation.navigate('CreateRecord', {
       record: record,
-      recordType: record.type,
+      recordType: isAuthenticatorLoginRecord ? RECORD_TYPES.OTP : record.type,
       selectedFolder: record.folder
     })
     collapse?.()
-  }, [record, navigation, collapse])
+  }, [record, recordType, isOtpContextProp, navigation, collapse])
 
   const handleFolderMoveSelect = useCallback(
     async (folder) => {
