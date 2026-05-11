@@ -1,0 +1,39 @@
+node_modules/
+
+# Local app files
+apps/**/*.apk
+apps/**/*.ipa
+
+# Logs
+logs/
+*.log
+
+# Screenshots
+screenshots/
+error-shots/
+
+# Allure results
+allure-results/
+allure-report/
+
+# CTRF / wdio JSON reports (generated under ctrl/)
+ctrl/
+ctrf/
+
+# Qase runtime results (written by tests/helpers/qase-sync.ts)
+.qase-results.json
+
+# Environment files
+.env
+*.env.local
+*.env.qa
+
+# TypeScript build caches
+*.tsbuildinfo
+
+# MacOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

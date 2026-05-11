@@ -1,0 +1,18 @@
+diff --git a/node_modules/@wdio/appium-service/build/index.js b/node_modules/@wdio/appium-service/build/index.js
+index 6b1aa1d..0ed4430 100644
+--- a/node_modules/@wdio/appium-service/build/index.js
++++ b/node_modules/@wdio/appium-service/build/index.js
+@@ -189,7 +189,12 @@ var AppiumLauncher = class _AppiumLauncher {
+   }
+   _startAppium(command, args, timeout = APPIUM_START_TIMEOUT) {
+     log.info(`Will spawn Appium process: ${command} ${args.join(" ")}`);
+-    const appiumProcess = spawn(command, args, { stdio: ["ignore", "pipe", "pipe"] });
++    const appiumEnv = { ...process.env };
++    delete appiumEnv.NODE_OPTIONS;
++    const appiumProcess = spawn(command, args, {
++      stdio: ["ignore", "pipe", "pipe"],
++      env: appiumEnv
++    });
+     let errorCaptured = false;
+     let timeoutId;
+     let error;
