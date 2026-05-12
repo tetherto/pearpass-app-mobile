@@ -190,9 +190,9 @@ Each test file requires an `appId` block and a `---` separator before the comman
 appId: com.pears.pass
 ---
 - launchApp
-- assertVisible: 'Master password'
+- assertVisible: "Master password"
 - tapOn:
-    text: 'Master password'
+    text: "Master password"
 ```
 
 For more information, see the [Maestro documentation](https://maestro.mobile.dev/).
@@ -227,6 +227,31 @@ For more information, see the [Maestro documentation](https://maestro.mobile.dev
 ## Contributing
 
 We welcome contributions. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the development workflow and coding conventions.
+
+---
+
+## Logging
+
+Logging is off by default. When enabled, logs are written to the app's cache directory — `main.log` from the JS host (React Native side) and `core-logs.txt` from the Bare vault worker. The worker's sink redacts known sensitive fields (passwords, keys, tokens, etc.) before writing to `core-logs.txt`. The host logger does not redact, so treat anything passed to `logger.*` on the JS side as on-disk-visible in `main.log`.
+
+Two ways to enable:
+
+- **In-app toggle** (Settings → Diagnostics → **Enable logs**). Persists across launches. Toggling off stops writes but keeps existing log files; toggling back on resumes appending to the same files, so a session can span multiple toggles.
+- **Nightly builds** (`PearPass-nightly`): logging defaults to `debug` on first launch so testers don't have to opt in. The toggle still works to disable it.
+
+Logs can be shared via Diagnostics screen **Share logs** action that zips both files plus a small metadata file (app version, distribution channel).
+
+---
+
+## Error reporting
+
+**PearPass mobile is open source. Public releases and self-built versions never send any data anywhere. Sentry is only enabled on our nightly distribution channel for catching crashes during pre-release testing.**
+
+Verifying:
+
+- The gate is `isNightly()` from `src/constants/distribution.js`. Returns `false` unless the distribution channel is `nightly`.
+- The Expo config plugin for Sentry is only loaded when `PEARPASS_DISTRIBUTION=nightly` at build time. `app.config.ts`. `app.json` has no Sentry plugin entry, so standard / F-Droid builds never include it.
+- The Bare-side Sentry SDK (`sentry-bare`) is an optional peer dependency of `pearpass-lib-vault-core` — public builds don't install it.
 
 ---
 
