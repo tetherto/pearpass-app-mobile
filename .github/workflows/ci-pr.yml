@@ -1,0 +1,46 @@
+name: PR CI
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    outputs:
+      allowed: ${{ steps.auth.outputs.allowed }}
+
+    steps:
+      - name: Checkout workflow code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Authorize PR execution
+        id: auth
+        uses: ./.github/actions/authorize-pr
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Summarize skipped run
+        if: steps.auth.outputs.allowed != 'true'
+        run: |
+          echo "PR CI is limited to members, collaborators, or external PRs labeled 'verify' (re-review required after each push)." >> "$GITHUB_STEP_SUMMARY"
+
+  ci:
+    needs: authorize
+    if: needs.authorize.outputs.allowed == 'true'
+    uses: ./.github/workflows/ci-reusable.yml
+    with:
+      checkout_ref: ${{ github.event.pull_request.head.sha }}
+      checkout_repository: ${{ github.event.pull_request.head.repo.full_name }}
