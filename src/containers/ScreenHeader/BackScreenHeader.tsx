@@ -6,13 +6,20 @@ import { ArrowBackOutined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { ScreenHeader } from './index'
 
 type BackScreenHeaderProps = {
-  title: string
+  title?: string
   onBack: () => void
+  centerSlot?: ReactNode
   rightActions?: ReactNode
   style?: StyleProp<ViewStyle>
 }
 
-export const BackScreenHeader = ({ title, onBack, rightActions, style }: BackScreenHeaderProps) => {
+export const BackScreenHeader = ({
+  title,
+  onBack,
+  centerSlot,
+  rightActions,
+  style
+}: BackScreenHeaderProps) => {
   const { theme } = useTheme()
 
   return (
@@ -33,9 +40,11 @@ export const BackScreenHeader = ({ title, onBack, rightActions, style }: BackScr
         />
       }
       centerSlot={
-        <Text variant="bodyEmphasized">
-          {title}
-        </Text>
+        centerSlot || (
+          <Text variant="bodyEmphasized">
+            {title}
+          </Text>
+        )
       }
       rightActions={rightActions}
     />

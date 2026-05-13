@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Button.PearPass.V2" parent="Widget.AppCompat.Button">
+        <item name="android:fontFamily">@font/pp_v2_inter</item>
+        <item name="android:textSize">@dimen/pp_v2_font_s14</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">@dimen/pp_v2_spacing_s12</item>
+        <item name="android:paddingEnd">@dimen/pp_v2_spacing_s12</item>
+        <item name="android:paddingTop">@dimen/pp_v2_spacing_s12</item>
+        <item name="android:paddingBottom">@dimen/pp_v2_spacing_s12</item>
+        <item name="android:drawablePadding">@dimen/pp_v2_spacing_s4</item>
+        <item name="android:maxWidth">350dp</item>
+    </style>
+
+    <style name="Button.PearPass.V2.Primary" parent="Button.PearPass.V2">
+        <item name="android:background">@drawable/pp_v2_btn_primary</item>
+        <item name="android:textColor">@color/pp_v2_on_primary</item>
+    </style>
+
+    <style name="Button.PearPass.V2.Secondary" parent="Button.PearPass.V2">
+        <item name="android:background">@drawable/pp_v2_btn_secondary</item>
+        <item name="android:textColor">@color/pp_v2_text_primary</item>
+    </style>
+
+    <style name="Button.PearPass.V2.Tertiary" parent="Button.PearPass.V2">
+        <item name="android:background">@drawable/pp_v2_btn_tertiary</item>
+        <item name="android:textColor">@color/pp_v2_primary</item>
+    </style>
+
+    <style name="Button.PearPass.V2.Destructive" parent="Button.PearPass.V2">
+        <item name="android:background">@drawable/pp_v2_btn_destructive</item>
+        <item name="android:textColor">@color/pp_v2_text_primary</item>
+    </style>
+</resources>

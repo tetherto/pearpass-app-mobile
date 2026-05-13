@@ -5,12 +5,12 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 
-import { InputPasswordPearPass } from '../../../libComponents'
-import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
 import { InputLabel, InputWrapper } from './styles'
 import { VAULT_ACTION } from '../../../constants/vaultActions'
 import { useModal } from '../../../context/ModalContext'
+import { InputPasswordPearPass } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
+import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
 
 export const ModifyVaultModalContent = ({
   vaultId,

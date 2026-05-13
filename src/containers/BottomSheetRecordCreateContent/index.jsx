@@ -1,5 +1,6 @@
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet'
 import { useNavigation } from '@react-navigation/native'
+import { isV2 } from 'src/utils/designVersion'
 
 import { ListItemRecordCategory } from '../../components/ListItemRecordCategory'
 import { BottomSheetPassGeneratorContent } from '../../containers/BottomSheetPassGeneratorContent'
@@ -17,6 +18,12 @@ export const BottomSheetRecordCreateContent = () => {
 
   const handleRecordPress = (item) => {
     if (item.type === 'password') {
+      if (isV2()) {
+        collapse()
+        navigation.navigate('CreatePasswordItem')
+        return
+      }
+
       collapse()
 
       expand({

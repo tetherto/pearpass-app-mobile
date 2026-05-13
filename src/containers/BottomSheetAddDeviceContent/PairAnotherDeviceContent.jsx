@@ -43,6 +43,7 @@ export const PairAnotherDeviceContent = ({
 
   const {
     hasPermission,
+    codeScanner,
     device,
     frameProcessor,
     pauseScanning,
@@ -107,6 +108,7 @@ export const PairAnotherDeviceContent = ({
                 device={device}
                 isActive={!isLoading}
                 style={styles.camera}
+                codeScanner={codeScanner}
                 frameProcessor={frameProcessor}
               >
                 <View style={styles.cameraSpot} />

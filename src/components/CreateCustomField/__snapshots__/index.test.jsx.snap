@@ -22,6 +22,7 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
   }
 >
   <View
+    accessibilityLabel="Expand create custom field button"
     accessibilityState={
       {
         "busy": undefined,
@@ -62,61 +63,68 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
         "width": "100%",
       }
     }
+    testID="expand-create-custom-field-button"
   >
-    <RNSVGSvgView
-      align="xMidYMid"
-      bbHeight="21"
-      bbWidth="21"
-      fill="none"
-      focusable={false}
-      height="21"
-      meetOrSlice={0}
-      minX={0}
-      minY={0}
-      size="21"
-      style={
-        [
-          {
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-          },
-          {
-            "flex": 0,
-            "height": 21,
-            "width": 21,
-          },
-        ]
-      }
-      vbHeight={25}
-      vbWidth={25}
-      width="21"
-      xmlns="http://www.w3.org/2000/svg"
+    <View
+      accessibilityLabel="Create custom field plus icon"
+      testID="create-custom-field-plus-icon"
     >
-      <RNSVGGroup
-        fill={null}
-        propList={
+      <RNSVGSvgView
+        align="xMidYMid"
+        bbHeight="21"
+        bbWidth="21"
+        fill="none"
+        focusable={false}
+        height="21"
+        meetOrSlice={0}
+        minX={0}
+        minY={0}
+        size="21"
+        style={
           [
-            "fill",
+            {
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+            },
+            {
+              "flex": 0,
+              "height": 21,
+              "width": 21,
+            },
           ]
         }
+        vbHeight={25}
+        vbWidth={25}
+        width="21"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <RNSVGPath
-          d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
-          fill={
-            {
-              "payload": 4294375158,
-              "type": 0,
-            }
-          }
+        <RNSVGGroup
+          fill={null}
           propList={
             [
               "fill",
             ]
           }
-        />
-      </RNSVGGroup>
-    </RNSVGSvgView>
+        >
+          <RNSVGPath
+            d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
+            fill={
+              {
+                "payload": 4294375158,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+        </RNSVGGroup>
+      </RNSVGSvgView>
+    </View>
     <Text
+      accessibilityLabel="Create custom field text"
       style={
         {
           "color": "#BABABA",
@@ -125,6 +133,7 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
           "fontWeight": "700",
         }
       }
+      testID="create-custom-field-text"
     >
       Create Custom
     </Text>
@@ -215,6 +224,7 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
   }
 >
   <View
+    accessibilityLabel="Сollapse create custom field button"
     accessibilityState={
       {
         "busy": undefined,
@@ -255,61 +265,68 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
         "width": "100%",
       }
     }
+    testID="сollapse-create-custom-field-button"
   >
-    <RNSVGSvgView
-      align="xMidYMid"
-      bbHeight="21"
-      bbWidth="21"
-      fill="none"
-      focusable={false}
-      height="21"
-      meetOrSlice={0}
-      minX={0}
-      minY={0}
-      size="21"
-      style={
-        [
-          {
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-          },
-          {
-            "flex": 0,
-            "height": 21,
-            "width": 21,
-          },
-        ]
-      }
-      vbHeight={25}
-      vbWidth={25}
-      width="21"
-      xmlns="http://www.w3.org/2000/svg"
+    <View
+      accessibilityLabel="Create custom field plus icon"
+      testID="create-custom-field-plus-icon"
     >
-      <RNSVGGroup
-        fill={null}
-        propList={
+      <RNSVGSvgView
+        align="xMidYMid"
+        bbHeight="21"
+        bbWidth="21"
+        fill="none"
+        focusable={false}
+        height="21"
+        meetOrSlice={0}
+        minX={0}
+        minY={0}
+        size="21"
+        style={
           [
-            "fill",
+            {
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+            },
+            {
+              "flex": 0,
+              "height": 21,
+              "width": 21,
+            },
           ]
         }
+        vbHeight={25}
+        vbWidth={25}
+        width="21"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <RNSVGPath
-          d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
-          fill={
-            {
-              "payload": 4294375158,
-              "type": 0,
-            }
-          }
+        <RNSVGGroup
+          fill={null}
           propList={
             [
               "fill",
             ]
           }
-        />
-      </RNSVGGroup>
-    </RNSVGSvgView>
+        >
+          <RNSVGPath
+            d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
+            fill={
+              {
+                "payload": 4294375158,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+        </RNSVGGroup>
+      </RNSVGSvgView>
+    </View>
     <Text
+      accessibilityLabel="Create custom field text"
       style={
         {
           "color": "#BABABA",
@@ -318,6 +335,7 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
           "fontWeight": "700",
         }
       }
+      testID="create-custom-field-text"
     >
       Create Custom
     </Text>
@@ -399,121 +417,127 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
     }
   >
     <View
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        {
-          "alignItems": "center",
-          "backgroundColor": "#232323",
-          "borderBottomLeftRadius": 10,
-          "borderBottomRightRadius": 10,
-          "borderTopLeftRadius": 10,
-          "borderTopRightRadius": 10,
-          "flexDirection": "row",
-          "fontFamily": "Inter",
-          "fontSize": 12,
-          "fontWeight": "400",
-          "gap": 7,
-          "opacity": 1,
-          "paddingBottom": 10,
-          "paddingLeft": 10,
-          "paddingRight": 10,
-          "paddingTop": 10,
-        }
-      }
+      accessibilityLabel="Add new comment field"
+      testID="add-new-comment-field"
     >
-      <RNSVGSvgView
-        align="xMidYMid"
-        bbHeight="21"
-        bbWidth="21"
-        color="#F6F6F6"
-        fill="none"
-        focusable={false}
-        height="21"
-        meetOrSlice={0}
-        minX={0}
-        minY={0}
-        size="21"
-        style={
-          [
-            {
-              "backgroundColor": "transparent",
-              "borderWidth": 0,
-            },
-            {
-              "flex": 0,
-              "height": 21,
-              "width": 21,
-            },
-          ]
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
         }
-        vbHeight={25}
-        vbWidth={24}
-        width="21"
-        xmlns="http://www.w3.org/2000/svg"
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#232323",
+            "borderBottomLeftRadius": 10,
+            "borderBottomRightRadius": 10,
+            "borderTopLeftRadius": 10,
+            "borderTopRightRadius": 10,
+            "flexDirection": "row",
+            "fontFamily": "Inter",
+            "fontSize": 12,
+            "fontWeight": "400",
+            "gap": 7,
+            "opacity": 1,
+            "paddingBottom": 10,
+            "paddingLeft": 10,
+            "paddingRight": 10,
+            "paddingTop": 10,
+          }
+        }
+        testID="add-new-comment-button"
       >
-        <RNSVGGroup
-          fill={null}
-          propList={
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight="21"
+          bbWidth="21"
+          color="#F6F6F6"
+          fill="none"
+          focusable={false}
+          height="21"
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          size="21"
+          style={
             [
-              "fill",
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 21,
+                "width": 21,
+              },
             ]
           }
+          vbHeight={25}
+          vbWidth={24}
+          width="21"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <RNSVGPath
-            d="M8.3845 12.8077H15.6155V11.8077H8.3845V12.8077ZM8.3845 15.577H15.6155V14.577H8.3845V15.577ZM8.3845 18.3462H12.6155V17.3462H8.3845V18.3462ZM5 21.5V3.5H14.5L19 8V21.5H5ZM14 8.5V4.5H6V20.5H18V8.5H14Z"
-            fill={
-              {
-                "payload": 4294375158,
-                "type": 0,
-              }
-            }
+          <RNSVGGroup
+            fill={null}
             propList={
               [
                 "fill",
               ]
             }
-          />
-        </RNSVGGroup>
-      </RNSVGSvgView>
-      <Text
-        style={
-          {
-            "color": "#F6F6F6",
-            "fontFamily": "Inter",
-            "fontSize": 16,
-            "fontWeight": "400",
+          >
+            <RNSVGPath
+              d="M8.3845 12.8077H15.6155V11.8077H8.3845V12.8077ZM8.3845 15.577H15.6155V14.577H8.3845V15.577ZM8.3845 18.3462H12.6155V17.3462H8.3845V18.3462ZM5 21.5V3.5H14.5L19 8V21.5H5ZM14 8.5V4.5H6V20.5H18V8.5H14Z"
+              fill={
+                {
+                  "payload": 4294375158,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "fill",
+                ]
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+        <Text
+          style={
+            {
+              "color": "#F6F6F6",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "400",
+            }
           }
-        }
-        variant="secondary"
-      >
-        Comment
-      </Text>
+          variant="secondary"
+        >
+          Comment
+        </Text>
+      </View>
     </View>
   </View>
 </View>
@@ -541,6 +565,7 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
   }
 >
   <View
+    accessibilityLabel="Expand create custom field button"
     accessibilityState={
       {
         "busy": undefined,
@@ -581,61 +606,68 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
         "width": "100%",
       }
     }
+    testID="expand-create-custom-field-button"
   >
-    <RNSVGSvgView
-      align="xMidYMid"
-      bbHeight="21"
-      bbWidth="21"
-      fill="none"
-      focusable={false}
-      height="21"
-      meetOrSlice={0}
-      minX={0}
-      minY={0}
-      size="21"
-      style={
-        [
-          {
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-          },
-          {
-            "flex": 0,
-            "height": 21,
-            "width": 21,
-          },
-        ]
-      }
-      vbHeight={25}
-      vbWidth={25}
-      width="21"
-      xmlns="http://www.w3.org/2000/svg"
+    <View
+      accessibilityLabel="Create custom field plus icon"
+      testID="create-custom-field-plus-icon"
     >
-      <RNSVGGroup
-        fill={null}
-        propList={
+      <RNSVGSvgView
+        align="xMidYMid"
+        bbHeight="21"
+        bbWidth="21"
+        fill="none"
+        focusable={false}
+        height="21"
+        meetOrSlice={0}
+        minX={0}
+        minY={0}
+        size="21"
+        style={
           [
-            "fill",
+            {
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+            },
+            {
+              "flex": 0,
+              "height": 21,
+              "width": 21,
+            },
           ]
         }
+        vbHeight={25}
+        vbWidth={25}
+        width="21"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <RNSVGPath
-          d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
-          fill={
-            {
-              "payload": 4294375158,
-              "type": 0,
-            }
-          }
+        <RNSVGGroup
+          fill={null}
           propList={
             [
               "fill",
             ]
           }
-        />
-      </RNSVGGroup>
-    </RNSVGSvgView>
+        >
+          <RNSVGPath
+            d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
+            fill={
+              {
+                "payload": 4294375158,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+        </RNSVGGroup>
+      </RNSVGSvgView>
+    </View>
     <Text
+      accessibilityLabel="Create custom field text"
       style={
         {
           "color": "#BABABA",
@@ -644,6 +676,7 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
           "fontWeight": "700",
         }
       }
+      testID="create-custom-field-text"
     >
       Create Custom
     </Text>

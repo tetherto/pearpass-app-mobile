@@ -17,7 +17,9 @@ import {
   getLastActivityAt,
   setLastActivityAt
 } from '../../../utils/autoLockStorage'
+import { isV2 } from '../../../utils/designVersion'
 import { clearAllFileCache } from '../../../utils/filesCache'
+import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 
 /**
  * Hook responsible for monitoring user inactivity and handling auto-lock logic.
@@ -81,17 +83,29 @@ export const useAutoLockWatcher = () => {
     closeAllInstances()
     clearAllFileCache()
 
-    navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'Welcome',
-          params: { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD }
-        }
-      ]
-    })
+    if (isV2()) {
+      const routeName = unsupportedFeaturesEnabled()
+        ? 'AuthV2Pin'
+        : 'AuthV2MasterPassword'
+      navigation.reset({
+        index: 0,
+        routes: [{ name: routeName }]
+      })
+    } else {
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Welcome',
+            params: { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD }
+          }
+        ]
+      })
+    }
 
     resetState()
+    await refetchUser()
+    lockInProgressRef.current = false
   }, [
     collapse,
     closeModal,
@@ -254,13 +268,19 @@ export const useAutoLockWatcher = () => {
   useEffect(() => {
     if (!isAutoLockActive) return
 
-    const route = getCurrentRoute()
-
-    if (!isMasterPasswordScreen(route)) {
-      lockInProgressRef.current = false
-      resetAutoLockTimer(Date.now())
+    const handleRouteChange = () => {
+      const route = getCurrentRoute()
+      if (route && !isMasterPasswordScreen(route)) {
+        lockInProgressRef.current = false
+        resetAutoLockTimer(Date.now())
+      }
     }
+
+    handleRouteChange()
+    const unsubscribe = navigation.addListener('state', handleRouteChange)
+    return unsubscribe
   }, [
+    navigation,
     getCurrentRoute,
     isMasterPasswordScreen,
     resetAutoLockTimer,

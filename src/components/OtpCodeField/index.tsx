@@ -36,11 +36,12 @@ export const OtpCodeField = ({
   isLast
 }: OtpCodeFieldProps) => {
   const { t } = useLingui()
-  const { code, timeRemaining, type, period, generateNext, isLoading } =
-    useOtp({
+  const { code, timeRemaining, type, period, generateNext, isLoading } = useOtp(
+    {
       recordId,
       otpPublic
-    })
+    }
+  )
 
   const formattedCode = formatOtpCode(code)
   const isTOTP = type === OTP_TYPE.TOTP
@@ -86,6 +87,7 @@ export const OtpCodeField = ({
     </View>
   ) : null
 
+  // @ts-ignore - InputField is a JS component with partial JSDoc types
   return (
     <InputField
       icon={LockIcon}

@@ -14,7 +14,7 @@ import { logger } from '../utils/logger'
  * @param {string[]} param0.fieldNames
  * @param {Function} param0.updateValues
  * @param {Object} param0.initialRecord
- * @param {Object} param0.currentValues - Optional: current form values to merge with loaded files
+ * @param {Object} [param0.currentValues] - Optional: current form values to merge with loaded files
  * @returns {{ refetch: () => Promise<void> }} Object with refetch function
  */
 export const useGetMultipleFiles = ({
@@ -165,6 +165,7 @@ export const useGetMultipleFiles = ({
   }, [
     initialRecord?.id,
     initialRecord?.isFavorite,
+    initialRecord?.updatedAt,
     ...fieldNames.map((fieldName) =>
       JSON.stringify(initialRecord?.data?.[fieldName] || [])
     )

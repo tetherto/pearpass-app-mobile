@@ -49,6 +49,10 @@ export const PassPhraseSettings = ({
           value={withRandomWord}
           onChange={(value) => setWithRandomWord(value)}
           disabled={isDisabled}
+          testIDOn="add-one-random-word-toggle-on"
+          testIDOff="add-one-random-word-toggle-off"
+          accessibilityLabelOn="Add one random word toggle on"
+          accessibilityLabelOff="Add one random word toggle off"
         />
       </View>
     </View>

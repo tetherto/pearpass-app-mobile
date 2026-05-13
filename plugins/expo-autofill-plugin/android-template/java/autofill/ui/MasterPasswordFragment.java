@@ -33,6 +33,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     private ImageView togglePasswordVisibility;
     private boolean isAuthenticatingBiometric = false;
     private boolean isPasswordVisible = false;
+    // V2 spinner overlay shown over Continue while auth is in flight.
+    private android.widget.ProgressBar continueProgress;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -63,6 +65,11 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // v2 uses the new sheet layout + inter font
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            return onCreateViewV2(inflater, container);
+        }
+
         View view = inflater.inflate(R.layout.fragment_master_password, container, false);
 
         passwordInput = view.findViewById(R.id.passwordInput);
@@ -93,6 +100,51 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     }
 
     /**
+     * v2 sheet layout: header close button replaces the cancel row, no biometric button
+     */
+    private View onCreateViewV2(LayoutInflater inflater, ViewGroup container) {
+        View view = inflater.inflate(R.layout.fragment_master_password_v2, container, false);
+
+        passwordInput = view.findViewById(R.id.ppPasswordEdit);
+        unlockButton = view.findViewById(R.id.masterPwdContinue);
+        togglePasswordVisibility = view.findViewById(R.id.ppPasswordToggle);
+        biometricButton = view.findViewById(R.id.masterPwdBiometricButton);
+        continueProgress = view.findViewById(R.id.masterPwdContinueProgress);
+
+        TextView passwordLabel = view.findViewById(R.id.ppPasswordLabel);
+        if (passwordLabel != null) passwordLabel.setText("Password");
+        if (passwordInput != null) passwordInput.setHint("Enter Master Password");
+
+        View cancelView = view.findViewById(R.id.ppHeaderClose);
+        if (cancelView != null) {
+            cancelView.setOnClickListener(v -> {
+                if (navigationListener != null) navigationListener.onCancel();
+            });
+        }
+
+        TextView sheetTitle = view.findViewById(R.id.ppHeaderTitle);
+        if (sheetTitle != null) {
+            // Sign in for assertion, Add a passkey for registration.
+            String title = (getActivity() instanceof AuthenticationActivity) ? "Sign in" : "Add a passkey";
+            sheetTitle.setText(title);
+        }
+
+        unlockButton.setOnClickListener(v -> {
+            String password = passwordInput.getText().toString();
+            if (password.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter your master password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            authenticateWithMasterPassword(password);
+        });
+
+        setupPasswordVisibilityToggle();
+        setupBiometricButton();
+
+        return view;
+    }
+
+    /**
      * Authenticate with the master password using the vault client
      */
     private void authenticateWithMasterPassword(String password) {
@@ -101,9 +153,14 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             return;
         }
 
-        // Disable the unlock button while authenticating
+        // V2 hides "Continue" + shows spinner; V1 swaps to "Unlocking...".
         unlockButton.setEnabled(false);
-        unlockButton.setText("Unlocking...");
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            unlockButton.setText("");
+            if (continueProgress != null) continueProgress.setVisibility(View.VISIBLE);
+        } else {
+            unlockButton.setText("Unlocking...");
+        }
 
         // Convert password to byte array for secure handling
         byte[] passwordBuffer = com.pears.pass.autofill.utils.SecureBufferUtils.stringToBuffer(password);
@@ -134,9 +191,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     SecureLog.w("MasterPasswordFragment", "Could not get master encryption for resume: " + e.getMessage());
                 }
 
-                // Authentication successful
+                // Authentication successful — silent navigation.
                 getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
                     if (navigationListener != null) {
                         navigationListener.navigateToVaultSelection();
                     }
@@ -148,7 +204,12 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Invalid master password", Toast.LENGTH_SHORT).show();
                     unlockButton.setEnabled(true);
-                    unlockButton.setText("Unlock");
+                    if (getResources().getInteger(R.integer.design_version) == 2) {
+                        unlockButton.setText("Continue");
+                        if (continueProgress != null) continueProgress.setVisibility(View.GONE);
+                    } else {
+                        unlockButton.setText("Unlock");
+                    }
                     passwordInput.setText("");
                 });
             } finally {
@@ -162,24 +223,49 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
      * Setup password visibility toggle
      */
     private void setupPasswordVisibilityToggle() {
-        if (togglePasswordVisibility != null && passwordInput != null) {
-            togglePasswordVisibility.setOnClickListener(v -> {
-                isPasswordVisible = !isPasswordVisible;
+        if (togglePasswordVisibility == null || passwordInput == null) return;
 
-                if (isPasswordVisible) {
-                    // Show password
-                    passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                    togglePasswordVisibility.setImageResource(R.drawable.eye_closed);
-                } else {
-                    // Hide password
-                    passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    togglePasswordVisibility.setImageResource(R.drawable.eye);
-                }
-
-                // Move cursor to end of text
-                passwordInput.setSelection(passwordInput.getText().length());
-            });
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            setupPasswordVisibilityToggleV2();
+            return;
         }
+
+        togglePasswordVisibility.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+
+            if (isPasswordVisible) {
+                // Show password
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                togglePasswordVisibility.setImageResource(R.drawable.eye_closed);
+            } else {
+                // Hide password
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                togglePasswordVisibility.setImageResource(R.drawable.eye);
+            }
+
+            // Move cursor to end of text
+            passwordInput.setSelection(passwordInput.getText().length());
+        });
+    }
+
+    /**
+     * Re-applies inter font on each toggle since Android switches to monospace
+     * when the input type flips to visible password
+     */
+    private void setupPasswordVisibilityToggleV2() {
+        final android.graphics.Typeface interFont =
+                androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.pp_v2_inter);
+
+        togglePasswordVisibility.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible) {
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+            if (interFont != null) passwordInput.setTypeface(interFont);
+            passwordInput.setSelection(passwordInput.getText().length());
+        });
     }
 
     /**
@@ -197,19 +283,26 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 ", canUse: " + canUse);
 
             if (isSupported && isEnabled && canUse) {
-                // Show biometric button
                 biometricButton.setVisibility(View.VISIBLE);
 
-                biometricButton.setText("Use Biometric");
+                // V2 retry link picks "Fingerprint" when device advertises one.
+                if (getResources().getInteger(R.integer.design_version) == 2) {
+                    boolean hasFingerprint = getContext() != null
+                            && getContext().getPackageManager().hasSystemFeature(
+                                    android.content.pm.PackageManager.FEATURE_FINGERPRINT);
+                    biometricButton.setText(hasFingerprint
+                            ? "Try again with Fingerprint"
+                            : "Try again with Biometrics");
+                } else {
+                    biometricButton.setText("Use Biometric");
+                }
 
-                // Set click listener for biometric authentication
                 biometricButton.setOnClickListener(v -> {
                     if (!isAuthenticatingBiometric) {
                         handleBiometricLogin();
                     }
                 });
             } else {
-                // Hide biometric button if not available
                 biometricButton.setVisibility(View.GONE);
             }
         }
@@ -308,7 +401,6 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
 
                 getActivity().runOnUiThread(() -> {
                     isAuthenticatingBiometric = false;
-                    Toast.makeText(getContext(), "Authentication successful", Toast.LENGTH_SHORT).show();
                     if (navigationListener != null) {
                         navigationListener.navigateToVaultSelection();
                     }

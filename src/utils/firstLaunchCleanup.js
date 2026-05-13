@@ -1,0 +1,120 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as FileSystem from 'expo-file-system'
+import * as SecureStore from 'expo-secure-store'
+
+import { getSharedDirectoryPath } from './AppGroupHelper'
+import { logger } from './logger'
+import { ASYNC_STORAGE_KEYS } from '../constants/asyncStorageKeys'
+import { SECURE_STORAGE_KEYS } from '../constants/secureStorageKeys'
+
+const { FIRST_LAUNCH_KEY, FAILED_KEYS_KEY } = ASYNC_STORAGE_KEYS
+const STORAGE_DIRECTORIES = ['pearpass', 'pearpass_jobs']
+
+/**
+ * Runs first-launch cleanup of expo-secure-store and on-disk vault
+ * directories. Must run BEFORE the Bare worklet binds to `pearpass/`,
+ * otherwise the recursive delete races the worklet's open file
+ * descriptors and leaves the storage tree in a partially-deleted state.
+ *
+ * @returns {Promise<{ ok: boolean, error?: Error }>}
+ */
+export const runFirstLaunchCleanup = async () => {
+  try {
+    const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY)
+
+    if (hasLaunchedBefore) {
+      await retryFailedKeys()
+      return { ok: true }
+    }
+
+    // Set the flag BEFORE the destructive ops. If clearVaultFileData
+    // throws (e.g. a file is held open during a race), we don't want
+    // every subsequent launch to re-enter this branch and re-attempt
+    // the wipe — that's the self-perpetuating loop.
+    await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true')
+    await clearSecureStoreData()
+    await clearVaultFileData()
+    return { ok: true }
+  } catch (error) {
+    logger.error('Error clearing data on first launch:', error)
+    return { ok: false, error }
+  }
+}
+
+const clearSecureStoreData = async () => {
+  const failedKeys = []
+
+  try {
+    const keysToClear = Object.values(SECURE_STORAGE_KEYS)
+    await deleteKeys(keysToClear, failedKeys)
+    if (failedKeys.length > 0) {
+      await setFailedKeys(failedKeys)
+      logger.log(
+        `Stored ${failedKeys.length} failed keys for retry:`,
+        failedKeys
+      )
+    }
+
+    logger.log('Completed SecureStore data clearing')
+  } catch (error) {
+    logger.error('Error clearing SecureStore data:', error)
+    throw error
+  }
+}
+
+const clearVaultFileData = async () => {
+  const sharedDirectory = await getSharedDirectoryPath()
+  const baseDirectory = sharedDirectory
+    ? `file://${sharedDirectory}`
+    : FileSystem.documentDirectory?.replace(/\/$/, '')
+
+  if (!baseDirectory) {
+    return
+  }
+
+  for (const directoryName of STORAGE_DIRECTORIES) {
+    const directoryPath = `${baseDirectory}/${directoryName}`
+    const directoryInfo = await FileSystem.getInfoAsync(directoryPath)
+
+    if (!directoryInfo.exists) {
+      continue
+    }
+
+    await FileSystem.deleteAsync(directoryPath, { idempotent: true })
+  }
+}
+
+const retryFailedKeys = async () => {
+  try {
+    const failedKeysJson = await AsyncStorage.getItem(FAILED_KEYS_KEY)
+    if (failedKeysJson) {
+      const failedKeys = JSON.parse(failedKeysJson)
+      const stillFailedKeys = []
+      await deleteKeys(failedKeys, stillFailedKeys)
+
+      if (stillFailedKeys.length > 0) {
+        await setFailedKeys(stillFailedKeys)
+      } else {
+        await AsyncStorage.removeItem(FAILED_KEYS_KEY)
+        logger.log('Completed SecureStore data clearing - no failed keys')
+      }
+    }
+  } catch (error) {
+    logger.error('Error retrying failed keys:', error)
+  }
+}
+
+const deleteKeys = async (keys, failedKeys = []) => {
+  for (const key of keys) {
+    try {
+      await SecureStore.deleteItemAsync(key)
+    } catch (error) {
+      failedKeys.push(key)
+      logger.error(`Failed to clear SecureStore key ${key}:`, error)
+    }
+  }
+}
+
+const setFailedKeys = async (failedKeys) => {
+  await AsyncStorage.setItem(FAILED_KEYS_KEY, JSON.stringify(failedKeys))
+}

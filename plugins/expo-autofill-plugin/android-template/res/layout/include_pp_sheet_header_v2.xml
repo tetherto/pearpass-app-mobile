@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/pp_v2_spacing_s12"
+    android:paddingEnd="@dimen/pp_v2_spacing_s12"
+    android:paddingTop="@dimen/pp_v2_spacing_s8"
+    android:paddingBottom="@dimen/pp_v2_spacing_s8">
+
+    <ImageView
+        android:id="@+id/ppHeaderLogoBadge"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@null"
+        android:src="@drawable/pp_v2_ic_app_logo" />
+
+    <TextView
+        android:id="@+id/ppHeaderTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.PearPass.V2.LabelEmphasized"
+        android:textColor="@color/pp_v2_text_primary"
+        tools:text="Add a passkey" />
+
+    <ImageView
+        android:id="@+id/ppHeaderClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Close"
+        android:src="@drawable/pp_v2_ic_close"
+        app:tint="@color/pp_v2_text_primary" />
+</RelativeLayout>

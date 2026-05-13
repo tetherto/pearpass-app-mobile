@@ -65,10 +65,10 @@ describe('downloadZip', () => {
 
     expect(FileSystem.writeAsStringAsync).toHaveBeenCalled()
     expect(Sharing.shareAsync).not.toHaveBeenCalled()
-    expect(errorSpy).toHaveBeenCalledWith([
+    expect(errorSpy).toHaveBeenCalledWith(
       'Error creating or saving zip:',
       new Error('Sharing is not available on this platform')
-    ])
+    )
 
     errorSpy.mockRestore()
   })
@@ -83,10 +83,10 @@ describe('downloadZip', () => {
     await downloadZip(files)
 
     // eslint-disable-next-line no-console
-    expect(console.error).toHaveBeenCalledWith([
+    expect(console.error).toHaveBeenCalledWith(
       'Error creating or saving zip:',
       error
-    ])
+    )
 
     errorSpy.mockRestore()
   })

@@ -53,6 +53,17 @@ describe('useRouteHelper', () => {
     ).toBe(true)
   })
 
+  it('treats Welcome with SCREEN_LOCKED as master password screen', () => {
+    const { result } = renderHook(() => useRouteHelper())
+
+    expect(
+      result.current.isMasterPasswordScreen({
+        name: 'Welcome',
+        params: { state: NAVIGATION_ROUTES.SCREEN_LOCKED }
+      })
+    ).toBe(true)
+  })
+
   it('returns false for non-Welcome routes', () => {
     const { result } = renderHook(() => useRouteHelper())
 

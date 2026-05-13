@@ -21,25 +21,24 @@ import {
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
-import { BottomSheetImportVaultContent } from 'src/containers/BottomSheetImportVaultContent'
-import { useBottomSheet } from 'src/context/BottomSheetContext'
 
-import { CardSingleSetting } from '../../../components/CardSingleSetting'
-import { useAutoLockContext } from '../../../context/AutoLockContext'
-import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
-import { ButtonLittle } from '../../../libComponents'
-import { logger } from '../../../utils/logger'
-import { settingsStyles } from '../styles'
 import {
   AcceptedFormats,
   Description,
   Container as ImportContainer,
-  ImportOptionImage,
   ImportOptionItem,
   ImportOptionsList,
   SubTitle
 } from './styles'
 import { readFileContent } from './utils/readFileContent'
+import { CardSingleSetting } from '../../../components/CardSingleSetting'
+import { BottomSheetImportVaultContent } from '../../../containers/BottomSheetImportVaultContent'
+import { useAutoLockContext } from '../../../context/AutoLockContext'
+import { useBottomSheet } from '../../../context/BottomSheetContext'
+import { useHapticFeedback } from '../../../hooks/useHapticFeedback'
+import { ButtonLittle } from '../../../libComponents'
+import { logger } from '../../../utils/logger'
+import { settingsStyles } from '../styles'
 
 const importOptions = [
   {
@@ -85,13 +84,13 @@ const importOptions = [
     imgKey: 'protonpass'
   },
   {
-    title: 'Encrypted file',
+    title: 'PearPass Encrypted File',
     type: 'encrypted',
     accepts: ['.json'],
     imgKey: 'encrypted'
   },
   {
-    title: 'Unencrypted file',
+    title: 'PearPass Unencrypted File',
     type: 'unencrypted',
     accepts: ['.json', '.csv'],
     imgKey: 'unencrypted'
@@ -105,18 +104,6 @@ const isAllowedType = (fileType, accepts) =>
     }
     return fileType === accept
   })
-
-const images = {
-  '1password': require('../../../../assets/images/1password.png'),
-  bitwarden: require('../../../../assets/images/BitWarden.png'),
-  keepass: require('../../../../assets/images/KeePass.png'),
-  keepassxc: require('../../../../assets/images/KeePassXC.png'),
-  lastpass: require('../../../../assets/images/LastPass.png'),
-  protonpass: require('../../../../assets/images/ProtonPass.png'),
-  nordpass: require('../../../../assets/images/NordPass.png'),
-  unencrypted: require('../../../../assets/images/VaultIcon.png'),
-  encrypted: require('../../../../assets/images/VaultIcon.png')
-}
 
 export const ImportSection = () => {
   const { t } = useLingui()
@@ -320,8 +307,8 @@ export const ImportSection = () => {
                   children: (
                     <BottomSheetImportVaultContent
                       passwordManagerName={
-                        option.title === 'Encrypted file' ||
-                        option.title === 'Unencrypted file'
+                        option.type === 'encrypted' ||
+                        option.type === 'unencrypted'
                           ? 'PearPass'
                           : option.title
                       }
@@ -348,11 +335,6 @@ export const ImportSection = () => {
                 expand(bottomSheetOptions)
               }}
             >
-              {option.imgKey ? (
-                <ImportOptionImage source={images[option.imgKey]} />
-              ) : (
-                <option.icon width={32} height={32} />
-              )}
               <SubTitle>{option.title}</SubTitle>
               <AcceptedFormats>{option.accepts.join(', ')}</AcceptedFormats>
             </ImportOptionItem>

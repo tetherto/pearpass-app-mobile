@@ -2,8 +2,8 @@ import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { act, renderHook } from '@testing-library/react-native'
 import * as ImagePicker from 'expo-image-picker'
-import { Alert } from 'react-native'
-import { Camera } from 'react-native-vision-camera'
+import { Alert, Platform } from 'react-native'
+import { Camera, useCodeScanner } from 'react-native-vision-camera'
 import { decodeBase64 } from 'vision-camera-zxing'
 
 import { useQRScanner } from './useQRScanner'
@@ -18,6 +18,7 @@ jest.mock('react-native-vision-camera', () => ({
     requestCameraPermission: jest.fn()
   },
   useCameraDevice: jest.fn(() => ({ id: 'back', position: 'back' })),
+  useCodeScanner: jest.fn((config) => config),
   useFrameProcessor: jest.fn(() => jest.fn()),
   VisionCameraProxy: { initFrameProcessorPlugin: jest.fn() }
 }))
@@ -55,6 +56,7 @@ jest.spyOn(Alert, 'alert')
 
 describe('useQRScanner', () => {
   let onScanned, onError
+  const originalPlatform = Platform.OS
 
   beforeEach(() => {
     onScanned = jest.fn()
@@ -67,6 +69,9 @@ describe('useQRScanner', () => {
   afterEach(() => {
     jest.clearAllTimers()
     jest.useRealTimers()
+    Object.defineProperty(Platform, 'OS', {
+      value: originalPlatform
+    })
   })
 
   it('should request and grant camera permission', async () => {
@@ -89,6 +94,7 @@ describe('useQRScanner', () => {
 
   it('should deny camera permission and show alert', async () => {
     Camera.getCameraPermissionStatus.mockReturnValue('denied')
+    Camera.requestCameraPermission.mockResolvedValue('denied')
 
     const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
       wrapper: ({ children }) => (
@@ -107,6 +113,26 @@ describe('useQRScanner', () => {
       expect.stringContaining("You've previously denied"),
       expect.any(Array)
     )
+  })
+
+  it('should still request permission when current status is denied', async () => {
+    Camera.getCameraPermissionStatus.mockReturnValue('denied')
+    Camera.requestCameraPermission.mockResolvedValue('granted')
+
+    const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    await act(async () => {
+      const permission = await result.current.requestPermission()
+      expect(permission).toBe(true)
+    })
+
+    expect(Camera.requestCameraPermission).toHaveBeenCalledTimes(1)
+    expect(Alert.alert).not.toHaveBeenCalled()
+    expect(result.current.hasPermission).toBe(true)
   })
 
   it('should call onScanned when a valid QR code is scanned', () => {
@@ -201,5 +227,38 @@ describe('useQRScanner', () => {
       expect.stringContaining('No QR code found in the image'),
       expect.any(Array)
     )
+  })
+
+  it('should use native code scanner on ios and forward scanned qr values', () => {
+    Object.defineProperty(Platform, 'OS', {
+      value: 'ios'
+    })
+
+    const { result } = renderHook(() => useQRScanner({ onScanned, onError }), {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      )
+    })
+
+    expect(useCodeScanner).toHaveBeenCalledWith(
+      expect.objectContaining({
+        codeTypes: expect.arrayContaining(['qr'])
+      })
+    )
+    expect(result.current.codeScanner).toEqual(
+      expect.objectContaining({
+        codeTypes: expect.arrayContaining(['qr']),
+        onCodeScanned: expect.any(Function)
+      })
+    )
+    expect(result.current.frameProcessor).toBeUndefined()
+
+    act(() => {
+      result.current.codeScanner.onCodeScanned([
+        { type: 'qr', value: 'ios-native-scan' }
+      ])
+    })
+
+    expect(onScanned).toHaveBeenCalledWith('ios-native-scan', 'qr')
   })
 })

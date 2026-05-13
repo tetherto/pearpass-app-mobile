@@ -56,7 +56,8 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: rawTokens.spacing16,
+    paddingHorizontal: rawTokens.spacing8,
+    paddingVertical: rawTokens.spacing16,
     gap: rawTokens.spacing8,
   },
   leftContainer: {
@@ -65,6 +66,7 @@ const styles = StyleSheet.create({
   },
   centerContainer: {
     flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start'
@@ -72,6 +74,7 @@ const styles = StyleSheet.create({
   rightContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: rawTokens.spacing16
+    gap: rawTokens.spacing16,
+    flexShrink: 0
   }
 })

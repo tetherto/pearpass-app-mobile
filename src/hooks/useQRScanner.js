@@ -7,6 +7,7 @@ import { Alert, Linking, Platform } from 'react-native'
 import { useSharedValue } from 'react-native-reanimated'
 import {
   Camera,
+  useCodeScanner,
   useCameraDevice,
   useFrameProcessor
 } from 'react-native-vision-camera'
@@ -43,6 +44,23 @@ export const useQRScanner = ({
   const isScanningShared = useSharedValue(true)
 
   const device = useCameraDevice('back')
+
+  const mapSupportedTypeToCodeScannerType = useCallback((type) => {
+    const formatMap = {
+      qr: 'qr',
+      aztec: 'aztec',
+      code128: 'code-128',
+      code39: 'code-39',
+      code93: 'code-93',
+      datamatrix: 'data-matrix',
+      ean13: 'ean-13',
+      ean8: 'ean-8',
+      pdf417: 'pdf-417',
+      upc_e: 'upc-e'
+    }
+
+    return formatMap[type]
+  }, [])
 
   // Check current permission status on mount
   const checkCurrentPermissions = useCallback(() => {
@@ -97,11 +115,6 @@ export const useQRScanner = ({
         return true
       }
 
-      if (permissionStatus === 'denied') {
-        showPermissionAlert(t`Camera`)
-        return false
-      }
-
       const result = await Camera.requestCameraPermission()
       const granted = result === 'granted'
 
@@ -110,7 +123,15 @@ export const useQRScanner = ({
         return true
       }
 
-      showPermissionAlert(t`Camera`)
+      if (
+        permissionStatus === 'denied' ||
+        permissionStatus === 'restricted' ||
+        result === 'denied' ||
+        result === 'restricted'
+      ) {
+        showPermissionAlert(t`Camera`)
+      }
+
       setHasPermission(false)
       return false
     } catch (error) {
@@ -144,7 +165,6 @@ export const useQRScanner = ({
     [isScanning, supportedTypes, scanDelay, onScanned]
   )
 
-  // ZXing format name → expo-camera-style short name
   const mapFormat = (zxingFormat) => {
     const formatMap = {
       QR_CODE: 'qr',
@@ -182,6 +202,28 @@ export const useQRScanner = ({
     },
     [onCodeScannedJS, isScanningShared]
   )
+
+  const codeScanner = useCodeScanner({
+    codeTypes: supportedTypes
+      .map(mapSupportedTypeToCodeScannerType)
+      .filter(Boolean),
+    onCodeScanned: (codes) => {
+      if (!codes.length) return
+
+      const { type, value } = codes[0]
+
+      if (!value) return
+
+      handleBarCodeScanned({
+        type,
+        data: value
+      })
+    }
+  })
+
+  const activeCodeScanner = Platform.OS === 'ios' ? codeScanner : undefined
+  const activeFrameProcessor =
+    Platform.OS === 'android' ? frameProcessor : undefined
 
   const pauseScanning = useCallback(() => {
     setIsScanning(false)
@@ -272,7 +314,8 @@ export const useQRScanner = ({
     isScanning,
     cameraRef,
     device,
-    frameProcessor,
+    codeScanner: activeCodeScanner,
+    frameProcessor: activeFrameProcessor,
     pauseScanning,
     resumeScanning,
     pickImageForScan,

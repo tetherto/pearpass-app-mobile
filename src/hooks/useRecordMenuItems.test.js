@@ -26,6 +26,14 @@ jest.mock('@tetherto/pearpass-lib-vault', () => ({
   }
 }))
 
+let mockDesignVersion = 1
+jest.mock('@tetherto/pearpass-lib-constants', () => ({
+  get MOBILE_DESIGN_VERSION() {
+    return mockDesignVersion
+  },
+  PROTECTED_VAULT_ENABLED: false
+}))
+
 const renderHookWithProviders = (hook) =>
   renderHook(hook, {
     wrapper: ({ children }) => (
@@ -34,21 +42,58 @@ const renderHookWithProviders = (hook) =>
   })
 
 describe('useRecordMenuItems', () => {
-  test('returns all items by default', () => {
-    const { result } = renderHookWithProviders(() => useRecordMenuItems())
+  describe('v1', () => {
+    beforeEach(() => {
+      mockDesignVersion = 1
+    })
 
-    expect(result.current).toHaveLength(9)
-    expect(result.current.map((item) => item.type)).toEqual([
-      'all',
-      RECORD_TYPES.LOGIN,
-      RECORD_TYPES.CREDIT_CARD,
-      RECORD_TYPES.WIFI_PASSWORD,
-      RECORD_TYPES.PASS_PHRASE,
-      RECORD_TYPES.IDENTITY,
-      RECORD_TYPES.NOTE,
-      RECORD_TYPES.CUSTOM,
-      'password'
-    ])
+    test('returns all items in v1 order', () => {
+      const { result } = renderHookWithProviders(() => useRecordMenuItems())
+
+      expect(result.current).toHaveLength(9)
+      expect(result.current.map((item) => item.type)).toEqual([
+        'all',
+        RECORD_TYPES.LOGIN,
+        RECORD_TYPES.CREDIT_CARD,
+        RECORD_TYPES.WIFI_PASSWORD,
+        RECORD_TYPES.PASS_PHRASE,
+        RECORD_TYPES.IDENTITY,
+        RECORD_TYPES.NOTE,
+        RECORD_TYPES.CUSTOM,
+        'password'
+      ])
+    })
+  })
+
+  describe('v2', () => {
+    beforeEach(() => {
+      mockDesignVersion = 2
+    })
+
+    test('returns all items in v2 order', () => {
+      const { result } = renderHookWithProviders(() => useRecordMenuItems())
+
+      expect(result.current).toHaveLength(9)
+      expect(result.current.map((item) => item.type)).toEqual([
+        'all',
+        RECORD_TYPES.LOGIN,
+        RECORD_TYPES.CREDIT_CARD,
+        RECORD_TYPES.IDENTITY,
+        RECORD_TYPES.NOTE,
+        RECORD_TYPES.PASS_PHRASE,
+        RECORD_TYPES.WIFI_PASSWORD,
+        'password',
+        RECORD_TYPES.CUSTOM
+      ])
+    })
+
+    test('v2 items include icon property', () => {
+      const { result } = renderHookWithProviders(() => useRecordMenuItems())
+
+      result.current.forEach((item) => {
+        expect(item).toHaveProperty('icon')
+      })
+    })
   })
 
   test('each item has name and type properties', () => {

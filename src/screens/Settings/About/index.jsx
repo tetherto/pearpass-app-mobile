@@ -132,7 +132,13 @@ export const About = () => {
             </Text>
             <View style={styles.versionRow}>
               <Text style={styles.versionLabel}>{t`App version`}</Text>
-              <Text style={styles.versionValue}>{version}</Text>
+              <Text
+                style={styles.versionValue}
+                testID="app-version"
+                accessibilityLabel="App Version"
+              >
+                {version}
+              </Text>
             </View>
             <TouchableOpacity onPress={() => Linking.openURL(TERMS_OF_USE)}>
               <Text style={styles.link}>{t`Terms of use`}</Text>

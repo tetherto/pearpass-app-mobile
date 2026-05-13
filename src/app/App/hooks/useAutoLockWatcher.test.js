@@ -47,6 +47,12 @@ jest.mock('../../../utils/autoLockStorage', () => ({
 jest.mock('../../../utils/filesCache', () => ({
   clearAllFileCache: jest.fn()
 }))
+jest.mock('../../../utils/designVersion', () => ({
+  isV2: jest.fn(() => false)
+}))
+jest.mock('../../../utils/unsupportedFeatures', () => ({
+  unsupportedFeaturesEnabled: jest.fn(() => false)
+}))
 
 describe('useAutoLockWatcher', () => {
   const addListenerRemoveMock = jest.fn()
@@ -74,7 +80,8 @@ describe('useAutoLockWatcher', () => {
       .mockImplementation(() => ({ remove: addListenerRemoveMock }))
 
     useNavigation.mockReturnValue({
-      reset: resetMock
+      reset: resetMock,
+      addListener: jest.fn(() => jest.fn())
     })
     useVaults.mockReturnValue({ resetState: resetStateMock })
     useBottomSheet.mockReturnValue({ collapse: collapseMock })

@@ -75,7 +75,7 @@ preBuild.dependsOn copyAutofillBundle
         const sodiumDeps = `
     // Lazysodium for job queue encryption (crypto_secretbox / XSalsa20-Poly1305)
     implementation "com.goterl:lazysodium-android:5.1.0@aar"
-    implementation "net.java.dev.jna:jna:5.16.0@aar"`;
+    implementation "net.java.dev.jna:jna:5.17.0@aar"`;
         cfg.modResults.contents =
           cfg.modResults.contents.slice(0, insertIndex) +
           sodiumDeps +
@@ -172,6 +172,19 @@ android {
       for (const file of valuesFiles) {
         const srcPath = path.join(valuesSrcDir, file);
         const destPath = path.join(valuesDestDir, file);
+        await fs.promises.copyFile(srcPath, destPath);
+      }
+    }
+
+    // Copy fonts
+    const fontSrcDir = path.join(templateDir, 'res/font');
+    const fontDestDir = path.join(resDir, 'font');
+    if (fs.existsSync(fontSrcDir)) {
+      await fs.promises.mkdir(fontDestDir, { recursive: true });
+      const fontFiles = await fs.promises.readdir(fontSrcDir);
+      for (const file of fontFiles) {
+        const srcPath = path.join(fontSrcDir, file);
+        const destPath = path.join(fontDestDir, file);
         await fs.promises.copyFile(srcPath, destPath);
       }
     }

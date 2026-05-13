@@ -8,6 +8,7 @@
 /* Common */
 "Continue" = "Continue";
 "Loading..." = "Loading...";
+"Closing..." = "Closing...";
 "Cancel" = "Cancel";
 "Go Back" = "Go Back";
 
@@ -66,3 +67,80 @@
 "Use Biometrics" = "Use Biometrics";
 "Vault is locked. Please try again." = "Vault is locked. Please try again.";
 "Failed to unlock vault. Please check your password and try again." = "Failed to unlock vault. Please check your password and try again.";
+
+/* V2 — sheet headers */
+"Sign in" = "Sign in";
+"Create Passkey" = "Create Passkey";
+"Add a passkey" = "Add a passkey";
+
+/* V2 — master password screen */
+"Enter Your Master Password" = "Enter Your Master Password";
+"Please enter your master password to continue" = "Please enter your master password to continue";
+"Password" = "Password";
+"Invalid master password" = "Invalid master password";
+"Use Passkey" = "Use Passkey";
+"Passkey authentication failed" = "Passkey authentication failed";
+"Failed to retrieve encryption data from passkey" = "Failed to retrieve encryption data from passkey";
+"Unable to get presentation window" = "Unable to get presentation window";
+
+/* V2 — vault password screen (kept for future re-wiring) */
+"Vault password" = "Vault password";
+
+/* V2 — passkey form */
+"Title" = "Title";
+"Credentials" = "Credentials";
+"Email / Username" = "Email / Username";
+"Passkey" = "Passkey";
+"Date" = "Date";
+"Details" = "Details";
+"Website" = "Website";
+"Enter Website" = "Enter Website";
+"https://..." = "https://...";
+"Comment" = "Comment";
+"Optional" = "Optional";
+"Folder" = "Folder";
+"Select folder" = "Select folder";
+"Save & Add Login" = "Save & Add Login";
+"Saving..." = "Saving...";
+"Discard" = "Discard";
+"Upload File" = "Upload File";
+"Replace Passkey" = "Replace Passkey";
+"Replace" = "Replace";
+"This login already has a passkey. Do you want to replace it?" = "This login already has a passkey. Do you want to replace it?";
+"Your file is too large. Please upload one that's 6 MB or smaller." = "Your file is too large. Please upload one that's 6 MB or smaller.";
+"Missing registration context" = "Missing registration context";
+"Title is required" = "Title is required";
+"Failed to save passkey" = "Failed to save passkey";
+
+/* V2 — combined items (vault + credentials) */
+"Search" = "Search";
+"Search in All Items" = "Search in All Items";
+"Select Vault" = "Select Vault";
+"Add New Login" = "Add New Login";
+"No matching items in this vault" = "No matching items in this vault";
+"We couldn't find a matching item in this vault. Would you like to " = "We couldn't find a matching item in this vault. Would you like to ";
+"save it as a new item" = "save it as a new item";
+" or look in another vault?" = " or look in another vault?";
+
+/* V2 — error boundary defaults */
+"Autofill Error" = "Autofill Error";
+"Unable to initialize autofill" = "Unable to initialize autofill";
+"An unexpected error occurred. Please try again." = "An unexpected error occurred. Please try again.";
+
+/* V2 — missing configuration screen */
+"Finish setting up PearPass" = "Finish setting up PearPass";
+"To use the autofill extension, you'll need to complete a few quick steps in the main app:" = "To use the autofill extension, you'll need to complete a few quick steps in the main app:";
+"Set your Master Password" = "Set your Master Password";
+
+/* V2 — accessibility labels */
+"Close" = "Close";
+"Back" = "Back";
+"Toggle password visibility" = "Toggle password visibility";
+
+/* V2 — biometric retry link */
+"Try again with Face ID" = "Try again with Face ID";
+"Try again with Touch ID" = "Try again with Touch ID";
+"Try again with Biometrics" = "Try again with Biometrics";
+
+/* V2 — passkey form validation */
+"Wrong format of website" = "Wrong format of website";

@@ -54,3 +54,39 @@ jest.mock('./src/context/HapticsContext', () => ({
   }),
   HapticsProvider: ({ children }) => children
 }))
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+)
+
+jest.mock('expo-file-system/next', () => ({
+  File: jest.fn().mockImplementation(() => ({
+    exists: false,
+    size: 0,
+    create: jest.fn(),
+    delete: jest.fn(),
+    write: jest.fn(),
+    textSync: jest.fn(() => ''),
+    open: jest.fn(() => ({
+      offset: 0,
+      size: 0,
+      writeBytes: jest.fn(),
+      close: jest.fn()
+    }))
+  })),
+  Paths: { cache: { uri: 'file:///mock-cache/' } }
+}))
+
+jest.mock('expo-sharing', () => ({
+  shareAsync: jest.fn(() => Promise.resolve())
+}))
+
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: { expoConfig: { extra: {} } }
+}))
+
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  reactNavigationIntegration: jest.fn(() => ({}))
+}))

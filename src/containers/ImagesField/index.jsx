@@ -31,8 +31,23 @@ import { BottomSheetUploadImageContent } from '../BottomSheetUploadImageContent'
  * @param {Array<Object>} [props.pictures=[]]
  * @param {function} [props.onAdd]
  * @param {function} [props.onRemove]
+ * @param {function} [props.onRename]
+ * @param {string} [props.testID]
+ * @param {string} [props.accessibilityLabel]
+ * @param {string} [props.addButtonTestID]
+ * @param {string} [props.addButtonAccessibilityLabel]
  */
-const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
+const ImagesFieldComponent = ({
+  title,
+  pictures = [],
+  onAdd,
+  onRemove,
+  onRename,
+  testID,
+  accessibilityLabel,
+  addButtonTestID,
+  addButtonAccessibilityLabel
+}) => {
   const { expand } = useBottomSheet()
   const navigation = useNavigation()
   const { t } = useLingui()
@@ -57,10 +72,11 @@ const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
       navigation.navigate('ImagePreview', {
         imageUri: uri,
         imageName: name,
-        onDelete: onRemove ? () => onRemove(index) : undefined
+        onDelete: onRemove ? () => onRemove(index) : undefined,
+        onRename: onRename ? (newName) => onRename(index, newName) : undefined
       })
     },
-    [navigation, onRemove]
+    [navigation, onRemove, onRename]
   )
 
   const handleAddClick = useCallback(async () => {
@@ -101,7 +117,7 @@ const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
   }, [expand, onAdd, t])
 
   return (
-    <Container>
+    <Container testID={testID} accessibilityLabel={accessibilityLabel}>
       <Header>
         <ImageIcon />
         <Title>{title}</Title>
@@ -120,7 +136,11 @@ const ImagesFieldComponent = ({ title, pictures = [], onAdd, onRemove }) => {
         ))}
 
         {onAdd && (
-          <AddContainer onPress={handleAddClick}>
+          <AddContainer
+            onPress={handleAddClick}
+            testID={addButtonTestID}
+            accessibilityLabel={addButtonAccessibilityLabel}
+          >
             <PlusIcon color={colors.primary400.mode1} />
           </AddContainer>
         )}

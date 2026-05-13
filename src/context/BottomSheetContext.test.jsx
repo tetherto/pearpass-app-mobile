@@ -3,11 +3,18 @@ import { render, act } from '@testing-library/react-native'
 import { BottomSheetProvider, useBottomSheet } from './BottomSheetContext'
 
 jest.mock('@gorhom/bottom-sheet', () => {
-  const MockBottomSheet = ({ children }) => <div>{children}</div>
+  const React = require('react')
+  const MockBottomSheet = React.forwardRef((props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      close: () => props.onClose?.()
+    }))
+    return <div testID="bottom-sheet">{props.children}</div>
+  })
   MockBottomSheet.displayName = 'BottomSheet'
   return {
     __esModule: true,
-    default: (props) => <div testID="bottom-sheet">{props.children}</div>
+    default: MockBottomSheet,
+    BottomSheetView: ({ children }) => <div>{children}</div>
   }
 })
 
@@ -20,6 +27,15 @@ jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
     grey500: { mode1: '#333333' },
     primary100: { mode1: '#cccccc' }
   }
+}))
+
+jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
+  rawTokens: { spacing16: 16 },
+  useTheme: () => ({
+    theme: {
+      colors: { colorSurfacePrimary: '#fff', colorBorderPrimary: '#ccc' }
+    }
+  })
 }))
 
 describe('BottomSheetContext', () => {

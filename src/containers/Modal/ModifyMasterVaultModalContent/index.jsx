@@ -12,6 +12,7 @@ import { validatePasswordChange } from '@tetherto/pearpass-utils-password-check'
 
 import { InputLabel, InputWrapper } from './styles'
 import { useModal } from '../../../context/ModalContext'
+import { useBiometricsAuthentication } from '../../../hooks/useBiometricsAuthentication'
 import { InputPasswordPearPass } from '../../../libComponents'
 import { logger } from '../../../utils/logger'
 import { ModifyVaultsModaContentWrapper } from '../ModifyVaultsModaContentWrapper'
@@ -25,6 +26,7 @@ export const ModifyMasterVaultModalContent = ({ onPasswordChange }) => {
   const { t } = useLingui()
 
   const { updateMasterPassword } = useUserData()
+  const { refreshBiometricEncryption } = useBiometricsAuthentication()
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -80,6 +82,10 @@ export const ModifyMasterVaultModalContent = ({ onPasswordChange }) => {
         newPassword: newPasswordBuffer,
         currentPassword: currentPasswordBuffer
       })
+
+      // Re-encrypt biometric SecureStore entry with the rotated master
+      // encryption so autofill biometric unlock keeps working.
+      await refreshBiometricEncryption()
 
       setIsLoading(false)
       onPasswordChange?.()

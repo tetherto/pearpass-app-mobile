@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ppSearchContainer"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@drawable/pp_v2_search_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/pp_v2_spacing_s12"
+    android:paddingEnd="@dimen/pp_v2_spacing_s12">
+
+    <ImageView
+        android:id="@+id/ppSearchIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="@dimen/pp_v2_spacing_s8"
+        android:contentDescription="Search"
+        android:src="@drawable/pp_v2_ic_search"
+        app:tint="@color/pp_v2_text_search_field" />
+
+    <EditText
+        android:id="@+id/ppSearchInput"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@null"
+        android:fontFamily="@font/pp_v2_inter"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"
+        android:textColor="@color/pp_v2_text_primary"
+        android:textColorHint="@color/pp_v2_text_search_field"
+        android:textCursorDrawable="@null"
+        android:textSize="@dimen/pp_v2_font_s14"
+        android:textStyle="normal" />
+
+</LinearLayout>

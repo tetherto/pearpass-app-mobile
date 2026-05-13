@@ -26,6 +26,7 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
 
   const {
     hasPermission,
+    codeScanner,
     device,
     frameProcessor,
     pauseScanning,
@@ -81,6 +82,7 @@ export const BottomSheetQrScannerContent = ({ onScanned }) => {
                   alignSelf: 'center',
                   margin: 16
                 }}
+                codeScanner={codeScanner}
                 frameProcessor={frameProcessor}
               >
                 <CameraSpot />

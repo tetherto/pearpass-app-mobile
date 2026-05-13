@@ -16,6 +16,8 @@ import android.widget.inline.InlinePresentationSpec;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -76,9 +78,15 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_authentication);
+        // v2 opens as a bottom sheet, v1 keeps the old fullscreen window
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            setContentView(R.layout.activity_authentication_v2);
+            applyPartialHeightWindow();
+        } else {
+            setContentView(R.layout.activity_authentication);
 
-        makeFullscreen();
+            makeFullscreen();
+        }
 
         // Show loading fragment immediately - user must not interact until initialization is complete
         if (savedInstanceState == null) {
@@ -207,8 +215,51 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
     @Override
     public void navigateToVaultSelection() {
+        // v2 uses one combined screen for vault + credentials, v1 has separate fragments
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            replaceFragment(CombinedItemsFragment.newInstance(
+                    CombinedItemsFragment.MODE_ASSERTION,
+                    webDomain, packageName, null, null), true);
+            return;
+        }
         Fragment fragment = new VaultSelectionFragment();
         replaceFragment(fragment, true);
+    }
+
+    // 85% height sheet anchored to bottom, with a dim backdrop. v2 only.
+    private static final float WINDOW_HEIGHT_RATIO = 0.85f;
+    private void applyPartialHeightWindow() {
+        try {
+            android.view.Window window = getWindow();
+            if (window == null) return;
+            int screenHeight = getResources().getDisplayMetrics().heightPixels;
+            int targetHeight = (int) (screenHeight * WINDOW_HEIGHT_RATIO);
+            android.view.WindowManager.LayoutParams params = window.getAttributes();
+            params.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            params.height = targetHeight;
+            params.gravity = android.view.Gravity.BOTTOM;
+            params.dimAmount = 0.5f;
+            window.setAttributes(params);
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.setDecorFitsSystemWindows(false);
+            }
+            window.setStatusBarColor(android.graphics.Color.TRANSPARENT);
+            window.setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+            applyBottomNavBarInset();
+        } catch (Exception e) {
+            SecureLog.e(TAG, "Error applying partial-height window", e);
+        }
+    }
+
+    private void applyBottomNavBarInset() {
+        android.view.View root = findViewById(R.id.fragment_container);
+        if (root == null) return;
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            int bottom = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), bottom);
+            return insets;
+        });
     }
 
     @Override

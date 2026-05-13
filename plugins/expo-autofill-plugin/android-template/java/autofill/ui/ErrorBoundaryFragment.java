@@ -62,12 +62,21 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            return inflater.inflate(R.layout.fragment_error_boundary_v2, container, false);
+        }
         return inflater.inflate(R.layout.fragment_error_boundary, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // v2 layout uses a static icon + different ids;
+        if (getResources().getInteger(R.integer.design_version) == 2) {
+            onViewCreatedV2(view);
+            return;
+        }
 
         TextView errorIcon = view.findViewById(R.id.errorIcon);
         TextView errorTitle = view.findViewById(R.id.errorTitle);
@@ -106,6 +115,49 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
         }
 
         setupCancelButton(cancelButton);
+        setupCancelButton(goBackButton);
+    }
+
+    private void onViewCreatedV2(View view) {
+        TextView errorTitle = view.findViewById(R.id.errorV2Title);
+        TextView errorSubtitle = view.findViewById(R.id.errorV2Subtitle);
+        TextView errorMessage = view.findViewById(R.id.errorV2Message);
+        Button goBackButton = view.findViewById(R.id.errorV2GoBackButton);
+
+        View sheetHeader = view.findViewById(R.id.errorSheetHeader);
+        if (sheetHeader != null) {
+            View back = sheetHeader.findViewById(R.id.ppHeaderBack);
+            View close = sheetHeader.findViewById(R.id.ppHeaderClose);
+            TextView headerTitle = sheetHeader.findViewById(R.id.ppHeaderTitle);
+            if (headerTitle != null) headerTitle.setText("");
+            if (close != null) close.setVisibility(View.GONE);
+            if (back != null) back.setOnClickListener(v -> {
+                if (navigationListener != null) navigationListener.onCancel();
+            });
+        }
+
+        Bundle args = getArguments();
+        if (args != null) {
+            if (args.containsKey(ARG_ERROR_TITLE)) {
+                errorTitle.setText(args.getString(ARG_ERROR_TITLE));
+            }
+            if (args.containsKey(ARG_ERROR_SUBTITLE)) {
+                errorSubtitle.setText(args.getString(ARG_ERROR_SUBTITLE));
+            }
+            if (args.containsKey(ARG_ERROR_MESSAGE)) {
+                String message = args.getString(ARG_ERROR_MESSAGE);
+                if (message != null && !message.isEmpty()) {
+                    errorMessage.setText(message);
+                    errorMessage.setVisibility(View.VISIBLE);
+                }
+            }
+            if (args.containsKey(ARG_ERROR_TYPE)) {
+                String errorTypeStr = args.getString(ARG_ERROR_TYPE);
+                ErrorType errorType = ErrorType.valueOf(errorTypeStr);
+                configureErrorTypeV2(errorType, errorTitle, errorSubtitle, errorMessage);
+            }
+        }
+
         setupCancelButton(goBackButton);
     }
 
@@ -150,6 +202,45 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
             case GENERIC_ERROR:
             default:
                 icon.setText("⚠️");
+                title.setText("Autofill Error");
+                subtitle.setText("Unable to initialize autofill");
+                message.setText("An unexpected error occurred. Please try again.");
+                message.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    /**
+     * v2 uses a static drawable icon, no TextView
+     */
+    private void configureErrorTypeV2(ErrorType errorType, TextView title, TextView subtitle, TextView message) {
+        switch (errorType) {
+            case INITIALIZATION_FAILED:
+                title.setText("Initialization Failed");
+                subtitle.setText("Unable to start autofill service");
+                message.setText("The autofill service failed to initialize. Please try again.");
+                message.setVisibility(View.VISIBLE);
+                break;
+            case VAULT_CLIENT_ERROR:
+                title.setText("Vault Error");
+                subtitle.setText("Unable to access vault");
+                message.setText("There was an error accessing the vault. Please close and reopen the app.");
+                message.setVisibility(View.VISIBLE);
+                break;
+            case VAULT_LOCKED_ERROR:
+                title.setText("Vault In Use");
+                subtitle.setText("PearPass is already running");
+                message.setText("The vault is locked by the PearPass app. Please close PearPass and try again.");
+                message.setVisibility(View.VISIBLE);
+                break;
+            case TIMEOUT_ERROR:
+                title.setText("Timeout");
+                subtitle.setText("Autofill took too long to start");
+                message.setText("The autofill service is taking longer than expected. Please try again.");
+                message.setVisibility(View.VISIBLE);
+                break;
+            case GENERIC_ERROR:
+            default:
                 title.setText("Autofill Error");
                 subtitle.setText("Unable to initialize autofill");
                 message.setText("An unexpected error occurred. Please try again.");

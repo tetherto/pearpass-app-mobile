@@ -6,6 +6,7 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
+    "types": ["jest"],
     "customConditions": [
       "react-native"
     ],
@@ -23,7 +24,10 @@
     "ios",
     "build",
     "dist",
-    "e2e-mobile-tests"
+    "e2e-mobile-tests",
+    "e2e-mobile-newdesign",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ],
   "extends": "expo/tsconfig.base"
 }

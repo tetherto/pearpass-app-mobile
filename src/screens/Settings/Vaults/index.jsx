@@ -34,6 +34,14 @@ const getDeviceDisplayName = (deviceName) => {
   return deviceName
 }
 
+const getDeviceTypeKey = (deviceName) => {
+  if (!deviceName) return 'Unknown'
+  const lowerName = deviceName.toLowerCase()
+  if (lowerName.startsWith('ios')) return 'iOS'
+  if (lowerName.startsWith('android')) return 'Android'
+  return deviceName
+}
+
 export const Vaults = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
@@ -76,6 +84,12 @@ export const Vaults = () => {
                     key={device.name + index}
                     name={getDeviceDisplayName(device?.name)}
                     date={device.createdAt}
+                    testID={`${getDeviceTypeKey(device?.name)} Linked Device`}
+                    accessibilityLabel={`${getDeviceTypeKey(device?.name)} Linked Device`}
+                    nameTestID="linked-device-name"
+                    nameAccessibilityLabel="Linked Device Name"
+                    dateTestID="linked-device-date"
+                    dateAccessibilityLabel="Linked Device Date"
                   />
                 ))}
               </View>

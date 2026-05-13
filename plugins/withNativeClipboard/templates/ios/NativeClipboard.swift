@@ -17,9 +17,13 @@ class NativeClipboard: NSObject {
             if #available(iOS 10.3, *) {
                 let expireDate = Date().addingTimeInterval(TimeInterval(seconds))
                 let pbType = "public.utf8-plain-text"
+                // The `public.utf8-plain-text` UTI requires a `Data` value (UTF-8 bytes).
+                // Older iOS leniently accepted a `String`; iOS 26 enforces the type and
+                // silently leaves the pasteboard empty if a `String` is passed instead.
+                let utf8Data = text.data(using: .utf8) ?? Data()
 
                 UIPasteboard.general.setItems(
-                    [[pbType: text]],
+                    [[pbType: utf8Data]],
                     options: [
                         .expirationDate: expireDate,
                         .localOnly: false
