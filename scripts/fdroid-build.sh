@@ -34,7 +34,7 @@ google_dep_re='com\.google\.android\.gms|com\.google\.mlkit|com\.google\.firebas
 
 run_prebuild() {
   npm cache clean --force 2>/dev/null || true
-  npm ci --install-links --legacy-peer-deps --no-audit --no-fund
+  npm ci --legacy-peer-deps --no-audit --no-fund
   write_swarmconf_stub
   npm run fdroid:patches:prebuild
   npm run build
