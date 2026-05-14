@@ -286,25 +286,28 @@ export const ImportItems = () => {
 
       if (
         resolvedType === ImportOptionType.Bitwarden &&
-        JSON.parse(fileContent as string).encrypted
+        fileType === 'json'
       ) {
-        if (!password) {
-          throw new Error('Password is required for encrypted files')
-        }
+        const parsed = JSON.parse(fileContent as string)
 
-        dataToProcess = await decryptBitwardenJson(
-          fileContent as string,
-          password,
-          {
-            decryptViaWorklet:
-              pearpassVaultClient.decryptBitwardenExport.bind(
-                pearpassVaultClient
-              )
+        if (parsed.encrypted) {
+          if (!password) {
+            throw new Error('Password is required for encrypted files')
           }
-        )
+
+          dataToProcess = await decryptBitwardenJson(
+            fileContent as string,
+            password,
+            {
+              decryptViaWorklet:
+                pearpassVaultClient.decryptBitwardenExport.bind(
+                  pearpassVaultClient
+                )
+            }
+          )
+        }
       }
-    } catch (err) {
-      console.log('[bw-import] decrypt failed:', err)
+    } catch {
       throw new Error(
         'Failed to decrypt file. Please check your password and try again.'
       )
