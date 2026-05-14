@@ -15,7 +15,8 @@ import {
   PersonAdd
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
-import { View } from 'react-native'
+import { View, useWindowDimensions } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { VAULT_ACTION } from 'src/constants/vaultActions'
 
@@ -38,6 +39,7 @@ export const BottomSheetVaultSelectorContent = ({
   const styles = createStyles()
   const collapse = useBottomSheetClose()
   const { bottom } = useSafeAreaInsets()
+  const { height: screenHeight } = useWindowDimensions()
   const { openModal, closeModal } = useModal()
   const { dismiss } = useBottomSheetModal()
   const [menuVault, setMenuVault] = useState(null)
@@ -137,72 +139,79 @@ export const BottomSheetVaultSelectorContent = ({
   return (
     <Layout
       mode="sheet"
-      scrollable
-      contentStyle={{ padding: 0, paddingBottom: bottom }}
+      contentStyle={{ padding: 0 }}
       header={<SheetHeader title={t`Vaults`} onClose={closeSelector} />}
     >
-      {sortedVaults.map((vault) => {
-        const isSelected = vault.id === activeVault?.id
-        const memberCount =
-          (isSelected ? activeVault?.devices?.length : undefined) ??
-          vault.devices?.length ??
-          0
-        return (
+      <View style={{ maxHeight: screenHeight * 0.85 }}>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: bottom }}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
+        >
+          {sortedVaults.map((vault) => {
+            const isSelected = vault.id === activeVault?.id
+            const memberCount =
+              (isSelected ? activeVault?.devices?.length : undefined) ??
+              vault.devices?.length ??
+              0
+            return (
+              <ListItem
+                key={vault.id}
+                icon={<LockFilled color={theme.colors.colorTextPrimary} />}
+                title={vault.name}
+                subtitle={
+                  memberCount > 0
+                    ? memberCount === 1
+                      ? t`${memberCount} Member`
+                      : t`${memberCount} Members`
+                    : undefined
+                }
+                selected={isSelected}
+                showDivider
+                iconSize={16}
+                style={styles.listItem}
+                rightElement={
+                  isSelected ? (
+                    <View style={styles.rowActions}>
+                      <Button
+                        variant="tertiary"
+                        size="small"
+                        iconBefore={
+                          <PersonAdd color={theme.colors.colorTextPrimary} />
+                        }
+                        onClick={() =>
+                          closeAndRun(() => onNavigateToShareVault(vault))
+                        }
+                      />
+                      <Button
+                        variant="tertiary"
+                        size="small"
+                        iconBefore={
+                          <MoreVert color={theme.colors.colorTextPrimary} />
+                        }
+                        aria-label={t`Vault actions`}
+                        onClick={() => setMenuVault(vault)}
+                      />
+                    </View>
+                  ) : undefined
+                }
+                onClick={isSelected ? undefined : () => switchVault(vault)}
+              />
+            )
+          })}
+
           <ListItem
-            key={vault.id}
-            icon={<LockFilled color={theme.colors.colorTextPrimary} />}
-            title={vault.name}
-            subtitle={
-              memberCount > 0
-                ? memberCount === 1
-                  ? t`${memberCount} Member`
-                  : t`${memberCount} Members`
-                : undefined
-            }
-            selected={isSelected}
-            showDivider
+            icon={<Add color={theme.colors.colorTextPrimary} />}
+            title={t`Create New Vault`}
             iconSize={16}
             style={styles.listItem}
-            rightElement={
-              isSelected ? (
-                <View style={styles.rowActions}>
-                  <Button
-                    variant="tertiary"
-                    size="small"
-                    iconBefore={
-                      <PersonAdd color={theme.colors.colorTextPrimary} />
-                    }
-                    onClick={() =>
-                      closeAndRun(() => onNavigateToShareVault(vault))
-                    }
-                  />
-                  <Button
-                    variant="tertiary"
-                    size="small"
-                    iconBefore={
-                      <MoreVert color={theme.colors.colorTextPrimary} />
-                    }
-                    aria-label={t`Vault actions`}
-                    onClick={() => setMenuVault(vault)}
-                  />
-                </View>
-              ) : undefined
-            }
-            onClick={isSelected ? undefined : () => switchVault(vault)}
+            onClick={() => {
+              closeSelector()
+              onCreateVault?.()
+            }}
           />
-        )
-      })}
-
-      <ListItem
-        icon={<Add color={theme.colors.colorTextPrimary} />}
-        title={t`Create New Vault`}
-        iconSize={16}
-        style={styles.listItem}
-        onClick={() => {
-          closeSelector()
-          onCreateVault?.()
-        }}
-      />
+        </ScrollView>
+      </View>
     </Layout>
   )
 }
