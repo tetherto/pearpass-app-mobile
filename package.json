@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
-    "@gorhom/bottom-sheet": "5",
+    "@gorhom/bottom-sheet": "5.2.9",
     "@lingui/core": "5.3.3",
     "@lingui/macro": "5.3.3",
     "@lingui/react": "5.3.3",
