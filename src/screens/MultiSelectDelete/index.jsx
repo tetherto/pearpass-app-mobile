@@ -5,6 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { Button, ListItem, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { useRecords } from '@tetherto/pearpass-lib-vault'
 import { ScrollView, View } from 'react-native'
+import Toast from 'react-native-toast-message'
 
 import { createStyles } from './styles'
 import { FadeGradient } from '../../components/FadeGradient'
@@ -31,25 +32,52 @@ export const MultiSelectDelete = () => {
   const recordsMaxHeight =
     containerHeight > 0 ? containerHeight - confirmTextHeight : undefined
 
-  const { selectedRecordIds, selectedRecordObjects, onComplete } = params
+  const { selectedRecordIds, selectedRecordObjects, onComplete, isOtpContext } =
+    params
 
-  const { deleteRecords } = useRecords({
+  const { deleteRecords, updateRecords } = useRecords({
     onCompleted: () => {
       onComplete?.()
       navigation.goBack()
     }
   })
-
   const isSingleRecord = selectedRecordIds.length === 1
+  const isSingleLoginInOtpContext =
+    isOtpContext &&
+    isSingleRecord &&
+    selectedRecordObjects?.[0]?.type === 'login'
+
+  const handleStripOtp = async () => {
+    const record = selectedRecordObjects[0]
+    const data = { ...record?.data }
+    delete data.otpInput
+    delete data.otp
+    const updatedRecord = { ...record }
+    // otpPublic is computed at read time and never stored, but explicitly removing it
+    // prevents any accidental write-through if the vault layer changes its whitelist.
+    delete updatedRecord.otpPublic
+    try {
+      await updateRecords([{ ...updatedRecord, data }])
+    } catch (err) {
+      Toast.show({
+        type: 'baseToast',
+        text1: err?.message ?? t`Failed to remove authenticator code`,
+        position: 'bottom',
+        bottomOffset: 100
+      })
+    }
+  }
 
   return (
     <Layout
       header={
         <BackScreenHeader
           title={
-            isSingleRecord
-              ? t`Delete ${selectedRecordIds.length} Item`
-              : t`Delete ${selectedRecordIds.length} Items`
+            isSingleLoginInOtpContext
+              ? t`Remove Authenticator Code`
+              : isSingleRecord
+                ? t`Delete ${selectedRecordIds.length} Item`
+                : t`Delete ${selectedRecordIds.length} Items`
           }
           onBack={() => navigation.goBack()}
         />
@@ -59,9 +87,17 @@ export const MultiSelectDelete = () => {
         <Button
           variant="destructive"
           fullWidth
-          onClick={() => deleteRecords(selectedRecordIds)}
+          onClick={
+            isSingleLoginInOtpContext
+              ? handleStripOtp
+              : () => deleteRecords(selectedRecordIds)
+          }
         >
-          {isSingleRecord ? t`Delete Item` : t`Delete Items`}
+          {isSingleLoginInOtpContext
+            ? t`Remove`
+            : isSingleRecord
+              ? t`Delete Item`
+              : t`Delete Items`}
         </Button>
       }
     >
@@ -121,9 +157,11 @@ export const MultiSelectDelete = () => {
           onLayout={(e) => setConfirmTextHeight(e.nativeEvent.layout.height)}
         >
           <Text variant="caption" style={styles.confirmText}>
-            {isSingleRecord
-              ? t`Are you sure to delete the selected item?`
-              : t`Are you sure to delete the selected items?`}
+            {isSingleLoginInOtpContext
+              ? t`Are you sure you want to remove the authenticator code from this login record?`
+              : isSingleRecord
+                ? t`Are you sure to delete the selected item?`
+                : t`Are you sure to delete the selected items?`}
           </Text>
         </View>
       </View>

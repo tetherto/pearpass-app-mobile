@@ -1,6 +1,6 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
-import { renderHook } from '@testing-library/react-native'
+import { act, renderHook } from '@testing-library/react-native'
 import { RECORD_TYPES } from '@tetherto/pearpass-lib-vault'
 
 import { useRecordActionItems } from './useRecordActionItems'
@@ -13,10 +13,16 @@ jest.mock('@lingui/react/macro', () => ({
   useLingui: () => ({ t: (text) => text })
 }))
 
+const mockNavigate = jest.fn()
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
-    navigate: jest.fn()
+    navigate: mockNavigate
   })
+}))
+
+jest.mock('../utils/designVersion', () => ({
+  isV2: () => true
 }))
 
 jest.mock('@tetherto/pearpass-lib-vault', () => {
@@ -24,6 +30,7 @@ jest.mock('@tetherto/pearpass-lib-vault', () => {
 
   return {
     RECORD_TYPES: {
+      OTP: 'OTP',
       CREDIT_CARD: 'CREDIT_CARD',
       IDENTITY: 'IDENTITY',
       LOGIN: 'LOGIN',
@@ -475,6 +482,118 @@ describe('useRecordActionItems', () => {
 
       expect(result.current.actions).toBeDefined()
       expect(result.current.actions.length).toBe(5)
+    })
+  })
+
+  describe('OTP context — isAuthenticatorLoginRecord routing', () => {
+    const otpLoginRecord = {
+      id: 'otp-login-1',
+      type: RECORD_TYPES.LOGIN,
+      isFavorite: false,
+      folder: 'Work',
+      data: {
+        title: 'GitHub',
+        username: 'dev@example.com',
+        otpInput: 'test-otp-secret'
+      }
+    }
+
+    const wrapper = ({ children }) => (
+      <I18nProvider i18n={i18n}>{children}</I18nProvider>
+    )
+
+    beforeEach(() => {
+      mockNavigate.mockClear()
+    })
+
+    it('handleDelete passes isOtpContext: true to MultiSelectDelete when isOtpContext=true and record is login', () => {
+      const { result } = renderHook(
+        () =>
+          useRecordActionItems({
+            recordType: RECORD_TYPES.LOGIN,
+            record: otpLoginRecord,
+            isOtpContext: true
+          }),
+        { wrapper }
+      )
+
+      const deleteAction = result.current.actions.find(
+        (a) => a.type === 'delete'
+      )
+      act(() => {
+        deleteAction.click()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        'MultiSelectDelete',
+        expect.objectContaining({ isOtpContext: true })
+      )
+    })
+
+    it('handleDelete passes isOtpContext: false to MultiSelectDelete when not in OTP context', () => {
+      const { result } = renderHook(
+        () =>
+          useRecordActionItems({
+            recordType: RECORD_TYPES.LOGIN,
+            record: otpLoginRecord
+          }),
+        { wrapper }
+      )
+
+      const deleteAction = result.current.actions.find(
+        (a) => a.type === 'delete'
+      )
+      act(() => {
+        deleteAction.click()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        'MultiSelectDelete',
+        expect.objectContaining({ isOtpContext: false })
+      )
+    })
+
+    it('handleEdit navigates to CreateRecord with recordType OTP when isOtpContext=true and record is login', () => {
+      const { result } = renderHook(
+        () =>
+          useRecordActionItems({
+            recordType: RECORD_TYPES.LOGIN,
+            record: otpLoginRecord,
+            isOtpContext: true
+          }),
+        { wrapper }
+      )
+
+      const editAction = result.current.actions.find((a) => a.type === 'edit')
+      act(() => {
+        editAction.click()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        'CreateRecord',
+        expect.objectContaining({ recordType: RECORD_TYPES.OTP })
+      )
+    })
+
+    it('handleEdit navigates to CreateRecord with the record own type when not in OTP context', () => {
+      const { result } = renderHook(
+        () =>
+          useRecordActionItems({
+            recordType: RECORD_TYPES.LOGIN,
+            record: otpLoginRecord
+          }),
+        { wrapper }
+      )
+
+      const editAction = result.current.actions.find((a) => a.type === 'edit')
+      act(() => {
+        editAction.click()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        'CreateRecord',
+        expect.objectContaining({ recordType: RECORD_TYPES.LOGIN })
+      )
     })
   })
 })

@@ -1,8 +1,12 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require('expo/metro-config')
+const isNightly = process.env.PEARPASS_DISTRIBUTION === 'nightly'
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname)
+const config = isNightly
+  ? require('@sentry/react-native/metro').getSentryExpoConfig(__dirname, {
+      includeWebFeedback: false
+    })
+  : require('expo/metro-config').getDefaultConfig(__dirname)
 
 config.transformer = {
   ...config.transformer,

@@ -377,7 +377,7 @@ export const CreateOrEditLoginContent = ({
           <FormGroup>
             <PasswordField
               label={t`Authenticator Secret Key`}
-              placeholder={t`Enter Secret Key (TOTP)`}
+              placeholder={t`Enter your key or URI`}
               rightSlot={
                 <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
               }

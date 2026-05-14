@@ -13,7 +13,7 @@ import {
   clearBuffer,
   stringToBuffer
 } from '@tetherto/pearpass-lib-vault/src/utils/buffer'
-import { Keyboard, Platform } from 'react-native'
+import { Keyboard } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
@@ -166,7 +166,7 @@ export const usePasswordCreation = () => {
       await logIn({ password: loginBuffer })
       await initVaults({ password: loginBuffer })
       await createVault({ name: t`Personal` })
-      await addDevice(Platform.OS + ' ' + Platform.Version)
+      await addDevice()
       clearBuffer(loginBuffer)
 
       clearBuffer(passwordBuffer)

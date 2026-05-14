@@ -47,13 +47,15 @@ export const BottomSheetRecordActionsContentV2 = ({
   recordType,
   record,
   excludeTypes,
-  onDelete
+  onDelete,
+  isOtpContext
 }) => {
   const { actions } = useRecordActionItems({
     excludeTypes,
     record,
     recordType,
-    onDelete
+    onDelete,
+    isOtpContext
   })
   const { theme } = useTheme()
   const { dismiss } = useBottomSheetModal()

@@ -232,7 +232,7 @@ export const CreateOrEditAuthenticatorContent = ({
         <PasswordField
           label={t`Authenticator Secret Key`}
           value={values.otpSecret}
-          placeholder={t`Enter Secret Key (TOTP)`}
+          placeholder={t`Enter your key or URI`}
           onChangeText={(value) => setValue('otpSecret', value)}
           rightSlot={
             <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />

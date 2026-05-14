@@ -1,10 +1,16 @@
+/* global __DEV__ */
 import { PearpassVaultClient } from '@tetherto/pearpass-lib-vault-core'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
 import { Worklet } from 'react-native-bare-kit'
 
+import { isNightly } from '../constants/distribution.js'
 import { getSharedDirectoryPath } from '../utils/AppGroupHelper.js'
-import { logger } from '../utils/logger'
+import {
+  getLogLevelSync,
+  subscribeLogLevel
+} from '../utils/logConfigurationStorage'
+import { coreLogsFileURI, logger } from '../utils/logger'
 
 /**
  * @param {string} dirPath
@@ -47,10 +53,10 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
     let worklet = null
 
     try {
-      logger.log('[pearpass] init: createPearpassVaultClient start')
+      logger.debug('[pearpass] init: createPearpassVaultClient start')
       worklet = new Worklet()
 
-      logger.log('[pearpass] init: worklet created')
+      logger.debug('[pearpass] init: worklet created')
 
       const bundle = Platform.select({
         ios: require('../../bundles/app-ios.bundle.js'),
@@ -63,11 +69,11 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
 
       worklet.start('/worklet.bundle', bundle)
 
-      logger.log('[pearpass] init: worklet started')
+      logger.debug('[pearpass] init: worklet started')
 
       const sharedDirectory = await getSharedDirectoryPath()
 
-      logger.log('[pearpass] init: shared directory resolved')
+      logger.debug('[pearpass] init: shared directory resolved')
 
       const path = sharedDirectory
         ? `file://${sharedDirectory}/pearpass`
@@ -75,27 +81,62 @@ export const createPearpassVaultClient = async ({ debugMode } = {}) => {
 
       await ensureDirectoryExist(path)
 
-      logger.log('[pearpass] init: storage path ensured')
+      logger.debug('[pearpass] init: storage path ensured')
 
       const client = new PearpassVaultClient(worklet.IPC, path, {
         debugMode: debugMode
       })
 
-      logger.log('[pearpass] init: client created')
+      logger.debug('[pearpass] init: client created')
+
+      const corePath = coreLogsFileURI.replace(/^file:\/\//, '')
+      const sentryDsn =
+        isNightly() && !__DEV__
+          ? (process.env.EXPO_PUBLIC_SENTRY_DSN ?? null)
+          : null
+
+      // null logFile closes vault-core's file sink; string opens/swaps it.
+      // 'off' means "no file"; vault-core has no 'off' logLevel, so we send
+      // a valid level (kept as the last non-off choice doesn't matter — the
+      // file sink is closed). For boot/off we just default to 'info'.
+      const buildLogOptions = (level) => {
+        const enabled = level !== 'off'
+        return {
+          logFile: enabled ? corePath : null,
+          logLevel: enabled ? level : 'info',
+          dev: __DEV__,
+          sentryDsn
+        }
+      }
+
+      try {
+        await client.setLogOptions(buildLogOptions(getLogLevelSync()))
+        logger.debug('[pearpass] init: setLogOptions sent')
+      } catch (err) {
+        logger.error('[pearpass] init: setLogOptions failed', err)
+      }
+
+      subscribeLogLevel(async (level) => {
+        try {
+          await client.setLogOptions(buildLogOptions(level))
+        } catch (err) {
+          logger.error('[pearpass] setLogOptions update failed', err)
+        }
+      })
 
       const jobStoragePath = sharedDirectory
         ? `file://${sharedDirectory}/pearpass_jobs`
         : `${FileSystem.documentDirectory}pearpass_jobs`
 
       await ensureDirectoryExist(jobStoragePath)
-      logger.log('[pearpass] init: job storage path ensured')
+      logger.debug('[pearpass] init: job storage path ensured')
       await withTimeout(
         client.setJobStoragePath(jobStoragePath),
         30_000,
         'setJobStoragePath'
       )
 
-      logger.log('[pearpass] init: job storage path set')
+      logger.debug('[pearpass] init: job storage path set')
 
       return client
     } catch (err) {

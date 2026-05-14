@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import {
@@ -6,6 +6,7 @@ import {
   useVault,
   useVaults
 } from '@tetherto/pearpass-lib-vault'
+import { pearpassVaultClient } from '@tetherto/pearpass-lib-vault/src/instances'
 import { Platform } from 'react-native'
 import Toast from 'react-native-toast-message'
 
@@ -17,10 +18,12 @@ import { logger } from '../utils/logger'
 
 /**
  * Receive-side handler for "another device removed me from this vault".
- * Wipes local data and opens the access-removed modal.
+ * Wipes local data, recovers to a fresh "Personal" vault when nothing
+ * remains, and opens the access-removed modal.
  *
- * Currently invoked manually via `globalThis.__pearpassTriggerAccessRevoked`
- * for testing; will be wired into the action-bus once it lands.
+ * Triggered by the 'vault-access-revoked' event the lib emits from its
+ * delete-vault action handler when an entry lands in this device's
+ * actions queue (see pearpass-lib-vault/src/actions/index.js).
  */
 export const useVaultAccessRevoked = () => {
   const { t } = useLingui()
@@ -30,11 +33,14 @@ export const useVaultAccessRevoked = () => {
   const { switchVault } = useVaultSwitch()
   const { createVault } = useCreateVault()
 
-  const triggerAccessRevoked = useCallback(
-    async (vaultId, deviceName) => {
+  const handleAccessRevoked = useCallback(
+    async ({ vaultId, actor } = {}) => {
+      if (!vaultId) return
+
       const list = vaults ?? []
       const vault = list.find((v) => v.id === vaultId)
       const vaultName = vault?.name ?? vaultId
+      const deviceName = vault?.devices?.find((d) => d?.id === actor)?.name
       const wasActive = activeVault?.id === vaultId
 
       try {
@@ -87,5 +93,11 @@ export const useVaultAccessRevoked = () => {
     ]
   )
 
-  return { triggerAccessRevoked }
+  useEffect(() => {
+    if (!pearpassVaultClient?.on) return
+    pearpassVaultClient.on('vault-access-revoked', handleAccessRevoked)
+    return () => {
+      pearpassVaultClient.off?.('vault-access-revoked', handleAccessRevoked)
+    }
+  }, [handleAccessRevoked])
 }

@@ -1,11 +1,27 @@
-import './strict.css';
-import '@expo/metro-runtime';
+import './strict.css'
+import '@expo/metro-runtime'
 
 import { registerRootComponent } from 'expo'
 
+import { isNightly } from './src/constants/distribution'
 import { Main } from './src/main'
+import { loadLogConfiguration } from './src/utils/logConfigurationStorage'
+import { logger } from './src/utils/logger'
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
+// Should happen first - awaiting AsyncStorage before
+// registering races the native activity on Android — iOS happens to win
+// the race, Android does not, and the JS root never mounts.
 registerRootComponent(Main)
+
+async function bootstrap() {
+  await loadLogConfiguration()
+
+  if (isNightly()) {
+    const { initSentry } = require('./src/utils/sentry')
+    initSentry()
+  } else {
+    logger.log('[sentry] disabled — non-nightly distribution')
+  }
+}
+
+bootstrap()
