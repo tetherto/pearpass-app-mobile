@@ -4,6 +4,7 @@ import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { MAX_IMPORT_RECORDS } from '@tetherto/pearpass-lib-constants'
 import {
+  decryptBitwardenJson,
   decryptKeePassKdbx,
   parse1PasswordData,
   parseBitwardenData,
@@ -34,11 +35,12 @@ import {
   decryptExportData,
   useCreateRecord
 } from '@tetherto/pearpass-lib-vault'
+import { pearpassVaultClient } from '@tetherto/pearpass-lib-vault/src/instances'
 import { useCallback, useState } from 'react'
 import { ActivityIndicator, Linking, Pressable, View } from 'react-native'
 import Toast from 'react-native-toast-message'
-import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { Layout } from 'src/containers/Layout'
+import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { useAutoLockContext } from 'src/context/AutoLockContext'
 import { useHapticFeedback } from 'src/hooks/useHapticFeedback'
 import { readFileContent } from '../Settings/TabImport/utils/readFileContent'
@@ -281,7 +283,28 @@ export const ImportItems = () => {
         const encryptedData = JSON.parse(fileContent as string)
         dataToProcess = await decryptExportData(encryptedData, password)
       }
-    } catch {
+
+      if (
+        resolvedType === ImportOptionType.Bitwarden &&
+        JSON.parse(fileContent as string).encrypted
+      ) {
+        if (!password) {
+          throw new Error('Password is required for encrypted files')
+        }
+
+        dataToProcess = await decryptBitwardenJson(
+          fileContent as string,
+          password,
+          {
+            decryptViaWorklet:
+              pearpassVaultClient.decryptBitwardenExport.bind(
+                pearpassVaultClient
+              )
+          }
+        )
+      }
+    } catch (err) {
+      console.log('[bw-import] decrypt failed:', err)
       throw new Error(
         'Failed to decrypt file. Please check your password and try again.'
       )
