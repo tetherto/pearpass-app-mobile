@@ -48,9 +48,8 @@ export const VaultDeleteScreenV2 = ({ route }) => {
   const { switchVault } = useVaultSwitch()
 
   const devices = vaultData?.devices
-  const otherDeviceCount = Array.isArray(devices)
-    ? Math.max(devices.length - 1, 0)
-    : 0
+  const deviceCount = Array.isArray(devices) ? devices.length : 0
+  const showEraseFromAllDevices = deviceCount > 1
 
   const [pairedDevicesOpen, setPairedDevicesOpen] = useState(false)
   const [eraseFromAllDevices, setEraseFromAllDevices] = useState(false)
@@ -227,34 +226,35 @@ export const VaultDeleteScreenV2 = ({ route }) => {
           testID="vault-delete-v2-password-input"
         />
 
-        <View style={styles.eraseRow}>
-          <View style={styles.eraseLabel}>
-            <Text variant="label">{t`Erase Vault from`} </Text>
-            <Link
-              onClick={() => setPairedDevicesOpen(true)}
-              testID="vault-delete-v2-eraseall-link"
-            >
-              {otherDeviceCount === 1
-                ? t`${otherDeviceCount} other device`
-                : t`${otherDeviceCount} other devices`}
-            </Link>
-            <Text variant="label"> {t`with access`}</Text>
-          </View>
-          <ToggleSwitch
-            checked={eraseFromAllDevices}
-            onChange={setEraseFromAllDevices}
-            testID="vault-delete-v2-eraseall-toggle"
-          />
-        </View>
+        {showEraseFromAllDevices ? (
+          <>
+            <View style={styles.eraseRow}>
+              <View style={styles.eraseLabel}>
+                <Text variant="label">{t`Erase Vault from all`} </Text>
+                <Link
+                  onClick={() => setPairedDevicesOpen(true)}
+                  testID="vault-delete-v2-eraseall-link"
+                >
+                  {t`${deviceCount} devices`}
+                </Link>
+              </View>
+              <ToggleSwitch
+                checked={eraseFromAllDevices}
+                onChange={setEraseFromAllDevices}
+                testID="vault-delete-v2-eraseall-toggle"
+              />
+            </View>
 
-        {eraseFromAllDevices ? (
-          <AlertMessage
-            variant="warning"
-            size="small"
-            title=""
-            description={t`The removal will take effect on all other devices the next time they access this vault.`}
-            testID="vault-delete-v2-eraseall-alert"
-          />
+            {eraseFromAllDevices ? (
+              <AlertMessage
+                variant="warning"
+                size="small"
+                title=""
+                description={t`The removal will take effect on all other devices the next time they access this vault.`}
+                testID="vault-delete-v2-eraseall-alert"
+              />
+            ) : null}
+          </>
         ) : null}
 
         {submitError ? (
