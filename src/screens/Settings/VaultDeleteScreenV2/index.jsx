@@ -60,7 +60,7 @@ export const VaultDeleteScreenV2 = ({ route }) => {
     masterPassword: Validator.string().required(t`Master password is required`)
   })
 
-  const { register, handleSubmit, setErrors, values } = useForm({
+  const { register, handleSubmit, values } = useForm({
     initialValues: { masterPassword: '' },
     validate: (formValues) => schema.validate(formValues)
   })
@@ -74,11 +74,6 @@ export const VaultDeleteScreenV2 = ({ route }) => {
 
   const onSubmit = async (formValues) => {
     if (isLoading || !vaultId) return
-
-    if (!formValues.masterPassword) {
-      setErrors({ masterPassword: t`Master password is required` })
-      return
-    }
 
     setSubmitError(null)
     Keyboard.dismiss()
@@ -159,6 +154,12 @@ export const VaultDeleteScreenV2 = ({ route }) => {
             'failed to create fallback Personal vault:',
             error
           )
+          Toast.show({
+            type: 'baseToast',
+            text1: t`Couldn't create a starter vault. Please try again.`,
+            position: 'bottom',
+            bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+          })
         }
       }
 

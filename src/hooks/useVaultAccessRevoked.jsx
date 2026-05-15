@@ -38,16 +38,18 @@ export const useVaultAccessRevoked = () => {
     openModal,
     t
   })
-  latest.current = {
-    vaults,
-    activeVault,
-    deleteVaultLocal,
-    addDevice,
-    switchVault,
-    createVault,
-    openModal,
-    t
-  }
+  useEffect(() => {
+    latest.current = {
+      vaults,
+      activeVault,
+      deleteVaultLocal,
+      addDevice,
+      switchVault,
+      createVault,
+      openModal,
+      t
+    }
+  })
 
   const handleAccessRevoked = useCallback(async ({ vaultId, actor } = {}) => {
     if (!vaultId) return
@@ -102,6 +104,12 @@ export const useVaultAccessRevoked = () => {
             'failed to create fallback Personal vault:',
             error
           )
+          Toast.show({
+            type: 'baseToast',
+            text1: t`Couldn't create a starter vault. Please try again.`,
+            position: 'bottom',
+            bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+          })
         }
       }
     }

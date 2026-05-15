@@ -8,46 +8,13 @@ import {
   useBottomSheetClose,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import {
-  Devices,
-  LaptopMac,
-  LaptopWindows,
-  PhoneIphone,
-  Tablet
-} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { unsupportedFeaturesEnabled } from '../../utils/unsupportedFeatures'
+import { formatDeviceDate, getDeviceIcon } from '../../utils/devicePresentation'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { Layout } from '../Layout'
-
-const formatDeviceDate = (dateInput) => {
-  const date = new Date(dateInput)
-  if (isNaN(date.getTime())) return ''
-  const day = date.getDate()
-  const month = date.toLocaleString('en-US', { month: 'short' })
-  const year = date.getFullYear()
-  return `${day} ${month}, ${year}`
-}
-
-const getDeviceIcon = (deviceName) => {
-  if (!deviceName) return Devices
-  const lowerName = deviceName.toLowerCase()
-  if (lowerName.startsWith('ios') || lowerName.includes('iphone'))
-    return PhoneIphone
-  if (lowerName.startsWith('android')) return PhoneIphone
-  if (lowerName.includes('ipad') || lowerName.includes('tablet')) return Tablet
-  if (
-    lowerName.includes('mac') ||
-    lowerName.includes('imac') ||
-    lowerName.includes('macbook')
-  )
-    return LaptopMac
-  if (lowerName.includes('windows')) return LaptopWindows
-  return Devices
-}
 
 const PairedDevicesSheetBody = () => {
   const { t } = useLingui()
@@ -55,7 +22,6 @@ const PairedDevicesSheetBody = () => {
   const collapse = useBottomSheetClose()
   const { bottom } = useSafeAreaInsets()
   const { data, refetch: refetchVault } = useVault()
-  const showUnsupported = unsupportedFeaturesEnabled()
 
   useEffect(() => {
     refetchVault()
@@ -91,7 +57,7 @@ const PairedDevicesSheetBody = () => {
 
             return (
               <View
-                key={device.name + index}
+                key={device.id ?? `${device.name}-${index}`}
                 style={[
                   styles.deviceItem,
                   !isLast && {
@@ -121,15 +87,6 @@ const PairedDevicesSheetBody = () => {
                     {getDeviceDisplayName(device?.name)}
                   </Text>
                   <View style={styles.deviceDates}>
-                    {showUnsupported && (
-                      <Text
-                        variant="caption"
-                        color={theme.colors.colorTextSecondary}
-                        numberOfLines={1}
-                      >
-                        {t`Last used on ${formatDeviceDate(device.createdAt)}`}
-                      </Text>
-                    )}
                     {device.createdAt && (
                       <Text
                         variant="caption"
