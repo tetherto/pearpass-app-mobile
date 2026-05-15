@@ -66,7 +66,11 @@ export const useRecordActionItems = ({
   })
   const { setState } = useSharedFilter()
 
-  const isOtpContext = isOtpContextProp || recordType === RECORD_TYPES.OTP
+  // RECORD_TYPES.OTP is `undefined` (used as a route-state sentinel for the
+  // Authenticator screen). Comparing the unset `recordType` parameter against
+  // it would always be true — so only rely on the explicit `isOtpContextProp`
+  // flag, which callers set when they actually mean "Authenticator context".
+  const isOtpContext = isOtpContextProp
   const isAuthenticatorLoginRecord =
     isOtpContext && record?.type === RECORD_TYPES.LOGIN
 
@@ -77,7 +81,7 @@ export const useRecordActionItems = ({
         selectedRecordIds: [record?.id],
         selectedRecordObjects: [record],
         onComplete: onDelete,
-        isOtpContext: isAuthenticatorLoginRecord
+        isOtpContext: false
       })
     } else {
       v1Collapse?.()

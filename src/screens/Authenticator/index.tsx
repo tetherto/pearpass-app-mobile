@@ -24,6 +24,7 @@ import {
   isExpiring,
   useRecords
 } from '@tetherto/pearpass-lib-vault'
+import { MOBILE_2FA_IMPORTS_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
   FlatList,
   Pressable,
@@ -117,7 +118,8 @@ export const Authenticator = () => {
   const handleRecordPress = (record: RecordWithOtp) => {
     navigation.navigate('RecordDetails', {
       recordId: record.id,
-      recordType: RECORD_TYPES.OTP
+      recordType: RECORD_TYPES.OTP,
+      isOtpContext: true
     })
   }
 
@@ -343,17 +345,19 @@ export const Authenticator = () => {
             >
               {t`Add Code`}
             </Button>
-            <Button
-              variant="secondary"
-              fullWidth
-              iconBefore={
-                <ImportOutlined color={theme.colors.colorTextPrimary} />
-              }
-              onClick={() => navigation.navigate('ImportItems')}
-              data-testid="authenticator-import-codes-button"
-            >
-              {t`Import Codes`}
-            </Button>
+            {MOBILE_2FA_IMPORTS_ENABLED && (
+              <Button
+                variant="secondary"
+                fullWidth
+                iconBefore={
+                  <ImportOutlined color={theme.colors.colorTextPrimary} />
+                }
+                onClick={() => navigation.navigate('ImportItems')}
+                data-testid="authenticator-import-codes-button"
+              >
+                {t`Import Codes`}
+              </Button>
+            )}
           </View>
         </ScrollView>
       )}
