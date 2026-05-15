@@ -45,38 +45,9 @@ import { useAutoLockContext } from 'src/context/AutoLockContext'
 import { useHapticFeedback } from 'src/hooks/useHapticFeedback'
 import { readFileContent } from '../Settings/TabImport/utils/readFileContent'
 import { styles } from './styles'
-
-type ImportState = 'default' | 'upload' | 'inputPassword'
-
-type ImportOption = {
-  title: string
-  type: ImportOptionType
-  description: string
-  testId: string
-  accepts: string[]
-  imgKey: string
-  supportLink?: string
-}
-
-type FileInfo = {
-  fileContent: string | ArrayBuffer
-  fileType: string
-  filename: string
-  size: number
-  isEncrypted: boolean
-}
-
-enum ImportOptionType {
-  OnePassword = '1password',
-  Bitwarden = 'bitwarden',
-  KeePass = 'keepass',
-  KeePassKDBX = 'keepass-kdbx',
-  LastPass = 'lastpass',
-  NordPass = 'nordpass',
-  ProtonPass = 'protonpass',
-  Unencrypted = 'unencrypted',
-  Encrypted = 'encrypted'
-}
+import { ImportOptionType } from './types'
+import type { FileInfo, ImportOption, ImportState } from './types'
+import { detectIsEncrypted, parseJsonContent } from './utils'
 
 const importOptions: ImportOption[] = [
   {
@@ -227,7 +198,24 @@ export const ImportItems = () => {
       if (!isAllowedType(fileInfo.fileType, selectedOption.accepts)) {
         throw new Error('Invalid file type')
       }
-      setSelectedFileInfo({ ...fileInfo, size: fileInfo.size ?? 0 })
+      // `readFileContent` decides `isEncrypted` purely from the file shape
+      // (any JSON with `encrypted: true`). That's wrong for Bitwarden, where
+      // an account-restricted export sets `encrypted: true` without a
+      // `passwordProtected` flag and cannot be decrypted with a password —
+      // gating it on the password screen would be a dead end. Recompute the
+      // flag here using the import type, and stash the parsed JSON so
+      // `onImport` doesn't have to parse it again.
+      const parsedJson = parseJsonContent(fileInfo.fileContent)
+      setSelectedFileInfo({
+        ...fileInfo,
+        size: fileInfo.size ?? 0,
+        isEncrypted: detectIsEncrypted(
+          selectedOption.type,
+          fileInfo.fileType,
+          parsedJson
+        ),
+        parsedJson
+      })
       setFiles([
         {
           file: null as unknown as File,
@@ -254,12 +242,16 @@ export const ImportItems = () => {
     type,
     fileContent,
     fileType,
-    password
+    parsedJson,
+    password,
+    isEncrypted
   }: {
     type: string
     fileContent: string | ArrayBuffer
     fileType: string
+    parsedJson: Record<string, unknown> | null
     password: string | null
+    isEncrypted: boolean
   }) => {
     let result: unknown[] = []
     let dataToProcess: unknown = fileContent
@@ -277,40 +269,48 @@ export const ImportItems = () => {
         resolvedType = ImportOptionType.KeePassKDBX
       }
 
-      if (resolvedType === ImportOptionType.Encrypted) {
+      if (resolvedType === ImportOptionType.Encrypted && isEncrypted) {
         if (!password)
           throw new Error('Password is required for encrypted files')
-        const encryptedData = JSON.parse(fileContent as string)
-        dataToProcess = await decryptExportData(encryptedData, password)
-      }
-
-      if (
-        resolvedType === ImportOptionType.Bitwarden &&
-        fileType === 'json'
-      ) {
-        const parsed = JSON.parse(fileContent as string)
-
-        if (parsed.encrypted) {
-          if (!password) {
-            throw new Error('Password is required for encrypted files')
-          }
-
-          dataToProcess = await decryptBitwardenJson(
-            fileContent as string,
-            password,
-            {
-              decryptViaWorklet:
-                pearpassVaultClient.decryptBitwardenExport.bind(
-                  pearpassVaultClient
-                )
-            }
-          )
+        if (!parsedJson) {
+          throw new Error('Failed to parse file. Please ensure it is valid.')
         }
+        dataToProcess = await decryptExportData(parsedJson, password)
       }
-    } catch {
-      throw new Error(
-        'Failed to decrypt file. Please check your password and try again.'
-      )
+
+      if (resolvedType === ImportOptionType.Bitwarden && isEncrypted) {
+        if (!password) {
+          throw new Error('Password is required for encrypted files')
+        }
+        dataToProcess = await decryptBitwardenJson(
+          fileContent as string,
+          password,
+          {
+            decryptViaWorklet:
+              pearpassVaultClient.decryptBitwardenExport.bind(
+                pearpassVaultClient
+              )
+          }
+        )
+      }
+    } catch (error) {
+      // Only a wrong-password failure is recoverable by re-entering the
+      // password. The decrypt helpers signal this with "Incorrect password"
+      // (Bitwarden / KeePass KDBX), an "InvalidKey" error, or "invalid
+      // password" (PearPass export worklet). Everything else — malformed
+      // file, unsupported KDF, a structural error, or a worklet/IPC failure
+      // — is surfaced as-is so it isn't misattributed to a bad password.
+      const message = error instanceof Error ? error.message : ''
+      if (/incorrect password|invalid password|invalid key/i.test(message)) {
+        throw new Error(
+          'Failed to decrypt file. Please check your password and try again.'
+        )
+      }
+      throw error instanceof Error
+        ? error
+        : new Error(
+            'Failed to decrypt file. Please check your password and try again.'
+          )
     }
 
     try {
@@ -417,7 +417,9 @@ export const ImportItems = () => {
         type: selectedOption.type,
         fileContent: selectedFileInfo.fileContent,
         fileType: selectedFileInfo.fileType,
-        password
+        parsedJson: selectedFileInfo.parsedJson,
+        password,
+        isEncrypted: selectedFileInfo.isEncrypted
       })
       navigation.goBack()
     } catch (error: unknown) {
