@@ -68,8 +68,6 @@ export const useRecordActionItems = ({
 
   // RECORD_TYPES.OTP is `undefined` (used as a route-state sentinel for the
   // Authenticator screen). Comparing the unset `recordType` parameter against
-  // it would always be true — so only rely on the explicit `isOtpContextProp`
-  // flag, which callers set when they actually mean "Authenticator context".
   const isOtpContext = isOtpContextProp
   const isAuthenticatorLoginRecord =
     isOtpContext && record?.type === RECORD_TYPES.LOGIN

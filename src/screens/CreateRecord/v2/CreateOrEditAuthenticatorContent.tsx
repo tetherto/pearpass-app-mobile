@@ -62,7 +62,7 @@ export const CreateOrEditAuthenticatorContent = ({
 
   const { data: loginRecords } = useRecords({
     variables: { filters: { type: RECORD_TYPES.LOGIN } }
-  }) as unknown as { data: LoginRecord[] | undefined }
+  }) as unknown as { data: LoginRecord[] }
 
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
