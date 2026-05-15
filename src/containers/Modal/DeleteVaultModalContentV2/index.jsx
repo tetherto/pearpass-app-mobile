@@ -15,8 +15,7 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
-  ACTION_TYPES,
-  broadcastAction,
+  broadcastDeleteVault,
   useCreateVault,
   useUserData,
   useVault,
@@ -103,14 +102,11 @@ export const DeleteVaultModalContentV2 = ({
 
       if (eraseFromAllDevices) {
         try {
-          await broadcastAction({
-            type: ACTION_TYPES.DELETE_VAULT,
-            payload: { vaultId }
-          })
+          await broadcastDeleteVault(vaultId)
         } catch (error) {
           logger.error(
             'DeleteVaultModalContentV2',
-            'broadcastAction failed:',
+            'broadcastDeleteVault failed:',
             error
           )
         }
