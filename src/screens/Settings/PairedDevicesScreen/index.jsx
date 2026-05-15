@@ -1,26 +1,22 @@
 import { useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import {
-  ContextMenu,
-  Text,
-  rawTokens,
-  useBottomSheetClose,
-  useTheme
-} from '@tetherto/pearpass-lib-ui-kit'
+import { useNavigation } from '@react-navigation/native'
+import { rawTokens, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { formatDeviceDate, getDeviceIcon } from '../../utils/devicePresentation'
-import { SheetHeader } from '../BottomSheet/SheetHeader'
-import { Layout } from '../Layout'
+import { Layout } from '../../../containers/Layout'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
+import {
+  formatDeviceDate,
+  getDeviceIcon
+} from '../../../utils/devicePresentation'
 
-const PairedDevicesSheetBody = () => {
+export const PairedDevicesScreen = () => {
   const { t } = useLingui()
+  const navigation = useNavigation()
   const { theme } = useTheme()
-  const collapse = useBottomSheetClose()
-  const { bottom } = useSafeAreaInsets()
   const { data, refetch: refetchVault } = useVault()
 
   useEffect(() => {
@@ -39,10 +35,14 @@ const PairedDevicesSheetBody = () => {
 
   return (
     <Layout
-      mode="sheet"
       scrollable
-      contentStyle={[styles.content, { paddingBottom: bottom }]}
-      header={<SheetHeader title={t`Paired Devices`} onClose={collapse} />}
+      contentStyle={styles.content}
+      header={
+        <BackScreenHeader
+          title={t`Paired Devices`}
+          onBack={() => navigation.goBack()}
+        />
+      }
     >
       {devices.length > 0 && (
         <View
@@ -107,16 +107,9 @@ const PairedDevicesSheetBody = () => {
   )
 }
 
-export const BottomSheetPairedDevicesContent = ({ open, onOpenChange }) => (
-  <ContextMenu open={open} onOpenChange={onOpenChange}>
-    <PairedDevicesSheetBody />
-  </ContextMenu>
-)
-
 const styles = StyleSheet.create({
   content: {
     padding: rawTokens.spacing16,
-    paddingTop: rawTokens.spacing16,
     gap: rawTokens.spacing16
   },
   deviceList: {

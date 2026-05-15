@@ -110,8 +110,12 @@ export const BottomSheetVaultSelectorContent = ({
     onShare: () => {
       onNavigateToShareVault(vault)
     },
+    onViewPairedDevices: async () => {
+      await switchVault(vault)
+      onNavigate?.('PairedDevicesScreen')
+    },
     onDelete: () => {
-      onNavigate?.('VaultDeleteScreen', {
+      onNavigate?.('VaultDeleteScreenV2', {
         vaultId: vault.id,
         vaultName: vault.name
       })
