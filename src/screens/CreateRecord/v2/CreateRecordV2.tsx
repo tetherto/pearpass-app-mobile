@@ -39,9 +39,6 @@ export const CreateRecordV2 = ({ route }: CreateRecordV2Props) => {
   const renderContent = () => {
     switch (recordType) {
       case RECORD_TYPES.OTP:
-        // Authenticator items are login records underneath. When editing, render
-        // the full login form so all fields are accessible regardless of OTP
-        // presence. Only the create path uses the dedicated authenticator UI.
         if (initialRecord) {
           return <CreateOrEditLoginContent initialRecord={initialRecord} selectedFolder={resolvedFolder} />
         }

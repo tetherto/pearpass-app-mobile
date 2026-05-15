@@ -15,10 +15,6 @@ import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHea
 
 export const RecordDetailsV2 = ({ route }) => {
   const { recordId, isOtpContext: routeIsOtpContext } = route.params
-  // `RECORD_TYPES.OTP` is `undefined` (a sentinel for Authenticator screens),
-  // so comparing route params against it false-positives whenever a caller
-  // omits recordType. Callers from the Authenticator screen pass an explicit
-  // `isOtpContext: true` route param instead.
   const isOtpContext = !!routeIsOtpContext
   const { theme } = useTheme()
 
