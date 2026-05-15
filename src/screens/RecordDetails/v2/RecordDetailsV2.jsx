@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
 import { rawTokens, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { RECORD_TYPES, useRecordById } from '@tetherto/pearpass-lib-vault'
+import { useRecordById } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 
 import { RecordDetailsContent } from './RecordDetailsContentWrapper'
@@ -14,8 +14,8 @@ import { Layout } from '../../../containers/Layout'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 
 export const RecordDetailsV2 = ({ route }) => {
-  const { recordId, recordType: routeRecordType } = route.params
-  const isOtpContext = routeRecordType === RECORD_TYPES.OTP
+  const { recordId, isOtpContext: routeIsOtpContext } = route.params
+  const isOtpContext = !!routeIsOtpContext
   const { theme } = useTheme()
 
   const { data: record } = useRecordById({

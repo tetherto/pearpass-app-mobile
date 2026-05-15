@@ -3,11 +3,12 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
-import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Add, Close, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   RECORD_TYPES,
   useCreateRecord,
-  useRecords
+  useRecords,
+  validateOtpInput
 } from '@tetherto/pearpass-lib-vault'
 import {
   Button,
@@ -141,7 +142,7 @@ export const CreateOrEditLoginContent = ({
     title: Validator.string().required(t`Title is required`),
     username: Validator.string(),
     password: Validator.string(),
-    otpSecret: Validator.string(),
+    otpSecret: Validator.string().refine(validateOtpInput),
     note: Validator.string(),
     websites: Validator.array().items(
       Validator.object({
@@ -323,7 +324,11 @@ export const CreateOrEditLoginContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading || !values.title.trim()}
+          disabled={
+            isLoading ||
+            !values.title.trim() ||
+            !!register('otpSecret').error
+          }
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
@@ -379,7 +384,19 @@ export const CreateOrEditLoginContent = ({
               label={t`Authenticator Secret Key`}
               placeholder={t`Enter your key or URI`}
               rightSlot={
-                <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
+                <View style={styles.otpRightSlot}>
+                  {isEditing && values.otpSecret ? (
+                    <Button
+                      variant="tertiary"
+                      size="small"
+                      aria-label={t`Remove Authenticator Code`}
+                      iconBefore={<Close color={theme.colors.colorTextPrimary} />}
+                      onClick={() => setValue('otpSecret', '')}
+                      data-testid="otp-secret-clear-button"
+                    />
+                  ) : null}
+                  <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
+                </View>
               }
               testID="otp-secret-field"
               {...adaptRegister(register('otpSecret'))}
@@ -543,5 +560,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingHorizontal: rawTokens.spacing12,
     paddingVertical: rawTokens.spacing8
+  },
+  otpRightSlot: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: rawTokens.spacing4
   }
 })

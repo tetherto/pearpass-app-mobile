@@ -1,84 +1,56 @@
+import { useMemo, useState } from 'react'
+
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { RECORD_TYPES, useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
+import {
+  RECORD_TYPES,
+  matchLoginRecords,
+  parseOtpInput,
+  useCreateRecord,
+  useRecords,
+  validateOtpInput
+} from '@tetherto/pearpass-lib-vault'
 import {
   Button,
+  Combobox,
   InputField,
-  MultiSlotInput,
   PasswordField,
-  Text,
-  rawTokens,
-  useTheme
+  rawTokens
 } from '@tetherto/pearpass-lib-ui-kit'
-import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
-import { AttachmentFieldsV2 } from '../../../components/AttachmentFieldsV2'
 import { OtpSecretScanButton } from './OtpSecretScanButton'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../../containers/Layout'
 import { useLoadingContext } from '../../../context/LoadingContext'
-import { useGetMultipleFiles } from '../../../hooks/useGetMultipleFiles'
-import { convertBase64FilesToUint8 } from '../../../utils/convertBase64FilesToUint8'
 import { logger } from '../../../utils/logger'
+import { RecordItemIcon } from '../../../components/RecordItemIcon'
 
-type AuthenticatorAttachment = {
-  base64?: string
-  id?: string | number
-  name: string
-}
-
-type UploadedAuthenticatorAttachment = AuthenticatorAttachment & {
-  base64: string
-}
-
-type CustomField = {
-  type: string
-  note: string
-}
-
-type AuthenticatorRecord = {
-  data?: {
-    title?: string
-    otpInput?: string
-    otp?: { secret?: string }
-    customFields?: CustomField[]
-  }
-  folder?: string
-  isFavorite?: boolean
-  attachments?: AuthenticatorAttachment[]
+type LoginRecord = {
+  id: string
+  type?: string
+  data?: Record<string, unknown>
 }
 
 type Props = {
-  initialRecord?: AuthenticatorRecord
   selectedFolder?: string
 }
 
 type FormValues = {
   title: string
   otpSecret: string
-  customFields: CustomField[]
-  folder: string
-  attachments: AuthenticatorAttachment[]
+  linkedRecordId: string
 }
 
-const isUploadedAttachment = (
-  a: AuthenticatorAttachment
-): a is UploadedAuthenticatorAttachment => typeof a.base64 === 'string'
-
 export const CreateOrEditAuthenticatorContent = ({
-  initialRecord,
   selectedFolder
 }: Props) => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const { theme } = useTheme()
   const { setIsLoading, isLoading } = useLoadingContext()
-  const isEditing = !!initialRecord
-  const actionLabel = isEditing ? t`Save Changes` : t`Add Item`
 
   const { createRecord } = useCreateRecord({
     onCompleted: () => navigation.goBack()
@@ -88,53 +60,60 @@ export const CreateOrEditAuthenticatorContent = ({
     onCompleted: () => navigation.goBack()
   })
 
+  const { data: loginRecords } = useRecords({
+    variables: { filters: { type: RECORD_TYPES.LOGIN } }
+  }) as unknown as { data: LoginRecord[] }
+
   const schema = Validator.object({
     title: Validator.string().required(t`Title is required`),
-    otpSecret: Validator.string(),
-    customFields: Validator.array().items(
-      Validator.object({
-        note: Validator.string()
-      })
-    ),
-    folder: Validator.string(),
-    attachments: Validator.array().items(
-      Validator.object({
-        id: Validator.string(),
-        name: Validator.string().required()
-      })
-    )
+    otpSecret: Validator.string().refine(validateOtpInput)
   })
 
-  const { handleSubmit, registerArray, values, setValue, errors } =
+  const { handleSubmit, register, values, setValue, errors } =
     useForm<FormValues>({
       initialValues: {
-        title: initialRecord?.data?.title ?? '',
-        otpSecret:
-          initialRecord?.data?.otpInput ??
-          initialRecord?.data?.otp?.secret ??
-          '',
-        customFields: initialRecord?.data?.customFields ?? [],
-        folder: selectedFolder ?? initialRecord?.folder ?? '',
-        attachments: initialRecord?.attachments ?? []
+        title: '',
+        otpSecret: '',
+        linkedRecordId: ''
       },
-      validate: (formValues) => schema.validate(formValues) as Record<string, unknown>
+      validate: (formValues) =>
+        schema.validate(formValues) as Record<string, unknown>
     })
 
-  useGetMultipleFiles({
-    fieldNames: ['attachments'],
-    updateValues: setValue,
-    initialRecord: initialRecord as object
-  })
+  const parsedOtp = useMemo(
+    () => parseOtpInput(values.otpSecret),
+    [values.otpSecret]
+  )
 
-  const {
-    value: customFieldsList,
-    addItem: addCustomField,
-    removeItem: removeCustomField
-  } = registerArray('customFields')
+  const matchedRecords = useMemo(
+    () => matchLoginRecords(parsedOtp, loginRecords ?? []),
+    [parsedOtp, loginRecords]
+  )
 
-  const handleFirstCustomFieldChange = (value: string) => {
-    setValue('customFields', [{ type: 'note', note: value }])
-  }
+  const linkedRecord = useMemo(
+    () =>
+      values.linkedRecordId
+        ? (loginRecords ?? []).find((r) => r.id === values.linkedRecordId)
+        : undefined,
+    [values.linkedRecordId, loginRecords]
+  )
+
+  const parsedEmail =
+    typeof parsedOtp?.label === 'string' ? parsedOtp.label : ''
+
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const dropdownRecords = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (q) {
+      return (loginRecords ?? []).filter((r) => {
+        const title = ((r.data?.title as string) ?? '').toLowerCase()
+        const username = ((r.data?.username as string) ?? '').toLowerCase()
+        return title.includes(q) || username.includes(q)
+      })
+    }
+    return matchedRecords.map(({ record }) => record)
+  }, [searchQuery, loginRecords, matchedRecords])
 
   const onError = (error: Error) => {
     Toast.show({
@@ -148,28 +127,40 @@ export const CreateOrEditAuthenticatorContent = ({
   const onSubmit = async (formValues: FormValues) => {
     if (isLoading) return
 
-    const data = {
-      type: RECORD_TYPES.LOGIN,
-      folder: formValues.folder,
-      isFavorite: initialRecord?.isFavorite,
-      data: {
-        ...(initialRecord?.data ? initialRecord.data : {}),
-        title: formValues.title,
-        otpInput: formValues.otpSecret?.trim() || undefined,
-        customFields: formValues.customFields,
-        attachments: convertBase64FilesToUint8(
-          formValues.attachments.filter(isUploadedAttachment)
-        )
-      }
-    }
+    const otpInput = formValues.otpSecret?.trim() || undefined
+    const selectedLinkedRecord = formValues.linkedRecordId
+      ? (loginRecords ?? []).find((r) => r.id === formValues.linkedRecordId)
+      : undefined
 
     try {
       setIsLoading(true)
 
-      if (initialRecord) {
-        await updateRecords([{ ...initialRecord, ...data }], onError)
+      if (selectedLinkedRecord) {
+        await updateRecords(
+          [
+            {
+              ...selectedLinkedRecord,
+              data: {
+                ...(selectedLinkedRecord.data ?? {}),
+                otpInput
+              }
+            }
+          ],
+          onError
+        )
       } else {
-        await createRecord(data, onError)
+        await createRecord(
+          {
+            type: RECORD_TYPES.LOGIN,
+            folder: selectedFolder,
+            data: {
+              title: formValues.title,
+              otpInput,
+              ...(parsedEmail ? { username: parsedEmail } : {})
+            }
+          },
+          onError
+        )
       }
 
       setIsLoading(false)
@@ -179,20 +170,8 @@ export const CreateOrEditAuthenticatorContent = ({
     }
   }
 
-  const handleFileUpload = (file?: AuthenticatorAttachment | null) => {
-    if (!file) return
-    setValue('attachments', [...values.attachments, file])
-  }
-
-  const handleAttachmentReplace = (index: number, file?: AuthenticatorAttachment | null) => {
-    if (!file) return
-    const updated = values.attachments.map((a: AuthenticatorAttachment, i: number) => (i === index ? file : a))
-    setValue('attachments', updated)
-  }
-
-  const handleAttachmentDelete = (index: number) => {
-    setValue('attachments', values.attachments.filter((_: AuthenticatorAttachment, i: number) => i !== index))
-  }
+  const titleField = register('title')
+  const otpSecretField = register('otpSecret')
 
   return (
     <Layout
@@ -201,7 +180,7 @@ export const CreateOrEditAuthenticatorContent = ({
       contentStyle={styles.content}
       header={
         <BackScreenHeader
-          title={isEditing ? t`Edit Authenticator Code Item` : t`New Authenticator Code Item`}
+          title={t`New Authenticator Code Item`}
           onBack={() => navigation.goBack()}
         />
       }
@@ -210,20 +189,29 @@ export const CreateOrEditAuthenticatorContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading || !values.title.trim()}
+          disabled={
+            isLoading ||
+            (!linkedRecord && !values.title.trim()) ||
+            !!otpSecretField.error
+          }
           onClick={handleSubmit(onSubmit)}
         >
-          {actionLabel}
+          {t`Add Item`}
         </Button>
       }
     >
       <View>
         <InputField
           label={t`Title`}
-          value={values.title}
+          value={
+            linkedRecord
+              ? ((linkedRecord.data?.title as string) ?? '')
+              : titleField.value
+          }
           placeholder={t`Enter Title`}
           onChangeText={(value) => setValue('title', value)}
           error={errors.title as string | undefined}
+          disabled={!!linkedRecord}
           testID="title-field"
         />
       </View>
@@ -231,9 +219,10 @@ export const CreateOrEditAuthenticatorContent = ({
       <View style={styles.section}>
         <PasswordField
           label={t`Authenticator Secret Key`}
-          value={values.otpSecret}
+          value={otpSecretField.value}
           placeholder={t`Enter your key or URI`}
           onChangeText={(value) => setValue('otpSecret', value)}
+          error={errors.otpSecret as string | undefined}
           rightSlot={
             <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
           }
@@ -241,68 +230,39 @@ export const CreateOrEditAuthenticatorContent = ({
         />
       </View>
 
-      <View style={styles.section}>
-        <Text variant="caption" color={theme.colors.colorTextSecondary}>
-          {t`Additional`}
-        </Text>
-
-        <MultiSlotInput
-          actions={
-            <Button
-              size="small"
-              variant="tertiaryAccent"
-              iconBefore={<Add />}
-              onClick={() => addCustomField({ type: 'note', note: '' })}
-            >
-              {t`Add Another Note`}
-            </Button>
+      <View>
+        <Combobox
+          label={t`Link to Existing Login`}
+          title={t`Change Login Match`}
+          value={(linkedRecord?.data?.title as string) ?? ''}
+          placeholder={t`No record linked`}
+          onClear={() => setValue('linkedRecordId', '')}
+          onOpenChange={(open) => {
+            if (!open) setSearchQuery('')
+          }}
+          items={dropdownRecords.map((record) => ({
+            id: record.id,
+            title: (record.data?.title as string) ?? t`Untitled`,
+            subtitle: record.data?.username as string | undefined,
+            icon: (
+              <RecordItemIcon record={{ ...record, type: RECORD_TYPES.LOGIN }} />
+            )
+          }))}
+          selectedId={values.linkedRecordId}
+          onSelect={(id) => {
+            setValue('linkedRecordId', id)
+            const rec = (loginRecords ?? []).find((r) => r.id === id)
+            setValue('title', (rec?.data?.title as string) ?? '')
+          }}
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t`Search...`}
+          emptyText={
+            searchQuery.trim()
+              ? t`No login items found`
+              : t`No matching login items`
           }
-          errorMessage={
-            (errors as Record<string, { error?: { note?: string } }[]>)?.customFields?.find(Boolean)?.error?.note
-          }
-          testID="notes-multi-slot-input"
-        >
-          {customFieldsList.length ? (
-            customFieldsList.map((field, index) => (
-              <InputField
-                key={`${field.type}-${index}`}
-                label={t`Comment`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Comment`}
-                onChangeText={(value) => setValue(`customFields[${index}].note`, value)}
-                isGrouped
-                testID={`notes-multi-slot-input-slot-${index}`}
-                rightSlot={
-                  customFieldsList.length > 1 ? (
-                    <Button
-                      size="small"
-                      variant="tertiary"
-                      aria-label={t`Delete note`}
-                      iconBefore={<TrashOutlined color={theme.colors.colorTextPrimary} />}
-                      onClick={() => removeCustomField(index)}
-                    />
-                  ) : undefined
-                }
-              />
-            ))
-          ) : (
-            <InputField
-              label={t`Comment`}
-              value=""
-              placeholder={t`Enter Comment`}
-              onChangeText={handleFirstCustomFieldChange}
-              isGrouped
-              testID="notes-multi-slot-input-slot-0"
-            />
-          )}
-        </MultiSlotInput>
-
-        <AttachmentFieldsV2
-          attachments={values.attachments}
-          isEditing={isEditing}
-          onAdd={handleFileUpload}
-          onReplace={handleAttachmentReplace}
-          onDelete={handleAttachmentDelete}
+          testID="authenticator-link-combobox"
         />
       </View>
     </Layout>
