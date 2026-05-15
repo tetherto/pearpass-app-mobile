@@ -15,6 +15,7 @@ import {
   parseProtonPassData
 } from '@tetherto/pearpass-lib-data-import'
 import {
+  AlertMessage,
   Button,
   Link,
   ListItem,
@@ -47,7 +48,11 @@ import { readFileContent } from '../Settings/TabImport/utils/readFileContent'
 import { styles } from './styles'
 import { ImportOptionType } from './types'
 import type { FileInfo, ImportOption, ImportState } from './types'
-import { detectIsEncrypted, parseJsonContent } from './utils'
+import {
+  detectIsEncrypted,
+  isArgon2BitwardenExport,
+  parseJsonContent
+} from './utils'
 
 const importOptions: ImportOption[] = [
   {
@@ -617,6 +622,15 @@ export const ImportItems = () => {
               <Text color={theme.colors.colorTextSecondary} variant="caption">
                 {t`The Uploaded File is encrypted, put the Password file to continue`}
               </Text>
+              {isArgon2BitwardenExport(selectedFileInfo?.parsedJson ?? null) && (
+                <AlertMessage
+                  variant="warning"
+                  size="small"
+                  title={t`Decryption may take a few minutes`}
+                  description={t`This file uses Argon2 encryption, it will take some time to decrypt it. Keep the app open, we'll let you know when it's done.`}
+                  testID="import-argon2-warning"
+                />
+              )}
             </View>
           ) : (
             <UploadField
