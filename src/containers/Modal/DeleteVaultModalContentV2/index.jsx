@@ -25,7 +25,7 @@ import {
   clearBuffer,
   stringToBuffer
 } from '@tetherto/pearpass-lib-vault/src/utils/buffer'
-import { Platform, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
@@ -56,7 +56,9 @@ export const DeleteVaultModalContentV2 = ({
   const { switchVault } = useVaultSwitch()
 
   const devices = vaultData?.devices
-  const deviceCount = Array.isArray(devices) ? devices.length : 0
+  const otherDeviceCount = Array.isArray(devices)
+    ? Math.max(devices.length - 1, 0)
+    : 0
 
   const [eraseFromAllDevices, setEraseFromAllDevices] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -100,10 +102,13 @@ export const DeleteVaultModalContentV2 = ({
         clearBuffer(passwordBuffer)
       }
 
+      let broadcastFailed = false
       if (eraseFromAllDevices) {
         try {
-          await broadcastDeleteVault(vaultId)
+          const { failures } = await broadcastDeleteVault(vaultId)
+          if (failures?.length) broadcastFailed = true
         } catch (error) {
+          broadcastFailed = true
           logger.error(
             'DeleteVaultModalContentV2',
             'broadcastDeleteVault failed:',
@@ -121,7 +126,22 @@ export const DeleteVaultModalContentV2 = ({
           error
         )
         setSubmitError(t`Failed to delete vault`)
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Couldn't delete vault files. Please try again.`,
+          position: 'bottom',
+          bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+        })
         return
+      }
+
+      if (broadcastFailed) {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Couldn't reach other devices. They will sync next time they come online.`,
+          position: 'bottom',
+          bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+        })
       }
 
       closeModal()
@@ -138,7 +158,7 @@ export const DeleteVaultModalContentV2 = ({
       } else {
         try {
           await createVault({ name: t`Personal` })
-          await addDevice(Platform.OS + ' ' + Platform.Version)
+          await addDevice()
           Toast.show({
             type: 'baseToast',
             text1: t`A new "Personal" vault was created`,
@@ -195,12 +215,12 @@ export const DeleteVaultModalContentV2 = ({
 
           <View style={styles.eraseRow}>
             <View style={styles.eraseLabel}>
-              <Text variant="label">{t`Erase Vault from all the`} </Text>
+              <Text variant="label">{t`Erase Vault from`} </Text>
               <Link
                 onClick={onDeviceCountPress}
                 testID="delete-vault-modal-v2-eraseall-link"
               >
-                {t`${deviceCount} devices`}
+                {t`${otherDeviceCount} other devices`}
               </Link>
               <Text variant="label"> {t`with access`}</Text>
             </View>

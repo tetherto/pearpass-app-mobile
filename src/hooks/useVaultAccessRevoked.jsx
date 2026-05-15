@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import {
@@ -7,7 +7,6 @@ import {
   useVaults
 } from '@tetherto/pearpass-lib-vault'
 import { pearpassVaultClient } from '@tetherto/pearpass-lib-vault/src/instances'
-import { Platform } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { useVaultSwitch } from './useVaultSwitch'
@@ -20,10 +19,6 @@ import { logger } from '../utils/logger'
  * Receive-side handler for "another device removed me from this vault".
  * Wipes local data, recovers to a fresh "Personal" vault when nothing
  * remains, and opens the access-removed modal.
- *
- * Triggered by the 'vault-access-revoked' event the lib emits from its
- * delete-vault action handler when an entry lands in this device's
- * actions queue (see pearpass-lib-vault/src/actions/index.js).
  */
 export const useVaultAccessRevoked = () => {
   const { t } = useLingui()
@@ -33,65 +28,90 @@ export const useVaultAccessRevoked = () => {
   const { switchVault } = useVaultSwitch()
   const { createVault } = useCreateVault()
 
-  const handleAccessRevoked = useCallback(
-    async ({ vaultId, actor } = {}) => {
-      if (!vaultId) return
+  const latest = useRef({
+    vaults,
+    activeVault,
+    deleteVaultLocal,
+    addDevice,
+    switchVault,
+    createVault,
+    openModal,
+    t
+  })
+  latest.current = {
+    vaults,
+    activeVault,
+    deleteVaultLocal,
+    addDevice,
+    switchVault,
+    createVault,
+    openModal,
+    t
+  }
 
-      const list = vaults ?? []
-      const vault = list.find((v) => v.id === vaultId)
-      const vaultName = vault?.name ?? vaultId
-      const deviceName = vault?.devices?.find((d) => d?.id === actor)?.name
-      const wasActive = activeVault?.id === vaultId
+  const handleAccessRevoked = useCallback(async ({ vaultId, actor } = {}) => {
+    if (!vaultId) return
+    const {
+      vaults,
+      activeVault,
+      deleteVaultLocal,
+      addDevice,
+      switchVault,
+      createVault,
+      openModal,
+      t
+    } = latest.current
 
-      try {
-        await deleteVaultLocal(vaultId)
-      } catch (error) {
-        logger.error('useVaultAccessRevoked', 'deleteVaultLocal failed:', error)
-        return
-      }
+    const list = vaults ?? []
+    const vault = list.find((v) => v.id === vaultId)
+    const vaultName = vault?.name ?? vaultId
+    const deviceName = vault?.devices?.find((d) => d?.id === actor)?.name
+    const wasActive = activeVault?.id === vaultId
 
-      if (wasActive) {
-        const next = list.find((v) => v.id !== vaultId)
-        if (next) {
-          await switchVault(next)
-        } else {
-          try {
-            await createVault({ name: t`Personal` })
-            await addDevice(Platform.OS + ' ' + Platform.Version)
-            Toast.show({
-              type: 'baseToast',
-              text1: t`A new "Personal" vault was created`,
-              position: 'bottom',
-              bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
-            })
-          } catch (error) {
-            logger.error(
-              'useVaultAccessRevoked',
-              'failed to create fallback Personal vault:',
-              error
-            )
-          }
-        }
-      }
-
+    try {
+      await deleteVaultLocal(vaultId)
+    } catch (error) {
+      logger.error('useVaultAccessRevoked', 'deleteVaultLocal failed:', error)
       openModal(
         <AccessRemovedModalContent
           vaultName={vaultName}
           deviceName={deviceName}
         />
       )
-    },
-    [
-      vaults,
-      activeVault?.id,
-      deleteVaultLocal,
-      switchVault,
-      createVault,
-      addDevice,
-      openModal,
-      t
-    ]
-  )
+      return
+    }
+
+    if (wasActive) {
+      const next = list.find((v) => v.id !== vaultId)
+      if (next) {
+        await switchVault(next)
+      } else {
+        try {
+          await createVault({ name: t`Personal` })
+          await addDevice()
+          Toast.show({
+            type: 'baseToast',
+            text1: t`A new "Personal" vault was created`,
+            position: 'bottom',
+            bottomOffset: TOAST_CONFIG.BOTTOM_OFFSET
+          })
+        } catch (error) {
+          logger.error(
+            'useVaultAccessRevoked',
+            'failed to create fallback Personal vault:',
+            error
+          )
+        }
+      }
+    }
+
+    openModal(
+      <AccessRemovedModalContent
+        vaultName={vaultName}
+        deviceName={deviceName}
+      />
+    )
+  }, [])
 
   useEffect(() => {
     if (!pearpassVaultClient?.on) return
