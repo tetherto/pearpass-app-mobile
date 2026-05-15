@@ -82,6 +82,7 @@ export const VaultDeleteScreenV2 = ({ route }) => {
 
     try {
       try {
+        // Reused for password verification - throws on a wrong password.
         await logIn({ password: passwordBuffer })
       } catch {
         setSubmitError(t`Invalid master password`)
