@@ -26,7 +26,6 @@ import { isModifyVaultModalV2Enabled } from '../../utils/modifyVaultModalV2Flag'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { BottomSheetVaultAction } from '../BottomSheetVaultAction'
 import { Layout } from '../Layout'
-import { DeleteVaultModalContentV2 } from '../Modal/DeleteVaultModalContentV2'
 import { ModifyVaultModalContentV2 } from '../Modal/ModifyVaultModalContentV2'
 
 export const BottomSheetVaultSelectorContent = ({
@@ -109,10 +108,15 @@ export const BottomSheetVaultSelectorContent = ({
     onShare: () => {
       onNavigateToShareVault(vault)
     },
+    onViewPairedDevices: async () => {
+      await switchVault(vault)
+      onNavigate?.('PairedDevicesScreen')
+    },
     onDelete: () => {
-      openModal(
-        <DeleteVaultModalContentV2 vaultId={vault.id} vaultName={vault.name} />
-      )
+      onNavigate?.('VaultDeleteScreenV2', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
     }
   })
 
