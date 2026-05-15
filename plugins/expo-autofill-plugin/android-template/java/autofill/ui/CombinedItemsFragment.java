@@ -23,6 +23,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,6 +83,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
     private TextView vaultSelectorTitle;
     private ImageView vaultSelectorChevron;
     private LinearLayout vaultDropdown;
+    private NestedScrollView vaultDropdownScroll;
     private View vaultDropdownDivider;
     private RecyclerView credentialsRecycler;
     private TextView emptyState;
@@ -165,6 +167,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
         vaultSelectorTitle = root.findViewById(R.id.combinedVaultSelectorTitle);
         vaultSelectorChevron = root.findViewById(R.id.combinedVaultSelectorChevron);
         vaultDropdown = root.findViewById(R.id.combinedVaultDropdown);
+        vaultDropdownScroll = root.findViewById(R.id.combinedVaultDropdownScroll);
         vaultDropdownDivider = root.findViewById(R.id.combinedVaultDropdownDivider);
 
         credentialsRecycler = root.findViewById(R.id.combinedCredentialsList);
@@ -233,7 +236,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
                 .start();
         int vis = dropdownExpanded ? View.VISIBLE : View.GONE;
         if (dropdownExpanded) rebuildDropdown();
-        vaultDropdown.setVisibility(vis);
+        vaultDropdownScroll.setVisibility(vis);
         vaultDropdownDivider.setVisibility(vis);
     }
 
@@ -270,6 +273,22 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
 
             vaultDropdown.addView(row);
         }
+        capDropdownHeight();
+    }
+
+    // Caps the dropdown scroll wrapper so a long vault list doesn't push the
+    // credentials list off-screen. Below the cap → wrap_content (no empty
+    // space); above → fixed cap and the inner LinearLayout scrolls inside.
+    private void capDropdownHeight() {
+        if (vaultDropdownScroll == null || vaultDropdown == null) return;
+        int maxHeightPx = (int) (240 * getResources().getDisplayMetrics().density);
+        vaultDropdownScroll.post(() -> {
+            ViewGroup.LayoutParams lp = vaultDropdownScroll.getLayoutParams();
+            if (lp == null) return;
+            int natural = vaultDropdown.getHeight();
+            lp.height = (natural > maxHeightPx) ? maxHeightPx : ViewGroup.LayoutParams.WRAP_CONTENT;
+            vaultDropdownScroll.setLayoutParams(lp);
+        });
     }
 
     private void setupCredentialsList() {

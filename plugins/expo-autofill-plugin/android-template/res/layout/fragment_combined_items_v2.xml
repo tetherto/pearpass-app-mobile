@@ -98,17 +98,23 @@
                     android:background="@color/pp_v2_border_primary"
                     android:visibility="gone" />
 
-                
-                <LinearLayout
-                    android:id="@+id/combinedVaultDropdown"
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/combinedVaultDropdownScroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="@dimen/pp_v2_spacing_s12"
-                    android:paddingEnd="@dimen/pp_v2_spacing_s12"
-                    android:paddingTop="@dimen/pp_v2_spacing_s12"
-                    android:paddingBottom="@dimen/pp_v2_spacing_s12"
-                    android:visibility="gone" />
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/combinedVaultDropdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="@dimen/pp_v2_spacing_s12"
+                        android:paddingEnd="@dimen/pp_v2_spacing_s12"
+                        android:paddingTop="@dimen/pp_v2_spacing_s12"
+                        android:paddingBottom="@dimen/pp_v2_spacing_s12" />
+                </androidx.core.widget.NestedScrollView>
             </LinearLayout>
         </LinearLayout>
 
