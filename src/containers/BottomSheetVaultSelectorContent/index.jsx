@@ -154,7 +154,7 @@ export const BottomSheetVaultSelectorContent = ({
         >
           {sortedVaults.map((vault) => {
             const isSelected = vault.id === activeVault?.id
-            const memberCount =
+            const deviceCount =
               (isSelected ? activeVault?.devices?.length : undefined) ??
               vault.devices?.length ??
               0
@@ -164,10 +164,10 @@ export const BottomSheetVaultSelectorContent = ({
                 icon={<LockFilled color={theme.colors.colorTextPrimary} />}
                 title={vault.name}
                 subtitle={
-                  memberCount > 0
-                    ? memberCount === 1
-                      ? t`${memberCount} Member`
-                      : t`${memberCount} Members`
+                  deviceCount > 0
+                    ? deviceCount === 1
+                      ? t`${deviceCount} Device`
+                      : t`${deviceCount} Devices`
                     : undefined
                 }
                 selected={isSelected}
