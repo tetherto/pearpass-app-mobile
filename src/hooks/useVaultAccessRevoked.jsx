@@ -15,11 +15,6 @@ import { AccessRemovedModalContent } from '../containers/Modal/AccessRemovedModa
 import { useModal } from '../context/ModalContext'
 import { logger } from '../utils/logger'
 
-/**
- * Receive-side handler for "another device removed me from this vault".
- * Wipes local data, recovers to a fresh "Personal" vault when nothing
- * remains, and opens the access-removed modal.
- */
 export const useVaultAccessRevoked = () => {
   const { t } = useLingui()
   const { openModal } = useModal()
@@ -28,6 +23,7 @@ export const useVaultAccessRevoked = () => {
   const { switchVault } = useVaultSwitch()
   const { createVault } = useCreateVault()
 
+  // `t` must stay outside latest.current so the lingui macro can resolve it.
   const latest = useRef({
     vaults,
     activeVault,
@@ -35,8 +31,7 @@ export const useVaultAccessRevoked = () => {
     addDevice,
     switchVault,
     createVault,
-    openModal,
-    t
+    openModal
   })
   useEffect(() => {
     latest.current = {
@@ -46,8 +41,7 @@ export const useVaultAccessRevoked = () => {
       addDevice,
       switchVault,
       createVault,
-      openModal,
-      t
+      openModal
     }
   })
 
@@ -60,8 +54,7 @@ export const useVaultAccessRevoked = () => {
       addDevice,
       switchVault,
       createVault,
-      openModal,
-      t
+      openModal
     } = latest.current
 
     const list = vaults ?? []
@@ -85,7 +78,8 @@ export const useVaultAccessRevoked = () => {
     }
 
     if (wasActive) {
-      const next = list.find((v) => v.id !== vaultId)
+      const refreshed = latest.current.vaults ?? []
+      const next = refreshed.find((v) => v.id !== vaultId)
       if (next) {
         await switchVault(next)
       } else {
