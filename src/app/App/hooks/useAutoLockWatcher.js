@@ -80,7 +80,7 @@ export const useAutoLockWatcher = () => {
 
     collapse()
     closeModal()
-    closeAllInstances()
+    await closeAllInstances()
     clearAllFileCache()
 
     if (isV2()) {
