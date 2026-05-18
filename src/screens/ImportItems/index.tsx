@@ -84,7 +84,7 @@ const importOptions: ImportOption[] = [
   },
   {
     title: 'KeePassXC',
-    type: ImportOptionType.KeePassKDBX,
+    type: ImportOptionType.KeePassXC,
     description: t`To import data from KeePassXC, open your database and go to Database > Export to CSV or XML. Once done, upload the exported file here.`,
     testId: 'settings-import-keepassxc',
     accepts: ['.csv', '.xml'],
@@ -260,21 +260,15 @@ export const ImportItems = () => {
   }) => {
     let result: unknown[] = []
     let dataToProcess: unknown = fileContent
-    let resolvedType = type
 
     try {
-      if (
-        (resolvedType === ImportOptionType.KeePass ||
-          resolvedType === ImportOptionType.KeePassKDBX) &&
-        fileType === 'kdbx'
-      ) {
+      if (type === ImportOptionType.KeePass && fileType === 'kdbx') {
         if (!password)
           throw new Error('Password is required for encrypted files')
         dataToProcess = await decryptKeePassKdbx(fileContent, password)
-        resolvedType = ImportOptionType.KeePassKDBX
       }
 
-      if (resolvedType === ImportOptionType.Encrypted && isEncrypted) {
+      if (type === ImportOptionType.Encrypted && isEncrypted) {
         if (!password)
           throw new Error('Password is required for encrypted files')
         if (!parsedJson) {
@@ -283,7 +277,7 @@ export const ImportItems = () => {
         dataToProcess = await decryptExportData(parsedJson, password)
       }
 
-      if (resolvedType === ImportOptionType.Bitwarden && isEncrypted) {
+      if (type === ImportOptionType.Bitwarden && isEncrypted) {
         if (!password) {
           throw new Error('Password is required for encrypted files')
         }
@@ -319,7 +313,7 @@ export const ImportItems = () => {
     }
 
     try {
-      switch (resolvedType) {
+      switch (type) {
         case ImportOptionType.OnePassword:
           result = await parse1PasswordData(dataToProcess, fileType)
           break
@@ -330,10 +324,8 @@ export const ImportItems = () => {
           result = await parseLastPassData(dataToProcess, fileType)
           break
         case ImportOptionType.KeePass:
+        case ImportOptionType.KeePassXC:
           result = await parseKeePassData(dataToProcess, fileType)
-          break
-        case ImportOptionType.KeePassKDBX:
-          result = await parseKeePassData(dataToProcess, 'kdbx')
           break
         case ImportOptionType.NordPass:
           result = await parseNordPassData(dataToProcess, fileType)
