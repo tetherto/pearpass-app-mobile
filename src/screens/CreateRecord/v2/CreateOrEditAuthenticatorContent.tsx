@@ -69,7 +69,7 @@ export const CreateOrEditAuthenticatorContent = ({
     otpSecret: Validator.string().refine(validateOtpInput)
   })
 
-  const { handleSubmit, register, values, setValue, errors } =
+  const { handleSubmit, register, values, setValue, setErrors, errors } =
     useForm<FormValues>({
       initialValues: {
         title: '',
@@ -173,6 +173,16 @@ export const CreateOrEditAuthenticatorContent = ({
   const titleField = register('title')
   const otpSecretField = register('otpSecret')
 
+  // Clear the OTP error as soon as the user touches the field again (typing,
+  // scanning, or clearing). The submit-time validator will re-set it if the
+  // new value is still invalid.
+  const handleOtpSecretChange = (value: string) => {
+    setValue('otpSecret', value)
+    if (errors?.otpSecret) {
+      setErrors((prev) => ({ ...prev, otpSecret: null }))
+    }
+  }
+
   return (
     <Layout
       scrollable
@@ -221,10 +231,10 @@ export const CreateOrEditAuthenticatorContent = ({
           label={t`Authenticator Secret Key`}
           value={otpSecretField.value}
           placeholder={t`Enter your key or URI`}
-          onChangeText={(value) => setValue('otpSecret', value)}
+          onChangeText={handleOtpSecretChange}
           error={errors.otpSecret as string | undefined}
           rightSlot={
-            <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
+            <OtpSecretScanButton onScanned={handleOtpSecretChange} />
           }
           testID="otp-secret-field"
         />
