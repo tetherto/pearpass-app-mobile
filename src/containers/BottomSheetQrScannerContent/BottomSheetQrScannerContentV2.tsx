@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import {
@@ -8,7 +8,7 @@ import {
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { Dimensions, StyleSheet, View } from 'react-native'
+import { Dimensions, Keyboard, StyleSheet, View } from 'react-native'
 import { Camera } from 'react-native-vision-camera'
 
 import { withAutoLockBypass } from '../../HOCs'
@@ -120,6 +120,10 @@ export const BottomSheetQrScannerContentV2 = withAutoLockBypass(
   ({ onScanned, title, trigger, open, onOpenChange }: Props) => {
     const { t } = useLingui()
     const sheetTitle = title ?? t`Scan Authenticator QR Code`
+
+    useEffect(() => {
+      if (open) Keyboard.dismiss()
+    }, [open])
 
     return (
       <ContextMenu trigger={trigger} open={open} onOpenChange={onOpenChange}>
