@@ -173,9 +173,6 @@ export const CreateOrEditAuthenticatorContent = ({
   const titleField = register('title')
   const otpSecretField = register('otpSecret')
 
-  // Clear the OTP error as soon as the user touches the field again (typing,
-  // scanning, or clearing). The submit-time validator will re-set it if the
-  // new value is still invalid.
   const handleOtpSecretChange = (value: string) => {
     setValue('otpSecret', value)
     if (errors?.otpSecret) {
