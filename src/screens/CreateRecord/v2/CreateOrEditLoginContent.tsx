@@ -391,11 +391,11 @@ export const CreateOrEditLoginContent = ({
                       size="small"
                       aria-label={t`Remove Authenticator Code`}
                       iconBefore={<Close color={theme.colors.colorTextPrimary} />}
-                      onClick={() => setValue('otpSecret', '')}
+                      onClick={() => register('otpSecret').onChange('')}
                       data-testid="otp-secret-clear-button"
                     />
                   ) : null}
-                  <OtpSecretScanButton onScanned={(secret) => setValue('otpSecret', secret)} />
+                  <OtpSecretScanButton onScanned={(secret) => register('otpSecret').onChange(secret)} />
                 </View>
               }
               testID="otp-secret-field"
