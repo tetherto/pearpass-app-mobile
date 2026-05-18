@@ -19,7 +19,7 @@ import {
   useVault
 } from '@tetherto/pearpass-lib-vault'
 import { useCallback, useEffect, useState } from 'react'
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Platform, Text, View } from 'react-native'
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -240,6 +240,9 @@ export const ExportItems = () => {
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
             android_keyboardInputMode="adjustResize"
+            onOpenChange={(open) => {
+              if (open) Keyboard.dismiss()
+            }}
             trigger={
               <Button
                 disabled={
