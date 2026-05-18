@@ -11,6 +11,7 @@ import { useRedirect } from './hooks/useRedirect'
 import { ToastCard } from '../../components/ToastCard'
 import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { useVaultAccessRevoked } from '../../hooks/useVaultAccessRevoked'
 import { useVersionCheck } from '../../hooks/useVersionCheck'
 
 export const App = () => {
@@ -25,6 +26,8 @@ export const App = () => {
       expand({ children: <UpdateModalContent />, locked: true })
     }
   }, [needsUpdate])
+
+  useVaultAccessRevoked()
 
   const { initialRouteName, isLoading } = useRedirect()
 

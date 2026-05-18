@@ -134,8 +134,9 @@ declare module '@tetherto/pearpass-lib-vault' {
         hashedPassword?: string
       }
     ) => Promise<unknown>
-    addDevice: (device: unknown) => Promise<void>
+    addDevice: () => Promise<void>
     isVaultProtected: (vaultId: string) => Promise<boolean>
+    deleteVaultLocal: (vaultId: string) => Promise<unknown[]>
   }
 
   export function useVaults(options?: {
@@ -246,7 +247,11 @@ declare module '@tetherto/pearpass-lib-vault' {
   ): Promise<Array<{ recordId: string; code: string; timeRemaining?: number }>>
   export function generateHotpNext(recordId: string): Promise<{ code: string } | null>
   export function closeAllInstances(): Promise<void>
-  export function setPearpassVaultClient(client: unknown): void
+  export function setPearpassVaultClient(
+    client: unknown,
+    options?: { currentDeviceName?: string }
+  ): void
+  export function setCurrentDeviceName(name: string | null): void
   export function setStoragePath(path: string): void
   export function authoriseCurrentProtectedVault(params: unknown): Promise<unknown>
   export function getVaultById(vaultId: string): Promise<Record<string, any>>

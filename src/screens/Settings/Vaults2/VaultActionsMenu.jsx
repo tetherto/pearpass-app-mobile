@@ -17,8 +17,6 @@ import {
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const isDeleteEnabled = false
-
 export const VaultActionsMenu = ({
   onRename,
   onViewPairedDevices,
@@ -65,7 +63,7 @@ export const VaultActionsMenu = ({
             label: t`Set Vault Password`,
             onClick: () => closeAndRun(onSetPassword)
           },
-          isDeleteEnabled && {
+          {
             key: 'delete',
             icon: (
               <TrashOutlined

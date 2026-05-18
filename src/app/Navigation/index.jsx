@@ -33,8 +33,10 @@ import { AppPreferences } from '../../screens/Settings/AppPreferences'
 import { Diagnostics } from '../../screens/Settings/Diagnostics'
 import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
+import { PairedDevicesScreen } from '../../screens/Settings/PairedDevicesScreen'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
 import { VaultDeleteScreen } from '../../screens/Settings/VaultDeleteScreen'
+import { VaultDeleteScreenV2 } from '../../screens/Settings/VaultDeleteScreenV2'
 import { VaultPasswordScreen } from '../../screens/Settings/VaultPasswordScreen'
 import { VaultRenameScreen } from '../../screens/Settings/VaultRenameScreen'
 import { VaultsV2 } from '../../screens/Settings/Vaults2'
@@ -140,6 +142,8 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="VaultRenameScreen" component={VaultRenameScreen} />
     <Stack.Screen name="VaultPasswordScreen" component={VaultPasswordScreen} />
     <Stack.Screen name="VaultDeleteScreen" component={VaultDeleteScreen} />
+    <Stack.Screen name="VaultDeleteScreenV2" component={VaultDeleteScreenV2} />
+    <Stack.Screen name="PairedDevicesScreen" component={PairedDevicesScreen} />
     <Stack.Screen name="VaultShareScreen" component={VaultShareScreen} />
   </Stack.Navigator>
 )

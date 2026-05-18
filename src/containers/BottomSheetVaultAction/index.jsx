@@ -9,9 +9,10 @@ import {
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
 import {
+  ArrowBackOutined,
   Close,
+  Devices,
   EditOutlined,
-  KeyboardArrowLeftOutlined,
   LockOutlined,
   Share,
   TrashOutlined
@@ -34,7 +35,7 @@ const VaultActionHeader = ({ title, onBack, onClose, showBackButton }) => {
           size="medium"
           aria-label={t`Back`}
           iconBefore={
-            <KeyboardArrowLeftOutlined color={theme.colors.colorTextPrimary} />
+            <ArrowBackOutined color={theme.colors.colorTextPrimary} />
           }
           onClick={onBack}
         />
@@ -63,6 +64,7 @@ const VaultActionHeader = ({ title, onBack, onClose, showBackButton }) => {
  * @param {Object} props
  * @param {string} props.vaultName
  * @param {() => void} [props.onRename]
+ * @param {() => void} [props.onViewPairedDevices]
  * @param {() => void} [props.onPassword]
  * @param {() => void} [props.onShare]
  * @param {() => void} [props.onDelete]
@@ -74,6 +76,7 @@ const VaultActionHeader = ({ title, onBack, onClose, showBackButton }) => {
 export const BottomSheetVaultAction = ({
   vaultName,
   onRename,
+  onViewPairedDevices,
   onPassword,
   onShare,
   onDelete,
@@ -110,6 +113,12 @@ export const BottomSheetVaultAction = ({
       icon: <EditOutlined color={theme.colors.colorTextPrimary} />,
       onClick: () => closeAndRun(onRename)
     },
+    {
+      key: 'members',
+      label: t`View Paired Devices`,
+      icon: <Devices color={theme.colors.colorTextPrimary} />,
+      onClick: () => closeAndRun(onViewPairedDevices)
+    },
     ...(PROTECTED_VAULT_ENABLED
       ? [
           {
@@ -127,20 +136,18 @@ export const BottomSheetVaultAction = ({
             label: t`Share Personal Vault`,
             icon: <Share color={theme.colors.colorTextPrimary} />,
             onClick: () => closeAndRun(onShare)
-          },
-          {
-            key: 'delete',
-            label: t`Delete Vault`,
-            icon: (
-              <TrashOutlined
-                color={theme.colors.colorSurfaceDestructiveElevated}
-              />
-            ),
-            variant: 'destructive',
-            onClick: () => closeAndRun(onDelete)
           }
         ]
-      : [])
+      : []),
+    {
+      key: 'delete',
+      label: t`Delete Vault`,
+      icon: (
+        <TrashOutlined color={theme.colors.colorSurfaceDestructiveElevated} />
+      ),
+      variant: 'destructive',
+      onClick: () => closeAndRun(onDelete)
+    }
   ]
 
   return (

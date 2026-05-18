@@ -197,6 +197,9 @@ export class Logger {
   log(...args) {
     writeMainLog('log', ...args)
   }
+  warn(...args) {
+    writeMainLog('warn', ...args)
+  }
   error(...args) {
     if (!__DEV__) {
       // eslint-disable-next-line no-console
