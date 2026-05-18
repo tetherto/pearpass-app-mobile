@@ -18,6 +18,7 @@ export interface BaseRecord<T = unknown> {
   attachments?: Attachment[]
   otpPublic?: OtpPublic
   passkeyCreatedAt?: Date | string | null
+  updatedAt?: number
   data?: T
 }
 

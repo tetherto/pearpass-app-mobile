@@ -19,7 +19,7 @@ import {
   useVault
 } from '@tetherto/pearpass-lib-vault'
 import { useCallback, useEffect, useState } from 'react'
-import { Text, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, Text, View } from 'react-native'
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -225,86 +225,93 @@ export const ExportItems = () => {
     register('passwordConfirm')
 
   return (
-    <Layout
-      header={
-        <BackScreenHeader title={t`Settings`} onBack={navigation.goBack} />
-      }
-      footer={
-        <ContextMenu
-          keyboardBehavior="interactive"
-          keyboardBlurBehavior="restore"
-          android_keyboardInputMode="adjustResize"
-          trigger={
-            <Button
-              disabled={
-                isPasswordProtected &&
-                (!values.password ||
-                  !values.passwordConfirm ||
-                  values.password !== values.passwordConfirm)
-              }
-            >{t`Export`}</Button>
-          }
-        >
-          <BottomSheetReauthContent
-            onConfirm={async () => {
-              handleExport()
-            }}
-          />
-        </ContextMenu>
-      }
-      contentStyle={styles.container}
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.content}>
-        <View style={styles.captions}>
-          <Text
-            style={[styles.label, { color: theme.colors.colorTextPrimary }]}
+      <Layout
+        scrollable
+        disableKeyboardAvoidance
+        header={
+          <BackScreenHeader title={t`Settings`} onBack={navigation.goBack} />
+        }
+        footer={
+          <ContextMenu
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            android_keyboardInputMode="adjustResize"
+            trigger={
+              <Button
+                disabled={
+                  isPasswordProtected &&
+                  (!values.password ||
+                    !values.passwordConfirm ||
+                    values.password !== values.passwordConfirm)
+                }
+              >{t`Export`}</Button>
+            }
           >
-            {t`Export`}
-          </Text>
-          <TextComponent
-            color={theme.colors.colorTextSecondary}
-            variant="caption"
-          >
-            {t`Download the data in the desired format and optionally protect the file with a password for securely backing up or transferring your data.`}
-          </TextComponent>
-        </View>
-        <Radio
-          options={options}
-          value={selectedFormat}
-          onChange={handleOptionSelect}
-        />
-        {selectedFormat === 'json' && (
-          <View
-            style={[
-              styles.protectionWrapper,
-              { borderColor: theme.colors.colorSurfaceDisabled }
-            ]}
-          >
-            <ToggleSwitch
-              checked={isPasswordProtected}
-              onChange={setIsPasswordProtected}
-              label={t`Protect with Password`}
-              description={t`Protect your exported file so it can only be opened with the password you set`}
+            <BottomSheetReauthContent
+              onConfirm={async () => {
+                handleExport()
+              }}
             />
-            <Animated.View style={animatedFormStyle}>
-              <View style={styles.formWrapper}>
-                <PasswordField
-                  label={t`Password`}
-                  placeholder={t`Enter file password`}
-                  {...passwordRegisterProps}
-                  error={passwordError ?? undefined}
-                />
-                <PasswordField
-                  label={t`Repeat Password`}
-                  placeholder={t`Repeat file password`}
-                  {...passwordConfirmRegisterProps}
-                  error={passwordConfirmError ?? undefined}
-                />
-              </View>
-            </Animated.View>
+          </ContextMenu>
+        }
+        contentStyle={styles.container}
+      >
+        <View style={styles.content}>
+          <View style={styles.captions}>
+            <Text
+              style={[styles.label, { color: theme.colors.colorTextPrimary }]}
+            >
+              {t`Export`}
+            </Text>
+            <TextComponent
+              color={theme.colors.colorTextSecondary}
+              variant="caption"
+            >
+              {t`Download the data in the desired format and optionally protect the file with a password for securely backing up or transferring your data.`}
+            </TextComponent>
           </View>
-        )}
-      </View>
-    </Layout>
+          <Radio
+            options={options}
+            value={selectedFormat}
+            onChange={handleOptionSelect}
+          />
+          {selectedFormat === 'json' && (
+            <View
+              style={[
+                styles.protectionWrapper,
+                { borderColor: theme.colors.colorSurfaceDisabled }
+              ]}
+            >
+              <ToggleSwitch
+                checked={isPasswordProtected}
+                onChange={setIsPasswordProtected}
+                label={t`Protect with Password`}
+                description={t`Protect your exported file so it can only be opened with the password you set`}
+              />
+              <Animated.View style={animatedFormStyle}>
+                <View style={styles.formWrapper}>
+                  <PasswordField
+                    label={t`Password`}
+                    placeholder={t`Enter file password`}
+                    {...passwordRegisterProps}
+                    error={passwordError ?? undefined}
+                  />
+                  <PasswordField
+                    label={t`Repeat Password`}
+                    placeholder={t`Repeat file password`}
+                    {...passwordConfirmRegisterProps}
+                    error={passwordConfirmError ?? undefined}
+                  />
+                </View>
+              </Animated.View>
+            </View>
+          )}
+        </View>
+      </Layout>
+    </KeyboardAvoidingView>
   )
 }

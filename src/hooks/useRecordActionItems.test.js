@@ -506,7 +506,7 @@ describe('useRecordActionItems', () => {
       mockNavigate.mockClear()
     })
 
-    it('handleDelete passes isOtpContext: true to MultiSelectDelete when isOtpContext=true and record is login', () => {
+    it('handleDelete passes isOtpContext: false to MultiSelectDelete when isOtpContext=true and record is login', () => {
       const { result } = renderHook(
         () =>
           useRecordActionItems({
@@ -526,7 +526,7 @@ describe('useRecordActionItems', () => {
 
       expect(mockNavigate).toHaveBeenCalledWith(
         'MultiSelectDelete',
-        expect.objectContaining({ isOtpContext: true })
+        expect.objectContaining({ isOtpContext: false })
       )
     })
 

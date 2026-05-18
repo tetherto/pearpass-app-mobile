@@ -2,8 +2,11 @@ import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 import { StyleSheet } from 'react-native'
 
 export const styles = StyleSheet.create({
+  flex: {
+    flex: 1
+  },
   container: {
-    paddingTop: rawTokens.spacing24,
+    paddingTop: rawTokens.spacing24
   },
   content: {
     gap: rawTokens.spacing24

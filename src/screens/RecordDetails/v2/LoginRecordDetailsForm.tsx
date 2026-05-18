@@ -82,7 +82,7 @@ export const LoginRecordDetailsForm = ({
       credential: initialRecord?.data?.credential?.id ?? '',
       passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
     }),
-    [initialRecord, selectedFolder]
+    [initialRecord?.id, initialRecord?.updatedAt, selectedFolder]
   )
 
   const { register, setValues, values, setValue } =

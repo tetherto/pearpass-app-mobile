@@ -69,16 +69,20 @@ struct CombinedItemsV2View: View {
                                 .fill(PPColors.borderPrimary)
                                 .frame(height: 1)
 
-                            VStack(spacing: PPSpacing.s8) {
-                                ForEach(vaults) { vault in
-                                    PPVaultInlineItemView(
-                                        name: vault.name,
-                                        isSelected: vault.id == selectedVaultId,
-                                        onTap: { onSelectVault(vault.id) }
-                                    )
+                            // Capped scroll wrapper so a long vault list
+                            ScrollView {
+                                VStack(spacing: PPSpacing.s8) {
+                                    ForEach(vaults) { vault in
+                                        PPVaultInlineItemView(
+                                            name: vault.name,
+                                            isSelected: vault.id == selectedVaultId,
+                                            onTap: { onSelectVault(vault.id) }
+                                        )
+                                    }
                                 }
+                                .padding(PPSpacing.s12)
                             }
-                            .padding(PPSpacing.s12)
+                            .frame(maxHeight: 240)
                         }
                     }
                     .background(
