@@ -9,10 +9,12 @@ import {
   matchLoginRecords,
   parseOtpInput,
   useCreateRecord,
+  useFindOtpDuplicates,
   useRecords,
   validateOtpInput
 } from '@tetherto/pearpass-lib-vault'
 import {
+  AlertMessage,
   Button,
   Combobox,
   InputField,
@@ -89,6 +91,12 @@ export const CreateOrEditAuthenticatorContent = ({
     () => matchLoginRecords(parsedOtp, loginRecords ?? []),
     [parsedOtp, loginRecords]
   )
+
+  const { data: duplicates } = useFindOtpDuplicates({
+    secret: parsedOtp?.secret,
+    excludeRecordId: values.linkedRecordId || undefined
+  })
+  const duplicateRecord = duplicates[0]
 
   const linkedRecord = useMemo(
     () =>
@@ -235,6 +243,17 @@ export const CreateOrEditAuthenticatorContent = ({
           }
           testID="otp-secret-field"
         />
+        {duplicateRecord && (
+          <AlertMessage
+            variant="warning"
+            size="small"
+            title={t`Potential code duplicate`}
+            description={t`An item with this secret key or URL already exists: ${
+              duplicateRecord.title || t`Untitled`
+            }`}
+            testID="otp-duplicate-warning"
+          />
+        )}
       </View>
 
       <View>

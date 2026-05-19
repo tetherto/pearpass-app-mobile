@@ -299,6 +299,19 @@ declare module '@tetherto/pearpass-lib-vault' {
     reasons: Array<'issuer-domain' | 'label-username'>
   }>
 
+  export function findOtpDuplicates(params: {
+    secret?: string | null
+    excludeRecordId?: string
+  }): Promise<Array<{ id: string; title: string }>>
+
+  export function useFindOtpDuplicates(params?: {
+    secret?: string | null
+    excludeRecordId?: string
+  }): {
+    data: Array<{ id: string; title: string }>
+    isLoading: boolean
+  }
+
   // ─── Context / Provider ───────────────────────────────────────────────────
 
   export const VaultProvider: React.ComponentType<{ children: React.ReactNode }>
