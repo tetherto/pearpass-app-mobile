@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
-import { Platform } from 'react-native'
 
 type ImportVaultState = {
   isLoading: boolean
@@ -29,7 +28,7 @@ export const useImportVault = () => {
         setState({ error: '', isLoading: true })
         const vaultId = await pairActiveVault(code)
         await refetchVault(vaultId)
-        await addDevice(Platform.OS + ' ' + Platform.Version)
+        await addDevice()
         setState({ isLoading: false, error: '' })
         return true
       } catch {

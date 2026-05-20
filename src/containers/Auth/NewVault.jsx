@@ -68,7 +68,7 @@ export const NewVault = () => {
     try {
       setIsLoading(true)
       await createVault({ name: values.name, password: values.password })
-      await addDevice(Platform.OS + ' ' + Platform.Version)
+      await addDevice()
       navigation.replace('MainTabNavigator')
       setIsLoading(false)
     } catch (error) {

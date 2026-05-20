@@ -16,7 +16,7 @@ import {
   VaultProvider
 } from '@tetherto/pearpass-lib-vault'
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, Text } from 'react-native'
+import { Platform, StyleSheet, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -62,7 +62,9 @@ export const Main = () => {
           debugMode: process.env.NODE_ENV === 'development'
         })
 
-        setPearpassVaultClient(vaultClient)
+        setPearpassVaultClient(vaultClient, {
+          currentDeviceName: Platform.OS + ' ' + Platform.Version
+        })
         setIsPearPassReady(true)
       } catch (error) {
         logger.error('PearPass init failed:', error)

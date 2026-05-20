@@ -39,7 +39,10 @@ export const CreateRecordV2 = ({ route }: CreateRecordV2Props) => {
   const renderContent = () => {
     switch (recordType) {
       case RECORD_TYPES.OTP:
-        return <CreateOrEditAuthenticatorContent initialRecord={initialRecord} selectedFolder={resolvedFolder} />
+        if (initialRecord) {
+          return <CreateOrEditLoginContent initialRecord={initialRecord} selectedFolder={resolvedFolder} />
+        }
+        return <CreateOrEditAuthenticatorContent selectedFolder={resolvedFolder} />
       case RECORD_TYPES.CREDIT_CARD:
         return <CreateOrEditCreditCardContent initialRecord={initialRecord} selectedFolder={resolvedFolder} />
       case RECORD_TYPES.CUSTOM:

@@ -134,8 +134,9 @@ declare module '@tetherto/pearpass-lib-vault' {
         hashedPassword?: string
       }
     ) => Promise<unknown>
-    addDevice: (device: unknown) => Promise<void>
+    addDevice: () => Promise<void>
     isVaultProtected: (vaultId: string) => Promise<boolean>
+    deleteVaultLocal: (vaultId: string) => Promise<unknown[]>
   }
 
   export function useVaults(options?: {
@@ -246,7 +247,11 @@ declare module '@tetherto/pearpass-lib-vault' {
   ): Promise<Array<{ recordId: string; code: string; timeRemaining?: number }>>
   export function generateHotpNext(recordId: string): Promise<{ code: string } | null>
   export function closeAllInstances(): Promise<void>
-  export function setPearpassVaultClient(client: unknown): void
+  export function setPearpassVaultClient(
+    client: unknown,
+    options?: { currentDeviceName?: string }
+  ): void
+  export function setCurrentDeviceName(name: string | null): void
   export function setStoragePath(path: string): void
   export function authoriseCurrentProtectedVault(params: unknown): Promise<unknown>
   export function getVaultById(vaultId: string): Promise<Record<string, any>>
@@ -268,6 +273,44 @@ declare module '@tetherto/pearpass-lib-vault' {
   export function groupOtpRecords(
     records: Array<{ otpPublic?: OtpPublic }>
   ): OtpGroupResult
+
+  export function validateOtpInput(
+    input: string | undefined | null
+  ): string | null
+
+  export function parseOtpInput(input: string | undefined | null): {
+    secret: string
+    type: 'TOTP' | 'HOTP'
+    algorithm: string
+    digits: number
+    period?: number
+    counter?: number
+    issuer?: string
+    label?: string
+  } | null
+
+  export function matchLoginRecords<
+    R extends { id: string; data?: Record<string, unknown> }
+  >(
+    parsedOtp: { issuer?: string; label?: string } | null | undefined,
+    loginRecords: R[]
+  ): Array<{
+    record: R
+    reasons: Array<'issuer-domain' | 'label-username'>
+  }>
+
+  export function findOtpDuplicates(params: {
+    secret?: string | null
+    excludeRecordId?: string
+  }): Promise<Array<{ id: string; title: string }>>
+
+  export function useFindOtpDuplicates(params?: {
+    secret?: string | null
+    excludeRecordId?: string
+  }): {
+    data: Array<{ id: string; title: string }>
+    isLoading: boolean
+  }
 
   // ─── Context / Provider ───────────────────────────────────────────────────
 

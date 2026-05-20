@@ -11,7 +11,6 @@ import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
 import * as Clipboard from 'expo-clipboard'
 import {
   ActivityIndicator,
-  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -78,7 +77,7 @@ export const PairAnotherDeviceContent = ({
       setError('')
       const vaultId = await pairActiveVault(code)
       const vault = await refetchVault(vaultId)
-      await addDevice(Platform.OS + ' ' + Platform.Version)
+      await addDevice()
       if (vault) {
         collapse()
         navigation.replace('MainTabNavigator')

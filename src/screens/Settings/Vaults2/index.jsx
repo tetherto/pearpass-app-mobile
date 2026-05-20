@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
@@ -18,7 +18,6 @@ import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { VaultRow } from './VaultRow'
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { VAULT_ACTION } from '../../../constants/vaultActions'
-import { BottomSheetPairedDevicesContent } from '../../../containers/BottomSheetPairedDevicesContent'
 import { ModifyVaultModalContentV2 } from '../../../containers/Modal/ModifyVaultModalContentV2'
 import { useModal } from '../../../context/ModalContext'
 import { useVaultSwitch } from '../../../hooks/useVaultSwitch'
@@ -28,7 +27,6 @@ export const VaultsV2 = () => {
   const navigation = useNavigation()
   const { theme } = useTheme()
   const { openModal } = useModal()
-  const [pairedDevicesOpen, setPairedDevicesOpen] = useState(false)
   const { data: currentVault, refetch: refetchVault } = useVault()
   const { switchVault } = useVaultSwitch()
   const { data: allVaults } = useVaults()
@@ -56,7 +54,7 @@ export const VaultsV2 = () => {
         vaultId: vault.id,
         vaultName: vault.name
       }),
-    onViewPairedDevices: () => setPairedDevicesOpen(true),
+    onViewPairedDevices: () => navigation.navigate('PairedDevicesScreen'),
     onSetPassword: () =>
       openModal(
         <ModifyVaultModalContentV2
@@ -65,7 +63,11 @@ export const VaultsV2 = () => {
           action={VAULT_ACTION.PASSWORD}
         />
       ),
-    onDelete: () => {}
+    onDelete: () =>
+      navigation.navigate('VaultDeleteScreenV2', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
   })
 
   const renderVaultItem = (
@@ -108,11 +110,6 @@ export const VaultsV2 = () => {
       <PageHeader
         title={t`Your Vaults`}
         subtitle={t`Manage your vaults. Select the vault you want to apply changes to.`}
-      />
-
-      <BottomSheetPairedDevicesContent
-        open={pairedDevicesOpen}
-        onOpenChange={setPairedDevicesOpen}
       />
 
       {currentVault && (

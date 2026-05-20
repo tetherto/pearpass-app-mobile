@@ -51,7 +51,7 @@ export const LoadVault = () => {
     try {
       const vaultId = await pairActiveVault(code)
       const vault = await refetchVault(vaultId)
-      await addDevice(Platform.OS + ' ' + Platform.Version)
+      await addDevice()
       if (vault) navigation.replace('MainTabNavigator')
     } catch {
       setError(t`Something went wrong, please check invite code`)

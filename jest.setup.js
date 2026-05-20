@@ -1,7 +1,20 @@
 require('react-native-reanimated').setUpTests()
+require('react-native-gesture-handler/jestSetup')
 
 // Since many components use clipboard and secure store, we mock them here
 // Developer can overwrite them in their test files if needed.
+jest.mock('expo-crypto', () => ({
+  randomUUID: () =>
+    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+    }),
+  getRandomValues: (arr) => {
+    for (let i = 0; i < arr.length; i++) arr[i] = Math.floor(Math.random() * 256)
+    return arr
+  }
+}))
+
 jest.mock('expo-clipboard', () => ({
   setStringAsync: jest.fn(() => Promise.resolve()),
   getStringAsync: jest.fn(() => Promise.resolve('')),
