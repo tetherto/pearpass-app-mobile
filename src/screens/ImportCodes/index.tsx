@@ -2,7 +2,6 @@ import { t } from '@lingui/core/macro'
 import { useNavigation } from '@react-navigation/native'
 import { MOBILE_2FA_IMPORTS_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
-  AlertMessage,
   Button,
   Link,
   ListItem,
@@ -19,10 +18,12 @@ import {
   QrCode,
   UploadFileFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Linking, Pressable, View } from 'react-native'
+import { BottomSheetQrScannerContentV2 } from 'src/containers/BottomSheetQrScannerContent/BottomSheetQrScannerContentV2'
 import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
+import { ScanResultsView } from './ScanResultsView'
 import { styles } from './styles'
 import { ImportCodesOptionType } from './types'
 import type { ImportCodesOption, ImportCodesState } from './types'
@@ -49,16 +50,18 @@ export const ImportCodes = () => {
   const [selectedOption, setSelectedOption] =
     useState<ImportCodesOption | null>(null)
   const [files, setFiles] = useState<UploadedFile[]>([])
+  const [isScannerOpen, setIsScannerOpen] = useState(false)
 
-  if (!MOBILE_2FA_IMPORTS_ENABLED) {
-    navigation.goBack()
-    return null
-  }
+  useEffect(() => {
+    if (!MOBILE_2FA_IMPORTS_ENABLED) {
+      navigation.goBack()
+    }
+  }, [navigation])
+
+  if (!MOBILE_2FA_IMPORTS_ENABLED) return null
 
   const handleBack = () => {
-    if (state === 'reviewed') {
-      setState('upload')
-    } else if (state === 'upload') {
+    if (state === 'upload') {
       setState('default')
       setSelectedOption(null)
       setFiles([])
@@ -68,13 +71,23 @@ export const ImportCodes = () => {
   }
 
   const handleFilePick = () => {
-    // TODO: integrate real file picker when 2FA import functionality lands
     setFiles([
       {
         file: null as unknown as File,
-        name: 'IMG_3661.png',
-        size: 0,
-        type: 'png'
+        name: 'codes.json',
+        size: 1024,
+        type: 'json'
+      }
+    ])
+  }
+
+  const handleQRScanned = (data: string) => {
+    setFiles([
+      {
+        file: null as unknown as File,
+        name: 'qr-scan.txt',
+        size: data.length,
+        type: 'txt'
       }
     ])
   }
@@ -84,57 +97,45 @@ export const ImportCodes = () => {
   }
 
   const renderFooter = () => {
-    if (state === 'default') return null
+    if (state !== 'upload') return null
 
-    if (state === 'upload') {
-      if (files.length === 0) {
-        return (
-          <View style={{ gap: rawTokens.spacing12 }}>
-            <Button
-              iconBefore={<QrCode />}
-              onClick={() => {
-                // TODO: open QR scanner modal
-              }}
-              data-testid="import-codes-scan-qr-button"
-            >
-              {t`Scan QR Code`}
-            </Button>
-            <Button
-              variant="secondary"
-              iconBefore={<UploadFileFilled />}
-              onClick={handleFilePick}
-              data-testid="import-codes-upload-file-button"
-            >
-              {t`Upload File`}
-            </Button>
-          </View>
-        )
-      }
+    if (files.length === 0) {
       return (
-        <Button
-          onClick={() => setState('reviewed')}
-          data-testid="import-codes-scan-button"
-        >
-          {t`Scan Uploaded File`}
-        </Button>
+        <View style={{ gap: rawTokens.spacing12 }}>
+          <BottomSheetQrScannerContentV2
+            open={isScannerOpen}
+            onOpenChange={setIsScannerOpen}
+            title={t`Scan QR to import 2FA codes`}
+            trigger={
+              <Button
+                iconBefore={<QrCode />}
+                data-testid="import-codes-scan-qr-button"
+              >
+                {t`Scan QR Code`}
+              </Button>
+            }
+            onScanned={handleQRScanned}
+          />
+          <Button
+            variant="secondary"
+            iconBefore={<UploadFileFilled />}
+            onClick={handleFilePick}
+            data-testid="import-codes-upload-file-button"
+          >
+            {t`Upload File`}
+          </Button>
+        </View>
       )
     }
 
-    if (state === 'reviewed') {
-      return (
-        <Button
-          onClick={() => {
-            // TODO: wire to matching screen once it lands
-            navigation.goBack()
-          }}
-          data-testid="import-codes-import-button"
-        >
-          {t`Import Codes`}
-        </Button>
-      )
-    }
-
-    return null
+    return (
+      <Button
+        onClick={navigation.goBack}
+        data-testid="import-codes-import-button"
+      >
+        {t`Import Codes`}
+      </Button>
+    )
   }
 
   return (
@@ -198,7 +199,7 @@ export const ImportCodes = () => {
         </View>
       )}
 
-      {state !== 'default' && selectedOption && (
+      {state === 'upload' && selectedOption && (
         <View style={styles.content}>
           <Pressable
             style={styles.backButton}
@@ -247,15 +248,7 @@ export const ImportCodes = () => {
             testID="import-codes-upload-field"
           />
 
-          {state === 'reviewed' && (
-            <AlertMessage
-              variant="warning"
-              size="small"
-              title={t`Some codes couldn't be imported`}
-              description={t`Some codes from the uploaded file couldn't be recognized and will be skipped. Review the codes after import to make sure all your accounts are protected.`}
-              testID="import-codes-warning"
-            />
-          )}
+          {files.length > 0 && <ScanResultsView />}
         </View>
       )}
     </Layout>

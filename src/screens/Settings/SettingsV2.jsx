@@ -118,8 +118,7 @@ export const SettingsV2 = () => {
                 {
                   key: 'export-codes',
                   label: t`Export Codes`,
-                  // TODO: wire to ExportCodes screen once it lands
-                  screen: null,
+                  screen: 'ExportCodes',
                   icon: Logout
                 }
               ]

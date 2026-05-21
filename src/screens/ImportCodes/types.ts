@@ -17,3 +17,20 @@ export type ImportCodesOption = {
   accepts: string[]
   supportLink?: string
 }
+
+export type ImportedCode = {
+  id: string
+  issuer: string
+  accountName: string
+}
+
+export type MatchRecord = {
+  id: string
+  title: string
+  subtitle?: string
+}
+
+export type CodeMatchEntry = {
+  code: ImportedCode
+  matchedRecord: MatchRecord | null
+}
