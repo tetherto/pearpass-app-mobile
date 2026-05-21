@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
+import { MOBILE_2FA_IMPORTS_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
   NavbarListItem,
   rawTokens,
@@ -26,7 +27,8 @@ import {
   KeyboardArrowRightFilled,
   InfoOutlined,
   KeyboardArrowBottom,
-  TerminalTone
+  TerminalTone,
+  TwoFactorAuthenticationOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 
@@ -100,6 +102,29 @@ export const SettingsV2 = () => {
           }
         ]
       },
+      ...(MOBILE_2FA_IMPORTS_ENABLED
+        ? [
+            {
+              key: 'authenticator',
+              title: t`Authenticator`,
+              icon: TwoFactorAuthenticationOutlined,
+              items: [
+                {
+                  key: 'import-codes',
+                  label: t`Import Codes`,
+                  screen: 'ImportCodes',
+                  icon: Login
+                },
+                {
+                  key: 'export-codes',
+                  label: t`Export Codes`,
+                  screen: 'ExportCodes',
+                  icon: Logout
+                }
+              ]
+            }
+          ]
+        : []),
       {
         key: 'appearance',
         title: t`Appearance`,
