@@ -1,6 +1,8 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { DeleteFolderV2 } from 'src/screens/DeleteFolder/DeleteFolderv2'
+import { ExportCodes } from 'src/screens/ExportCodes'
 import { ExportItems } from 'src/screens/ExportItems'
+import { ImportCodes } from 'src/screens/ImportCodes'
 import { ImportItems } from 'src/screens/ImportItems'
 
 import {
@@ -135,8 +137,10 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="AboutV2" component={AboutV2} />
     <Stack.Screen name="AppearanceV2" component={AppearanceV2} />
     <Stack.Screen name="ImportItems" component={ImportItems} />
+    <Stack.Screen name="ImportCodes" component={ImportCodes} />
     <Stack.Screen name="Vaults2" component={VaultsV2} />
     <Stack.Screen name="ExportItems" component={ExportItems} />
+    <Stack.Screen name="ExportCodes" component={ExportCodes} />
     <Stack.Screen name="DeleteFolder" component={DeleteFolderV2} />
     <Stack.Screen name="VaultSettingsScreen" component={VaultSettingsScreen} />
     <Stack.Screen name="VaultRenameScreen" component={VaultRenameScreen} />
