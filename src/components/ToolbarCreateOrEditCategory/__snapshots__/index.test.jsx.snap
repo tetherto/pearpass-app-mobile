@@ -59,7 +59,7 @@ exports[`ToolbarCreateOrEditCategory component renders correctly with all compon
       <Text
         testID="x-icon"
       >
-        XIcon
+        Close
       </Text>
     </View>
   </View>
@@ -127,7 +127,7 @@ exports[`ToolbarCreateOrEditCategory component renders correctly with all compon
       <Text
         testID="save-icon"
       >
-        SaveIcon
+        Check
       </Text>
       <Text
         style={

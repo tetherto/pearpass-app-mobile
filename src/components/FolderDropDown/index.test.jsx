@@ -15,9 +15,9 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  ArrowDownIcon: () => 'ArrowDownIcon',
-  FolderIcon: () => 'FolderIcon'
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  KeyboardArrowBottom: () => 'KeyboardArrowBottom',
+  Folder: () => 'Folder'
 }))
 
 const renderWithProviders = (ui) =>

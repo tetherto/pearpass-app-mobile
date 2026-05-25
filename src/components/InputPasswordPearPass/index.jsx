@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
 
 import {
-  ErrorIcon,
-  EyeClosedIcon,
-  EyeIcon,
-  LockCircleIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  ErrorFilled,
+  EyeFilled,
+  EyeOutlined,
+  LockFilled
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import {
   AdditionalItems,
@@ -71,7 +71,7 @@ export const InputPasswordPearPass = ({
     >
       {isPassword && (
         <IconWrapper>
-          <LockCircleIcon size="21" />
+          <LockFilled width="21" height="21" />
         </IconWrapper>
       )}
 
@@ -95,7 +95,7 @@ export const InputPasswordPearPass = ({
 
         {!!error?.length && (
           <ErrorMessageWrapper>
-            <ErrorIcon size="10" />
+            <ErrorFilled width="10" height="10" />
             <ErrorMessage> {error} </ErrorMessage>
           </ErrorMessageWrapper>
         )}
@@ -106,7 +106,7 @@ export const InputPasswordPearPass = ({
             variant="secondary"
             borderRadius="md"
             onPress={() => setIsVisible(!isVisible)}
-            startIcon={isVisible ? EyeClosedIcon : EyeIcon}
+            startIcon={isVisible ? EyeFilled : EyeOutlined}
           />
         </AdditionalItems>
       )}

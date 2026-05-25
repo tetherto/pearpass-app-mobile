@@ -8,7 +8,7 @@ import { Text } from 'react-native'
 import { ButtonThin } from './index'
 
 const DummyIcon = (props) => (
-  <Text testID="dummy-icon">{`Icon ${props.size} ${props.color}`}</Text>
+  <Text testID="dummy-icon">{`Icon ${props.width} ${props.color}`}</Text>
 )
 
 describe('ButtonThin Component', () => {

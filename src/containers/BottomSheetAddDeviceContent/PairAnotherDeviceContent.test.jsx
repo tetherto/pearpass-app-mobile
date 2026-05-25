@@ -30,9 +30,9 @@ jest.mock('@react-navigation/native', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  PasteFromClipboardIcon: () => null,
-  QrCodeIcon: () => null
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  ContentPaste: () => null,
+  QrCode: () => null
 }))
 
 jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({

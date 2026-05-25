@@ -48,7 +48,7 @@ describe('FileSizeWarning', () => {
 
     expect(getByText(`Maximum file size: 6 MB.`)).toBeTruthy()
 
-    expect(queryByTestId('YellowErrorIcon')).toBeNull()
+    expect(queryByTestId('ReportProblem')).toBeNull()
   })
 
   it('renders warning text when file is too large', () => {

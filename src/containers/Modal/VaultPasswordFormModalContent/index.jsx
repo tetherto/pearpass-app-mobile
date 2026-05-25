@@ -1,7 +1,7 @@
 import { useLingui } from '@lingui/react/macro'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { XIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import {
   Actions,
@@ -69,7 +69,7 @@ export const VaultPasswordFormModalContent = ({ vault, onSubmit }) => {
         <ButtonLittle
           variant="secondary"
           borderRadius="md"
-          startIcon={XIcon}
+          startIcon={Close}
           onPress={closeModal}
         />
       </CloseButtonWrapper>

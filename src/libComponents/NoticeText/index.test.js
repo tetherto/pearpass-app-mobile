@@ -1,44 +1,44 @@
 import { render } from '@testing-library/react-native'
 import {
-  ErrorIcon,
-  OkayIcon,
-  YellowErrorIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  ErrorFilled,
+  Check,
+  ReportProblem
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { NoticeText } from './index'
 
 describe('NoticeText Component', () => {
-  test('renders success type with OkayIcon and text', () => {
+  test('renders success type with Check and text', () => {
     const { getByText, UNSAFE_getByType } = render(
       <ThemeProvider>
         <NoticeText text="Success message" type="success" />
       </ThemeProvider>
     )
     expect(getByText('Success message')).toBeTruthy()
-    const icon = UNSAFE_getByType(OkayIcon)
+    const icon = UNSAFE_getByType(Check)
     expect(icon).toBeTruthy()
   })
 
-  test('renders error type with ErrorIcon and text', () => {
+  test('renders error type with ErrorFilled and text', () => {
     const { getByText, UNSAFE_getByType } = render(
       <ThemeProvider>
         <NoticeText text="Error message" type="error" />
       </ThemeProvider>
     )
     expect(getByText('Error message')).toBeTruthy()
-    const icon = UNSAFE_getByType(ErrorIcon)
+    const icon = UNSAFE_getByType(ErrorFilled)
     expect(icon).toBeTruthy()
   })
 
-  test('renders warning type with YellowErrorIcon and text', () => {
+  test('renders warning type with ReportProblem and text', () => {
     const { getByText, UNSAFE_getByType } = render(
       <ThemeProvider>
         <NoticeText text="Warning message" type="warning" />
       </ThemeProvider>
     )
     expect(getByText('Warning message')).toBeTruthy()
-    const icon = UNSAFE_getByType(YellowErrorIcon)
+    const icon = UNSAFE_getByType(ReportProblem)
     expect(icon).toBeTruthy()
   })
 

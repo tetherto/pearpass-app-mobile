@@ -9,11 +9,11 @@ import messages from '../../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => {
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => {
   const { Text } = require('react-native')
 
   return {
-    YellowErrorIcon: () => <Text testID="yellow-error-icon">Icon</Text>
+    ReportProblem: () => <Text testID="yellow-error-icon">Icon</Text>
   }
 })
 

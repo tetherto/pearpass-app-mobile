@@ -1,23 +1,23 @@
 import {
-  ArrowUpAndDown,
-  BrushIcon,
-  CopyIcon,
-  DeleteIcon,
-  MoveToIcon,
-  MultiSelectionIcon,
-  StarIcon,
-  TimeIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  UnfoldMoreOutlined,
+  PaletteOutlined,
+  ContentCopy,
+  TrashOutlined,
+  DriveFileMoveOutlined,
+  Checklist,
+  StarFilled,
+  WatchLater
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 
 export const RECORD_ACTION_ICON_BY_TYPE = {
-  copy: CopyIcon,
-  favorite: StarIcon,
-  move: MoveToIcon,
-  edit: BrushIcon,
-  rename: BrushIcon,
-  delete: DeleteIcon,
-  selection: MultiSelectionIcon,
-  order: ArrowUpAndDown,
-  sort: ArrowUpAndDown,
-  recent: TimeIcon
+  copy: ContentCopy,
+  favorite: StarFilled,
+  move: DriveFileMoveOutlined,
+  edit: PaletteOutlined,
+  rename: PaletteOutlined,
+  delete: TrashOutlined,
+  selection: Checklist,
+  order: UnfoldMoreOutlined,
+  sort: UnfoldMoreOutlined,
+  recent: WatchLater
 }

@@ -1,4 +1,4 @@
-import { CopyIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { TouchableOpacity } from 'react-native'
 import { useTheme } from 'styled-components/native'
 
@@ -25,7 +25,7 @@ export const CopyButton = ({ value }) => {
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
-      <CopyIcon size="20" color={theme.colors.white.mode1} />
+      <ContentCopy width="20" height="20" color={theme.colors.white.mode1} />
     </TouchableOpacity>
   )
 }

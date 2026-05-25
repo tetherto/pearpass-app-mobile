@@ -11,7 +11,7 @@ exports[`InputFieldNote component renders correctly with default props 1`] = `
   <div
     data-testid="icon"
   >
-    CommonFileIcon
+    InsertDriveFileOutlined
   </div>
 </div>
 `;

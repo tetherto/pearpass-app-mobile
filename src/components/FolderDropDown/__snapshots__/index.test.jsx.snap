@@ -53,7 +53,7 @@ exports[`FolderDropDown component renders correctly with selected folder 1`] = `
     }
   }
 >
-  FolderIcon
+  Folder
   <Text
     ellipsizeMode="tail"
     numberOfLines={1}
@@ -68,7 +68,7 @@ exports[`FolderDropDown component renders correctly with selected folder 1`] = `
   >
     Test Folder
   </Text>
-  ArrowDownIcon
+  KeyboardArrowBottom
 </View>
 `;
 
@@ -125,7 +125,7 @@ exports[`FolderDropDown component renders correctly without selected folder 1`] 
     }
   }
 >
-  FolderIcon
+  Folder
   <Text
     ellipsizeMode="tail"
     numberOfLines={1}
@@ -140,6 +140,6 @@ exports[`FolderDropDown component renders correctly without selected folder 1`] 
   >
     No Folder
   </Text>
-  ArrowDownIcon
+  KeyboardArrowBottom
 </View>
 `;

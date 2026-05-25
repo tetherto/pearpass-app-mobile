@@ -15,8 +15,8 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  CommonFileIcon: () => 'CommonFileIcon'
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  InsertDriveFileOutlined: () => 'InsertDriveFileOutlined'
 }))
 
 jest.mock('../../libComponents', () => ({

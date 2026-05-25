@@ -1,4 +1,4 @@
-import { DeleteIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import { ButtonLittle } from '../../libComponents'
 import { FormGroup } from '../FormGroup'
@@ -25,7 +25,7 @@ export const CustomFields = ({
               additionalItems={
                 !areInputsDisabled && (
                   <ButtonLittle
-                    startIcon={DeleteIcon}
+                    startIcon={TrashOutlined}
                     variant="secondary"
                     borderRadius="md"
                     onPress={() => removeItem?.(index)}

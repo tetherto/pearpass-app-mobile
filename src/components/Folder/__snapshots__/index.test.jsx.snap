@@ -97,9 +97,9 @@ exports[`Folder component renders active folder with check icon 1`] = `
         items
       </Text>
     </View>
-    CheckIcon
+    Check
   </View>
-  KebabMenuIcon
+  MoreVert
 </View>
 `;
 
@@ -189,7 +189,7 @@ exports[`Folder component renders create new folder option without count 1`] = `
       </Text>
     </View>
   </View>
-  KebabMenuIcon
+  MoreVert
 </View>
 `;
 
@@ -291,6 +291,6 @@ exports[`Folder component renders folder correctly 1`] = `
       </Text>
     </View>
   </View>
-  KebabMenuIcon
+  MoreVert
 </View>
 `;

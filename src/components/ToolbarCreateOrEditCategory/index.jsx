@@ -1,9 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import {
-  SaveIcon,
-  XIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { Check, Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator, Keyboard, View } from 'react-native'
 
@@ -35,7 +32,7 @@ export const ToolbarCreateOrEditCategory = ({
       <View>
         <ButtonLittle
           activeOpacity={0.5}
-          startIcon={XIcon}
+          startIcon={Close}
           variant="secondary"
           borderRadius="md"
           testId="button-little"
@@ -67,7 +64,7 @@ export const ToolbarCreateOrEditCategory = ({
         ) : (
           <ButtonLittle
             activeOpacity={0.5}
-            startIcon={SaveIcon}
+            startIcon={Check}
             testId="button-little-save"
             onPress={() => {
               onSave()

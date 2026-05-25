@@ -53,7 +53,6 @@ exports[`SelectInput renders correctly with provided props 1`] = `
       meetOrSlice={0}
       minX={0}
       minY={0}
-      size="14"
       style={
         [
           {
@@ -67,10 +66,9 @@ exports[`SelectInput renders correctly with provided props 1`] = `
           },
         ]
       }
-      vbHeight={25}
-      vbWidth={25}
+      vbHeight={24}
+      vbWidth={24}
       width="14"
-      xmlns="http://www.w3.org/2000/svg"
     >
       <RNSVGGroup
         fill={null}
@@ -81,11 +79,10 @@ exports[`SelectInput renders correctly with provided props 1`] = `
         }
       >
         <RNSVGPath
-          d="M3.17234 16.3761L12.4801 7.06836L21.7878 16.3761L20.7243 17.4396L12.4801 9.19536L4.23584 17.4396L3.17234 16.3761Z"
+          d="M12 5.83 15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15z"
           fill={
             {
-              "payload": 4294375158,
-              "type": 0,
+              "type": 2,
             }
           }
           propList={

@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native'
 import { useCountDown } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
 import {
-  ArrowDownIcon,
-  BackIcon,
-  CopyIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  KeyboardArrowBottom,
+  ArrowBackOutined,
+  ContentCopy
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useInvite } from '@tetherto/pearpass-lib-vault'
 import {
@@ -175,7 +175,11 @@ export const VaultShareScreen = () => {
               style={styles.backButton}
               testID="vault-share-back-button"
             >
-              <BackIcon size={20} color={colors.white?.mode1 || '#FFFFFF'} />
+              <ArrowBackOutined
+                width={20}
+                height={20}
+                color={colors.white?.mode1 || '#FFFFFF'}
+              />
             </TouchableOpacity>
             <Text
               style={styles.headerTitle}
@@ -231,7 +235,11 @@ export const VaultShareScreen = () => {
                     style={styles.copyButton}
                     testID="vault-share-copy-link-button"
                   >
-                    <CopyIcon size={14} color={colors.primary400.mode1} />
+                    <ContentCopy
+                      width={14}
+                      height={14}
+                      color={colors.primary400.mode1}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -318,7 +326,11 @@ export const VaultShareScreen = () => {
                     <Text style={styles.expiryText}>
                       {expiryOptions[EXPIRY_OPTIONS[expiryIndex]]}
                     </Text>
-                    <ArrowDownIcon size={14} color={colors.white.mode1} />
+                    <KeyboardArrowBottom
+                      width={14}
+                      height={14}
+                      color={colors.white.mode1}
+                    />
                   </View>
                 </Pressable>
               </View>

@@ -43,8 +43,9 @@ exports[`MenuActionItem renders correctly with item data 1`] = `
       testID="item-container"
     >
       <mockSortIcon
-        size="24"
+        height="24"
         testID="sort-icon"
+        width="24"
       />
       <Text
         testID="record-text"
@@ -55,13 +56,15 @@ exports[`MenuActionItem renders correctly with item data 1`] = `
     <View
       testID="menu-item-right-side"
     >
-      <mockCheckIcon
-        size={24}
+      <mockCheck
+        height={24}
         testID="check-icon"
+        width={24}
       />
-      <mockKebabMenuIcon
-        size={24}
+      <mockMoreVert
+        height={24}
         testID="kebab-menu-icon"
+        width={24}
       />
     </View>
   </View>

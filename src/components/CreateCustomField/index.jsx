@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  PlusIcon,
-  CommonFileIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  KeyboardArrowBottom,
+  UnfoldMoreOutlined,
+  Add,
+  InsertDriveFileOutlined
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View } from 'react-native'
 
 import { ArrowIconWrapper, DropDown, Label, LabelText, Wrapper } from './styles'
@@ -35,7 +35,7 @@ export const CreateCustomField = ({
     {
       name: t`Comment`,
       type: 'note',
-      icon: CommonFileIcon
+      icon: InsertDriveFileOutlined
     }
     // {
     //   name: 'Pin code',
@@ -84,7 +84,7 @@ export const CreateCustomField = ({
           testID="create-custom-field-plus-icon"
           accessibilityLabel="Create custom field plus icon"
         >
-          <PlusIcon size="21" />
+          <Add width="21" height="21" />
         </View>
 
         <LabelText
@@ -93,7 +93,11 @@ export const CreateCustomField = ({
         >{t`Create Custom`}</LabelText>
 
         <ArrowIconWrapper>
-          {isOpen ? <ArrowUpIcon size="21" /> : <ArrowDownIcon size="21" />}
+          {isOpen ? (
+            <UnfoldMoreOutlined width="21" height="21" />
+          ) : (
+            <KeyboardArrowBottom width="21" height="21" />
+          )}
         </ArrowIconWrapper>
       </Label>
 

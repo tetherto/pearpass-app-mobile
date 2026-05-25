@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { CLIPBOARD_CLEAR_TIMEOUT } from '@tetherto/pearpass-lib-constants'
-import { CopyIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ContentCopy } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import * as Clipboard from 'expo-clipboard'
 import * as SecureStore from 'expo-secure-store'
@@ -125,7 +125,7 @@ export const useCopyToClipboard = () => {
         Toast.show({
           type: 'baseToast',
           text1: t`Copied!`,
-          renderLeadingIcon: () => <CopyIcon color={colors.black.mode1} />,
+          renderLeadingIcon: () => <ContentCopy color={colors.black.mode1} />,
           position: 'bottom',
           bottomOffset: 100
         })

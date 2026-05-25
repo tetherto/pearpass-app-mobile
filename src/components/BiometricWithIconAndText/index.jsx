@@ -1,8 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import {
-  FaceIdIcon,
-  FingerprintIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { FaceId, Fingerprint } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import * as LocalAuthentication from 'expo-local-authentication'
 
@@ -13,11 +10,11 @@ const { FACIAL_RECOGNITION, FINGERPRINT } =
 
 const biometrics = {
   [FACIAL_RECOGNITION]: {
-    Icon: FaceIdIcon,
+    Icon: FaceId,
     label: `Use Face ID`
   },
   [FINGERPRINT]: {
-    Icon: FingerprintIcon,
+    Icon: Fingerprint,
     label: `Use Fingerprint`
   },
   [`${FINGERPRINT}-${FACIAL_RECOGNITION}`]: {
@@ -39,7 +36,7 @@ export const BiometricWithIconAndText = ({ biometricType, onPress }) => {
   const label = biometrics[biometricType].label
   return (
     <Wrapper onPress={onPress}>
-      {Icon && <Icon size="21" color={colors.primary400.mode1} />}
+      {Icon && <Icon width="21" height="21" color={colors.primary400.mode1} />}
       <PressableText testID="biometric-login-button">
         {t`${label}`}
       </PressableText>

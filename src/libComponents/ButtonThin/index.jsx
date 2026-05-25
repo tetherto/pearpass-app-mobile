@@ -29,7 +29,7 @@ export const ButtonThin = ({
 
   return (
     <Button activeOpacity={0.8} onPress={handlePress} testID={testID}>
-      {Icon && <Icon size="21" color={colors.primary400.mode1} />}
+      {Icon && <Icon width="21" height="21" color={colors.primary400.mode1} />}
       {children && <ButtonText testID={textTestID}>{children}</ButtonText>}
     </Button>
   )

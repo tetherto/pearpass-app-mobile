@@ -3,10 +3,7 @@ import { useEffect, useState } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useCountDown } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { generateQRCodeSVG } from '@tetherto/pear-apps-utils-qr'
-import {
-  CopyIcon,
-  TimeIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ContentCopy, WatchLater } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useInvite } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -71,7 +68,7 @@ export const PairThisDeviceContent = ({ tabs }) => {
         <Text style={styles.expireText}>
           {t`Expires in`} {expireTime}
         </Text>
-        <TimeIcon size={14} color={colors.primary400.mode1} />
+        <WatchLater width={14} height={14} color={colors.primary400.mode1} />
       </View>
       <TouchableOpacity
         activeOpacity={0.5}
@@ -79,7 +76,11 @@ export const PairThisDeviceContent = ({ tabs }) => {
       >
         <View style={styles.copyAccountContainer}>
           <View style={styles.copyAccountHeader}>
-            <CopyIcon size={14} color={colors.primary400.mode1} />
+            <ContentCopy
+              width={14}
+              height={14}
+              color={colors.primary400.mode1}
+            />
             <Text style={styles.copyAccountTitle}>{t`Copy vault key`}</Text>
           </View>
           <Text

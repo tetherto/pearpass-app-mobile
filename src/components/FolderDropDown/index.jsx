@@ -1,8 +1,8 @@
 import { useLingui } from '@lingui/react/macro'
 import {
-  ArrowDownIcon,
-  FolderIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  KeyboardArrowBottom,
+  Folder
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import { FolderSelectorWrapper, FolderTitle } from './styles'
 
@@ -11,12 +11,12 @@ export const FolderDropDown = ({ onPress, selectedFolder }) => {
 
   return (
     <FolderSelectorWrapper onPress={onPress}>
-      <FolderIcon size={21} />
+      <Folder width={21} height={21} />
       <FolderTitle>
         {selectedFolder ? selectedFolder : t`No Folder`}
       </FolderTitle>
 
-      <ArrowDownIcon size={12} />
+      <KeyboardArrowBottom width={12} height={12} />
     </FolderSelectorWrapper>
   )
 }

@@ -30,7 +30,8 @@ export const ButtonFilter = ({
     >
       {Icon && (
         <Icon
-          size="21"
+          width="21"
+          height="21"
           color={
             variant === 'primary'
               ? colors.secondary400.mode1

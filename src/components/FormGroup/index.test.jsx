@@ -4,9 +4,9 @@ import { View, Text } from 'react-native'
 
 import { FormGroup } from './index'
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  ArrowDownIcon: () => 'ArrowDownIcon',
-  ArrowUpIcon: () => 'ArrowUpIcon'
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  KeyboardArrowBottom: () => 'KeyboardArrowBottom',
+  UnfoldMoreOutlined: () => 'UnfoldMoreOutlined'
 }))
 
 const TestChild = ({ isFirst, isLast, index, focusedIndex, onFocus }) => (

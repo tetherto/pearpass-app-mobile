@@ -79,7 +79,6 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="21"
         style={
           [
             {
@@ -93,10 +92,9 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
             },
           ]
         }
-        vbHeight={25}
-        vbWidth={25}
+        vbHeight={16}
+        vbWidth={16}
         width="21"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -107,11 +105,10 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
           }
         >
           <RNSVGPath
-            d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
+            d="M12.667 8.667h-4v4H7.334v-4h-4V7.334h4v-4h1.333v4h4z"
             fill={
               {
-                "payload": 4294375158,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={
@@ -154,7 +151,6 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="21"
         style={
           [
             {
@@ -168,10 +164,9 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
             },
           ]
         }
-        vbHeight={25}
-        vbWidth={25}
+        vbHeight={24}
+        vbWidth={24}
         width="21"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -182,11 +177,10 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 1`]
           }
         >
           <RNSVGPath
-            d="M3.19236 8.1636L4.25586 7.1001L12.5001 15.3443L20.7444 7.1001L21.8079 8.1636L12.5001 17.4713L3.19236 8.1636Z"
+            d="m7.41 8.295 4.59 4.58 4.59-4.58L18 9.705l-6 6-6-6z"
             fill={
               {
-                "payload": 4294375158,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={
@@ -281,7 +275,6 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="21"
         style={
           [
             {
@@ -295,10 +288,9 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
             },
           ]
         }
-        vbHeight={25}
-        vbWidth={25}
+        vbHeight={16}
+        vbWidth={16}
         width="21"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -309,11 +301,10 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
           }
         >
           <RNSVGPath
-            d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
+            d="M12.667 8.667h-4v4H7.334v-4h-4V7.334h4v-4h1.333v4h4z"
             fill={
               {
-                "payload": 4294375158,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={
@@ -356,7 +347,6 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="21"
         style={
           [
             {
@@ -370,10 +360,9 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
             },
           ]
         }
-        vbHeight={25}
-        vbWidth={25}
+        vbHeight={24}
+        vbWidth={24}
         width="21"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -384,11 +373,10 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
           }
         >
           <RNSVGPath
-            d="M3.17234 16.3761L12.4801 7.06836L21.7878 16.3761L20.7243 17.4396L12.4801 9.19536L4.23584 17.4396L3.17234 16.3761Z"
+            d="M12 5.83 15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15z"
             fill={
               {
-                "payload": 4294375158,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={
@@ -481,7 +469,6 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
           meetOrSlice={0}
           minX={0}
           minY={0}
-          size="21"
           style={
             [
               {
@@ -495,10 +482,9 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
               },
             ]
           }
-          vbHeight={25}
+          vbHeight={24}
           vbWidth={24}
           width="21"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <RNSVGGroup
             fill={null}
@@ -509,11 +495,10 @@ exports[`CreateCustomField displays the correct icon based on dropdown state 2`]
             }
           >
             <RNSVGPath
-              d="M8.3845 12.8077H15.6155V11.8077H8.3845V12.8077ZM8.3845 15.577H15.6155V14.577H8.3845V15.577ZM8.3845 18.3462H12.6155V17.3462H8.3845V18.3462ZM5 21.5V3.5H14.5L19 8V21.5H5ZM14 8.5V4.5H6V20.5H18V8.5H14Z"
+              d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
               fill={
                 {
-                  "payload": 4294375158,
-                  "type": 0,
+                  "type": 2,
                 }
               }
               propList={
@@ -622,7 +607,6 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="21"
         style={
           [
             {
@@ -636,10 +620,9 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
             },
           ]
         }
-        vbHeight={25}
-        vbWidth={25}
+        vbHeight={16}
+        vbWidth={16}
         width="21"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -650,11 +633,10 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
           }
         >
           <RNSVGPath
-            d="M11.6816 20.2856V12.7856H4.18164V11.7856H11.6816V4.28564H12.6816V11.7856H20.1816V12.7856H12.6816V20.2856H11.6816Z"
+            d="M12.667 8.667h-4v4H7.334v-4h-4V7.334h4v-4h1.333v4h4z"
             fill={
               {
-                "payload": 4294375158,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={
@@ -697,7 +679,6 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="21"
         style={
           [
             {
@@ -711,10 +692,9 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
             },
           ]
         }
-        vbHeight={25}
-        vbWidth={25}
+        vbHeight={24}
+        vbWidth={24}
         width="21"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -725,11 +705,10 @@ exports[`CreateCustomField renders correctly in closed state 1`] = `
           }
         >
           <RNSVGPath
-            d="M3.19236 8.1636L4.25586 7.1001L12.5001 15.3443L20.7444 7.1001L21.8079 8.1636L12.5001 17.4713L3.19236 8.1636Z"
+            d="m7.41 8.295 4.59 4.58 4.59-4.58L18 9.705l-6 6-6-6z"
             fill={
               {
-                "payload": 4294375158,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={

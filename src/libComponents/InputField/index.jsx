@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 
-import { ErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ErrorFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import {
   Platform,
@@ -162,7 +162,7 @@ export const InputField = ({
     >
       {!!icon && (
         <View style={styles.iconWrapper}>
-          <Icon size="21" />
+          <Icon width="21" height="21" />
         </View>
       )}
       <View style={styles.mainWrapper}>
@@ -246,7 +246,7 @@ export const InputField = ({
 
         {!!error?.length && (
           <View style={styles.errorMessageWrapper}>
-            <ErrorIcon size="10" />
+            <ErrorFilled width="10" height="10" />
             <Text style={styles.errorMessage}> {error} </Text>
           </View>
         )}

@@ -1,26 +1,24 @@
 import {
-  NoteIcon,
-  CreditCardIcon,
-  FullBodyIcon,
-  KeyIcon,
-  LockIcon,
-  UserIcon,
-  PasswordIcon,
-  WifiIcon,
-  PassPhraseIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  Note,
+  CreditCard,
+  AccountCircleOutlined,
+  Key,
+  LockOutlined,
+  WiFi,
+  FormatQuote
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 
 /**
  * @type {Record<string, import('react').ElementType>}
  */
 export const RECORD_ICON_BY_TYPE = {
-  all: KeyIcon,
-  login: UserIcon,
-  identity: FullBodyIcon,
-  creditCard: CreditCardIcon,
-  note: NoteIcon,
-  custom: LockIcon,
-  password: PasswordIcon,
-  wifiPassword: WifiIcon,
-  passPhrase: PassPhraseIcon
+  all: Key,
+  login: AccountCircleOutlined,
+  identity: AccountCircleOutlined,
+  creditCard: CreditCard,
+  note: Note,
+  custom: LockOutlined,
+  password: LockOutlined,
+  wifiPassword: WiFi,
+  passPhrase: FormatQuote
 }

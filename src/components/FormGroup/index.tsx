@@ -1,9 +1,9 @@
 import { Children, cloneElement, isValidElement, useCallback, useState } from 'react'
 import { ReactNode } from 'react'
 import {
-  ArrowDownIcon,
-  ArrowUpIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  KeyboardArrowBottom,
+  UnfoldMoreOutlined
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View } from 'react-native'
 import { Title, TitleWrapper, Wrapper } from './styles'
 
@@ -46,7 +46,7 @@ export const FormGroup = ({
     <Wrapper>
       {!!title?.length && isCollapse && (
         <TitleWrapper onPress={handleToggle}>
-          {isOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
+          {isOpen ? <UnfoldMoreOutlined /> : <KeyboardArrowBottom />}
           <Title>{title}</Title>
         </TitleWrapper>
       )}

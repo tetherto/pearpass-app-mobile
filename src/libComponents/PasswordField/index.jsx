@@ -2,13 +2,13 @@ import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import {
-  ErrorIcon,
-  EyeClosedIcon,
-  EyeIcon,
-  KeyIcon,
-  OkayIcon,
-  YellowErrorIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  ErrorFilled,
+  EyeFilled,
+  EyeOutlined,
+  Key,
+  Check,
+  ReportProblem
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   checkPassphraseStrength,
   checkPasswordStrength
@@ -20,9 +20,9 @@ import { InputField } from '../InputField'
 import { PasswordStrongnessWrapper, PasswordText } from './styles'
 
 const PASSWORD_STRENGTH_ICONS = {
-  error: ErrorIcon,
-  warning: YellowErrorIcon,
-  success: OkayIcon
+  error: ErrorFilled,
+  warning: ReportProblem,
+  success: Check
 }
 
 /**
@@ -139,7 +139,7 @@ export const PasswordField = ({
       <InputField
         label={label || 'Password'}
         variant="outline"
-        icon={icon === undefined ? KeyIcon : icon}
+        icon={icon === undefined ? Key : icon}
         isDisabled={isDisabled}
         value={value}
         onChange={handleChange}
@@ -167,7 +167,7 @@ export const PasswordField = ({
             <ButtonLittle
               variant="secondary"
               borderRadius="md"
-              startIcon={isPasswordVisible ? EyeClosedIcon : EyeIcon}
+              startIcon={isPasswordVisible ? EyeFilled : EyeOutlined}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
               testID={
                 isPasswordVisible

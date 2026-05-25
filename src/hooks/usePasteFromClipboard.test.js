@@ -18,8 +18,8 @@ jest.mock('react-native-toast-message', () => ({
   show: jest.fn()
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  PasteFromClipboardIcon: ({ color }) => `PasteFromClipboardIcon-${color}`
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  ContentPaste: ({ color }) => `ContentPaste-${color}`
 }))
 
 jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
@@ -67,7 +67,7 @@ describe('usePasteFromClipboard', () => {
       })
     })
 
-    it('should render PasteFromClipboardIcon in success toast', async () => {
+    it('should render ContentPaste in success toast', async () => {
       const mockText = 'Test text'
       Clipboard.getStringAsync.mockResolvedValue(mockText)
 
@@ -79,7 +79,7 @@ describe('usePasteFromClipboard', () => {
 
       const toastCall = Toast.show.mock.calls[0][0]
       const iconComponent = toastCall.renderLeadingIcon()
-      expect(iconComponent.type.name).toBe('PasteFromClipboardIcon')
+      expect(iconComponent.type.name).toBe('ContentPaste')
       expect(iconComponent.props.color).toBe('#000000')
     })
 

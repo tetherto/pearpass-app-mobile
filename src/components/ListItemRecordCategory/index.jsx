@@ -31,7 +31,12 @@ export const ListItemRecordCategory = ({ item, onPress }) => {
         accessible
       >
         <CategoryIConContainer color={RECORD_COLOR_BY_TYPE[item.type]}>
-          <Icon size={24} color={RECORD_COLOR_BY_TYPE[item.type]} fill />
+          <Icon
+            width={24}
+            height={24}
+            color={RECORD_COLOR_BY_TYPE[item.type]}
+            fill
+          />
         </CategoryIConContainer>
 
         <CategoryContent>

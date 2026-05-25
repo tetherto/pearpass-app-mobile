@@ -21,7 +21,7 @@ jest.mock('../../context/BottomSheetContext', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => {
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => {
   const { Text } = require('react-native')
 
   return {
@@ -30,8 +30,8 @@ jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => {
         {children || 'ButtonLittle'}
       </Text>
     ),
-    SaveIcon: () => <Text testID="save-icon">SaveIcon</Text>,
-    XIcon: () => <Text testID="x-icon">XIcon</Text>
+    Check: () => <Text testID="save-icon">Check</Text>,
+    Close: () => <Text testID="x-icon">Close</Text>
   }
 })
 

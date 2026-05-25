@@ -7,7 +7,7 @@ import {
   VALID_WORD_COUNTS
 } from '@tetherto/pearpass-lib-constants'
 import {
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   Button,
   FieldError,

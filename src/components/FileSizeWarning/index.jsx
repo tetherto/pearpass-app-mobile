@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
 import { MAX_FILE_SIZE_MB } from '@tetherto/pearpass-lib-constants'
-import { YellowErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { ReportProblem } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native'
 import { useTheme } from 'styled-components/native'
@@ -25,7 +25,7 @@ export const FileSizeWarning = ({
 
   return (
     <View style={[styles.wrapper, { marginBottom: withMarginBottom ? 20 : 0 }]}>
-      {isFileSizeWarning && <YellowErrorIcon size="14" />}
+      {isFileSizeWarning && <ReportProblem width="14" height="14" />}
       <Text style={[styles.text, { color: theme.colors.white.mode1 }]}>
         {isFileSizeWarning
           ? t`Your file is too large. Please upload one that’s ${MAX_FILE_SIZE_MB} MB or smaller.`

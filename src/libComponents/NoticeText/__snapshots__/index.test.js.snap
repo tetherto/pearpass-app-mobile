@@ -21,7 +21,6 @@ exports[`NoticeText Component matches snapshot for success type 1`] = `
     meetOrSlice={0}
     minX={0}
     minY={0}
-    size="14"
     style={
       [
         {
@@ -35,10 +34,9 @@ exports[`NoticeText Component matches snapshot for success type 1`] = `
         },
       ]
     }
-    vbHeight={24}
-    vbWidth={24}
+    vbHeight={14}
+    vbWidth={14}
     width="14"
-    xmlns="http://www.w3.org/2000/svg"
   >
     <RNSVGGroup
       fill={null}
@@ -49,32 +47,10 @@ exports[`NoticeText Component matches snapshot for success type 1`] = `
       }
     >
       <RNSVGPath
-        d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z"
+        d="M5.13 9.26 2.697 6.827l-.828.823 3.261 3.26 7-7-.823-.822z"
         fill={
           {
-            "payload": 4288920418,
-            "type": 0,
-          }
-        }
-        propList={
-          [
-            "fill",
-            "stroke",
-          ]
-        }
-        stroke={
-          {
-            "payload": 4290436699,
-            "type": 0,
-          }
-        }
-      />
-      <RNSVGPath
-        d="M10.311 16.1445L6.38184 12.2154L7.36412 11.2331L10.311 14.18L16.6355 7.85547L17.6177 8.83775L10.311 16.1445Z"
-        fill={
-          {
-            "payload": 4290436699,
-            "type": 0,
+            "type": 2,
           }
         }
         propList={

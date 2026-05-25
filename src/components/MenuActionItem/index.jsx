@@ -1,7 +1,4 @@
-import {
-  CheckIcon,
-  KebabMenuIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { Check, MoreVert } from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import {
   MenuItemWrapper,
@@ -30,14 +27,14 @@ export const MenuActionItem = ({ item, onPress, disableHaptics = false }) => {
     <MenuItemWrapper>
       <MenuItemContainer onPress={handlePress}>
         <ItemContainer>
-          <ActionIcon size="24" />
+          <ActionIcon width="24" height="24" />
           <RecordText>{item.name}</RecordText>
         </ItemContainer>
         <MenuItemRightSide>
           {(item.type === 'sort' || item.type === 'recent') &&
-            item.name === state.sort && <CheckIcon size={24} />}
+            item.name === state.sort && <Check width={24} height={24} />}
 
-          <KebabMenuIcon size={24} />
+          <MoreVert width={24} height={24} />
         </MenuItemRightSide>
       </MenuItemContainer>
     </MenuItemWrapper>

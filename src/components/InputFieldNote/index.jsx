@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import { CommonFileIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
+import { InsertDriveFileOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import { InputField } from '../../libComponents'
 
@@ -11,7 +11,7 @@ export const InputFieldNote = (props) => {
       label={t`Comment`}
       placeholder={t`Add comment`}
       variant="outline"
-      icon={CommonFileIcon}
+      icon={InsertDriveFileOutlined}
       {...props}
     />
   )

@@ -27,16 +27,16 @@ jest.mock('@tetherto/pearpass-utils-password-check', () => ({
   validatePasswordChange: (...args) => mockValidatePasswordChange(...args)
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  BackIcon: (props) => {
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  ArrowBackOutined: (props) => {
     const { View } = require('react-native')
     return <View {...props} testID="back-icon" />
   },
-  EyeClosedIcon: (props) => {
+  EyeOutlined: (props) => {
     const { View } = require('react-native')
     return <View {...props} testID="eye-closed-icon" />
   },
-  EyeIcon: (props) => {
+  EyeOutlined: (props) => {
     const { View } = require('react-native')
     return <View {...props} testID="eye-icon" />
   }

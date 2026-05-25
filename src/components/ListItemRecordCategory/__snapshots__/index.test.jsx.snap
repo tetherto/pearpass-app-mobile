@@ -46,8 +46,9 @@ exports[`ListItemRecordCategory renders correctly with provided item data 1`] = 
       <Text
         color="red"
         fill={true}
-        size={24}
+        height={24}
         testID="expense-icon"
+        width={24}
       >
         ExpenseIcon
       </Text>

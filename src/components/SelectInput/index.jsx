@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
 import {
-  ArrowDownIcon,
-  ArrowUpIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  KeyboardArrowBottom,
+  UnfoldMoreOutlined
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import {
   Dropdown,
@@ -40,7 +40,11 @@ export const SelectInput = ({ value, onChange, options }) => {
         accessibilityRole="button"
       >
         <SelectedText>{selectedLabel}</SelectedText>
-        {open ? <ArrowUpIcon size="14" /> : <ArrowDownIcon size="14" />}
+        {open ? (
+          <UnfoldMoreOutlined width="14" height="14" />
+        ) : (
+          <KeyboardArrowBottom width="14" height="14" />
+        )}
       </SelectBox>
 
       {open && (

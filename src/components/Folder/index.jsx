@@ -1,8 +1,5 @@
 import { useLingui } from '@lingui/react/macro'
-import {
-  CheckIcon,
-  KebabMenuIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+import { Check, MoreVert } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import {
@@ -91,15 +88,16 @@ export const Folder = ({
         </FolderContent>
 
         {isActive && (
-          <CheckIcon
+          <Check
             testID={getActiveCheckTestID()}
             color={colors.primary400.mode1}
-            size="24"
+            width="24"
+            height="24"
           />
         )}
       </FolderContainer>
 
-      <KebabMenuIcon size="21" />
+      <MoreVert width="21" height="21" />
     </FolderWrapper>
   )
 }

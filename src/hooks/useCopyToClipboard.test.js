@@ -28,8 +28,8 @@ jest.mock('react-native-toast-message', () => ({
   show: jest.fn()
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  CopyIcon: jest.fn(() => null)
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  ContentCopy: jest.fn(() => null)
 }))
 
 jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({

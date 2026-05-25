@@ -16,9 +16,9 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  CheckIcon: () => 'CheckIcon',
-  KebabMenuIcon: () => 'KebabMenuIcon'
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  Check: () => 'Check',
+  MoreVert: () => 'MoreVert'
 }))
 
 const mockCollapse = jest.fn()

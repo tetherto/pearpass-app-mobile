@@ -3,10 +3,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
-  BackIcon,
-  EyeClosedIcon,
-  EyeIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  ArrowBackOutined,
+  EyeOutlined
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { validatePasswordChange } from '@tetherto/pearpass-utils-password-check'
@@ -182,7 +181,11 @@ export const VaultPasswordScreen = ({ route }) => {
               style={styles.backButton}
               testID="vault-password-back-button"
             >
-              <BackIcon size={20} color={colors.white?.mode1 || '#FFFFFF'} />
+              <ArrowBackOutined
+                width={20}
+                height={20}
+                color={colors.white?.mode1 || '#FFFFFF'}
+              />
             </TouchableOpacity>
             <Text
               style={styles.headerTitle}
@@ -228,9 +231,9 @@ export const VaultPasswordScreen = ({ route }) => {
                   testID="vault-password-current-visibility"
                 >
                   {isCurrentPasswordVisible ? (
-                    <EyeClosedIcon size={14} color="#BDC3AC" />
+                    <EyeOutlined width={14} height={14} color="#BDC3AC" />
                   ) : (
-                    <EyeIcon size={14} color="#BDC3AC" />
+                    <EyeOutlined width={14} height={14} color="#BDC3AC" />
                   )}
                 </TouchableOpacity>
               </View>
@@ -266,9 +269,9 @@ export const VaultPasswordScreen = ({ route }) => {
                 testID="vault-password-new-visibility"
               >
                 {isNewPasswordVisible ? (
-                  <EyeClosedIcon size={14} color="#BDC3AC" />
+                  <EyeOutlined width={14} height={14} color="#BDC3AC" />
                 ) : (
-                  <EyeIcon size={14} color="#BDC3AC" />
+                  <EyeOutlined width={14} height={14} color="#BDC3AC" />
                 )}
               </TouchableOpacity>
             </View>
@@ -308,9 +311,9 @@ export const VaultPasswordScreen = ({ route }) => {
                 testID="vault-password-repeat-visibility"
               >
                 {isRepeatPasswordVisible ? (
-                  <EyeClosedIcon size={14} color="#BDC3AC" />
+                  <EyeOutlined width={14} height={14} color="#BDC3AC" />
                 ) : (
-                  <EyeIcon size={14} color="#BDC3AC" />
+                  <EyeOutlined width={14} height={14} color="#BDC3AC" />
                 )}
               </TouchableOpacity>
             </View>

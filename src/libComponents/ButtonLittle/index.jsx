@@ -51,7 +51,8 @@ export const ButtonLittle = ({
     >
       {Icon && (
         <Icon
-          size="21"
+          width="21"
+          height="21"
           color={
             variant === 'primary' ? colors.black.mode1 : colors.primary400.mode1
           }

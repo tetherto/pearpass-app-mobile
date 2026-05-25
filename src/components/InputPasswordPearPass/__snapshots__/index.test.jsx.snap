@@ -42,7 +42,7 @@ exports[`InputPasswordPearPass component renders correctly with default props (p
     <Text
       testID="lock-icon"
     >
-      LockCircleIcon
+      LockFilled
     </Text>
   </View>
   <View
@@ -117,7 +117,7 @@ exports[`InputPasswordPearPass component renders correctly with default props (p
       <Text
         testID="eye-icon"
       >
-        EyeIcon
+        EyeOutlined
       </Text>
     </View>
   </View>

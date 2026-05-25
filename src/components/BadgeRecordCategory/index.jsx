@@ -77,7 +77,8 @@ export const BadgeRecordCategory = ({ item, isActive, onPress, quantity }) => {
     >
       <Icon
         color={isActive ? colors.black.mode1 : RECORD_COLOR_BY_TYPE[item.type]}
-        size={21}
+        width={21}
+        height={21}
         fill
         testID={`${baseTestId}-icon`}
         accessibilityLabel={t(CATEGORY_ICON_ACCESSIBILITY_LABELS[item.type])}
