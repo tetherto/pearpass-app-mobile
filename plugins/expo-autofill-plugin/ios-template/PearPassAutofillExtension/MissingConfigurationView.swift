@@ -1,89 +1,78 @@
+//
+//  MissingConfigurationView.swift
+//  PearPassAutoFillExtension
+//
+//  missing configuration screen. Mirrors android-template/res/layout/fragment_missing_configuration.xml.
+//  Error icon + "Finish setting up PearPass" + 3 numbered steps + Go Back.
+//
+
 import SwiftUI
 
 struct MissingConfigurationView: View {
-    let onCancel: () -> Void
-    
+
+    var onBack: () -> Void = {}
+
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                SharedBackgroundView()
-                
+        VStack(spacing: 0) {
+            PPSheetHeaderBack(
+                title: "",
+                showBack: true,
+                showClose: false,
+                onBack: onBack
+            )
+
+            PPContentCard {
                 VStack(spacing: 0) {
-                    CancelHeader {
-                        onCancel()
+                    Image("Icons/ErrorIcon", bundle: .main)
+                        .resizable()
+                        .frame(width: 75, height: 75)
+                        .padding(.top, 56)
+                        .padding(.bottom, PPSpacing.s16)
+
+                    Text(NSLocalizedString("Finish setting up PearPass", comment: "missing config title"))
+                        .font(PPTypography.title)
+                        .foregroundColor(PPColors.textPrimary)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+
+                    Text(NSLocalizedString("To use the autofill extension, you'll need to complete a few quick steps in the main app:", comment: "missing config subtitle"))
+                        .font(PPTypography.label)
+                        .foregroundColor(PPColors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, PPSpacing.s8)
+
+                    VStack(alignment: .leading, spacing: PPSpacing.s8) {
+                        stepRow(number: 1, text: NSLocalizedString("Open the PearPass app", comment: "setup step 1"))
+                        stepRow(number: 2, text: NSLocalizedString("Set your Master Password", comment: "setup step 2"))
+                        stepRow(number: 3, text: NSLocalizedString("Create or import a vault", comment: "setup step 3"))
                     }
-                    
+                    .padding(.top, PPSpacing.s24)
+                    .frame(maxWidth: .infinity, alignment: .center)
+
                     Spacer()
-                    
-                    VStack(spacing: 32) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 64))
-                            .foregroundColor(.yellow)
-                        
-                        VStack(spacing: 16) {
-                            Text(NSLocalizedString("Setup Required", comment: "Setup required title"))
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundColor(.white)
-                            
-                            Text(NSLocalizedString("PearPass is not configured", comment: "Not configured message"))
-                                .font(.system(size: 18))
-                                .foregroundColor(Color.white.opacity(0.8))
-                                .multilineTextAlignment(.center)
-                        }
-                        
-                        VStack(spacing: 12) {
-                            Text(NSLocalizedString("To use the autofill extension, please:", comment: "Instructions header"))
-                                .font(.system(size: 16))
-                                .foregroundColor(Color.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                Label(NSLocalizedString("Open the PearPass app", comment: "Step 1"), systemImage: "1.circle.fill")
-                                    .font(.system(size: 15))
-                                    .foregroundColor(Color.white.opacity(0.7))
-                                
-                                Label(NSLocalizedString("Set up your master password", comment: "Step 2"), systemImage: "2.circle.fill")
-                                    .font(.system(size: 15))
-                                    .foregroundColor(Color.white.opacity(0.7))
-                                
-                                Label(NSLocalizedString("Create or import a vault", comment: "Step 3"), systemImage: "3.circle.fill")
-                                    .font(.system(size: 15))
-                                    .foregroundColor(Color.white.opacity(0.7))
-                                
-                             
-                            }
-                            .padding(.horizontal, 40)
-                        }
-                        
-                        Button(action: {
-                            onCancel()
-                        }) {
-                            Text(NSLocalizedString("Go Back", comment: "Go back button"))
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .background(
-                                    RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                        .fill(Constants.Colors.primaryGreen)
-                                )
-                        }
-                        .padding(.horizontal, 24)
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    Spacer()
-                    Spacer()
+
+                    Rectangle()
+                        .fill(PPColors.borderPrimary)
+                        .frame(height: 1)
+                        .padding(.horizontal, -PPSpacing.s16)
+
+                    PPButton(title: NSLocalizedString("Go Back", comment: "go back button"), variant: .primary, action: onBack)
+                        .padding(.top, PPSpacing.s16)
+                        .padding(.bottom, PPSpacing.s12)
                 }
+                .padding(.horizontal, PPSpacing.s16)
             }
+        }
+        .background(PPColors.surfacePrimary)
+    }
+
+    private func stepRow(number: Int, text: String) -> some View {
+        HStack(spacing: PPSpacing.s10) {
+            PPStepNumber(number: number)
+            Text(text)
+                .font(PPTypography.label)
+                .foregroundColor(PPColors.textSecondary)
         }
     }
 }
-
-#if DEBUG
-struct MissingConfigurationView_Previews: PreviewProvider {
-    static var previews: some View {
-        MissingConfigurationView(onCancel: {})
-    }
-}
-#endif

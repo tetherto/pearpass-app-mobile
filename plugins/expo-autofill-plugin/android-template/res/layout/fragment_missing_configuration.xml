@@ -1,197 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/autofill_background"
-    android:fitsSystemWindows="true">
+    android:background="@color/pp_background"
+    android:orientation="vertical">
 
-    <!-- Cancel Header -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="60dp"
-        android:paddingBottom="16dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp">
+    <include
+        android:id="@+id/missingSheetHeader"
+        layout="@layout/include_pp_sheet_header_back" />
 
-        <TextView
-            android:id="@+id/cancelButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:text="Cancel"
-            android:textColor="#B0D944"
-            android:textSize="16sp"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp" />
-    </RelativeLayout>
-
-    <!-- Main Content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@drawable/pp_content_card_bg"
         android:orientation="vertical"
-        android:gravity="center"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp">
+        android:paddingStart="@dimen/pp_spacing_s16"
+        android:paddingEnd="@dimen/pp_spacing_s16"
+        android:paddingTop="@dimen/pp_spacing_s16">
 
-        <LinearLayout
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="56dp"
+            android:layout_marginBottom="@dimen/pp_spacing_s16"
+            android:contentDescription="@null"
+            android:src="@drawable/pp_ic_error" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginBottom="0dp">
+            android:text="Finish setting up PearPass"
+            android:textAppearance="@style/TextAppearance.PearPass.Title"
+            android:textColor="@color/pp_text_primary" />
 
-            <!-- Warning Icon -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="⚠️"
-                android:textSize="64sp"
-                android:layout_marginBottom="32dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/pp_spacing_s8"
+            android:gravity="center"
+            android:text="To use the autofill extension, you'll need to complete a few quick steps in the main app:"
+            android:textAppearance="@style/TextAppearance.PearPass.Label"
+            android:textColor="@color/pp_text_secondary" />
 
-            <!-- Title -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Setup Required"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp" />
+        
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/pp_spacing_s24"
+            android:orientation="vertical">
 
-            <!-- Subtitle -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PearPass is not configured"
-                android:textColor="#CCFFFFFF"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
-
-            <!-- Instructions -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="12dp">
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/pp_spacing_s8"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:background="@drawable/pp_step_number_bg"
+                    android:fontFamily="@font/pp_inter"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="1"
+                    android:textColor="@color/pp_surface_primary"
+                    android:textSize="10sp"
+                    android:textStyle="normal" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="To use the autofill extension, please:"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Steps -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingStart="40dp"
-                    android:paddingEnd="40dp">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="15sp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Open the PearPass app"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="15sp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Set up your master password"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="3"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="15sp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Create or import a vault"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:layout_marginStart="10dp"
+                    android:text="Open the PearPass app"
+                    android:textAppearance="@style/TextAppearance.PearPass.Label"
+                    android:textColor="@color/pp_text_secondary" />
             </LinearLayout>
 
-            <!-- Go Back Button -->
-            <Button
-                android:id="@+id/goBackButton"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
-                android:text="Go Back"
-                android:textColor="#050B06"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/primary_button"
-                android:paddingVertical="12dp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/pp_spacing_s8"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:background="@drawable/pp_step_number_bg"
+                    android:fontFamily="@font/pp_inter"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="2"
+                    android:textColor="@color/pp_surface_primary"
+                    android:textSize="10sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Set your Master Password"
+                    android:textAppearance="@style/TextAppearance.PearPass.Label"
+                    android:textColor="@color/pp_text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:background="@drawable/pp_step_number_bg"
+                    android:fontFamily="@font/pp_inter"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="3"
+                    android:textColor="@color/pp_surface_primary"
+                    android:textSize="10sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Create or import a vault"
+                    android:textAppearance="@style/TextAppearance.PearPass.Label"
+                    android:textColor="@color/pp_text_secondary" />
+            </LinearLayout>
         </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/missingV2GoBackButton"
+            style="@style/Button.PearPass.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/pp_spacing_s16"
+            android:layout_marginBottom="@dimen/pp_spacing_s16"
+            android:text="Go Back" />
     </LinearLayout>
-
-    <!-- Bottom spacer -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
 </LinearLayout>

@@ -95,7 +95,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
     private View addNewButton;
 
     // State
-    private CredentialAdapterV2 credentialsAdapter;
+    private CredentialAdapter credentialsAdapter;
     private final List<VaultItem> vaults = new ArrayList<>();
     private VaultItem selectedVault;
     private final List<CredentialItem> allCredentials = new ArrayList<>();
@@ -137,7 +137,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_combined_items_v2, container, false);
+        return inflater.inflate(R.layout.fragment_combined_items, container, false);
     }
 
     @Override
@@ -221,7 +221,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
     }
 
     private void setupVaultSelector() {
-        vaultSelectorChevron.setImageResource(R.drawable.pp_v2_ic_chevron_down);
+        vaultSelectorChevron.setImageResource(R.drawable.pp_ic_chevron_down);
         vaultSelectorRow.setOnClickListener(v -> {
             if (vaults.isEmpty()) return;
             toggleDropdown();
@@ -243,17 +243,17 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
     private void rebuildDropdown() {
         vaultDropdown.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        int gapPx = (int) (getResources().getDimension(R.dimen.pp_v2_spacing_s8));
+        int gapPx = (int) (getResources().getDimension(R.dimen.pp_spacing_s8));
         for (int i = 0; i < vaults.size(); i++) {
             VaultItem vault = vaults.get(i);
-            View row = inflater.inflate(R.layout.item_vault_inline_v2, vaultDropdown, false);
+            View row = inflater.inflate(R.layout.item_vault_inline, vaultDropdown, false);
             TextView name = row.findViewById(R.id.vaultInlineName);
             View dot = row.findViewById(R.id.vaultInlineSelectedDot);
             name.setText(vault.getName());
             boolean isSelected = selectedVault != null && vault.getId().equals(selectedVault.getId());
             dot.setBackgroundResource(isSelected
-                    ? R.drawable.pp_v2_vault_indicator_selected
-                    : R.drawable.pp_v2_vault_indicator_unselected);
+                    ? R.drawable.pp_vault_indicator_selected
+                    : R.drawable.pp_vault_indicator_unselected);
 
             if (i > 0) {
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) row.getLayoutParams();
@@ -293,7 +293,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
 
     private void setupCredentialsList() {
         credentialsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
-        credentialsAdapter = new CredentialAdapterV2(new ArrayList<>(), this::handleCredentialClick);
+        credentialsAdapter = new CredentialAdapter(new ArrayList<>(), this::handleCredentialClick);
         credentialsRecycler.setAdapter(credentialsAdapter);
     }
 
@@ -579,7 +579,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             int end = start + link.length();
 
             SpannableString span = new SpannableString(full);
-            int accent = ContextCompat.getColor(requireContext(), R.color.pp_v2_primary);
+            int accent = ContextCompat.getColor(requireContext(), R.color.pp_primary);
             span.setSpan(new ForegroundColorSpan(accent), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             span.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             span.setSpan(new ClickableSpan() {

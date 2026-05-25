@@ -1,330 +1,48 @@
+//
+//  MasterPasswordView.swift
+//  PearPassAutoFillExtension
+//
+//  master password screen. Mirrors android-template/res/layout/fragment_master_password.xml.
+//  Sheet header (logo + close + title) + content card with title/subtitle/password + Continue button.
+//  Biometric (Face ID / Touch ID) unlock button mirrors V1 MasterPasswordView.
+//
+
 import SwiftUI
-import LocalAuthentication
 
 struct MasterPasswordView: View {
-    @ObservedObject var viewModel: ExtensionViewModel
-    let onCancel: () -> Void
-    let vaultClient: PearPassVaultClient?
-    let presentationWindow: UIWindow?
-    
-    @State private var isLoading: Bool = false
-    @State private var isAuthenticatingBiometric: Bool = false
-    @State private var isAuthenticatingPasskey: Bool = false
-    @State private var keyboardHeight: CGFloat = 0
-    @State private var showToast: Bool = false
-    @State private var toastMessage: String = ""
-    @State private var toastWorkItem: DispatchWorkItem?
-    
-    private var showFaceIDButton: Bool {
+
+    var headerTitle: String = NSLocalizedString("Add a passkey", comment: "sheet header default")
+    @Binding var password: String
+
+    /// Disables Continue + Face ID + Use Passkey and swaps the Continue label
+    /// to "Authenticating..." while a vault unlock is in flight. Auth errors
+    /// are surfaced via the toast overlay rendered in HostView, not inline.
+    var isAuthenticating: Bool = false
+
+    var onClose: () -> Void = {}
+    var onContinue: () -> Void = {}
+    /// Fired when the user taps the biometric button. Hidden when biometrics
+    /// are unavailable on the device or the user has not enabled them in the
+    /// main app keychain.
+    var onFaceIDLogin: () -> Void = {}
+    /// Fired when the user taps the passkey button. Hidden when the device
+    /// can't use a passkey for vault unlock (iOS 16+ + main app must have
+    /// registered a passkey + flag enabled).
+    var onPasskeyLogin: () -> Void = {}
+
+    private var showBiometricButton: Bool {
         KeychainHelper.shared.canUseBiometrics()
     }
-    
+
     private var showPasskeyButton: Bool {
         if #available(iOS 16.0, *) {
             return PasskeyHelper.shared.canUsePasskey()
-        } else {
-            return false
         }
-    }
-    
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                SharedBackgroundView()
-                
-                VStack(spacing: 0) {
-                    CancelHeader {
-                        onCancel()
-                    }
-
-                    GeometryReader { contentGeometry in
-                        ScrollView {
-                            VStack(spacing: 32) {
-                                Spacer()
-                                    .frame(height: max(50, (contentGeometry.size.height - keyboardHeight - 400) / 2))
-
-                                HStack {
-                                    Text("•••")
-                                        .font(.system(size: 24, weight: .bold))
-                                        .foregroundColor(.white)
-
-                                    Text(NSLocalizedString("Enter Master Password", comment: "Master password prompt"))
-                                        .font(.system(size: 20, weight: .medium))
-                                        .foregroundColor(.white)
-                                }
-
-                                VStack(spacing: 20) {
-                                    PasswordInput(password: $viewModel.masterPassword)
-
-                                    // Error message (Android-style toast design)
-                                    if showToast {
-                                        HStack(spacing: 10) {
-                                            Image("AppIcon")
-                                                .resizable()
-                                                .frame(width: 28, height: 28)
-                                                .clipShape(Circle())
-                                            Text(toastMessage)
-                                                .font(.system(size: 14, weight: .medium))
-                                                .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
-                                        }
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 10)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 25)
-                                                .fill(Color(red: 0xec/255, green: 0xeb/255, blue: 0xf2/255))
-                                        )
-                                    }
-
-                                    Button(action: {
-                                        handleLogin()
-                                    }) {
-                                        ZStack {
-                                            if isLoading {
-                                                HStack(spacing: 8) {
-                                                    ProgressView()
-                                                        .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                                                        .scaleEffect(0.8)
-                                                    Text(NSLocalizedString("Authenticating...", comment: "Authentication in progress"))
-                                                        .font(.system(size: 16, weight: .semibold))
-                                                        .foregroundColor(.black)
-                                                }
-                                            } else {
-                                                Text(NSLocalizedString("Continue", comment: "Continue button"))
-                                                    .font(.system(size: 16, weight: .semibold))
-                                                    .foregroundColor(.black)
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 12)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                                .fill(Constants.Colors.primaryGreen)
-                                        )
-                                    }
-                                    .disabled(viewModel.masterPassword.isEmpty || isLoading)
-                                    .opacity(viewModel.masterPassword.isEmpty || isLoading ? 0.6 : 1.0)
-
-                                    VStack(spacing: 12) {
-                                        if showPasskeyButton {
-                                            Button(action: {
-                                                if #available(iOS 16.0, *) {
-                                                    handlePasskeyLogin()
-                                                }
-                                            }) {
-                                                Text(NSLocalizedString("Use Passkey", comment: "Passkey button text"))
-                                                    .font(.system(size: 16, weight: .semibold))
-                                                    .foregroundColor(Constants.Colors.lightGray)
-                                                    .frame(maxWidth: .infinity)
-                                                    .padding(.vertical, 12)
-                                                    .background(
-                                                        ZStack {
-                                                            RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                                                .fill(Constants.Colors.primaryBackground)
-                                                            RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                                                .stroke(Constants.Colors.primaryGreen, lineWidth: 2)
-                                                        }
-                                                    )
-                                            }
-                                            .disabled(isAuthenticatingPasskey)
-                                            .opacity(isAuthenticatingPasskey ? 0.6 : 1.0)
-                                        }
-
-                                        if showFaceIDButton {
-                                            Button(action: {
-                                                handleFaceIDLogin()
-                                            }) {
-                                                HStack {
-                                                    Image(systemName: getFaceIDIconName())
-                                                        .foregroundColor(Constants.Colors.primaryGreen)
-
-                                                    Text(getFaceIDButtonText())
-                                                        .foregroundColor(Constants.Colors.primaryGreen)
-                                                        .font(.system(size: 16, weight: .medium))
-                                                }
-                                            }
-                                            .disabled(isAuthenticatingBiometric)
-                                            .opacity(isAuthenticatingBiometric ? 0.6 : 1.0)
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal, 24)
-
-                                Spacer()
-                                    .frame(height: 50)
-                            }
-                        }
-                    }
-                    .animation(.easeInOut(duration: 0.3), value: keyboardHeight)
-                }
-
-            }
-        }
-        .onAppear {
-            // Clear password when view appears to prevent blinking
-            viewModel.masterPassword = ""
-
-            // Listen for keyboard notifications
-            NotificationCenter.default.addObserver(
-                forName: UIResponder.keyboardWillShowNotification,
-                object: nil,
-                queue: .main
-            ) { notification in
-                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                    keyboardHeight = keyboardFrame.height
-                }
-            }
-
-            NotificationCenter.default.addObserver(
-                forName: UIResponder.keyboardWillHideNotification,
-                object: nil,
-                queue: .main
-            ) { _ in
-                keyboardHeight = 0
-            }
-        }
-        .onDisappear {
-            // Remove keyboard observers
-            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-        }
-    }
-    
-    // MARK: - Private Methods
-    
-    private func handleLogin() {
-        guard let client = vaultClient else {
-            showToastMessage(NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized"))
-            return
-        }
-
-        // Capture password and clear from viewModel immediately
-        let password = viewModel.masterPassword
-        viewModel.masterPassword = ""
-
-        Task {
-            await MainActor.run { isLoading = true }
-
-            do {
-                try await authenticateWithPassword(password, client: client)
-
-                await MainActor.run {
-                    isLoading = false
-                    viewModel.currentFlow = .vaultSelection
-                }
-            } catch {
-                await MainActor.run {
-                    isLoading = false
-                    showToastMessage(NSLocalizedString("Invalid master password", comment: "Invalid master password error"))
-                }
-            }
-        }
+        return false
     }
 
-    // MARK: - Toast Helper
-
-    private func showToastMessage(_ message: String) {
-        // Cancel any existing timer
-        toastWorkItem?.cancel()
-
-        toastMessage = message
-        withAnimation {
-            showToast = true
-        }
-
-        // Create new work item for auto-hide
-        let workItem = DispatchWorkItem {
-            withAnimation {
-                showToast = false
-            }
-        }
-        toastWorkItem = workItem
-
-        // Auto-hide after 3 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: workItem)
-    }
-
-    // MARK: - Authentication Functions
-
-    private func authenticateWithPassword(_ password: String, client: PearPassVaultClient) async throws {
-        // Convert password string to Data buffer for secure handling
-        var passwordBuffer = Utils.stringToBuffer(password)
-        defer {
-            // Securely clear the password buffer after use
-            Utils.clearBuffer(&passwordBuffer)
-        }
-
-        guard let masterPasswordEncryption = try await client.getMasterPasswordEncryption() else {
-            throw NSError(domain: "MasterPasswordView", code: 1001, userInfo: [
-                NSLocalizedDescriptionKey: NSLocalizedString("Failed to get master password encryption data", comment: "Error description")
-            ])
-        }
-
-        try await initialize(
-            ciphertext: masterPasswordEncryption.ciphertext,
-            nonce: masterPasswordEncryption.nonce,
-            salt: masterPasswordEncryption.salt,
-            hashedPassword: masterPasswordEncryption.hashedPassword,
-            password: passwordBuffer,
-            client: client
-        )
-
-        let vaults = try await client.listVaults()
-        await MainActor.run { viewModel.vaults = vaults }
-    }
-
-    private func initialize(
-        ciphertext: String,
-        nonce: String,
-        salt: String,
-        hashedPassword: String?,
-        password: Data,
-        client: PearPassVaultClient
-    ) async throws {
-        // Check if vaults are already initialized
-        let vaultStatus = try await client.vaultsGetStatus()
-        if vaultStatus.isInitialized && !vaultStatus.isLocked {
-            return
-        }
-
-        // Case 1: We have ciphertext, nonce, and hashedPassword (from biometric auth)
-        // Use the simplified initWithCredentials API
-        if !ciphertext.isEmpty && !nonce.isEmpty, let hashedPwd = hashedPassword, !hashedPwd.isEmpty {
-            try await client.initWithCredentials(
-                ciphertext: ciphertext,
-                nonce: nonce,
-                hashedPassword: hashedPwd
-            )
-            return
-        }
-
-        // Case 2: We need to use the password to decrypt
-        // Use the simplified initWithPassword API
-        if password.isEmpty {
-            throw NSError(domain: "MasterPasswordView", code: 1003, userInfo: [
-                NSLocalizedDescriptionKey: NSLocalizedString("Password is required", comment: "Error description")
-            ])
-        }
-
-        try await client.initWithPassword(password: password)
-    }
-    
-    // MARK: - Biometric Authentication
-    
-    private func getFaceIDIconName() -> String {
-        let biometricType = KeychainHelper.shared.getBiometricType()
-        switch biometricType {
-        case .faceID:
-            return "faceid"
-        case .touchID:
-            return "touchid"
-        default:
-            return "lock.shield"
-        }
-    }
-    
-    private func getFaceIDButtonText() -> String {
-        let biometricType = KeychainHelper.shared.getBiometricType()
-        switch biometricType {
+    private var biometricButtonTitle: String {
+        switch KeychainHelper.shared.getBiometricType() {
         case .faceID:
             return NSLocalizedString("Use Face ID", comment: "Face ID button text")
         case .touchID:
@@ -333,109 +51,120 @@ struct MasterPasswordView: View {
             return NSLocalizedString("Use Biometrics", comment: "Generic biometrics button text")
         }
     }
-    
-    private func handleFaceIDLogin() {
-        guard let client = vaultClient else {
-            showToastMessage(NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized"))
-            return
-        }
 
-        isAuthenticatingBiometric = true
-
-        Task {
-            do {
-                // Get encryption data with biometric authentication
-                guard let encryptionData = try await KeychainHelper.shared.getEncryptionData(withBiometricAuth: true) else {
-                    await MainActor.run {
-                        isAuthenticatingBiometric = false
-                        showToastMessage(NSLocalizedString("Failed to retrieve encryption data", comment: "Failed to retrieve encryption data error"))
-                    }
-                    return
-                }
-
-                try await initialize(
-                    ciphertext: encryptionData.ciphertext,
-                    nonce: encryptionData.nonce,
-                    salt: "",
-                    hashedPassword: encryptionData.hashedPassword,
-                    password: Data(), // No password needed for biometric auth
-                    client: client
-                )
-
-                let vaults = try await client.listVaults()
-
-                await MainActor.run {
-                    isAuthenticatingBiometric = false
-                    viewModel.vaults = vaults
-                    // Move to vault selection
-                    viewModel.currentFlow = .vaultSelection
-                }
-
-            } catch {
-                await MainActor.run {
-                    isAuthenticatingBiometric = false
-
-                    let message = (error as NSError).code == -128 ?
-                        NSLocalizedString("Authentication canceled", comment: "Authentication canceled by user") :
-                        NSLocalizedString("Face ID authentication failed", comment: "Face ID authentication failed")
-                    showToastMessage(message)
-                }
-            }
+    /// Suffix tracks device biometry type so Touch ID hardware doesn't read "Face ID".
+    private var biometricRetryTitle: String {
+        switch KeychainHelper.shared.getBiometricType() {
+        case .faceID:
+            return NSLocalizedString("Try again with Face ID", comment: "biometric retry link — Face ID")
+        case .touchID:
+            return NSLocalizedString("Try again with Touch ID", comment: "biometric retry link — Touch ID")
+        default:
+            return NSLocalizedString("Try again with Biometrics", comment: "biometric retry link — generic")
         }
     }
-    
-    
-    @available(iOS 16.0, *)
-    private func handlePasskeyLogin() {
-        guard let client = vaultClient else {
-            showToastMessage(NSLocalizedString("Vault client not initialized", comment: "Error when vault client is not initialized"))
-            return
+
+    private var biometricIconName: String {
+        switch KeychainHelper.shared.getBiometricType() {
+        case .faceID: return "faceid"
+        case .touchID: return "touchid"
+        default: return "lock.shield"
         }
+    }
 
-        guard let window = presentationWindow else {
-            showToastMessage(NSLocalizedString("Unable to get presentation window", comment: "Error when unable to get window"))
-            return
-        }
+    /// Static label — spinner replaces it during isLoading.
+    private var continueButtonTitle: String {
+        NSLocalizedString("Continue", comment: "continue button")
+    }
 
-        isAuthenticatingPasskey = true
+    private var continueEnabled: Bool {
+        !password.isEmpty && !isAuthenticating
+    }
 
-        Task {
-            do {
-                let encryptionData = try await PasskeyHelper.shared.authenticateWithPasskey(presentationAnchor: window)
+    var body: some View {
+        VStack(spacing: 0) {
+            PPSheetHeader(
+                title: headerTitle,
+                showLogo: true,
+                showClose: true,
+                onClose: onClose
+            )
 
-                guard let encryptionData = encryptionData else {
-                    await MainActor.run {
-                        isAuthenticatingPasskey = false
-                        showToastMessage(NSLocalizedString("Failed to retrieve encryption data from passkey", comment: "No largeBlob data error"))
+            PPContentCard {
+                VStack(spacing: 0) {
+                    // Body
+                    VStack(spacing: 0) {
+                        Text(NSLocalizedString("Enter Your Master Password", comment: "master password screen title"))
+                            .font(PPTypography.title)
+                            .foregroundColor(PPColors.textPrimary)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, PPSpacing.s16)
+
+                        Text(NSLocalizedString("Please enter your master password to continue", comment: "master password screen subtitle"))
+                            .font(PPTypography.label)
+                            .foregroundColor(PPColors.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, PPSpacing.s8)
+
+                        Spacer().frame(height: PPSpacing.s46)
+
+                        PPPasswordField(
+                            label: NSLocalizedString("Password", comment: "password input label"),
+                            text: $password,
+                            placeholder: NSLocalizedString("Enter Master Password", comment: "password input placeholder")
+                        )
+
+                        Spacer()
+
+                        // Biometric retry — sits at the bottom of the body
+                        // 16pt above the footer divider (per design), so the
+                        // password input has the visual weight of the screen.
+                        if showBiometricButton {
+                            Button(action: onFaceIDLogin) {
+                                Text(biometricRetryTitle)
+                                    .font(Font.custom(PPFontFamily.inter, size: PPFontSizes.s14))
+                                    .foregroundColor(PPColors.primary)
+                                    .underline()
+                                    .multilineTextAlignment(.center)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.bottom, PPSpacing.s16)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(isAuthenticating)
+                        }
                     }
-                    return
-                }
-                try await initialize(
-                    ciphertext: encryptionData.ciphertext,
-                    nonce: encryptionData.nonce,
-                    salt: encryptionData.salt,
-                    hashedPassword: encryptionData.hashedPassword,
-                    password: Data(), // No password needed for passkey auth
-                    client: client
-                )
+                    .padding(.horizontal, PPSpacing.s16)
+                    .padding(.top, PPSpacing.s24)
 
-                let vaults = try await client.listVaults()
+                    // Top border for footer
+                    Rectangle()
+                        .fill(PPColors.borderPrimary)
+                        .frame(height: 1)
 
-                await MainActor.run {
-                    isAuthenticatingPasskey = false
-                    viewModel.vaults = vaults
-                    // Move to vault selection
-                    viewModel.currentFlow = .vaultSelection
-                }
+                    VStack(spacing: PPSpacing.s8) {
+                        PPButton(
+                            title: continueButtonTitle,
+                            variant: .primary,
+                            isEnabled: continueEnabled,
+                            isLoading: isAuthenticating,
+                            action: onContinue
+                        )
 
-            } catch {
-                await MainActor.run {
-                    isAuthenticatingPasskey = false
-
-                    let message = (error as NSError).code == -128 ?
-                        NSLocalizedString("Authentication canceled", comment: "Authentication canceled by user") :
-                        NSLocalizedString("Passkey authentication failed", comment: "Passkey authentication failed")
-                    showToastMessage(message)
+                        if showPasskeyButton {
+                            PPButton(
+                                title: NSLocalizedString("Use Passkey", comment: "Passkey button text"),
+                                variant: .secondary,
+                                isEnabled: !isAuthenticating,
+                                action: onPasskeyLogin
+                            )
+                        }
+                    }
+                    .padding(.horizontal, PPSpacing.s16)
+                    .padding(.top, PPSpacing.s16)
+                    .padding(.bottom, PPSpacing.s12)
                 }
             }
         }

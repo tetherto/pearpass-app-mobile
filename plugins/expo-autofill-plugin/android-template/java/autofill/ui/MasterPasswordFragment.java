@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.biometric.BiometricManager;
 import androidx.fragment.app.FragmentActivity;
 
 import com.pears.pass.R;
@@ -22,7 +21,6 @@ import com.pears.pass.autofill.data.PearPassVaultClient;
 import com.pears.pass.autofill.utils.BiometricAuthHelper;
 import com.pears.pass.autofill.utils.SecureLog;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class MasterPasswordFragment extends BaseAutofillFragment {
@@ -33,13 +31,12 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     private ImageView togglePasswordVisibility;
     private boolean isAuthenticatingBiometric = false;
     private boolean isPasswordVisible = false;
-    // V2 spinner overlay shown over Continue while auth is in flight.
+    // Spinner overlay shown over Continue while auth is in flight.
     private android.widget.ProgressBar continueProgress;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        // Initialize BiometricAuthHelper
         biometricHelper = BiometricAuthHelper.getInstance(context);
     }
 
@@ -65,45 +62,7 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // v2 uses the new sheet layout + inter font
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            return onCreateViewV2(inflater, container);
-        }
-
         View view = inflater.inflate(R.layout.fragment_master_password, container, false);
-
-        passwordInput = view.findViewById(R.id.passwordInput);
-        unlockButton = view.findViewById(R.id.continueButton);
-        TextView cancelButton = view.findViewById(R.id.cancelButton);
-        biometricButton = view.findViewById(R.id.biometricButton);
-        togglePasswordVisibility = view.findViewById(R.id.togglePasswordVisibility);
-
-        unlockButton.setOnClickListener(v -> {
-            String password = passwordInput.getText().toString();
-            if (password.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter your master password", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            authenticateWithMasterPassword(password);
-        });
-
-        setupCancelButton(cancelButton);
-
-        // Setup password visibility toggle
-        setupPasswordVisibilityToggle();
-
-        // Setup biometric button if available
-        setupBiometricButton();
-
-        return view;
-    }
-
-    /**
-     * v2 sheet layout: header close button replaces the cancel row, no biometric button
-     */
-    private View onCreateViewV2(LayoutInflater inflater, ViewGroup container) {
-        View view = inflater.inflate(R.layout.fragment_master_password_v2, container, false);
 
         passwordInput = view.findViewById(R.id.ppPasswordEdit);
         unlockButton = view.findViewById(R.id.masterPwdContinue);
@@ -153,30 +112,22 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             return;
         }
 
-        // V2 hides "Continue" + shows spinner; V1 swaps to "Unlocking...".
         unlockButton.setEnabled(false);
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            unlockButton.setText("");
-            if (continueProgress != null) continueProgress.setVisibility(View.VISIBLE);
-        } else {
-            unlockButton.setText("Unlocking...");
-        }
+        unlockButton.setText("");
+        if (continueProgress != null) continueProgress.setVisibility(View.VISIBLE);
 
         // Convert password to byte array for secure handling
         byte[] passwordBuffer = com.pears.pass.autofill.utils.SecureBufferUtils.stringToBuffer(password);
 
         CompletableFuture.runAsync(() -> {
             try {
-                // Use the simplified initWithPassword API which handles everything internally
                 vaultClient.initWithPassword(passwordBuffer).get();
 
-                // Verify that the vault was actually unlocked by checking status
                 PearPassVaultClient.VaultStatus vaultStatus = vaultClient.vaultsGetStatus().get();
                 if (vaultStatus.isLocked) {
                     throw new Exception("Invalid master password - vault remains locked");
                 }
 
-                // Get and store the master password encryption for resume reinitialization
                 try {
                     PearPassVaultClient.MasterPasswordEncryption masterEnc =
                         vaultClient.getMasterPasswordEncryption(vaultStatus).get();
@@ -191,7 +142,6 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     SecureLog.w("MasterPasswordFragment", "Could not get master encryption for resume: " + e.getMessage());
                 }
 
-                // Authentication successful — silent navigation.
                 getActivity().runOnUiThread(() -> {
                     if (navigationListener != null) {
                         navigationListener.navigateToVaultSelection();
@@ -204,57 +154,25 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 getActivity().runOnUiThread(() -> {
                     Toast.makeText(getContext(), "Invalid master password", Toast.LENGTH_SHORT).show();
                     unlockButton.setEnabled(true);
-                    if (getResources().getInteger(R.integer.design_version) == 2) {
-                        unlockButton.setText("Continue");
-                        if (continueProgress != null) continueProgress.setVisibility(View.GONE);
-                    } else {
-                        unlockButton.setText("Unlock");
-                    }
+                    unlockButton.setText("Continue");
+                    if (continueProgress != null) continueProgress.setVisibility(View.GONE);
                     passwordInput.setText("");
                 });
             } finally {
-                // Securely clear the password buffer
                 com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(passwordBuffer);
             }
         });
     }
 
     /**
-     * Setup password visibility toggle
+     * Re-applies inter font on each toggle since Android switches to monospace
+     * when the input type flips to visible password.
      */
     private void setupPasswordVisibilityToggle() {
         if (togglePasswordVisibility == null || passwordInput == null) return;
 
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            setupPasswordVisibilityToggleV2();
-            return;
-        }
-
-        togglePasswordVisibility.setOnClickListener(v -> {
-            isPasswordVisible = !isPasswordVisible;
-
-            if (isPasswordVisible) {
-                // Show password
-                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                togglePasswordVisibility.setImageResource(R.drawable.eye_closed);
-            } else {
-                // Hide password
-                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                togglePasswordVisibility.setImageResource(R.drawable.eye);
-            }
-
-            // Move cursor to end of text
-            passwordInput.setSelection(passwordInput.getText().length());
-        });
-    }
-
-    /**
-     * Re-applies inter font on each toggle since Android switches to monospace
-     * when the input type flips to visible password
-     */
-    private void setupPasswordVisibilityToggleV2() {
         final android.graphics.Typeface interFont =
-                androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.pp_v2_inter);
+                androidx.core.content.res.ResourcesCompat.getFont(requireContext(), R.font.pp_inter);
 
         togglePasswordVisibility.setOnClickListener(v -> {
             isPasswordVisible = !isPasswordVisible;
@@ -285,17 +203,12 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             if (isSupported && isEnabled && canUse) {
                 biometricButton.setVisibility(View.VISIBLE);
 
-                // V2 retry link picks "Fingerprint" when device advertises one.
-                if (getResources().getInteger(R.integer.design_version) == 2) {
-                    boolean hasFingerprint = getContext() != null
-                            && getContext().getPackageManager().hasSystemFeature(
-                                    android.content.pm.PackageManager.FEATURE_FINGERPRINT);
-                    biometricButton.setText(hasFingerprint
-                            ? "Try again with Fingerprint"
-                            : "Try again with Biometrics");
-                } else {
-                    biometricButton.setText("Use Biometric");
-                }
+                boolean hasFingerprint = getContext() != null
+                        && getContext().getPackageManager().hasSystemFeature(
+                                android.content.pm.PackageManager.FEATURE_FINGERPRINT);
+                biometricButton.setText(hasFingerprint
+                        ? "Try again with Fingerprint"
+                        : "Try again with Biometrics");
 
                 biometricButton.setOnClickListener(v -> {
                     if (!isAuthenticatingBiometric) {
@@ -323,7 +236,6 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
 
         isAuthenticatingBiometric = true;
 
-        // Get encryption data with biometric authentication
         FragmentActivity activity = getActivity();
         if (activity == null) {
             isAuthenticatingBiometric = false;
@@ -336,7 +248,6 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             "Use your biometric to unlock"
         ).whenComplete((encryptionData, throwable) -> {
             if (throwable != null) {
-                // Authentication failed or was cancelled
                 getActivity().runOnUiThread(() -> {
                     isAuthenticatingBiometric = false;
                     String errorMessage = throwable.getMessage();
@@ -347,7 +258,6 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     }
                 });
             } else if (encryptionData != null) {
-                // Authentication successful, use encryption data to unlock vault
                 authenticateWithEncryptionData(encryptionData);
             } else {
                 getActivity().runOnUiThread(() -> {
@@ -372,25 +282,21 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
 
         CompletableFuture.runAsync(() -> {
             try {
-                // Verify we have the stored hashed password
                 if (encryptionData.hashedPassword == null || encryptionData.hashedPassword.isEmpty()) {
                     throw new Exception("Invalid credentials - no hashed password available");
                 }
 
-                // Use the simplified initWithCredentials API which handles everything internally
                 vaultClient.initWithCredentials(
                     encryptionData.ciphertext,
                     encryptionData.nonce,
                     encryptionData.hashedPassword
                 ).get();
 
-                // Verify that the vault was actually unlocked by checking status
                 PearPassVaultClient.VaultStatus vaultStatus = vaultClient.vaultsGetStatus().get();
                 if (vaultStatus.isLocked) {
                     throw new Exception("Invalid credentials - vault remains locked");
                 }
 
-                // Authentication successful - store credentials for resume reinitialization
                 if (getActivity() instanceof PasskeyRegistrationActivity) {
                     ((PasskeyRegistrationActivity) getActivity()).onCredentialsObtained(
                         encryptionData.ciphertext,

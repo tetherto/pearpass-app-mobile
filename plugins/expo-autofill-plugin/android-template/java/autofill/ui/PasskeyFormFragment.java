@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -34,7 +33,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -51,7 +49,6 @@ public class PasskeyFormFragment extends Fragment {
 
     private EditText titleInput;
     private EditText usernameInput;
-    private EditText websiteInput; // V1 only — V2 uses websiteInputs list
     private EditText commentInput;
     private TextView titleError;
     private TextView websiteError;
@@ -64,12 +61,12 @@ public class PasskeyFormFragment extends Fragment {
     private Button uploadFileButton;
     private LinearLayout attachmentsContainer;
 
-    // V2 multi-website rows; V1 keeps the single websiteInput.
+    // Multi-website rows.
     private LinearLayout websitesRowContainer;
     private View addWebsiteButton;
     private final List<EditText> websiteInputs = new ArrayList<>();
 
-    // V2 spinner overlay shown over Save while the passkey is being written.
+    // Spinner overlay shown over Save while the passkey is being written.
     private android.widget.ProgressBar saveProgress;
 
     private static final String STATE_SELECTED_FOLDER = "selected_folder";
@@ -98,7 +95,6 @@ public class PasskeyFormFragment extends Fragment {
             isSaving = savedInstanceState.getBoolean(STATE_IS_SAVING, false);
         }
 
-        // Register file picker result handler
         filePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -123,44 +119,18 @@ public class PasskeyFormFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // v2 layout uses reusable input includes, so we bind via a helper
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            View view = inflater.inflate(R.layout.fragment_passkey_form_v2, container, false);
-            bindV2Views(view);
-            initializeForm();
-            setupListeners();
-            refreshAttachmentsDisplay();
-            return view;
-        }
-
         View view = inflater.inflate(R.layout.fragment_passkey_form, container, false);
-
-        titleInput = view.findViewById(R.id.titleInput);
-        usernameInput = view.findViewById(R.id.usernameInput);
-        websiteInput = view.findViewById(R.id.websiteInput);
-        commentInput = view.findViewById(R.id.commentInput);
-        titleError = view.findViewById(R.id.titleError);
-        websiteError = view.findViewById(R.id.websiteError);
-        saveError = view.findViewById(R.id.saveError);
-        fileSizeError = view.findViewById(R.id.fileSizeError);
-        passkeyDateText = view.findViewById(R.id.passkeyDateText);
-        cancelButton = view.findViewById(R.id.cancelButton);
-        folderSelector = view.findViewById(R.id.folderSelector);
-        saveButton = view.findViewById(R.id.saveButton);
-        uploadFileButton = view.findViewById(R.id.uploadFileButton);
-        attachmentsContainer = view.findViewById(R.id.attachmentsContainer);
-
+        bindViews(view);
         initializeForm();
         setupListeners();
         refreshAttachmentsDisplay();
-
         return view;
     }
 
     /**
-     * Binds the v2 includes-based layout, resolving the shared ppInputEdit id inside each field
+     * Binds the includes-based layout, resolving the shared ppInputEdit id inside each field.
      */
-    private void bindV2Views(View view) {
+    private void bindViews(View view) {
         View titleField = view.findViewById(R.id.formTitleField);
         titleInput = titleField.findViewById(R.id.ppInputEdit);
         setInputFieldLabel(titleField, "Title*");
@@ -183,7 +153,7 @@ public class PasskeyFormFragment extends Fragment {
         passkeyDateText.setCursorVisible(false);
         passkeyDateText.setKeyListener(null);
 
-        // V2: unified websites card; rows added via addWebsiteRow.
+        // Unified websites card; rows added via addWebsiteRow.
         websitesRowContainer = view.findViewById(R.id.formWebsitesRowContainer);
         addWebsiteButton = view.findViewById(R.id.formAddWebsiteButton);
         websiteError = view.findViewById(R.id.formWebsiteError);
@@ -246,11 +216,9 @@ public class PasskeyFormFragment extends Fragment {
         // Always use current time since this is a new passkey being created
         passkeyCreatedAt = System.currentTimeMillis();
 
-        boolean isV2 = getResources().getInteger(R.integer.design_version) == 2;
         List<String> initialWebsites = new ArrayList<>();
 
         if (existingRecord != null) {
-            // Pre-populate from existing record
             Map<String, Object> data = null;
             if (existingRecord.containsKey("data") && existingRecord.get("data") instanceof Map) {
                 data = (Map<String, Object>) existingRecord.get("data");
@@ -269,7 +237,6 @@ public class PasskeyFormFragment extends Fragment {
 
                 commentInput.setText(data.get("note") != null ? (String) data.get("note") : "");
 
-                // Load existing attachments from record
                 Object attachmentsObj = data.get("attachments");
                 if (attachmentsObj instanceof List) {
                     for (Object item : (List<?>) attachmentsObj) {
@@ -286,69 +253,25 @@ public class PasskeyFormFragment extends Fragment {
 
             selectedFolder = (String) existingRecord.get("folder");
         } else {
-            // Pre-populate from passkey request
             titleInput.setText(activity.getRpName());
             usernameInput.setText(activity.getUserName());
             initialWebsites.add("https://" + activity.getRpId());
         }
 
-        if (isV2) {
-            if (initialWebsites.isEmpty()) {
-                addWebsiteRow("");
-            } else {
-                for (String w : initialWebsites) addWebsiteRow(w);
-            }
-        } else if (websiteInput != null && !initialWebsites.isEmpty()) {
-            websiteInput.setText(initialWebsites.get(0));
+        if (initialWebsites.isEmpty()) {
+            addWebsiteRow("");
+        } else {
+            for (String w : initialWebsites) addWebsiteRow(w);
         }
 
-        // Update folder display
         folderSelector.setText(selectedFolder != null ? selectedFolder : "No folder");
 
-        // Update passkey date display
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         String dateStr = "Created on " + dateFormat.format(new Date(passkeyCreatedAt));
         passkeyDateText.setText(dateStr);
     }
 
     private void setupListeners() {
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            setupListenersV2();
-            return;
-        }
-
-        cancelButton.setOnClickListener(v -> {
-            if (getActivity() instanceof PasskeyRegistrationActivity) {
-                ((PasskeyRegistrationActivity) getActivity()).onCancel();
-            }
-        });
-
-        folderSelector.setClickable(true);
-        folderSelector.setFocusable(true);
-        folderSelector.setOnClickListener(v -> {
-            SecureLog.d(TAG, "Folder selector clicked!");
-            showFolderPicker();
-        });
-
-        // Clear errors on input
-        titleInput.addTextChangedListener(new SimpleTextWatcher(() -> {
-            if (titleError != null) titleError.setVisibility(View.GONE);
-        }));
-
-        websiteInput.addTextChangedListener(new SimpleTextWatcher(() -> {
-            if (websiteError != null) websiteError.setVisibility(View.GONE);
-        }));
-
-        saveButton.setOnClickListener(v -> handleSave());
-
-        uploadFileButton.setOnClickListener(v -> openFilePicker());
-    }
-
-    /**
-     * Cancel/folder/discard are wired in bindV2Views; this handles the rest.
-     * Website TextWatcher is attached per-row by addWebsiteRow.
-     */
-    private void setupListenersV2() {
         titleInput.addTextChangedListener(new SimpleTextWatcher(() -> {
             if (titleError != null) titleError.setVisibility(View.GONE);
         }));
@@ -383,7 +306,7 @@ public class PasskeyFormFragment extends Fragment {
             websitesRowContainer.addView(divider);
         }
 
-        View row = inflater.inflate(R.layout.include_pp_website_row_v2, websitesRowContainer, false);
+        View row = inflater.inflate(R.layout.include_pp_website_row, websitesRowContainer, false);
         EditText edit = row.findViewById(R.id.ppWebsiteRowEdit);
         if (initialText != null) edit.setText(initialText);
         edit.addTextChangedListener(new SimpleTextWatcher(() -> {
@@ -405,19 +328,17 @@ public class PasskeyFormFragment extends Fragment {
         List<String> folders = activity.getPreloadedFolders();
         SecureLog.d(TAG, "Got folders: " + folders.size() + " folders");
 
-        // Build list with "No folder" option at the top
         List<String> options = new ArrayList<>();
         options.add("No folder");
         options.addAll(folders);
 
         String[] items = options.toArray(new String[0]);
 
-        // Find current selection index
         int checkedItem = 0;
         if (selectedFolder != null) {
             int idx = folders.indexOf(selectedFolder);
             if (idx >= 0) {
-                checkedItem = idx + 1; // +1 because "No folder" is at index 0
+                checkedItem = idx + 1;
             }
         }
 
@@ -451,7 +372,6 @@ public class PasskeyFormFragment extends Fragment {
         if (context == null) return;
 
         try {
-            // Read file data
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
             if (inputStream == null) return;
 
@@ -465,7 +385,6 @@ public class PasskeyFormFragment extends Fragment {
 
             byte[] fileData = buffer.toByteArray();
 
-            // Validate file size: max 6 MB (matching iOS)
             if (fileData.length > MAX_FILE_SIZE_BYTES) {
                 fileSizeError.setText("Your file is too large. Please upload one that's 6 MB or smaller.");
                 fileSizeError.setVisibility(View.VISIBLE);
@@ -474,16 +393,13 @@ public class PasskeyFormFragment extends Fragment {
 
             fileSizeError.setVisibility(View.GONE);
 
-            // Get file name
             String fileName = getFileName(context, uri);
 
-            // Create attachment
             PasskeyFormData.AttachmentFile attachment = new PasskeyFormData.AttachmentFile(
                     UUID.randomUUID().toString(), fileName, fileData
             );
             attachments.add(attachment);
 
-            // Update UI
             refreshAttachmentsDisplay();
 
         } catch (Exception e) {
@@ -505,7 +421,6 @@ public class PasskeyFormFragment extends Fragment {
     }
 
     private void refreshAttachmentsDisplay() {
-        // attachmentsContainer is null in V2
         if (attachmentsContainer == null) return;
         attachmentsContainer.removeAllViews();
 
@@ -529,18 +444,16 @@ public class PasskeyFormFragment extends Fragment {
         Context context = requireContext();
         float density = context.getResources().getDisplayMetrics().density;
 
-        // Container
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         int padding = (int) (12 * density);
         row.setPadding(padding, padding, padding, padding);
 
-        // Background matching iOS style (search_input_background equivalent)
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(8 * density);
-        bg.setColor(Color.parseColor("#0DFFFFFF")); // white 5% opacity
-        bg.setStroke((int) (1 * density), Color.parseColor("#1AFFFFFF")); // white 10% opacity
+        bg.setColor(Color.parseColor("#0DFFFFFF"));
+        bg.setStroke((int) (1 * density), Color.parseColor("#1AFFFFFF"));
         row.setBackground(bg);
 
         LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
@@ -548,7 +461,6 @@ public class PasskeyFormFragment extends Fragment {
         rowParams.bottomMargin = (int) (4 * density);
         row.setLayoutParams(rowParams);
 
-        // File name
         TextView nameText = new TextView(context);
         nameText.setText(attachment.getName());
         nameText.setTextColor(Color.WHITE);
@@ -560,10 +472,9 @@ public class PasskeyFormFragment extends Fragment {
         nameText.setLayoutParams(nameParams);
         row.addView(nameText);
 
-        // Delete button
         TextView deleteBtn = new TextView(context);
-        deleteBtn.setText("\u2715"); // ✕ character
-        deleteBtn.setTextColor(Color.parseColor("#B3FF4444")); // red 70% opacity
+        deleteBtn.setText("✕");
+        deleteBtn.setTextColor(Color.parseColor("#B3FF4444"));
         deleteBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         int deletePadding = (int) (8 * density);
         deleteBtn.setPadding(deletePadding, 0, 0, 0);
@@ -579,7 +490,6 @@ public class PasskeyFormFragment extends Fragment {
     private boolean validate() {
         boolean isValid = true;
 
-        // Title required
         String title = titleInput.getText().toString().trim();
         if (title.isEmpty()) {
             titleError.setText("Title is required");
@@ -587,17 +497,8 @@ public class PasskeyFormFragment extends Fragment {
             isValid = false;
         }
 
-        // V2 collects from every row; V1 falls back to single websiteInput.
-        List<String> entriesToCheck = new ArrayList<>();
-        if (!websiteInputs.isEmpty()) {
-            for (EditText e : websiteInputs) {
-                entriesToCheck.add(e.getText().toString().trim());
-            }
-        } else if (websiteInput != null) {
-            entriesToCheck.add(websiteInput.getText().toString().trim());
-        }
-
-        for (String entry : entriesToCheck) {
+        for (EditText e : websiteInputs) {
+            String entry = e.getText().toString().trim();
             if (entry.isEmpty()) continue;
             String urlString = addHttps(entry);
             if (!urlString.contains(".")) {
@@ -619,7 +520,6 @@ public class PasskeyFormFragment extends Fragment {
 
         isSaving = true;
         saveButton.setEnabled(false);
-        // V2: hide button label, show spinner overlay.
         if (saveProgress != null) {
             saveButton.setText("");
             saveProgress.setVisibility(View.VISIBLE);
@@ -630,15 +530,9 @@ public class PasskeyFormFragment extends Fragment {
         String username = usernameInput.getText().toString();
         String comment = commentInput.getText().toString();
 
-        // Drop empty rows + normalize each via addHttps before save.
         List<String> websites = new ArrayList<>();
-        if (!websiteInputs.isEmpty()) {
-            for (EditText e : websiteInputs) {
-                String w = e.getText().toString().trim();
-                if (!w.isEmpty()) websites.add(addHttps(w));
-            }
-        } else if (websiteInput != null) {
-            String w = websiteInput.getText().toString().trim();
+        for (EditText e : websiteInputs) {
+            String w = e.getText().toString().trim();
             if (!w.isEmpty()) websites.add(addHttps(w));
         }
 
@@ -674,17 +568,6 @@ public class PasskeyFormFragment extends Fragment {
         return "https://" + lower;
     }
 
-    private static final List<String> IMAGE_EXTENSIONS = Arrays.asList(
-            "png", "jpg", "jpeg", "gif", "bmp", "webp", "svg"
-    );
-
-    private static boolean isImageFile(String name) {
-        int dotIndex = name.lastIndexOf('.');
-        if (dotIndex < 0) return false;
-        String ext = name.substring(dotIndex + 1).toLowerCase();
-        return IMAGE_EXTENSIONS.contains(ext);
-    }
-
     /**
      * Represents an existing attachment from the record (read-only metadata).
      */
@@ -702,14 +585,12 @@ public class PasskeyFormFragment extends Fragment {
         Context context = requireContext();
         float density = context.getResources().getDisplayMetrics().density;
 
-        // Container
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         int padding = (int) (12 * density);
         row.setPadding(padding, padding, padding, padding);
 
-        // Background
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(8 * density);
         bg.setColor(Color.parseColor("#0DFFFFFF"));
@@ -721,7 +602,6 @@ public class PasskeyFormFragment extends Fragment {
         rowParams.bottomMargin = (int) (4 * density);
         row.setLayoutParams(rowParams);
 
-        // File name
         TextView nameText = new TextView(context);
         nameText.setText(attachment.name);
         nameText.setTextColor(Color.WHITE);
@@ -733,9 +613,8 @@ public class PasskeyFormFragment extends Fragment {
         nameText.setLayoutParams(nameParams);
         row.addView(nameText);
 
-        // Delete button
         TextView deleteBtn = new TextView(context);
-        deleteBtn.setText("\u2715");
+        deleteBtn.setText("✕");
         deleteBtn.setTextColor(Color.parseColor("#B3FF4444"));
         deleteBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         int deletePadding = (int) (8 * density);

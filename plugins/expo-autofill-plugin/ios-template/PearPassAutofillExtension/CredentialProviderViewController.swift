@@ -103,47 +103,7 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
     }
 
     private func setupSwiftUIView() {
-        // V2 routing — design version flag from extension's Info.plist (build-time).
-        if DesignVersion.isV2 {
-            setupV2AssertionView()
-            return
-        }
-
-        let mainView = ExtensionMainView(
-            serviceIdentifiers: serviceIdentifiers,
-            presentationWindow: self.view.window,
-            onCancel: { [weak self] in
-                // Cleanup BEFORE cancelling (critical!)
-                self?.performCleanupSync()
-                self?.cancel(nil)
-            },
-            onComplete: { [weak self] username, password in
-                // Cleanup BEFORE completing (critical!)
-                self?.performCleanupSync()
-                let passwordCredential = ASPasswordCredential(user: username, password: password)
-                self?.extensionContext.completeRequest(withSelectedCredential: passwordCredential, completionHandler: nil)
-            },
-            onVaultClientCreated: { [weak self] client in
-                // Store vault client reference so we can clean it up later
-                self?.vaultClient = client
-            }
-        )
-
-        let hostingController = UIHostingController(rootView: mainView)
-
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-        hostingController.didMove(toParent: self)
-
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        extensionHostingController = hostingController
+        setupAssertionView()
     }
 
     /*
@@ -242,52 +202,8 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
         // Create registration request
         let registrationRequest = PasskeyRegistrationRequest(from: passkeyRequest)
 
-        // V2 routing — V2 design + full save (passkey form + PasskeyJobCreator).
-        if DesignVersion.isV2 {
-            isSettingUpPasskeyRegistration = false
-            setupV2RegistrationView(registrationRequest: registrationRequest)
-            return
-        }
-
-        // Present registration UI
-        let registrationView = PasskeyRegistrationView(
-            request: registrationRequest,
-            presentationWindow: self.view.window,
-            onComplete: { [weak self] credential, attestationObject, credentialId in
-                self?.completePasskeyRegistration(
-                    credential: credential,
-                    attestationObject: attestationObject,
-                    credentialId: credentialId
-                )
-            },
-            onCancel: { [weak self] in
-                guard let self = self else { return }
-                Task { @MainActor in
-                    self.isSettingUpPasskeyRegistration = false
-                    await self.performCleanupAsync()
-                    self.extensionContext.cancelRequest(withError: ASExtensionError(.userCanceled))
-                }
-            },
-            onVaultClientCreated: { [weak self] client in
-                self?.vaultClient = client
-            }
-        )
-
-        let hostingController = UIHostingController(rootView: registrationView)
-
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-        hostingController.didMove(toParent: self)
-
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        extensionHostingController = hostingController
+        isSettingUpPasskeyRegistration = false
+        setupRegistrationView(registrationRequest: registrationRequest)
     }
 
     @available(iOS 17.0, *)
@@ -342,50 +258,7 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
         rpId: String,
         clientDataHash: Data
     ) {
-        // V2 routing — assertion flow (passkey-aware path falls back to V2HostView,
-        // which currently surfaces credentials only; passkey assertion wiring is V1 for now).
-        if DesignVersion.isV2 {
-            setupV2AssertionView()
-            return
-        }
-
-        let mainView = ExtensionMainView(
-            serviceIdentifiers: serviceIdentifiers,
-            presentationWindow: self.view.window,
-            passkeyRpId: rpId,
-            passkeyClientDataHash: clientDataHash,
-            onCancel: { [weak self] in
-                self?.performCleanupSync()
-                self?.cancel(nil)
-            },
-            onComplete: { [weak self] username, password in
-                self?.performCleanupSync()
-                let passwordCredential = ASPasswordCredential(user: username, password: password)
-                self?.extensionContext.completeRequest(withSelectedCredential: passwordCredential, completionHandler: nil)
-            },
-            onPasskeySelected: { [weak self] credential in
-                self?.completePasskeyAssertion(credential: credential, clientDataHash: clientDataHash)
-            },
-            onVaultClientCreated: { [weak self] client in
-                self?.vaultClient = client
-            }
-        )
-
-        let hostingController = UIHostingController(rootView: mainView)
-
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-        hostingController.didMove(toParent: self)
-
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        extensionHostingController = hostingController
+        setupAssertionView()
     }
 
     @available(iOS 17.0, *)
@@ -436,18 +309,18 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
 
     // MARK: - Passkey Without User Interaction (iOS 17+)
 
-    // MARK: - V2 hosting (design version 2)
+    // MARK: - Hosting
 
-    private func setupV2AssertionView() {
+    private func setupAssertionView() {
         // passkeyRpId is set by passkey assertion paths (iOS 17+) and stays
-        // nil for password-only autofill — V2HostView falls back to
+        // nil for password-only autofill — HostView falls back to
         // serviceIdentifiers when nil.
-        attachV2HostView(mode: .assertion, registrationContext: nil, passkeyRpId: passkeyRpId)
+        attachHostView(mode: .assertion, registrationContext: nil, passkeyRpId: passkeyRpId)
     }
 
     @available(iOS 17.0, *)
-    private func setupV2RegistrationView(registrationRequest: PasskeyRegistrationRequest) {
-        let ctx = V2RegistrationContext(
+    private func setupRegistrationView(registrationRequest: PasskeyRegistrationRequest) {
+        let ctx = RegistrationContext(
             rpId: registrationRequest.rpId,
             rpName: registrationRequest.rpName,
             userId: registrationRequest.userId,
@@ -455,11 +328,11 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
             userDisplayName: registrationRequest.userDisplayName,
             challenge: registrationRequest.challenge
         )
-        attachV2HostView(mode: .registration, registrationContext: ctx, passkeyRpId: nil)
+        attachHostView(mode: .registration, registrationContext: ctx, passkeyRpId: nil)
     }
 
-    private func attachV2HostView(mode: CombinedItemsMode, registrationContext: V2RegistrationContext?, passkeyRpId: String?) {
-        // Pin the sheet to 85% of the screen with flat corners so the V2
+    private func attachHostView(mode: CombinedItemsMode, registrationContext: RegistrationContext?, passkeyRpId: String?) {
+        // Pin the sheet to 85% of the screen with flat corners so the
         // surface sits flush against the screen edges and matches Android's
         // 0.85 partial-height autofill window. iOS 16+ exposes custom detents.
         if #available(iOS 16.0, *) {
@@ -503,7 +376,7 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
             }
         }()
 
-        let v2View = V2HostView(
+        let hostView = HostView(
             serviceIdentifiers: serviceIdentifiers,
             presentationWindow: self.view.window,
             mode: mode,
@@ -525,7 +398,7 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
             }
         )
 
-        let hostingController = UIHostingController(rootView: v2View)
+        let hostingController = UIHostingController(rootView: hostView)
 
         addChild(hostingController)
         view.addSubview(hostingController.view)

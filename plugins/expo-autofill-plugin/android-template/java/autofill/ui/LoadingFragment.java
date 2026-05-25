@@ -20,49 +20,19 @@ public class LoadingFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // v2 uses design system colors
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            return onCreateViewV2();
-        }
-
-        // Create a simple loading view programmatically
-        FrameLayout layout = new FrameLayout(requireContext());
-        layout.setLayoutParams(new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        ));
-        layout.setBackgroundColor(0xFF232323); // Dark background
-
-        // Create progress bar
-        ProgressBar progressBar = new ProgressBar(requireContext());
-        progressBar.setIndeterminate(true);
-
-        FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        );
-        progressParams.gravity = Gravity.CENTER;
-        progressBar.setLayoutParams(progressParams);
-
-        layout.addView(progressBar);
-
-        return layout;
-    }
-
-    private View onCreateViewV2() {
         FrameLayout layout = new FrameLayout(requireContext());
         layout.setLayoutParams(new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         ));
         layout.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.pp_v2_surface_primary));
+            ContextCompat.getColor(requireContext(), R.color.pp_surface_primary));
 
         ProgressBar progressBar = new ProgressBar(requireContext());
         progressBar.setIndeterminate(true);
         progressBar.setIndeterminateTintList(
             ColorStateList.valueOf(
-                ContextCompat.getColor(requireContext(), R.color.pp_v2_primary)));
+                ContextCompat.getColor(requireContext(), R.color.pp_primary)));
 
         FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,

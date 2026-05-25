@@ -86,20 +86,11 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
     private byte[] generatedAttestationObject;
     private byte[] generatedCredentialId;
 
-    // Secure password buffer for passing between fragments
-    private byte[] pendingPasswordBuffer = null;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // v2 opens as a bottom sheet, v1 keeps the old fullscreen window
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            setContentView(R.layout.activity_authentication_v2);
-            applyPartialHeightWindow();
-        } else {
-            setContentView(R.layout.activity_authentication);
-            makeFullscreen();
-        }
+        setContentView(R.layout.activity_authentication);
+        applyPartialHeightWindow();
 
         // Show loading
         if (savedInstanceState == null) {
@@ -169,23 +160,6 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         }
     }
 
-    private void makeFullscreen() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                android.view.WindowInsetsController insetsController = getWindow().getInsetsController();
-                if (insetsController != null) {
-                    insetsController.hide(android.view.WindowInsets.Type.navigationBars());
-                    insetsController.setSystemBarsBehavior(
-                            android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-                }
-                getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-                getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
-            }
-        } catch (Exception e) {
-            SecureLog.e(TAG, "Error setting fullscreen", e);
-        }
-    }
-
     private void initialize() {
         if (vaultClient != null) return;
 
@@ -249,14 +223,9 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
 
     @Override
     public void navigateToVaultSelection() {
-        // v2 routes through combined items in registration mode (one screen, no separate vault password)
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            replaceFragment(CombinedItemsFragment.newInstance(
-                    CombinedItemsFragment.MODE_REGISTRATION,
-                    null, null, rpId, userName), true);
-            return;
-        }
-        replaceFragment(new VaultSelectionFragment(), true);
+        replaceFragment(CombinedItemsFragment.newInstance(
+                CombinedItemsFragment.MODE_REGISTRATION,
+                null, null, rpId, userName), true);
     }
 
     // Called from CombinedItemsFragment after the user picks a vault.
@@ -322,39 +291,6 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
             v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), bottom);
             return insets;
         });
-    }
-
-    @Override
-    public void navigateToVaultPassword(String vaultId, String vaultName) {
-        this.selectedVaultId = vaultId;
-        this.selectedVaultName = vaultName;
-        replaceFragment(VaultPasswordFragment.newInstance(vaultId, vaultName), true);
-    }
-
-    @Override
-    public void navigateToCredentialsList(String vaultId) {
-        this.selectedVaultId = vaultId;
-        // In registration mode, search for existing credentials instead of showing credentials list
-        searchForExistingCredentials(vaultId, null);
-    }
-
-    @Override
-    public void navigateToCredentialsList(String vaultId, byte[] passwordBuffer) {
-        this.selectedVaultId = vaultId;
-        // Store password buffer securely for vault re-opening on resume
-        clearPendingPasswordBuffer();
-        this.pendingPasswordBuffer = passwordBuffer;
-        searchForExistingCredentials(vaultId, passwordBuffer);
-    }
-
-    /**
-     * Clear any pending password buffer from memory.
-     */
-    private void clearPendingPasswordBuffer() {
-        if (pendingPasswordBuffer != null) {
-            com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(pendingPasswordBuffer);
-            pendingPasswordBuffer = null;
-        }
     }
 
     @Override

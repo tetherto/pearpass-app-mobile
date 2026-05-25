@@ -66,10 +66,6 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     private boolean isVaultOpen = false;
     private boolean isLoading = true;
 
-    // Secure password buffer for passing between fragments
-    // This avoids passing password as String through Bundle arguments
-    private byte[] pendingPasswordBuffer = null;
-
     // State keys for savedInstanceState
     private static final String STATE_HAS_PASSWORD_SET = "hasPasswordSet";
     private static final String STATE_HAS_INITIALIZED_ONCE = "hasInitializedOnce";
@@ -78,15 +74,8 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // v2 opens as a bottom sheet, v1 keeps the old fullscreen window
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            setContentView(R.layout.activity_authentication_v2);
-            applyPartialHeightWindow();
-        } else {
-            setContentView(R.layout.activity_authentication);
-
-            makeFullscreen();
-        }
+        setContentView(R.layout.activity_authentication);
+        applyPartialHeightWindow();
 
         // Show loading fragment immediately - user must not interact until initialization is complete
         if (savedInstanceState == null) {
@@ -164,42 +153,6 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         SecureLog.d(TAG, "Saved state - hasPasswordSet: " + hasPasswordSet);
     }
 
-    private void makeFullscreen() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Android 11+ (API 30+) - Use WindowInsetsController
-                // Don't set setDecorFitsSystemWindows(false) to allow proper insets handling
-                android.view.WindowInsetsController insetsController = getWindow().getInsetsController();
-                if (insetsController != null) {
-                    insetsController.hide(
-                        android.view.WindowInsets.Type.navigationBars()
-                    );
-                    insetsController.setSystemBarsBehavior(
-                        android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    );
-                }
-                // Make status bar transparent but keep it visible for proper insets
-                getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-                getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
-            } else {
-                // Pre-Android 11 - Use system UI visibility flags
-                getWindow().getDecorView().setSystemUiVisibility(
-                    android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                    android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                    android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                    android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                );
-                // Make status bar transparent
-                getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-                getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
-            }
-        } catch (Exception e) {
-            // Log the error but don't crash - fullscreen is not critical
-            SecureLog.e("AuthenticationActivity", "Error setting fullscreen", e);
-        }
-    }
-
     @Override
     public void navigateToMasterPassword() {
         // Check if we're already showing MasterPasswordFragment
@@ -215,15 +168,9 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
     @Override
     public void navigateToVaultSelection() {
-        // v2 uses one combined screen for vault + credentials, v1 has separate fragments
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            replaceFragment(CombinedItemsFragment.newInstance(
-                    CombinedItemsFragment.MODE_ASSERTION,
-                    webDomain, packageName, null, null), true);
-            return;
-        }
-        Fragment fragment = new VaultSelectionFragment();
-        replaceFragment(fragment, true);
+        replaceFragment(CombinedItemsFragment.newInstance(
+                CombinedItemsFragment.MODE_ASSERTION,
+                webDomain, packageName, null, null), true);
     }
 
     // 85% height sheet anchored to bottom, with a dim backdrop. v2 only.
@@ -260,50 +207,6 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
             v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), bottom);
             return insets;
         });
-    }
-
-    @Override
-    public void navigateToVaultPassword(String vaultId, String vaultName) {
-        Fragment fragment = VaultPasswordFragment.newInstance(vaultId, vaultName);
-        replaceFragment(fragment, true);
-    }
-
-    @Override
-    public void navigateToCredentialsList(String vaultId) {
-        Fragment fragment = CredentialsListFragment.newInstance(vaultId, webDomain, packageName);
-        replaceFragment(fragment, true);
-    }
-
-    @Override
-    public void navigateToCredentialsList(String vaultId, byte[] passwordBuffer) {
-        // Store password buffer securely - it will be retrieved by CredentialsListFragment
-        // and cleared after vault activation
-        clearPendingPasswordBuffer(); // Clear any existing buffer first
-        this.pendingPasswordBuffer = passwordBuffer;
-        Fragment fragment = CredentialsListFragment.newInstance(vaultId, webDomain, packageName);
-        replaceFragment(fragment, true);
-    }
-
-    /**
-     * Get the pending password buffer for vault activation.
-     * This retrieves and clears the buffer in one operation to prevent multiple uses.
-     *
-     * @return The password buffer, or null if not set. Caller is responsible for clearing after use.
-     */
-    public byte[] consumePendingPasswordBuffer() {
-        byte[] buffer = this.pendingPasswordBuffer;
-        this.pendingPasswordBuffer = null; // Clear reference but don't zero - caller will use it
-        return buffer;
-    }
-
-    /**
-     * Clear any pending password buffer from memory.
-     */
-    private void clearPendingPasswordBuffer() {
-        if (pendingPasswordBuffer != null) {
-            com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(pendingPasswordBuffer);
-            pendingPasswordBuffer = null;
-        }
     }
 
     @Override
@@ -766,9 +669,6 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
      * Cleanup the vault client resources
      */
     private void cleanup() {
-        // Clear any pending password buffer
-        clearPendingPasswordBuffer();
-
         if (vaultClient == null) {
             return;
         }
