@@ -8,7 +8,7 @@ import {
   useBottomSheetClose,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { kickDevice } from '@tetherto/pearpass-lib-vault'
+import { kickDevice, useVault } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Toast from 'react-native-toast-message'
@@ -26,6 +26,7 @@ export const BottomSheetRevokeAccessContent = ({
   const { theme } = useTheme()
   const close = useBottomSheetClose()
   const { bottom } = useSafeAreaInsets()
+  const { refetch: refetchVault } = useVault()
   const [isLoading, setIsLoading] = useState(false)
 
   const onRevoke = async () => {
@@ -48,6 +49,12 @@ export const BottomSheetRevokeAccessContent = ({
       })
       setIsLoading(false)
       return
+    }
+
+    try {
+      await refetchVault(vaultId)
+    } catch (error) {
+      logger.error('BottomSheetRevokeAccessContent', 'refetch failed:', error)
     }
 
     close()
