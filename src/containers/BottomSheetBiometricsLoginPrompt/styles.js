@@ -1,39 +1,58 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Header = styled.View`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-`
+export const Header = (props) => (
+  <View {...props} style={[styles.header, props.style]} />
+)
 
-export const Title = styled.Text`
-  color: ${({ theme }) => theme.colors.white.mode1};
-  font-family: 'Inter';
-  font-size: 16px;
-  font-weight: 500;
-`
+export const Title = (props) => (
+  <Text {...props} style={[styles.title, props.style]} />
+)
 
-export const ContentWrapper = styled.View`
-  padding: 0 20px 20px 20px;
-`
+export const ContentWrapper = (props) => (
+  <View {...props} style={[styles.contentWrapper, props.style]} />
+)
 
-export const BottomSheetBody = styled.Text`
-  text-align: center;
-  color: ${({ theme }) => theme.colors.white.mode1};
-  font-size: 14px;
-  line-height: 22px;
-  padding-horizontal: 5px;
-`
+export const BottomSheetBody = (props) => (
+  <Text {...props} style={[styles.bottomSheetBody, props.style]} />
+)
 
-export const ActionsWrapper = styled.View`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  padding-top: 20px;
-`
+export const ActionsWrapper = (props) => (
+  <View {...props} style={[styles.actionsWrapper, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 20
+  },
+  title: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  contentWrapper: {
+    paddingTop: 0,
+    paddingHorizontal: 20,
+    paddingBottom: 20
+  },
+  bottomSheetBody: {
+    textAlign: 'center',
+    color: colors.white.mode1,
+    fontSize: 14,
+    lineHeight: 22,
+    paddingHorizontal: 5
+  },
+  actionsWrapper: {
+    width: '100%',
+    flexDirection: 'column',
+    gap: 10,
+    alignItems: 'center',
+    paddingTop: 20
+  }
+})

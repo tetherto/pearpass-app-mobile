@@ -1,8 +1,8 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, fireEvent, waitFor } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { StyleSheet, View } from 'react-native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { DropdownSwapVault } from '.'
 import messages from '../../locales/en/messages'

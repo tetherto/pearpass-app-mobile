@@ -9,8 +9,8 @@ import {
   Add,
   StarFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
+import { colors } from 'src/utils/colors'
 
 import { FoldersContainer } from './styles'
 import { Folder } from '../../components/Folder'

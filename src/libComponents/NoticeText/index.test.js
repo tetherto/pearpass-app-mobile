@@ -4,7 +4,7 @@ import {
   Check,
   ReportProblem
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { NoticeText } from './index'
 

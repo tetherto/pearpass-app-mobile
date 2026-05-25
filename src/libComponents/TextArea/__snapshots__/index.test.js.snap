@@ -37,7 +37,6 @@ exports[`TextArea Component matches snapshot 1`] = `
 >
   <TextInput
     editable={true}
-    isFocused={false}
     multiline={true}
     onBlur={[Function]}
     onChangeText={[Function]}
@@ -45,26 +44,25 @@ exports[`TextArea Component matches snapshot 1`] = `
     placeholder="Enter text"
     placeholderTextColor="#BABABA"
     style={
-      {
-        "backgroundColor": "#303030",
-        "borderBottomLeftRadius": 10,
-        "borderBottomRightRadius": 10,
-        "borderColor": "#BABABA",
-        "borderTopLeftRadius": 10,
-        "borderTopRightRadius": 10,
-        "borderWidth": 1,
-        "color": "#F6F6F6",
-        "fontFamily": "Inter",
-        "fontSize": 16,
-        "fontWeight": "700",
-        "height": 233,
-        "paddingBottom": 8,
-        "paddingLeft": 10,
-        "paddingRight": 10,
-        "paddingTop": 8,
-        "pointerEvents": "auto",
-        "width": "100%",
-      }
+      [
+        {
+          "backgroundColor": "#303030",
+          "borderRadius": 10,
+          "borderWidth": 1,
+          "color": "#F6F6F6",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "700",
+          "height": 233,
+          "paddingHorizontal": 10,
+          "paddingVertical": 8,
+          "width": "100%",
+        },
+        {
+          "borderColor": "#BABABA",
+        },
+        undefined,
+      ]
     }
     textAlignVertical="top"
     value="snapshot text"

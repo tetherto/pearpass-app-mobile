@@ -42,7 +42,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
   }
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     white: { mode1: '#FFFFFF' }
   }

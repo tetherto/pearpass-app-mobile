@@ -2,9 +2,9 @@ import { useCallback } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { ContentPaste } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import * as Clipboard from 'expo-clipboard'
 import Toast from 'react-native-toast-message'
+import { colors } from 'src/utils/colors'
 /**
  * Hook for pasting text from clipboard with toast notifications
  * @returns {{

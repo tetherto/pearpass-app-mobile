@@ -1,6 +1,6 @@
 import { ReportProblem } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text, StyleSheet } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 /**
  * @param {{

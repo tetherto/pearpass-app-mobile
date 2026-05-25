@@ -2,7 +2,7 @@ import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render } from '@testing-library/react-native'
 import { View } from 'react-native'
-import { ThemeProvider } from 'styled-components/native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { BottomSheetQrScannerContent } from './index'
 import messages from '../../locales/en/messages'

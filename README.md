@@ -164,7 +164,6 @@ See [`e2e/SETUP_AND_RUN_GUIDE.md`](e2e/SETUP_AND_RUN_GUIDE.md) for the full setu
 - [Expo](https://expo.dev/)
 - [React](https://reactjs.org/)
 - [React Navigation](https://reactnavigation.org/)
-- [Styled Components](https://styled-components.com/)
 - [Lingui](https://lingui.dev/)
 - [Redux](https://redux.js.org/)
 

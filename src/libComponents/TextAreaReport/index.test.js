@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { TouchableOpacity } from 'react-native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { TextAreaReport } from './index'
 

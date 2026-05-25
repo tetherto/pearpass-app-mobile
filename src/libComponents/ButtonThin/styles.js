@@ -1,21 +1,32 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Button = styled.TouchableOpacity`
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  border-radius: 20px;
-  padding: 10px 15px;
-  gap: 10px;
-  background: ${({ theme }) => theme.colors.black.mode1};
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.colors.black.mode1};
-`
+export const Button = (props) => (
+  <TouchableOpacity {...props} style={[styles.button, props.style]} />
+)
 
-export const ButtonText = styled.Text`
-  font-family: 'Inter';
-  font-size: 16px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.colors.primary400.mode1};
-`
+export const ButtonText = (props) => (
+  <Text {...props} style={[styles.buttonText, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    gap: 10,
+    backgroundColor: colors.black.mode1,
+    borderWidth: 1,
+    borderColor: colors.black.mode1
+  },
+  buttonText: {
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '400',
+    color: colors.primary400.mode1
+  }
+})

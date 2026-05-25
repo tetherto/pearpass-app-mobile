@@ -32,20 +32,15 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
   style={
     {
       "alignItems": "center",
-      "backgroundColor": "'transparent'",
-      "borderBottomLeftRadius": 10,
-      "borderBottomRightRadius": 10,
+      "backgroundColor": "transparent",
       "borderColor": "#BABABA",
-      "borderTopLeftRadius": 10,
-      "borderTopRightRadius": 10,
+      "borderRadius": 10,
       "borderWidth": 1,
       "flexDirection": "row",
       "gap": 15,
       "opacity": 1,
-      "paddingBottom": 5,
-      "paddingLeft": 10,
-      "paddingRight": 10,
-      "paddingTop": 5,
+      "paddingHorizontal": 10,
+      "paddingVertical": 5,
       "position": "relative",
       "width": "100%",
     }
@@ -53,9 +48,12 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
 >
   <View
     style={
-      {
-        "flexShrink": 0,
-      }
+      [
+        {
+          "flexShrink": 0,
+        },
+        undefined,
+      ]
     }
   >
     <RNSVGSvgView
@@ -111,12 +109,13 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
   </View>
   <View
     style={
-      {
-        "flexBasis": 0,
-        "flexDirection": "column",
-        "flexGrow": 1,
-        "flexShrink": 1,
-      }
+      [
+        {
+          "flex": 1,
+          "flexDirection": "column",
+        },
+        undefined,
+      ]
     }
   >
     <TextInput
@@ -129,24 +128,30 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
       placeholderTextColor="#BABABA"
       secureTextEntry={true}
       style={
-        {
-          "color": "#F6F6F6",
-          "fontFamily": "Inter",
-          "fontSize": 16,
-          "fontWeight": "400",
-        }
+        [
+          {
+            "color": "#F6F6F6",
+            "fontFamily": "Inter",
+            "fontSize": 16,
+            "fontWeight": "400",
+          },
+          undefined,
+        ]
       }
       type="text"
       value="snapshot"
     />
     <View
       style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "gap": 5,
-          "marginTop": 2,
-        }
+        [
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 5,
+            "marginTop": 2,
+          },
+          undefined,
+        ]
       }
     >
       <RNSVGSvgView
@@ -201,12 +206,15 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
       </RNSVGSvgView>
       <Text
         style={
-          {
-            "color": "#D65C5E",
-            "fontFamily": "Inter",
-            "fontSize": 10,
-            "fontWeight": "500",
-          }
+          [
+            {
+              "color": "#D65C5E",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500",
+            },
+            undefined,
+          ]
         }
       >
          
@@ -217,13 +225,16 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
   </View>
   <View
     style={
-      {
-        "alignItems": "center",
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "gap": 10,
-        "justifyContent": "flex-end",
-      }
+      [
+        {
+          "alignItems": "center",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "gap": 10,
+          "justifyContent": "flex-end",
+        },
+        undefined,
+      ]
     }
   >
     <View
@@ -259,21 +270,14 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
           "alignItems": "center",
           "alignSelf": "flex-start",
           "backgroundColor": "#050B06",
-          "borderBottomLeftRadius": 25,
-          "borderBottomRightRadius": 25,
           "borderColor": "#050B06",
-          "borderStyle": "solid",
-          "borderTopLeftRadius": 25,
-          "borderTopRightRadius": 25,
+          "borderRadius": 25,
           "borderWidth": 1,
           "flexDirection": "row",
           "gap": 10,
           "justifyContent": "center",
           "opacity": 1,
-          "paddingBottom": 7,
-          "paddingLeft": 7,
-          "paddingRight": 7,
-          "paddingTop": 7,
+          "padding": 7,
         }
       }
     >

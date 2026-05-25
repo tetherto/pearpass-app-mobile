@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useUserData } from '@tetherto/pearpass-lib-vault'
 import { ActivityIndicator, View, Image } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { NAVIGATION_ROUTES } from '../../constants/navigation'
 import { CreatePassword } from '../../containers/Auth/CreatePassword'

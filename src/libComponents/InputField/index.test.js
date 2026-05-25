@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { Text } from 'react-native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { InputField } from './index'
 

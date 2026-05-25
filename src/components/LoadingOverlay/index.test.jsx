@@ -2,7 +2,7 @@ import { render } from '@testing-library/react-native'
 
 import { LoadingOverlay } from './index'
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     primary400: {
       mode1: '#testColor'

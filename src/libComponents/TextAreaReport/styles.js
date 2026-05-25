@@ -1,20 +1,34 @@
-import styled from 'styled-components/native'
+import { StyleSheet, TextInput } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const TextAreaComponent = styled.TextInput.attrs(({ theme }) => ({
-  multiline: true,
-  placeholderTextColor: theme.colors.grey100.mode1,
-  textAlignVertical: 'top'
-}))`
-  width: 100%;
-  height: 70px;
-  padding: 11px 12px;
-  border-radius: 10px;
-  border-width: 1px;
-  border-color: ${({ isFocused, theme }) =>
-    isFocused ? theme.colors.primary400.mode1 : theme.colors.grey100.mode1};
-  font-family: 'Inter';
-  font-size: 12px;
-  font-weight: 600;
-  pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
-  color: ${({ theme }) => theme.colors.white.mode1};
-`
+export const TextAreaComponent = ({ isFocused, disabled, style, ...rest }) => (
+  <TextInput
+    multiline
+    placeholderTextColor={colors.grey100.mode1}
+    textAlignVertical="top"
+    editable={!disabled}
+    {...rest}
+    style={[
+      styles.textArea,
+      {
+        borderColor: isFocused ? colors.primary400.mode1 : colors.grey100.mode1
+      },
+      style
+    ]}
+  />
+)
+
+const styles = StyleSheet.create({
+  textArea: {
+    width: '100%',
+    height: 70,
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    fontFamily: 'Inter',
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.white.mode1
+  }
+})

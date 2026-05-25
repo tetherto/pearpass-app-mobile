@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { ContentPaste, QrCode } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
 import * as Clipboard from 'expo-clipboard'
 import {
@@ -15,6 +14,7 @@ import {
   View
 } from 'react-native'
 import { Camera } from 'react-native-vision-camera'
+import { colors } from 'src/utils/colors'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'

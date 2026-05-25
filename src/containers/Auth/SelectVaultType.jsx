@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { View, ScrollView, Text, StyleSheet } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { ListItem } from '../../components/ListItem'
 import { NAVIGATION_ROUTES } from '../../constants/navigation'

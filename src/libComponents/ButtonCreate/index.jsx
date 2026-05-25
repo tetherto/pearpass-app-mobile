@@ -1,5 +1,5 @@
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { Button, ButtonText } from './styles'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'

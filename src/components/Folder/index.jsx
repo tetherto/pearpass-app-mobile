@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
 import { Check, MoreVert } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { colors } from 'src/utils/colors'
 
 import {
   FolderContainer,

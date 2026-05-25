@@ -7,8 +7,8 @@ import {
   Check,
   LockFilled
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { ActivityIndicator, Animated, FlatList, Text } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import {
   ArrowIconWrapper,

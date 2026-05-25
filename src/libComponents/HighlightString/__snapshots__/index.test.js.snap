@@ -2,27 +2,33 @@
 
 exports[`HighlightString Component matches snapshot 1`] = `
 <Text
-  size="20px"
   style={
-    {
-      "color": "#F6F6F6",
-      "fontFamily": "Inter",
-      "fontSize": 20,
-      "fontWeight": "400",
-      "textAlign": "center",
-    }
+    [
+      {
+        "color": "#F6F6F6",
+        "fontFamily": "Inter",
+        "textAlign": "center",
+      },
+      {
+        "fontSize": "20px",
+        "fontWeight": 400,
+      },
+      undefined,
+    ]
   }
-  weight={400}
 >
   <Text>
     Test 
   </Text>
   <Text
     style={
-      {
-        "color": "#BADE5B",
-        "fontWeight": "bold",
-      }
+      [
+        {
+          "color": "#BADE5B",
+          "fontWeight": "bold",
+        },
+        undefined,
+      ]
     }
   >
     42
@@ -30,10 +36,13 @@ exports[`HighlightString Component matches snapshot 1`] = `
   <Text />
   <Text
     style={
-      {
-        "color": "#D567FA",
-        "fontWeight": "bold",
-      }
+      [
+        {
+          "color": "#D567FA",
+          "fontWeight": "bold",
+        },
+        undefined,
+      ]
     }
   >
     ,
@@ -43,10 +52,13 @@ exports[`HighlightString Component matches snapshot 1`] = `
   </Text>
   <Text
     style={
-      {
-        "color": "#D567FA",
-        "fontWeight": "bold",
-      }
+      [
+        {
+          "color": "#D567FA",
+          "fontWeight": "bold",
+        },
+        undefined,
+      ]
     }
   >
     !

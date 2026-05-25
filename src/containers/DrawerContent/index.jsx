@@ -5,13 +5,13 @@ import {
   Logout,
   AccountCircleOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   closeAllInstances,
   useVault,
   useVaults
 } from '@tetherto/pearpass-lib-vault'
 import { ActivityIndicator } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import {
   ActionsContainer,

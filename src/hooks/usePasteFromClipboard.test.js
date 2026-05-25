@@ -22,7 +22,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
   ContentPaste: ({ color }) => `ContentPaste-${color}`
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     black: {
       mode1: '#000000'

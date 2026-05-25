@@ -33,20 +33,11 @@ exports[`ButtonFilter Component matches snapshot for primary variant 1`] = `
     {
       "alignItems": "center",
       "backgroundColor": "#779FA1",
-      "borderBottomLeftRadius": 5,
-      "borderBottomRightRadius": 5,
-      "borderTopLeftRadius": 5,
-      "borderTopRightRadius": 5,
+      "borderRadius": 5,
       "flexDirection": "row",
-      "fontFamily": "Inter",
-      "fontSize": 12,
-      "fontWeight": "400",
       "gap": 7,
       "opacity": 1,
-      "paddingBottom": 4,
-      "paddingLeft": 4,
-      "paddingRight": 4,
-      "paddingTop": 4,
+      "padding": 4,
     }
   }
 >
@@ -57,14 +48,18 @@ exports[`ButtonFilter Component matches snapshot for primary variant 1`] = `
   </Text>
   <Text
     style={
-      {
-        "color": "#2A3B3C",
-        "fontFamily": "Inter",
-        "fontSize": 16,
-        "fontWeight": "400",
-      }
+      [
+        {
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "400",
+        },
+        {
+          "color": "#2A3B3C",
+        },
+        undefined,
+      ]
     }
-    variant="primary"
   >
     Filter Me
   </Text>

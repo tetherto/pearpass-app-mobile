@@ -44,7 +44,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
   Share: () => 'Share'
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     primary400: { mode1: '#000000' },
     black: { mode1: '#000000' },

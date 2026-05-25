@@ -6,8 +6,8 @@ import {
   KeyboardArrowLeftOutlined,
   ReportProblem
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { PairAnotherDeviceContent } from './PairAnotherDeviceContent'
 import { PairThisDeviceContent } from './PairThisDeviceContent'

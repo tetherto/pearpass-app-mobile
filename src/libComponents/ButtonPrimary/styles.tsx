@@ -1,7 +1,22 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { colors } from 'src/utils/colors'
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  type TextProps,
+  type TouchableOpacityProps
+} from 'react-native'
 
-export const Button = ({ size, stretch, disabled, style, ...rest }) => (
+interface ButtonProps extends TouchableOpacityProps {
+  size: 'sm' | 'md'
+  stretch?: boolean
+}
+
+interface ButtonTextProps extends TextProps {
+  size: 'sm' | 'md'
+}
+
+export const Button = ({ size, stretch, disabled, style, ...rest }: ButtonProps) => (
   <TouchableOpacity
     disabled={disabled}
     {...rest}
@@ -15,14 +30,10 @@ export const Button = ({ size, stretch, disabled, style, ...rest }) => (
   />
 )
 
-export const ButtonText = ({ size, style, ...rest }) => (
+export const ButtonText = ({ size, style, ...rest }: ButtonTextProps) => (
   <Text
     {...rest}
-    style={[
-      styles.buttonText,
-      size === 'sm' ? styles.textSm : styles.textMd,
-      style
-    ]}
+    style={[styles.buttonText, size === 'sm' ? styles.textSm : styles.textMd, style]}
   />
 )
 
@@ -32,7 +43,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexGrow: 0,
     borderColor: colors.primary400.mode1,
-    backgroundColor: colors.grey500.mode1,
+    backgroundColor: colors.primary400.mode1,
     alignSelf: 'flex-start',
     width: 'auto'
   },
@@ -56,7 +67,7 @@ const styles = StyleSheet.create({
     opacity: 0.6
   },
   buttonText: {
-    color: colors.white.mode1,
+    color: colors.black.mode1,
     fontFamily: 'Inter'
   },
   textSm: {

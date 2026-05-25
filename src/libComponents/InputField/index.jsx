@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 
 import { ErrorFilled } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider'
 import {
   Platform,
   StyleSheet,
@@ -11,7 +10,7 @@ import {
   View,
   ScrollView
 } from 'react-native'
-import { useTheme } from 'styled-components/native'
+import { colors } from 'src/utils/colors'
 
 import { CopyButton } from '../CopyButton'
 import { HighlightString } from '../HighlightString'
@@ -76,7 +75,6 @@ export const InputField = ({
 }) => {
   const inputRef = useRef(null)
   const [isFocused, setIsFocused] = useState(false)
-  const theme = useTheme()
 
   const handleChange = (e) => {
     if (isDisabled) {
@@ -117,23 +115,23 @@ export const InputField = ({
         {
           borderTopColor:
             isFocused || prevIsFocused
-              ? theme.colors.primary400.mode1
-              : theme.colors.grey100.mode1,
+              ? colors.primary400.mode1
+              : colors.grey100.mode1,
           borderLeftColor: isFocused
-            ? theme.colors.primary400.mode1
-            : theme.colors.grey100.mode1,
+            ? colors.primary400.mode1
+            : colors.grey100.mode1,
           borderBottomColor: isFocused
-            ? theme.colors.primary400.mode1
-            : theme.colors.grey100.mode1,
+            ? colors.primary400.mode1
+            : colors.grey100.mode1,
           borderRightColor: isFocused
-            ? theme.colors.primary400.mode1
-            : theme.colors.grey100.mode1,
+            ? colors.primary400.mode1
+            : colors.grey100.mode1,
           borderTopLeftRadius: isFirst ? 10 : 0,
           borderTopRightRadius: isFirst ? 10 : 0,
           borderBottomLeftRadius: isLast ? 10 : 0,
           borderBottomRightRadius: isLast ? 10 : 0,
           borderBottomWidth: isLast ? 1 : 0,
-          backgroundColor: theme.colors.grey400.mode1
+          backgroundColor: colors.grey400.mode1
         }
       ]
     }
@@ -143,7 +141,7 @@ export const InputField = ({
       styles.defaultWrapper,
       {
         borderTopWidth: isFirst ? 0 : 1,
-        borderTopColor: theme.colors.grey100.mode1
+        borderTopColor: colors.grey100.mode1
       }
     ]
   }
@@ -181,8 +179,8 @@ export const InputField = ({
                         : isTransparent || isColored
                           ? 'transparent'
                           : type === 'url'
-                            ? theme.colors.primary400.mode1
-                            : theme.colors.white.mode1
+                            ? colors.primary400.mode1
+                            : colors.white.mode1
                     }
                   ]}
                 >
@@ -207,8 +205,8 @@ export const InputField = ({
                     isTransparent || isColored
                       ? 'transparent'
                       : type === 'url'
-                        ? theme.colors.primary400.mode1
-                        : theme.colors.white.mode1
+                        ? colors.primary400.mode1
+                        : colors.white.mode1
                 }
               ]}
               keyboardType={type}

@@ -6,7 +6,6 @@ import {
   ArrowBackOutined,
   EyeOutlined
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVault } from '@tetherto/pearpass-lib-vault'
 import { validatePasswordChange } from '@tetherto/pearpass-utils-password-check'
 import {
@@ -22,6 +21,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 import Toast from 'react-native-toast-message'
+import { colors } from 'src/utils/colors'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
 import { ButtonPrimary } from '../../../libComponents'

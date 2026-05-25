@@ -1,27 +1,41 @@
 import { PASSWORD_STRENGTH } from '@tetherto/pearpass-utils-password-check'
-import styled from 'styled-components/native'
+import { StyleSheet, Text, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const PasswordStrongnessWrapper = styled.View`
-  flex-direction: row;
-  align-items: center;
-  margin-right: 5px;
-  gap: 5px;
-`
+const strengthColor = (strength) => {
+  switch (strength) {
+    case PASSWORD_STRENGTH.SAFE:
+      return colors.primary400.mode1
+    case PASSWORD_STRENGTH.VULNERABLE:
+      return colors.errorRed.dark
+    case PASSWORD_STRENGTH.WEAK:
+      return colors.errorYellow.mode1
+    default:
+      return colors.white.mode1
+  }
+}
 
-export const PasswordText = styled.Text`
-  font-family: 'Inter';
-  font-size: 8px;
-  font-weight: 500;
-  color: ${({ theme, strength }) => {
-    switch (strength) {
-      case PASSWORD_STRENGTH.SAFE:
-        return theme.colors.primary400.mode1
-      case PASSWORD_STRENGTH.VULNERABLE:
-        return theme.colors.errorRed.dark
-      case PASSWORD_STRENGTH.WEAK:
-        return theme.colors.errorYellow.mode1
-      default:
-        return theme.colors.white.mode1
-    }
-  }};
-`
+export const PasswordStrongnessWrapper = (props) => (
+  <View {...props} style={[styles.wrapper, props.style]} />
+)
+
+export const PasswordText = ({ strength, style, ...rest }) => (
+  <Text
+    {...rest}
+    style={[styles.text, { color: strengthColor(strength) }, style]}
+  />
+)
+
+const styles = StyleSheet.create({
+  wrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 5,
+    gap: 5
+  },
+  text: {
+    fontFamily: 'Inter',
+    fontSize: 8,
+    fontWeight: '500'
+  }
+})

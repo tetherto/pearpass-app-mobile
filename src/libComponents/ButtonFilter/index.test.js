@@ -1,9 +1,6 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import {
-  ThemeProvider,
-  colors
-} from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { Text } from 'react-native'
+import { ThemeProvider, colors } from 'src/utils/colors'
 
 import { ButtonFilter } from './index'
 

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { QrCode } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
 import {
   ActivityIndicator,
@@ -15,6 +14,7 @@ import {
   Pressable,
   StyleSheet
 } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useBottomSheet } from '../../context/BottomSheetContext'

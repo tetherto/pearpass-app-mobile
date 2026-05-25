@@ -9,7 +9,6 @@ import {
   ArrowBackOutined,
   ContentCopy
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useInvite } from '@tetherto/pearpass-lib-vault'
 import {
   KeyboardAvoidingView,
@@ -23,6 +22,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Defs, LinearGradient, Rect, Stop, SvgXml } from 'react-native-svg'
+import { colors } from 'src/utils/colors'
 
 import { AppSwitch } from '../../../components/AppSwitch/AppSwitch'
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard'

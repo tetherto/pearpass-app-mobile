@@ -96,21 +96,14 @@ exports[`InputPasswordPearPass component renders correctly with default props (p
           "alignItems": "center",
           "alignSelf": "flex-start",
           "backgroundColor": "#050B06",
-          "borderBottomLeftRadius": 25,
-          "borderBottomRightRadius": 25,
           "borderColor": "#050B06",
-          "borderStyle": "solid",
-          "borderTopLeftRadius": 25,
-          "borderTopRightRadius": 25,
+          "borderRadius": 25,
           "borderWidth": 1,
           "flexDirection": "row",
           "gap": 10,
           "justifyContent": "center",
           "opacity": 1,
-          "paddingBottom": 7,
-          "paddingLeft": 7,
-          "paddingRight": 7,
-          "paddingTop": 7,
+          "padding": 7,
         }
       }
     >

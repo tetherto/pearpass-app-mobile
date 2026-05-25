@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { BadgeTextItem } from './index'
 
 // Mock the theme provider colors
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   ThemeProvider: ({ children }) => children,
   colors: {
     grey500: {

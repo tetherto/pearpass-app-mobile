@@ -1,21 +1,37 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Button = styled.TouchableOpacity`
-  padding: 15px;
-  width: 100%;
-  flex-direction: row;
-  justify-content: ${({ hasIcon }) => (hasIcon ? 'space-between' : 'center')};
-  align-items: center;
-  align-self: stretch;
-  border-radius: 10px;
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.colors.grey100.mode1};
-  background: ${({ theme }) => theme.colors.primary300.mode1};
-`
+export const Button = ({ hasIcon, style, ...rest }) => (
+  <TouchableOpacity
+    {...rest}
+    style={[
+      styles.button,
+      { justifyContent: hasIcon ? 'space-between' : 'center' },
+      style
+    ]}
+  />
+)
 
-export const ButtonText = styled.Text`
-  font-family: 'Inter';
-  font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.black.mode1};
-`
+export const ButtonText = (props) => (
+  <Text {...props} style={[styles.buttonText, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  button: {
+    padding: 15,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.grey100.mode1,
+    backgroundColor: colors.primary300.mode1
+  },
+  buttonText: {
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.black.mode1
+  }
+})

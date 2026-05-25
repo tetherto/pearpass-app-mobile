@@ -132,17 +132,20 @@ exports[`InputField Component matches snapshot 1`] = `
         >
           <Text
             numberOfLines={1}
-            size="20px"
             style={
-              {
-                "color": "#F6F6F6",
-                "fontFamily": "Inter",
-                "fontSize": 20,
-                "fontWeight": "700",
-                "textAlign": "center",
-              }
+              [
+                {
+                  "color": "#F6F6F6",
+                  "fontFamily": "Inter",
+                  "textAlign": "center",
+                },
+                {
+                  "fontSize": "20px",
+                  "fontWeight": 700,
+                },
+                undefined,
+              ]
             }
-            weight={700}
           >
             <Text>
               snapshot value

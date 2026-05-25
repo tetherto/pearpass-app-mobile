@@ -1,20 +1,37 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const HighlightedText = styled.Text`
-  color: ${({ theme }) => theme.colors.white.mode1};
+export const HighlightedText = ({ size, weight, style, ...rest }) => (
+  <Text
+    {...rest}
+    style={[
+      styles.highlightedText,
+      { fontSize: size, fontWeight: weight },
+      style
+    ]}
+  />
+)
 
-  font-family: 'Inter';
-  font-size: ${({ size }) => size};
-  font-weight: ${({ weight }) => weight};
-  text-align: center;
-`
+export const NumberSpan = (props) => (
+  <Text {...props} style={[styles.numberSpan, props.style]} />
+)
 
-export const NumberSpan = styled.Text`
-  color: ${({ theme }) => theme.colors.primary400.mode1};
-  font-weight: bold;
-`
+export const SymbolSpan = (props) => (
+  <Text {...props} style={[styles.symbolSpan, props.style]} />
+)
 
-export const SymbolSpan = styled.Text`
-  color: ${({ theme }) => theme.colors.categoryLogin.mode1};
-  font-weight: bold;
-`
+const styles = StyleSheet.create({
+  highlightedText: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter',
+    textAlign: 'center'
+  },
+  numberSpan: {
+    color: colors.primary400.mode1,
+    fontWeight: 'bold'
+  },
+  symbolSpan: {
+    color: colors.categoryLogin.mode1,
+    fontWeight: 'bold'
+  }
+})

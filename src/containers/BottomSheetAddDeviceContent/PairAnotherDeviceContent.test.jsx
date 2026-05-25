@@ -35,7 +35,7 @@ jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
   QrCode: () => null
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     primary400: { mode1: '#00aa55' },
     grey400: { mode1: '#333333' },

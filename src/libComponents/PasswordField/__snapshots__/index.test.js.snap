@@ -275,12 +275,15 @@ exports[`PasswordField Component matches snapshot 1`] = `
       >
         <View
           style={
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "gap": 5,
-              "marginRight": 5,
-            }
+            [
+              {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "gap": 5,
+                "marginRight": 5,
+              },
+              undefined,
+            ]
           }
         >
           <RNSVGSvgView
@@ -334,14 +337,18 @@ exports[`PasswordField Component matches snapshot 1`] = `
             </RNSVGGroup>
           </RNSVGSvgView>
           <Text
-            strength="error"
             style={
-              {
-                "color": "#F6F6F6",
-                "fontFamily": "Inter",
-                "fontSize": 8,
-                "fontWeight": "500",
-              }
+              [
+                {
+                  "fontFamily": "Inter",
+                  "fontSize": 8,
+                  "fontWeight": "500",
+                },
+                {
+                  "color": "#F6F6F6",
+                },
+                undefined,
+              ]
             }
           >
             Weak
@@ -380,21 +387,14 @@ exports[`PasswordField Component matches snapshot 1`] = `
               "alignItems": "center",
               "alignSelf": "flex-start",
               "backgroundColor": "#050B06",
-              "borderBottomLeftRadius": 25,
-              "borderBottomRightRadius": 25,
               "borderColor": "#050B06",
-              "borderStyle": "solid",
-              "borderTopLeftRadius": 25,
-              "borderTopRightRadius": 25,
+              "borderRadius": 25,
               "borderWidth": 1,
               "flexDirection": "row",
               "gap": 10,
               "justifyContent": "center",
               "opacity": 1,
-              "paddingBottom": 7,
-              "paddingLeft": 7,
-              "paddingRight": 7,
-              "paddingTop": 7,
+              "padding": 7,
             }
           }
         >

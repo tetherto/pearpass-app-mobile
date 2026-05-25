@@ -1,4 +1,4 @@
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { colors } from 'src/utils/colors'
 
 import { Button, ButtonText } from './styles'
 
