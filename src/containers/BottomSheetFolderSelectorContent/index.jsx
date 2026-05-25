@@ -22,7 +22,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useSharedFilter } from '../../context/SharedFilterContext'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
-import { BottomSheetFolderMenuContentV2 } from '../BottomSheetFolderMenuContent/BottomSheetFolderMenuContentV2'
+import { BottomSheetFolderMenu } from '../BottomSheetFolderMenuContent/FolderMenu'
 import { Layout } from '../Layout'
 
 export const BottomSheetFolderSelectorContent = ({
@@ -121,7 +121,7 @@ export const BottomSheetFolderSelectorContent = ({
         scrollable
         contentStyle={{ padding: 0, paddingBottom: bottom }}
       >
-        <BottomSheetFolderMenuContentV2
+        <BottomSheetFolderMenu
           folderName={menuFolderName}
           onBack={() => setMenuFolderName(null)}
           onClose={collapse}

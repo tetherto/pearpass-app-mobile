@@ -17,7 +17,7 @@ const mockCloseModal = jest.fn()
 const mockOnRequestClose = jest.fn()
 const mockOnCreateVault = jest.fn()
 const mockOnNavigate = jest.fn()
-const mockIsModifyVaultModalV2Enabled = jest.fn(() => false)
+const mockIsModifyVaultModalEnabled = jest.fn(() => false)
 
 jest.mock('@gorhom/bottom-sheet', () => ({
   useBottomSheetModal: () => ({
@@ -42,8 +42,8 @@ jest.mock('../../context/ModalContext', () => ({
   })
 }))
 
-jest.mock('../../utils/modifyVaultModalV2Flag', () => ({
-  isModifyVaultModalV2Enabled: () => mockIsModifyVaultModalV2Enabled()
+jest.mock('../../utils/modifyVaultModalFlag', () => ({
+  isModifyVaultModalEnabled: () => mockIsModifyVaultModalEnabled()
 }))
 
 jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => {
@@ -159,8 +159,8 @@ jest.mock('../BottomSheetVaultAction', () => {
   }
 })
 
-jest.mock('../Modal/ModifyVaultModalContentV2', () => ({
-  ModifyVaultModalContentV2: () => null
+jest.mock('../Modal/ModifyVaultModalContent', () => ({
+  ModifyVaultModalContent: () => null
 }))
 
 const vaults = [
@@ -183,7 +183,7 @@ const renderSheet = (props = {}) =>
 describe('BottomSheetVaultSelectorContent', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockIsModifyVaultModalV2Enabled.mockReturnValue(false)
+    mockIsModifyVaultModalEnabled.mockReturnValue(false)
     mockUseVaults.mockReturnValue({
       data: vaults
     })
@@ -276,8 +276,8 @@ describe('BottomSheetVaultSelectorContent', () => {
     expect(mockOnCreateVault).toHaveBeenCalled()
   })
 
-  it('calls onNavigate for rename when modify vault v2 is disabled', () => {
-    mockIsModifyVaultModalV2Enabled.mockReturnValue(false)
+  it('calls onNavigate for rename when modify vault is disabled', () => {
+    mockIsModifyVaultModalEnabled.mockReturnValue(false)
     const { getByTestId } = renderSheet()
 
     fireEvent.press(getByTestId('vault-overflow-btn'))
@@ -289,8 +289,8 @@ describe('BottomSheetVaultSelectorContent', () => {
     })
   })
 
-  it('opens modal for rename when modify vault v2 is enabled', () => {
-    mockIsModifyVaultModalV2Enabled.mockReturnValue(true)
+  it('opens modal for rename when modify vault is enabled', () => {
+    mockIsModifyVaultModalEnabled.mockReturnValue(true)
     const { getByTestId } = renderSheet()
 
     fireEvent.press(getByTestId('vault-overflow-btn'))
@@ -300,8 +300,8 @@ describe('BottomSheetVaultSelectorContent', () => {
     expect(mockOnNavigate).not.toHaveBeenCalled()
   })
 
-  it('calls onNavigate for password when modify vault v2 is disabled', () => {
-    mockIsModifyVaultModalV2Enabled.mockReturnValue(false)
+  it('calls onNavigate for password when modify vault is disabled', () => {
+    mockIsModifyVaultModalEnabled.mockReturnValue(false)
     const { getByTestId } = renderSheet()
 
     fireEvent.press(getByTestId('vault-overflow-btn'))

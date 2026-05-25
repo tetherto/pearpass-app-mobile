@@ -47,6 +47,10 @@ jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   useBottomSheetClose: () => jest.fn()
 }))
 
+jest.mock('../containers/BottomSheetSortContent', () => ({
+  BottomSheetSortContent: () => null
+}))
+
 jest.mock('./useCopyToClipboard', () => ({
   useCopyToClipboard: () => ({
     copyToClipboard: jest.fn()

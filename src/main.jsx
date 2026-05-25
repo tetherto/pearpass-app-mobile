@@ -23,8 +23,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { App } from './app/App'
 import { AutoLockTouchCapture } from './components/AutoLockHandler'
 import { AutoLockProvider } from './context/AutoLockContext'
+import { BottomSheetAutoSizeProvider } from './context/BottomSheetAutoSizeContext'
 import { BottomSheetProvider } from './context/BottomSheetContext'
-import { BottomSheetV2Provider } from './context/BottomSheetV2Context'
 import { HapticsProvider } from './context/HapticsContext'
 import { LoadingProvider } from './context/LoadingContext'
 import { ModalProvider } from './context/ModalContext'
@@ -115,11 +115,11 @@ export const Main = () => {
                             <AutoLockTouchCapture>
                               <ModalProvider>
                                 <BottomSheetProvider>
-                                  <BottomSheetV2Provider>
+                                  <BottomSheetAutoSizeProvider>
                                     <BottomSheetModalProvider>
                                       <App />
                                     </BottomSheetModalProvider>
-                                  </BottomSheetV2Provider>
+                                  </BottomSheetAutoSizeProvider>
                                 </BottomSheetProvider>
                               </ModalProvider>
                             </AutoLockTouchCapture>

@@ -166,7 +166,7 @@ describe('useAutoLockWatcher', () => {
     expect(clearAllFileCache).toHaveBeenCalled()
     expect(resetMock).toHaveBeenCalledWith({
       index: 0,
-      routes: [{ name: 'AuthV2MasterPassword' }]
+      routes: [{ name: 'AuthMasterPassword' }]
     })
     expect(resetStateMock).toHaveBeenCalled()
   })

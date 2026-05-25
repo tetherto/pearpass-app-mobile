@@ -82,8 +82,8 @@ export const useAutoLockWatcher = () => {
     clearAllFileCache()
 
     const routeName = unsupportedFeaturesEnabled()
-      ? 'AuthV2Pin'
-      : 'AuthV2MasterPassword'
+      ? 'AuthPin'
+      : 'AuthMasterPassword'
     navigation.reset({
       index: 0,
       routes: [{ name: routeName }]

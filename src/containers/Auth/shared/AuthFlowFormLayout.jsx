@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { OnboardingLayout } from '../../../screens/OnboardingV2/components/OnboardingLayout'
+import { OnboardingLayout } from '../../../screens/Onboarding/components/OnboardingLayout'
 import { BackScreenHeader } from '../../ScreenHeader/BackScreenHeader'
 
 export const AuthFlowFormLayout = ({

@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { View, Text as RNText, StyleSheet } from 'react-native'
+import { Text, rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
+import { StyleSheet, View } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 
 import { useWifiPasswordQRCode } from '../../hooks/useWifiPasswordQRCode'
@@ -20,6 +20,7 @@ export const WifiPasswordQRCode = ({
   isHidden = false
 }) => {
   const { t } = useLingui()
+  const { theme } = useTheme()
   const qrCodeSvg = useWifiPasswordQRCode({
     ssid,
     password,
@@ -32,41 +33,42 @@ export const WifiPasswordQRCode = ({
   }
 
   return (
-    <View style={styles.qrCodeContainer}>
-      <RNText style={styles.qrCodeTitle}>
-        {t`Scan the QR-Code to connect to the Wi-Fi`}
-      </RNText>
-      <View style={styles.qrCodeWrapper}>
-        <SvgXml xml={qrCodeSvg} width={180} height={180} />
+    <View
+      style={[
+        styles.container,
+        {
+          borderColor: theme.colors.colorBorderPrimary,
+          backgroundColor: theme.colors.colorSurfacePrimary
+        }
+      ]}
+    >
+      <Text variant="label" color={theme.colors.colorTextSecondary}>
+        {t`Scan QR Code to connect with the Wi-Fi`}
+      </Text>
+      <View
+        style={[
+          styles.qrWrapper,
+          { backgroundColor: theme.colors.colorSurfaceHover }
+        ]}
+      >
+        <SvgXml xml={qrCodeSvg} width={188} height={188} />
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  qrCodeContainer: {
+  container: {
+    borderWidth: 1,
+    borderRadius: rawTokens.spacing8,
+    paddingHorizontal: rawTokens.spacing20,
+    paddingVertical: rawTokens.spacing24,
     alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-    backgroundColor: colors.grey500.mode1,
-    borderRadius: 10,
-    flexDirection: 'column',
-    marginHorizontal: 10,
-    marginBottom: 10
+    gap: rawTokens.spacing20
   },
-  qrCodeTitle: {
-    marginBottom: 10,
-    fontFamily: 'Inter',
-    fontSize: 15,
-    fontWeight: '700',
-    textAlign: 'center',
-    color: colors.white.mode1
-  },
-  qrCodeWrapper: {
-    backgroundColor: colors.white.mode1,
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 10,
+  qrWrapper: {
+    padding: rawTokens.spacing12,
+    borderRadius: rawTokens.spacing8,
     overflow: 'hidden'
   }
 })

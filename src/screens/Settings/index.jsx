@@ -1,1 +1,1 @@
-export { SettingsV2 as Settings } from './SettingsV2'
+export { Settings as Settings } from './Settings'

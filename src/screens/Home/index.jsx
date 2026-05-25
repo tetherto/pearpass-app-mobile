@@ -4,10 +4,10 @@ import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
 
 import { SORT_BY_TYPE } from '../../constants/sortOptions'
 import { ContentHeader } from '../../containers/ContentHeader'
-import { EmptyCollectionViewV2 } from '../../containers/EmptyCollectionViewV2'
+import { EmptyCollectionView } from '../../containers/EmptyCollectionView'
 import { EmptyResultsView } from '../../containers/EmptyResultsView'
 import { Header } from '../../containers/Header'
-import { ItemListV2 } from '../../containers/ItemListV2'
+import { ItemList } from '../../containers/ItemList'
 import { Layout } from '../../containers/Layout'
 import { MultiSelectBar } from '../../containers/MultiSelectBar'
 import {
@@ -118,7 +118,7 @@ export const Home = () => {
       )}
 
       {!!records.length && (
-        <ItemListV2
+        <ItemList
           sections={sections}
           isMultiSelectOn={isMultiSelectOn}
           selectedRecords={selectedRecords}
@@ -128,7 +128,7 @@ export const Home = () => {
       )}
 
       {!records.length && !searchValue.length && (
-        <EmptyCollectionViewV2 recordType={recordType} />
+        <EmptyCollectionView recordType={recordType} />
       )}
 
       {!records.length && !!searchValue.length && <EmptyResultsView />}

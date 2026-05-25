@@ -37,7 +37,7 @@ import {
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { TimerCircle } from '../../components/TimerCircle'
 import { SORT_BY_TYPE } from '../../constants/sortOptions'
-import { BottomSheetSortContentV2 } from '../../containers/BottomSheetSortContentV2'
+import { BottomSheetSortContent } from '../../containers/BottomSheetSortContent'
 import { EmptyResultsView } from '../../containers/EmptyResultsView'
 import { Header } from '../../containers/Header'
 import { Layout } from '../../containers/Layout'
@@ -290,7 +290,7 @@ export const Authenticator = () => {
               />
             }
           >
-            <BottomSheetSortContentV2 />
+            <BottomSheetSortContent />
           </ContextMenu>
         </View>
       </View>

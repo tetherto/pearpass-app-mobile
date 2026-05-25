@@ -8,7 +8,7 @@ import {
 import { ReportProblem } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
-import { OnboardingLayout } from '../OnboardingV2/components/OnboardingLayout'
+import { OnboardingLayout } from '../Onboarding/components/OnboardingLayout'
 
 export const ErrorScreen = () => {
   const { t } = useLingui()

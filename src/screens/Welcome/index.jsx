@@ -8,7 +8,7 @@ import { NAVIGATION_ROUTES } from '../../constants/navigation'
 import { CreatePassword } from '../../containers/Auth/CreatePassword'
 import { EnterPassword } from '../../containers/Auth/EnterPassword'
 import { LoadVault } from '../../containers/Auth/LoadVault'
-import { LockedScreenV2 } from '../../containers/Auth/LockedScreenV2'
+import { LockedScreen } from '../../containers/Auth/LockedScreen'
 import { SelectVaultType } from '../../containers/Auth/SelectVaultType'
 import { UnlockVault } from '../../containers/Auth/UnlockVault'
 import { VaultWizard } from '../../containers/Auth/VaultWizard'
@@ -30,7 +30,7 @@ const getWelcomeScreenContent = (state, vaultId) => {
     case NAVIGATION_ROUTES.CREDENTIALS:
       return <VaultWizard />
     case NAVIGATION_ROUTES.SCREEN_LOCKED:
-      return <LockedScreenV2 />
+      return <LockedScreen />
     default:
       return null
   }

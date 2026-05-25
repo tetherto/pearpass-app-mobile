@@ -43,7 +43,7 @@ export const useRedirect = ({ enabled = true } = {}) => {
             setInitialRouteName('Error')
             return
           }
-          setInitialRouteName('OnboardingV2')
+          setInitialRouteName('Onboarding')
           return
         }
 
@@ -53,7 +53,7 @@ export const useRedirect = ({ enabled = true } = {}) => {
         }
 
         setInitialRouteName(
-          unsupportedFeaturesEnabled() ? 'AuthV2Pin' : 'AuthV2MasterPassword'
+          unsupportedFeaturesEnabled() ? 'AuthPin' : 'AuthMasterPassword'
         )
       } catch (error) {
         logger.error('Auto-redirect error: ', error)

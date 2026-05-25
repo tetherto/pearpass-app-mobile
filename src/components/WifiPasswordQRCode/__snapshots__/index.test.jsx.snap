@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`WifiPasswordQRCode Snapshot matches snapshot when QR code is rendered 1`] = `null`;

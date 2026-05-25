@@ -38,23 +38,23 @@ describe('useRedirect', () => {
     hasOrphanedVaultData.mockResolvedValue(false)
   })
 
-  it('should set initialRouteName to "OnboardingV2" if user has not set password', async () => {
+  it('should set initialRouteName to "Onboarding" if user has not set password', async () => {
     mockRefetchUserData.mockResolvedValue({ hasPasswordSet: false })
     const { result } = renderHook(() => useRedirect())
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    expect(result.current.initialRouteName).toBe('OnboardingV2')
+    expect(result.current.initialRouteName).toBe('Onboarding')
   })
 
-  it('should set initialRouteName to "AuthV2MasterPassword" if user has password and is not locked', async () => {
+  it('should set initialRouteName to "AuthMasterPassword" if user has password and is not locked', async () => {
     mockRefetchUserData.mockResolvedValue({ hasPasswordSet: true })
     mockGetItemAsync.mockResolvedValue('true')
     const { result } = renderHook(() => useRedirect())
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    expect(result.current.initialRouteName).toBe('AuthV2MasterPassword')
+    expect(result.current.initialRouteName).toBe('AuthMasterPassword')
   })
 
   it('should set initialRouteName to "Welcome" if user is locked', async () => {
@@ -92,7 +92,7 @@ describe('useRedirect', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(hasOrphanedVaultData).not.toHaveBeenCalled()
-    expect(result.current.initialRouteName).toBe('AuthV2MasterPassword')
+    expect(result.current.initialRouteName).toBe('AuthMasterPassword')
   })
 
   it('should set initialRouteName to "Error" if an error occurs', async () => {
