@@ -265,7 +265,12 @@ export const ImportItems = () => {
       if (type === ImportOptionType.KeePass && fileType === 'kdbx') {
         if (!password)
           throw new Error('Password is required for encrypted files')
-        dataToProcess = await decryptKeePassKdbx(fileContent, password)
+        // Offload the memory-hard Argon2 KDF to the Bare worklet so it runs on
+        // JIT-enabled V8 instead of freezing the React Native JS thread.
+        dataToProcess = await decryptKeePassKdbx(fileContent, password, {
+          argon2ViaWorklet:
+            pearpassVaultClient.keepassArgon2.bind(pearpassVaultClient)
+        })
       }
 
       if (type === ImportOptionType.Encrypted && isEncrypted) {
@@ -614,7 +619,10 @@ export const ImportItems = () => {
               <Text color={theme.colors.colorTextSecondary} variant="caption">
                 {t`The Uploaded File is encrypted, put the Password file to continue`}
               </Text>
-              {isArgon2BitwardenExport(selectedFileInfo?.parsedJson ?? null) && (
+              {(isArgon2BitwardenExport(
+                selectedFileInfo?.parsedJson ?? null
+              ) ||
+                selectedFileInfo?.fileType === 'kdbx') && (
                 <AlertMessage
                   variant="warning"
                   size="small"

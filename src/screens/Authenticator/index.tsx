@@ -338,7 +338,7 @@ export const Authenticator = () => {
                 iconBefore={
                   <ImportOutlined color={theme.colors.colorTextPrimary} />
                 }
-                onClick={() => navigation.navigate('ImportItems')}
+                onClick={() => navigation.navigate('ImportCodes')}
                 data-testid="authenticator-import-codes-button"
               >
                 {t`Import Codes`}

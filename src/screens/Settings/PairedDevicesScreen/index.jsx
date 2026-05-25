@@ -1,17 +1,54 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { rawTokens, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { useVault } from '@tetherto/pearpass-lib-vault'
-import { StyleSheet, View } from 'react-native'
+import {
+  Button,
+  ContextMenu,
+  NativeBottomSheet,
+  NavbarListItem,
+  rawTokens,
+  Text,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { DoNotDisturb, MoreVert } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { getMyDeviceId, useVault } from '@tetherto/pearpass-lib-vault'
+import { Platform, StyleSheet, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { BottomSheetRevokeAccessContent } from '../../../containers/BottomSheetRevokeAccessContent'
 import { Layout } from '../../../containers/Layout'
 import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import {
   formatDeviceDate,
   getDeviceIcon
 } from '../../../utils/devicePresentation'
+import { logger } from '../../../utils/logger'
+
+const RevokeActionMenu = ({ onRevoke }) => {
+  const { t } = useLingui()
+  const { theme } = useTheme()
+  const close = useBottomSheetClose()
+  const { bottom } = useSafeAreaInsets()
+
+  return (
+    <View style={{ paddingBottom: bottom }}>
+      <NavbarListItem
+        platform="mobile"
+        icon={
+          <DoNotDisturb color={theme.colors.colorSurfaceDestructiveElevated} />
+        }
+        label={t`Revoke Access`}
+        variant="destructive"
+        onClick={() => {
+          close()
+          onRevoke()
+        }}
+      />
+    </View>
+  )
+}
 
 export const PairedDevicesScreen = () => {
   const { t } = useLingui()
@@ -23,6 +60,35 @@ export const PairedDevicesScreen = () => {
     refetchVault()
   }, [])
 
+  const currentDeviceName = useMemo(
+    () => `${Platform.OS} ${Platform.Version}`,
+    []
+  )
+
+  const [myDeviceId, setMyDeviceId] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getMyDeviceId()
+      .then((id) => {
+        if (!cancelled) setMyDeviceId(id ?? null)
+      })
+      .catch((error) => {
+        logger.error('PairedDevicesScreen', 'getMyDeviceId failed:', error)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [data?.devices])
+
+  const isCurrentDevice = (device) => {
+    if (!device) return false
+    if (myDeviceId && device.id === myDeviceId) return true
+    return device.name === currentDeviceName
+  }
+
+  const [revokeTarget, setRevokeTarget] = useState(null)
+
   const getDeviceDisplayName = (deviceName) => {
     if (!deviceName) return t`Unknown Device`
     const lowerName = deviceName.toLowerCase()
@@ -32,6 +98,7 @@ export const PairedDevicesScreen = () => {
   }
 
   const devices = data?.devices ?? []
+  const vaultId = data?.id
 
   return (
     <Layout
@@ -54,6 +121,8 @@ export const PairedDevicesScreen = () => {
           {devices.map((device, index) => {
             const isLast = index === devices.length - 1
             const DeviceIcon = getDeviceIcon(device?.name)
+            const displayName = getDeviceDisplayName(device?.name)
+            const isSelf = isCurrentDevice(device)
 
             return (
               <View
@@ -84,7 +153,7 @@ export const PairedDevicesScreen = () => {
 
                 <View style={styles.deviceInfo}>
                   <Text variant="bodyEmphasized" numberOfLines={1}>
-                    {getDeviceDisplayName(device?.name)}
+                    {displayName}
                   </Text>
                   <View style={styles.deviceDates}>
                     {device.createdAt && (
@@ -98,11 +167,50 @@ export const PairedDevicesScreen = () => {
                     )}
                   </View>
                 </View>
+
+                {!isSelf && device.id && (
+                  <ContextMenu
+                    trigger={
+                      <Button
+                        variant="tertiary"
+                        size="small"
+                        aria-label={t`Device actions`}
+                        iconBefore={
+                          <MoreVert color={theme.colors.colorTextPrimary} />
+                        }
+                      />
+                    }
+                  >
+                    <RevokeActionMenu
+                      onRevoke={() =>
+                        setRevokeTarget({
+                          deviceId: device.id,
+                          deviceName: displayName
+                        })
+                      }
+                    />
+                  </ContextMenu>
+                )}
               </View>
             )
           })}
         </View>
       )}
+
+      <NativeBottomSheet
+        open={revokeTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setRevokeTarget(null)
+        }}
+      >
+        {revokeTarget && vaultId && (
+          <BottomSheetRevokeAccessContent
+            vaultId={vaultId}
+            targetDeviceId={revokeTarget.deviceId}
+            deviceName={revokeTarget.deviceName}
+          />
+        )}
+      </NativeBottomSheet>
     </Layout>
   )
 }

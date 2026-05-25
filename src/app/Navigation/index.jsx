@@ -1,6 +1,8 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { DeleteFolder } from 'src/screens/DeleteFolder'
+import { ExportCodes } from 'src/screens/ExportCodes'
 import { ExportItems } from 'src/screens/ExportItems'
+import { ImportCodes } from 'src/screens/ImportCodes'
 import { ImportItems } from 'src/screens/ImportItems'
 
 import { AuthMasterPasswordScreen, AuthPinScreen } from '../../screens/Auth'
@@ -113,8 +115,10 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="About" component={About} />
     <Stack.Screen name="Appearance" component={Appearance} />
     <Stack.Screen name="ImportItems" component={ImportItems} />
+    <Stack.Screen name="ImportCodes" component={ImportCodes} />
     <Stack.Screen name="Vaults" component={Vaults} />
     <Stack.Screen name="ExportItems" component={ExportItems} />
+    <Stack.Screen name="ExportCodes" component={ExportCodes} />
     <Stack.Screen name="DeleteFolder" component={DeleteFolder} />
     <Stack.Screen name="VaultRenameScreen" component={VaultRenameScreen} />
     <Stack.Screen name="VaultPasswordScreen" component={VaultPasswordScreen} />
