@@ -173,7 +173,7 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
                 webDomain, packageName, null, null), true);
     }
 
-    // 85% height sheet anchored to bottom, with a dim backdrop. v2 only.
+    // 85% height sheet anchored to bottom, with a dim backdrop.
     private static final float WINDOW_HEIGHT_RATIO = 0.85f;
     private void applyPartialHeightWindow() {
         try {

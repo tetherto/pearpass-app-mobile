@@ -13,8 +13,6 @@ import com.pears.pass.autofill.data.CredentialItem;
 
 import java.util.List;
 
-// V2 credential row adapter, used by CombinedItemsFragment.
-// V1 adapters stay untouched since they still render the old list layouts.
 public class CredentialAdapter extends BaseItemAdapter<CredentialItem, CredentialAdapter.ViewHolder> {
     private final OnCredentialClickListener listener;
 

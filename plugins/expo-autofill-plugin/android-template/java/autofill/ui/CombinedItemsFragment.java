@@ -50,7 +50,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * V2 combined items screen — replaces V1 VaultSelection → VaultPassword → CredentialsList
  * flow with a single sheet that holds search, vault selector, and credentials list.
  *
  * Supports both modes via MODE arg:
