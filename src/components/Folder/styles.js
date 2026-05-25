@@ -1,44 +1,66 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const FolderWrapper = styled.TouchableOpacity`
-  background-color: ${({ theme }) => theme.colors.grey500.mode1};
-  justify-content: space-between;
-  flex-direction: row;
-  padding-bottom: 16px;
-  margin-bottom: 20px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${({ theme, last }) =>
-    last ? 'transparent' : theme.colors.grey100.mode1};
-  align-items: center;
-`
+export const FolderWrapper = ({ last, style, ...rest }) => (
+  <TouchableOpacity
+    {...rest}
+    style={[
+      styles.folderWrapper,
+      { borderBottomColor: last ? 'transparent' : colors.grey100.mode1 },
+      style
+    ]}
+  />
+)
 
-export const FolderContainer = styled.View`
-  width: 100%;
-  flex-direction: row;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
+export const FolderContainer = (props) => (
+  <View {...props} style={[styles.folderContainer, props.style]} />
+)
 
-export const FolderContent = styled.View`
-  font-size: 20px;
-  font-family: 'Inter';
-  color: #fff;
-  padding-left: 16px;
-  flex: 1;
-`
+export const FolderContent = (props) => (
+  <View {...props} style={[styles.folderContent, props.style]} />
+)
 
-export const FolderText = styled.Text.attrs({
-  numberOfLines: 1,
-  ellipsizeMode: 'tail'
-})`
-  font-size: 20px;
-  font-family: 'Inter';
-  color: #fff;
-`
+export const FolderText = (props) => (
+  <Text
+    numberOfLines={1}
+    ellipsizeMode="tail"
+    {...props}
+    style={[styles.folderText, props.style]}
+  />
+)
 
-export const FolderCount = styled.Text`
-  font-size: 14px;
-  font-family: 'Inter';
-  color: ${({ theme }) => theme.colors.grey100.mode1};
-`
+export const FolderCount = (props) => (
+  <Text {...props} style={[styles.folderCount, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  folderWrapper: {
+    backgroundColor: colors.grey500.mode1,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingBottom: 16,
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    alignItems: 'center'
+  },
+  folderContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  folderContent: {
+    paddingLeft: 16,
+    flex: 1
+  },
+  folderText: {
+    fontSize: 20,
+    fontFamily: 'Inter',
+    color: '#fff'
+  },
+  folderCount: {
+    fontSize: 14,
+    fontFamily: 'Inter',
+    color: colors.grey100.mode1
+  }
+})

@@ -1,154 +1,222 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
-import { fireEvent, render, waitFor } from '@testing-library/react-native'
+import { act, fireEvent, render } from '@testing-library/react-native'
+import {
+  broadcastDeleteVault,
+  useCreateVault,
+  useUserData,
+  useVault,
+  useVaults
+} from '@tetherto/pearpass-lib-vault'
 import Toast from 'react-native-toast-message'
 
 import { VaultDeleteScreen } from './index'
+import { useVaultSwitch } from '../../../hooks/useVaultSwitch'
 import messages from '../../../locales/en/messages'
-
-const mockGoBack = jest.fn()
 
 i18n.load('en', messages)
 i18n.activate('en')
 
 jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    goBack: mockGoBack
-  })
+  useNavigation: () => ({ goBack: jest.fn() })
 }))
 
 jest.mock('@tetherto/pearpass-lib-ui-kit', () => {
-  const RN = require('react-native')
-
+  const { View, Text: RNText, TextInput, Pressable } = require('react-native')
   return {
+    rawTokens: new Proxy({}, { get: () => 0 }),
     AlertMessage: ({ description, testID }) => (
-      <RN.Text testID={testID}>{description}</RN.Text>
+      <View testID={testID}>
+        <RNText>{description}</RNText>
+      </View>
     ),
-    Button: ({ children, disabled, onClick, testID }) => (
-      <RN.TouchableOpacity
+    Button: ({ children, onClick, disabled, testID, isLoading }) => (
+      <Pressable
         testID={testID}
-        disabled={disabled}
-        onPress={disabled ? undefined : onClick}
+        onPress={onClick}
+        disabled={!!disabled || !!isLoading}
       >
-        <RN.Text>{children}</RN.Text>
-      </RN.TouchableOpacity>
+        <RNText>{children}</RNText>
+      </Pressable>
     ),
-    PageHeader: ({ title, subtitle }) => (
-      <RN.View>
-        <RN.Text>{title}</RN.Text>
-        <RN.Text>{subtitle}</RN.Text>
-      </RN.View>
+    Link: ({ children, onClick, testID }) => (
+      <Pressable testID={testID} onPress={onClick}>
+        <RNText>{children}</RNText>
+      </Pressable>
     ),
-    PasswordField: ({ label, value, onChange, testID }) => (
-      <RN.View>
-        <RN.Text>{label}</RN.Text>
-        <RN.TextInput
-          testID={testID}
-          value={value}
-          onChangeText={(text) => onChange?.({ target: { value: text } })}
-        />
-      </RN.View>
+    PasswordField: ({ value, onChangeText, testID, label }) => (
+      <TextInput
+        testID={testID}
+        accessibilityLabel={label}
+        value={value ?? ''}
+        onChangeText={onChangeText}
+      />
     ),
-    rawTokens: {
-      spacing16: 16,
-      spacing20: 20
-    }
+    Text: ({ children }) => <RNText>{children}</RNText>,
+    ToggleSwitch: ({ checked, onChange, testID }) => (
+      <Pressable
+        testID={testID}
+        onChange={(e) => onChange?.(e?.nativeEvent ?? !checked)}
+        onPress={() => onChange?.(!checked)}
+      >
+        <RNText>{checked ? 'on' : 'off'}</RNText>
+      </Pressable>
+    )
   }
 })
 
-jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
-  ReportProblem: () => null
+jest.mock('@tetherto/pearpass-lib-vault', () => ({
+  broadcastDeleteVault: jest.fn(),
+  useCreateVault: jest.fn(),
+  useUserData: jest.fn(),
+  useVault: jest.fn(),
+  useVaults: jest.fn()
+}))
+
+jest.mock('@tetherto/pearpass-lib-vault/src/utils/buffer', () => ({
+  stringToBuffer: (s) => s,
+  clearBuffer: jest.fn()
 }))
 
 jest.mock('react-native-toast-message', () => ({
   __esModule: true,
-  default: {
-    show: jest.fn()
-  }
+  default: { show: jest.fn() }
 }))
 
-jest.mock(
-  'src/containers/ScreenHeader/BackScreenHeader',
-  () => ({
-    BackScreenHeader: ({ title, onBack }) => {
-      const { Text, TouchableOpacity, View } = require('react-native')
-      return (
-        <View>
-          <TouchableOpacity testID="vault-delete-back-button" onPress={onBack}>
-            <Text>Back</Text>
-          </TouchableOpacity>
-          <Text>{title}</Text>
-        </View>
-      )
-    }
-  }),
-  { virtual: true }
-)
+jest.mock('../../../hooks/useVaultSwitch', () => ({
+  useVaultSwitch: jest.fn()
+}))
 
-jest.mock(
-  'src/containers/Layout',
-  () => ({
-    Layout: ({ header, children, footer }) => {
-      const { View } = require('react-native')
-      return (
-        <View>
-          {header}
-          {children}
-          {footer}
-        </View>
+jest.mock('../../../containers/BottomSheetPairedDevicesContent', () => ({
+  BottomSheetPairedDevicesContent: () => null
+}))
+
+jest.mock('../../../containers/Layout', () => {
+  const { View } = require('react-native')
+  return {
+    Layout: ({ children, footer }) => (
+      <View>
+        {children}
+        {footer}
+      </View>
+    )
+  }
+})
+
+jest.mock('../../../containers/ScreenHeader/BackScreenHeader', () => ({
+  BackScreenHeader: () => null
+}))
+
+jest.mock('../../../utils/logger', () => ({
+  logger: { error: jest.fn() }
+}))
+
+const renderScreen = () =>
+  render(
+    <VaultDeleteScreen
+      route={{ params: { vaultId: 'v1', vaultName: 'V1' } }}
+    />,
+    {
+      wrapper: ({ children }) => (
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
       )
     }
-  }),
-  { virtual: true }
-)
+  )
 
 describe('VaultDeleteScreen', () => {
-  const renderScreen = (route = { params: { vaultName: 'Personal Vault' } }) =>
-    render(
-      <I18nProvider i18n={i18n}>
-        <VaultDeleteScreen route={route} />
-      </I18nProvider>
-    )
+  const logIn = jest.fn()
+  const deleteVaultLocal = jest.fn()
+  const addDevice = jest.fn()
+  const createVault = jest.fn()
+  const switchVault = jest.fn()
 
   beforeEach(() => {
     jest.clearAllMocks()
+    logIn.mockResolvedValue(undefined)
+    deleteVaultLocal.mockResolvedValue(undefined)
+    addDevice.mockResolvedValue(undefined)
+    createVault.mockResolvedValue(undefined)
+    switchVault.mockResolvedValue(undefined)
+    broadcastDeleteVault.mockResolvedValue({ results: [], failures: [] })
+
+    useUserData.mockReturnValue({ logIn })
+    useVault.mockReturnValue({
+      data: { id: 'v1', devices: [{ id: 'd1' }, { id: 'd2' }] },
+      deleteVaultLocal,
+      addDevice
+    })
+    useVaults.mockReturnValue({
+      data: [
+        { id: 'v1', name: 'V1' },
+        { id: 'v2', name: 'V2' }
+      ]
+    })
+    useCreateVault.mockReturnValue({ createVault })
+    useVaultSwitch.mockReturnValue({ switchVault })
   })
 
-  it('renders the destructive copy and warning', () => {
-    const { getByText, getByTestId } = renderScreen()
+  const typePassword = (api, value) => {
+    const input = api.getByTestId('vault-delete-password-input')
+    fireEvent.changeText(input, value)
+  }
 
-    expect(getByText(/Delete Personal Vault/)).toBeTruthy()
-    expect(
-      getByText(
-        'Deleting this vault permanently removes all data on this device. Vault deletion remains blocked until mobile SDK support is available.'
-      )
-    ).toBeTruthy()
-    expect(getByTestId('vault-delete-warning')).toBeTruthy()
+  const submit = async (api) => {
+    await act(async () => {
+      fireEvent.press(api.getByTestId('vault-delete-submit-button'))
+    })
+  }
+
+  it('rejects an invalid master password: no broadcast, no delete', async () => {
+    logIn.mockRejectedValue(new Error('bad password'))
+
+    const api = renderScreen()
+    typePassword(api, 'wrong')
+    await submit(api)
+
+    expect(logIn).toHaveBeenCalled()
+    expect(broadcastDeleteVault).not.toHaveBeenCalled()
+    expect(deleteVaultLocal).not.toHaveBeenCalled()
   })
 
-  it('shows a toast once the master password is provided', async () => {
-    const { getByTestId } = renderScreen()
+  it('with erase-all on and broadcast failure: surfaces toast but still deletes locally', async () => {
+    broadcastDeleteVault.mockResolvedValue({
+      results: [],
+      failures: [{ targetDeviceId: 'peer-A', error: new Error('boom') }]
+    })
 
-    fireEvent.changeText(
-      getByTestId('vault-delete-master-password-input'),
-      'master-password'
-    )
-    fireEvent.press(getByTestId('vault-delete-submit-button'))
+    const api = renderScreen()
+    typePassword(api, 'right')
+    fireEvent(api.getByTestId('vault-delete-eraseall-toggle'), 'onChange', true)
+    await submit(api)
 
-    await waitFor(() =>
-      expect(Toast.show).toHaveBeenCalledWith(
-        expect.objectContaining({
-          text1: 'Vault deletion is not yet connected on mobile'
-        })
-      )
-    )
+    expect(broadcastDeleteVault).toHaveBeenCalledWith('v1')
+    expect(deleteVaultLocal).toHaveBeenCalledWith('v1')
+    expect(Toast.show).toHaveBeenCalled()
   })
 
-  it('navigates back from the header control', () => {
-    const { getByTestId } = renderScreen()
+  it('creates a fallback Personal vault when the last vault is removed', async () => {
+    useVaults.mockReturnValue({ data: [{ id: 'v1', name: 'V1' }] })
 
-    fireEvent.press(getByTestId('vault-delete-back-button'))
+    const api = renderScreen()
+    typePassword(api, 'right')
+    await submit(api)
 
-    expect(mockGoBack).toHaveBeenCalled()
+    expect(deleteVaultLocal).toHaveBeenCalledWith('v1')
+    expect(createVault).toHaveBeenCalled()
+    expect(addDevice).toHaveBeenCalled()
+  })
+
+  it('logs and still proceeds when fallback Personal creation fails', async () => {
+    useVaults.mockReturnValue({ data: [{ id: 'v1', name: 'V1' }] })
+    createVault.mockRejectedValue(new Error('boom'))
+
+    const api = renderScreen()
+    typePassword(api, 'right')
+    await submit(api)
+
+    expect(deleteVaultLocal).toHaveBeenCalledWith('v1')
+    // Toast called multiple times across the flow; at least the recovery
+    // path should have triggered one of them.
+    expect(Toast.show).toHaveBeenCalled()
   })
 })

@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
 import { TERMS_OF_USE } from '@tetherto/pearpass-lib-constants'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import {
   closeAllInstances,
   useUserData,
@@ -29,6 +28,7 @@ import {
   Linking
 } from 'react-native'
 import Toast from 'react-native-toast-message'
+import { colors } from 'src/utils/colors'
 
 import { AppWarning } from '../../components/AppWarning'
 import { NAVIGATION_ROUTES } from '../../constants/navigation.js'

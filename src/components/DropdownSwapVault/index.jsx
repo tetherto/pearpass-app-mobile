@@ -2,13 +2,13 @@ import { useMemo, useRef, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  CheckIcon,
-  LockCircleIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+  KeyboardArrowBottom,
+  UnfoldMoreOutlined,
+  Check,
+  LockFilled
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { ActivityIndicator, Animated, FlatList, Text } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import {
   ArrowIconWrapper,
@@ -92,7 +92,7 @@ export const DropdownSwapVault = ({
         {switchingVault ? (
           <ActivityIndicator size="small" color={colors.primary400.mode1} />
         ) : (
-          <LockCircleIcon size={21} color={colors.primary400.mode1} />
+          <LockFilled width={21} height={21} color={colors.primary400.mode1} />
         )}
         <Text
           style={{
@@ -107,9 +107,17 @@ export const DropdownSwapVault = ({
         </Text>
         <ArrowIconWrapper>
           {isOpen ? (
-            <ArrowUpIcon size={14} color={colors.primary400.mode1} />
+            <UnfoldMoreOutlined
+              width={14}
+              height={14}
+              color={colors.primary400.mode1}
+            />
           ) : (
-            <ArrowDownIcon size={14} color={colors.primary400.mode1} />
+            <KeyboardArrowBottom
+              width={14}
+              height={14}
+              color={colors.primary400.mode1}
+            />
           )}
         </ArrowIconWrapper>
       </Container>
@@ -133,7 +141,11 @@ export const DropdownSwapVault = ({
                     {item?.name ?? item?.id}
                   </DropdownItemText>
                   {isSelected && (
-                    <CheckIcon size={20} color={colors.primary400.mode1} />
+                    <Check
+                      width={20}
+                      height={20}
+                      color={colors.primary400.mode1}
+                    />
                   )}
                 </DropdownItem>
               )

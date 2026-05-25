@@ -2,11 +2,7 @@ import { useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import {
-  PasteFromClipboardIcon,
-  QrCodeIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { ContentPaste, QrCode } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
 import * as Clipboard from 'expo-clipboard'
 import {
@@ -18,6 +14,7 @@ import {
   View
 } from 'react-native'
 import { Camera } from 'react-native-vision-camera'
+import { colors } from 'src/utils/colors'
 
 import { useBottomSheet } from '../../context/BottomSheetContext'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
@@ -154,7 +151,7 @@ export const PairAnotherDeviceContent = ({
               numberOfLines={1}
             />
             <TouchableOpacity onPress={handleQRPress} activeOpacity={0.7}>
-              <QrCodeIcon size={24} color={colors.primary400.mode1} />
+              <QrCode width={24} height={24} color={colors.primary400.mode1} />
             </TouchableOpacity>
           </View>
         </View>
@@ -164,7 +161,11 @@ export const PairAnotherDeviceContent = ({
           onPress={handlePaste}
           activeOpacity={0.7}
         >
-          <PasteFromClipboardIcon size={16} color={colors.primary400.mode1} />
+          <ContentPaste
+            width={16}
+            height={16}
+            color={colors.primary400.mode1}
+          />
           <Text style={styles.pasteText}>{t`Paste`}</Text>
         </TouchableOpacity>
 

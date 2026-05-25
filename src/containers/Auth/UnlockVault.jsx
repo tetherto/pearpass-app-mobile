@@ -4,7 +4,6 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import {
   ActivityIndicator,
@@ -14,6 +13,7 @@ import {
   View,
   Text
 } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import {
   ButtonPrimary,

@@ -1,17 +1,26 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Wrapper = styled.TouchableOpacity`
-  align-items: center;
-  flex-direction: row;
-  gap: 5px;
-  align-self: center;
-`
+export const Wrapper = (props) => (
+  <TouchableOpacity {...props} style={[styles.wrapper, props.style]} />
+)
 
-export const PressableText = styled.Text`
-  color: ${({ theme }) => theme.colors.primary400.mode1};
-  text-align: center;
-  font-family: 'Inter';
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 400;
-`
+export const PressableText = (props) => (
+  <Text {...props} style={[styles.pressableText, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  wrapper: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 5,
+    alignSelf: 'center'
+  },
+  pressableText: {
+    color: colors.primary400.mode1,
+    textAlign: 'center',
+    fontFamily: 'Inter',
+    fontSize: 20,
+    fontWeight: '400'
+  }
+})

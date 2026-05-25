@@ -1,20 +1,29 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Container = styled.View`
-  display: flex;
-  flex-direction: row;
-  padding: 5px 10px;
-  justify-content: center;
-  align-items: center;
-  gap: 7px;
-  border-radius: 10px;
-  background: ${({ theme }) => theme.colors.white.mode1};
-`
+export const Container = (props) => (
+  <View {...props} style={[styles.container, props.style]} />
+)
 
-export const ToastText = styled.Text`
-  color: ${({ theme }) => theme.colors.black.mode1};
-  font-family: 'Inter';
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-`
+export const ToastText = (props) => (
+  <Text {...props} style={[styles.toastText, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 7,
+    borderRadius: 10,
+    backgroundColor: colors.white.mode1
+  },
+  toastText: {
+    color: colors.black.mode1,
+    fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: '400'
+  }
+})

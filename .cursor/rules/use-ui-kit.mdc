@@ -8,28 +8,11 @@ alwaysApply: false
 
 This is the design system for the PearPass React Native + Expo mobile app. All UI primitives come from here.
 
-## When these rules apply — `MOBILE_DESIGN_VERSION`
-
-The active design is controlled by the `MOBILE_DESIGN_VERSION` flag from `@tetherto/pearpass-lib-constants`, consumed via `isV2()` in `src/utils/designVersion.js`.
-
-**Currently `MOBILE_DESIGN_VERSION === 1`** — v1 is still active at runtime, and the flag flip to `2` is pending. All new UI work should be built against the kit so it's ready when the flag flips. Legacy v1 components live in two places — `src/libComponents/` and the package `@tetherto/pearpass-lib-ui-react-native-components` — and render whenever `isV2()` returns `false`. Do not delete them as part of v2 work.
-
-## File naming: when to use the `V2` suffix
-
-The `V2` suffix is a **coexistence marker**, not a design marker. Use it only when a v1 sibling already exists:
-
-- **A v1 file already exists** → create a new file with the `V2` suffix next to it (e.g. v1 `ModifyVaultModalContent.jsx` → new `ModifyVaultModalContentV2.jsx`). Both live in the tree during migration; the branching happens at the call site via `isV2()`. See `src/containers/Modal/ModifyVaultModalContentV2/` for a real example.
-- **No v1 equivalent exists** (net-new feature, net-new component) → create the file with its natural name, **no `V2` suffix**.
-
-A handful of screens use a `v2/` subdirectory pattern instead of a suffix (e.g. `src/screens/CreateRecord/v2/`). Either is acceptable — match the neighbourhood you're editing in.
-
-Before creating a file, glob the directory for the base name without the suffix. If nothing comes up, skip the suffix.
-
 ## Golden rules
 
 1. **Check the catalog below before creating any component.** If it exists in the kit, use it — never wrap or reimplement.
-2. **All new UI goes through `@tetherto/pearpass-lib-ui-kit`.** New `.tsx`/`.jsx` files must import from the kit, **not** from `src/libComponents/` and **not** from `@tetherto/pearpass-lib-ui-react-native-components`. Both of those are legacy sources for v2 work.
-3. **Never add variants under `src/libComponents/`** (`ButtonThin`, `ButtonPrimary`, `ButtonLittle`, `InputPasswordPearPass`, etc.). That tree is legacy; the kit's `Button` takes variants.
+2. **All new UI goes through `@tetherto/pearpass-lib-ui-kit`.** New `.tsx`/`.jsx` files must import from the kit, **not** from `src/libComponents/`. That tree is legacy and is being phased out — migrate callers to the kit equivalents when you touch them.
+3. **Never add variants under `src/libComponents/`** (`ButtonThin`, `ButtonPrimary`, `ButtonLittle`, `InputPasswordPearPass`, etc.). The kit's `Button` takes variants — use it.
 4. **Style with tokens.** `useTheme()` + `rawTokens`. No hardcoded hex colors or design-system spacing.
 5. **Icons come from the kit.** `@tetherto/pearpass-lib-ui-kit/icons` has 530 icons. Do not add new SVGs under `src/`.
 6. **If the kit lacks something you need, stop and ask.** Don't silently roll a custom component.
@@ -98,7 +81,7 @@ Required props have no `?`. **Always include a `testID` on interactive component
 
 The kit's TypeScript defs mark `onChangeText` / `placeholderText` / `errorMessage` as `@deprecated` in favour of `onChange` / `placeholder` / `error`. **That's a web-centric note.** The `onChange` signature the kit declares is `(e: React.ChangeEvent<HTMLInputElement>) => void`, which React Native does not produce.
 
-**For this mobile repo:** keep using `onChangeText` (receives a `string`) on `InputField`, `PasswordField`, `SearchField`, and `TextArea`. That's what the kit's `.native` implementations actually call, and it's what every existing v2 file in this repo does. `placeholder` and `error` (string) are fine to use directly. `testID` is current everywhere.
+**For this mobile repo:** keep using `onChangeText` (receives a `string`) on `InputField`, `PasswordField`, `SearchField`, and `TextArea`. That's what the kit's `.native` implementations actually call, and it's what every existing file in this repo does. `placeholder` and `error` (string) are fine to use directly. `testID` is current everywhere.
 
 ## Theming — React Native `StyleSheet` + `theme.colors` inline
 
@@ -107,7 +90,7 @@ No styled-components. No `createStyles(colors)` factory. The mobile convention i
 1. `StyleSheet.create({ ... })` defined once per file (usually at the bottom), using `rawTokens` for numeric values.
 2. Color tokens applied inline via `style={[styles.x, { borderColor: theme.colors.xxx }]}` — because colors depend on the active theme.
 
-**Example** (from `src/containers/Modal/ModifyVaultModalContentV2/index.jsx`):
+**Example** (from `src/containers/Modal/ModifyVaultModalContent/index.jsx`):
 
 ```jsx
 import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
@@ -140,7 +123,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-Factoring styles into a sibling `*Styles.ts` module (e.g. `src/screens/CreateFolder/CreateFolderV2Styles.ts`) is also fine for larger screens — keep the `StyleSheet.create` + `rawTokens` pattern.
+Factoring styles into a sibling `styles.ts` module (e.g. `src/screens/CreateFolder/styles.ts`) is also fine for larger screens — keep the `StyleSheet.create` + `rawTokens` pattern.
 
 ### `rawTokens` — flat, numeric-suffixed keys (numbers, not strings)
 
@@ -184,24 +167,23 @@ import { Add, Download, Folder, OpenInNew } from '@tetherto/pearpass-lib-ui-kit/
 
 ## Anti-patterns to avoid
 
-When editing a v2 file or creating new UI, do **not**:
+When creating or editing UI, do **not**:
 
 - Add a new file under `src/libComponents/` for a Button/Input variant.
-- Import from `src/libComponents/` or from `@tetherto/pearpass-lib-ui-react-native-components` in a new file — swap to the kit equivalents.
-- Add a `V2` suffix to a net-new file that has no v1 sibling. Suffix is only for migration coexistence.
+- Import from `src/libComponents/` in a new file — swap to the kit equivalents.
 - Use `TouchableOpacity`, `TouchableHighlight`, or a raw `<Text>` from `react-native` for interactive UI when the kit's `Button` / `Pressable` / `Text` fit. RN primitives for layout (`View`, `StyleSheet`, `ScrollView`, `FlatList`) are fine and expected.
 - Hardcode hex colors, brand radii, or design-system spacing — use `rawTokens` and `theme.colors`. (Feature-specific layout literals like `maxWidth: 480` are fine.)
 - Add `px` suffixes or template-string units to token values — React Native takes numbers.
 - Add new SVG files under `src/` when the kit's icons subpath covers them.
 - Introduce `styled-components` — the convention is `StyleSheet.create` + `rawTokens` with colors applied inline.
 
-When editing a v1 file and you spot these patterns, mention them to the user but **don't do drive-by rewrites** unless asked — v1 migration is scoped work.
+If you encounter a file still importing from `src/libComponents/`, migrate it to the kit when the change is in scope; don't do drive-by rewrites outside your task.
 
 ## Reference files for patterns
 
-- `src/screens/Settings/Vaults2/index.jsx` — kit imports, `Layout` + `PageHeader` + `Button` footer, `StyleSheet.create` at the bottom.
-- `src/containers/Modal/ModifyVaultModalContentV2/index.jsx` — form with `InputField` / `PasswordField`, `AlertMessage`, full `testID` discipline, inline color theming.
-- `src/screens/CreateRecord/v2/CreatePasswordItemV2.tsx` — password generator, `Radio` / `Slider` / `ToggleSwitch` usage.
+- `src/screens/Settings/Vaults/index.jsx` — kit imports, `Layout` + `PageHeader` + `Button` footer, `StyleSheet.create` at the bottom.
+- `src/containers/Modal/ModifyVaultModalContent/index.jsx` — form with `InputField` / `PasswordField`, `AlertMessage`, full `testID` discipline, inline color theming.
+- `src/screens/CreateRecord/CreatePasswordItem.tsx` — password generator, `Radio` / `Slider` / `ToggleSwitch` usage.
 
 ## When the kit truly lacks something
 

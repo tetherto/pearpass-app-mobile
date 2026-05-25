@@ -1,10 +1,12 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import { ArrowDownIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { KeyboardArrowBottom } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { ButtonCreate } from './index'
 
-const DummyIcon = (props) => <ArrowDownIcon {...props} testID="dummy-icon" />
+const DummyIcon = (props) => (
+  <KeyboardArrowBottom {...props} testID="dummy-icon" />
+)
 
 describe('ButtonCreate Component', () => {
   test('renders children and triggers onPress event', () => {

@@ -1,38 +1,63 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const MenuItemWrapper = styled.View`
-  padding-bottom: 16px;
-  padding-right: 16px;
-  margin-bottom: 20px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${({ theme, last }) =>
-    last ? 'transparent' : theme.colors.grey100.mode1};
-  align-items: center;
-`
+export const MenuItemWrapper = ({ last, style, ...rest }) => (
+  <View
+    {...rest}
+    style={[
+      styles.menuItemWrapper,
+      { borderBottomColor: last ? 'transparent' : colors.grey100.mode1 },
+      style
+    ]}
+  />
+)
 
-export const MenuItemContainer = styled.TouchableOpacity`
-  width: 100%;
+export const MenuItemContainer = (props) => (
+  <TouchableOpacity
+    {...props}
+    style={[styles.menuItemContainer, props.style]}
+  />
+)
 
-  flex-direction: row;
-  justify-content: space-between;
-`
-export const ItemContainer = styled.View`
-  flex-direction: row;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`
+export const ItemContainer = (props) => (
+  <View {...props} style={[styles.itemContainer, props.style]} />
+)
 
-export const RecordText = styled.Text`
-  font-size: 20px;
-  font-weight: 400;
-  font-family: 'Inter';
-  color: ${({ theme }) => theme.colors.white.mode1};
-`
+export const RecordText = (props) => (
+  <Text {...props} style={[styles.recordText, props.style]} />
+)
 
-export const MenuItemRightSide = styled.View`
-  flex-direction: row;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`
+export const MenuItemRightSide = (props) => (
+  <View {...props} style={[styles.menuItemRightSide, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  menuItemWrapper: {
+    paddingBottom: 16,
+    paddingRight: 16,
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    alignItems: 'center'
+  },
+  menuItemContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
+  },
+  recordText: {
+    fontSize: 20,
+    fontWeight: '400',
+    fontFamily: 'Inter',
+    color: colors.white.mode1
+  },
+  menuItemRightSide: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
+  }
+})

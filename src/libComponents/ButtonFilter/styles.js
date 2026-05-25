@@ -1,46 +1,62 @@
-import { TouchableOpacity } from 'react-native'
-import styled, { css } from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-const getDisabledGradient = (theme) => theme.colors.secondary200.mode1
+export const Button = ({ variant, isDisabled, style, ...rest }) => (
+  <TouchableOpacity
+    activeOpacity={isDisabled ? 1 : 0.7}
+    {...rest}
+    style={[
+      styles.button,
+      isDisabled && styles.buttonDisabled,
+      variant === 'primary' && styles.buttonPrimary,
+      variant === 'secondary' && styles.buttonSecondary,
+      style
+    ]}
+  />
+)
 
-export const Button = styled(TouchableOpacity).attrs(({ isDisabled }) => ({
-  activeOpacity: isDisabled ? 1 : 0.7
-}))`
-  flex-direction: row;
-  align-items: center;
-  gap: 7px;
-  font-family: 'Inter';
-  font-size: 12px;
-  font-weight: 400;
-  padding: 4px;
-  border-radius: 5px;
-  opacity: ${({ isDisabled }) => (isDisabled ? 0.5 : 1)};
+export const ButtonText = ({ variant, style, ...rest }) => (
+  <Text
+    {...rest}
+    style={[
+      styles.buttonText,
+      variant === 'primary'
+        ? styles.buttonTextPrimary
+        : styles.buttonTextSecondary,
+      style
+    ]}
+  />
+)
 
-  ${({ variant, theme, isDisabled }) => {
-    if (variant === 'primary') {
-      return css`
-        background: ${isDisabled
-          ? getDisabledGradient(theme)
-          : theme.colors.secondary200.mode1};
-      `
-    }
-
-    if (variant === 'secondary') {
-      return css`
-        border-radius: 10px;
-        background: ${theme.colors.grey500.mode1};
-        padding: 10px;
-      `
-    }
-  }}
-`
-
-export const ButtonText = styled.Text`
-  font-family: 'Inter';
-  font-size: 16px;
-  font-weight: 400;
-  color: ${({ variant, theme }) =>
-    variant === 'primary'
-      ? theme.colors.secondary400.mode1
-      : theme.colors.white.mode1};
-`
+const styles = StyleSheet.create({
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    padding: 4,
+    borderRadius: 5,
+    opacity: 1
+  },
+  buttonDisabled: {
+    opacity: 0.5
+  },
+  buttonPrimary: {
+    backgroundColor: colors.secondary200.mode1
+  },
+  buttonSecondary: {
+    borderRadius: 10,
+    backgroundColor: colors.grey500.mode1,
+    padding: 10
+  },
+  buttonText: {
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '400'
+  },
+  buttonTextPrimary: {
+    color: colors.secondary400.mode1
+  },
+  buttonTextSecondary: {
+    color: colors.white.mode1
+  }
+})

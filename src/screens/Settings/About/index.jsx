@@ -1,227 +1,105 @@
-import { useState } from 'react'
-
 import { useLingui } from '@lingui/react/macro'
-import NetInfo from '@react-native-community/netinfo'
 import { useNavigation } from '@react-navigation/native'
 import {
-  sendGoogleFormFeedback,
-  sendSlackFeedback
-} from '@tetherto/pear-apps-lib-feedback'
-import { PRIVACY_POLICY, TERMS_OF_USE } from '@tetherto/pearpass-lib-constants'
+  PEARPASS_WEBSITE,
+  PRIVACY_POLICY,
+  TERMS_OF_USE
+} from '@tetherto/pearpass-lib-constants'
 import {
-  BackIcon,
-  OutsideLinkIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import {
-  Linking,
-  Platform,
-  ScrollView,
-  StyleSheet,
+  Link,
+  NavbarListItem,
+  PageHeader,
+  rawTokens,
   Text,
-  TouchableOpacity,
-  View
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import Toast from 'react-native-toast-message'
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { Linking, StyleSheet, View } from 'react-native'
 
 import { version } from '../../../../package.json'
-import { CardSingleSetting } from '../../../components/CardSingleSetting'
-import {
-  GOOGLE_FORM_KEY,
-  GOOGLE_FORM_MAPPING,
-  SLACK_WEBHOOK_URL_PATH
-} from '../../../constants/feedback'
-import { ButtonLittle } from '../../../libComponents'
-import { logger } from '../../../utils/logger'
-import { ReportSection } from '../ReportSection'
+import { Layout } from '../../../containers/Layout'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 
 export const About = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
-
-  const [message, setMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleReportProblem = async () => {
-    if (!message?.length) {
-      return
-    }
-
-    try {
-      setIsLoading(true)
-
-      const payload = {
-        message,
-        topic: 'BUG_REPORT',
-        app: 'MOBILE',
-        operatingSystem: Platform.OS,
-        deviceModel: Platform.constants.Brand,
-        appVersion: version
-      }
-
-      const slackResult = await sendSlackFeedback({
-        webhookUrPath: SLACK_WEBHOOK_URL_PATH,
-        ...payload
-      })
-
-      const googleResult = await sendGoogleFormFeedback({
-        formKey: GOOGLE_FORM_KEY,
-        mapping: GOOGLE_FORM_MAPPING,
-        ...payload
-      })
-
-      if (!slackResult && !googleResult) {
-        const { isConnected } = await NetInfo.fetch()
-
-        if (!isConnected) {
-          throw new Error('OFFLINE')
-        }
-
-        throw new Error('SEND_FAILED')
-      }
-
-      setMessage('')
-
-      Toast.show({
-        type: 'baseToast',
-        text1: t`Feedback sent`,
-        position: 'bottom',
-        bottomOffset: 100
-      })
-    } catch (error) {
-      logger.error('Error sending feedback:', error)
-
-      Toast.show({
-        type: 'baseToast',
-        text1:
-          error.message === 'OFFLINE'
-            ? t`You are offline, please check your internet connection`
-            : t`ERROR: Feedback not sent`,
-        position: 'bottom',
-        bottomOffset: 100
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { theme } = useTheme()
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <View style={styles.header}>
-        <ButtonLittle
-          startIcon={BackIcon}
-          variant="secondary"
-          borderRadius="md"
-          onPress={() => navigation.goBack()}
+    <Layout
+      scrollable
+      hideFooter
+      header={
+        <BackScreenHeader
+          title={t`Settings`}
+          onBack={() => navigation.goBack()}
         />
-        <Text style={styles.screenTitle}>{t`About`}</Text>
-      </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <ReportSection
-          message={message}
-          setMessage={setMessage}
-          isLoading={isLoading}
-          handleReportProblem={handleReportProblem}
-        />
+      }
+      contentStyle={styles.scrollContent}
+    >
+      <PageHeader
+        title={t`App version`}
+        subtitle={
+          <>
+            {t`Here you can find all the info about your app.`}
+            {'\n'}
+            {t`Check here to see the `}
+            <Link
+              href={TERMS_OF_USE}
+              isExternal
+              onClick={() => Linking.openURL(TERMS_OF_USE)}
+            >
+              {t`Terms of Use`}
+            </Link>
+            {t` and the `}
+            <Link
+              href={PRIVACY_POLICY}
+              isExternal
+              onClick={() => Linking.openURL(PRIVACY_POLICY)}
+            >
+              {t`Privacy Statement`}
+            </Link>
+            {t` and `}
+            <Link
+              href={PEARPASS_WEBSITE}
+              isExternal
+              onClick={() => Linking.openURL(PEARPASS_WEBSITE)}
+            >
+              {t`visit our website`}
+            </Link>
+            .
+          </>
+        }
+      />
 
-        <CardSingleSetting title={t`PearPass version`}>
-          <View style={styles.sectionContent}>
-            <Text style={styles.description}>
-              {t`Here you can find all the info about your app.`}
+      <View
+        style={[
+          styles.versionContainer,
+          { borderColor: theme.colors.colorBorderPrimary }
+        ]}
+      >
+        <NavbarListItem
+          label={t`App version`}
+          size="big"
+          additionalItems={
+            <Text variant="label" color={theme.colors.colorPrimary}>
+              {version}
             </Text>
-            <View style={styles.versionRow}>
-              <Text style={styles.versionLabel}>{t`App version`}</Text>
-              <Text
-                style={styles.versionValue}
-                testID="app-version"
-                accessibilityLabel="App Version"
-              >
-                {version}
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => Linking.openURL(TERMS_OF_USE)}>
-              <Text style={styles.link}>{t`Terms of use`}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => Linking.openURL(PRIVACY_POLICY)}>
-              <Text style={styles.link}>{t`Privacy statement`}</Text>
-            </TouchableOpacity>
-            <View style={styles.versionRow}>
-              <Text style={styles.versionLabel}>{t`Visit our website`}</Text>
-              <TouchableOpacity
-                style={styles.websiteLink}
-                onPress={() => Linking.openURL('https://pass.pears.com')}
-              >
-                <OutsideLinkIcon size="16" color={colors.primary400.mode1} />
-                <Text style={styles.link}>pass.pears.com</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </CardSingleSetting>
-      </ScrollView>
-    </SafeAreaView>
+          }
+        />
+      </View>
+    </Layout>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-    paddingHorizontal: 20,
-    paddingBottom: 0,
-    height: '100%',
-    gap: 20,
-    backgroundColor: colors.grey500.mode1
-  },
-  header: {
-    flexDirection: 'row',
-    gap: 20,
-    alignItems: 'center'
-  },
-  screenTitle: {
-    color: colors.white.mode1,
-    fontFamily: 'Inter',
-    fontSize: 20,
-    fontWeight: '700'
-  },
   scrollContent: {
-    gap: 20,
-    paddingBottom: 40
+    paddingTop: rawTokens.spacing24,
+    gap: rawTokens.spacing20,
+    flexGrow: 1
   },
-  sectionContent: {
-    gap: 15
-  },
-  description: {
-    color: colors.white.mode1,
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '400'
-  },
-  versionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  versionLabel: {
-    color: colors.white.mode1,
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '400'
-  },
-  versionValue: {
-    color: colors.primary400.mode1,
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '600'
-  },
-  link: {
-    color: colors.primary400.mode1,
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '600'
-  },
-  websiteLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6
+  versionContainer: {
+    borderWidth: 1,
+    borderRadius: rawTokens.spacing12,
+    overflow: 'hidden'
   }
 })

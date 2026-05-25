@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { InputPasswordPearPass } from './index'
 import messages from '../../locales/en/messages'
@@ -9,7 +9,7 @@ import messages from '../../locales/en/messages'
 i18n.load('en', messages)
 i18n.activate('en')
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => {
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => {
   const { Text } = require('react-native')
   return {
     ButtonLittle: (props) => (
@@ -17,10 +17,10 @@ jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => {
         ButtonLittle
       </Text>
     ),
-    ErrorIcon: () => <Text testID="error-icon">ErrorIcon</Text>,
-    EyeClosedIcon: () => <Text testID="eye-closed-icon">EyeClosedIcon</Text>,
-    EyeIcon: () => <Text testID="eye-icon">EyeIcon</Text>,
-    LockCircleIcon: () => <Text testID="lock-icon">LockCircleIcon</Text>
+    ErrorFilled: () => <Text testID="error-icon">ErrorFilled</Text>,
+    EyeFilled: () => <Text testID="eye-icon">EyeFilled</Text>,
+    EyeOutlined: () => <Text testID="eye-icon">EyeOutlined</Text>,
+    LockFilled: () => <Text testID="lock-icon">LockFilled</Text>
   }
 })
 
@@ -150,9 +150,9 @@ describe('InputPasswordPearPass component', () => {
 
     expect(updatedInput.props.secureTextEntry).toBe(false)
 
-    // After toggling, the icon should change to eye-closed-icon
-    const toggleIconClosed = getByTestId('eye-closed-icon')
-    fireEvent.press(toggleIconClosed)
+    // After toggling, press the eye icon again (now rendered with EyeOutlined)
+    const toggleIconAgain = getByTestId('eye-icon')
+    fireEvent.press(toggleIconAgain)
     const revertedInput = getByTestId('input')
     expect(revertedInput.props.secureTextEntry).toBe(true)
   })

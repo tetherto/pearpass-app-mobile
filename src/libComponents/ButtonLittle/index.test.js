@@ -1,14 +1,11 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import {
-  ThemeProvider,
-  colors
-} from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { Text } from 'react-native'
+import { ThemeProvider, colors } from 'src/utils/colors'
 
 import { ButtonLittle } from './index'
 
 const DummyIcon = (props) => (
-  <Text testID="dummy-icon">{`Icon ${props.size} ${props.color}`}</Text>
+  <Text testID="dummy-icon">{`Icon ${props.width} ${props.color}`}</Text>
 )
 
 describe('ButtonLittle Component', () => {

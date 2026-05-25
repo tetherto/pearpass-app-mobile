@@ -3,11 +3,14 @@
 exports[`FormGroup component renders children correctly 1`] = `
 <View
   style={
-    {
-      "flexDirection": "column",
-      "gap": 10,
-      "width": "100%",
-    }
+    [
+      {
+        "flexDirection": "column",
+        "gap": 10,
+        "width": "100%",
+      },
+      undefined,
+    ]
   }
 >
   <View>

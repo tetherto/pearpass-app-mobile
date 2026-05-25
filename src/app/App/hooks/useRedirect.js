@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 
 import { useUserData } from '@tetherto/pearpass-lib-vault'
 
-import { isV2 } from '../../../utils/designVersion'
 import { hasOrphanedVaultData } from '../../../utils/hasOrphanedVaultData'
 import { logger } from '../../../utils/logger'
 import * as SplashScreen from '../../../utils/SplashScreen'
@@ -44,7 +43,7 @@ export const useRedirect = ({ enabled = true } = {}) => {
             setInitialRouteName('Error')
             return
           }
-          setInitialRouteName(isV2() ? 'OnboardingV2' : 'Intro')
+          setInitialRouteName('Onboarding')
           return
         }
 
@@ -53,14 +52,9 @@ export const useRedirect = ({ enabled = true } = {}) => {
           return
         }
 
-        if (isV2()) {
-          setInitialRouteName(
-            unsupportedFeaturesEnabled() ? 'AuthV2Pin' : 'AuthV2MasterPassword'
-          )
-          return
-        }
-
-        setInitialRouteName('Welcome')
+        setInitialRouteName(
+          unsupportedFeaturesEnabled() ? 'AuthPin' : 'AuthMasterPassword'
+        )
       } catch (error) {
         logger.error('Auto-redirect error: ', error)
         setInitialRouteName('Error')

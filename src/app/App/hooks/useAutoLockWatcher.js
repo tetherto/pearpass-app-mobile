@@ -9,7 +9,6 @@ import {
 import { AppState, Keyboard } from 'react-native'
 
 import { useRouteHelper } from './useRouteHelper'
-import { NAVIGATION_ROUTES } from '../../../constants/navigation'
 import { useAutoLockContext } from '../../../context/AutoLockContext'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useModal } from '../../../context/ModalContext'
@@ -17,7 +16,6 @@ import {
   getLastActivityAt,
   setLastActivityAt
 } from '../../../utils/autoLockStorage'
-import { isV2 } from '../../../utils/designVersion'
 import { clearAllFileCache } from '../../../utils/filesCache'
 import { unsupportedFeaturesEnabled } from '../../../utils/unsupportedFeatures'
 
@@ -83,25 +81,13 @@ export const useAutoLockWatcher = () => {
     await closeAllInstances()
     clearAllFileCache()
 
-    if (isV2()) {
-      const routeName = unsupportedFeaturesEnabled()
-        ? 'AuthV2Pin'
-        : 'AuthV2MasterPassword'
-      navigation.reset({
-        index: 0,
-        routes: [{ name: routeName }]
-      })
-    } else {
-      navigation.reset({
-        index: 0,
-        routes: [
-          {
-            name: 'Welcome',
-            params: { state: NAVIGATION_ROUTES.ENTER_MASTER_PASSWORD }
-          }
-        ]
-      })
-    }
+    const routeName = unsupportedFeaturesEnabled()
+      ? 'AuthPin'
+      : 'AuthMasterPassword'
+    navigation.reset({
+      index: 0,
+      routes: [{ name: routeName }]
+    })
 
     resetState()
     await refetchUser()

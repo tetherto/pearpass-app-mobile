@@ -1,38 +1,67 @@
-import styled, { css } from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Button = styled.TouchableOpacity`
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  border-radius: ${({ borderRadius }) =>
-    borderRadius === 'sm' ? '15px' : '25px'};
-  padding: ${({ borderRadius }) => (borderRadius === 'sm' ? '10px' : '7px')};
-  gap: 10px;
+export const Button = ({ borderRadius, variant, style, ...rest }) => (
+  <TouchableOpacity
+    {...rest}
+    style={[
+      styles.button,
+      borderRadius === 'sm' ? styles.borderSm : styles.borderMd,
+      variant === 'primary' && styles.buttonPrimary,
+      variant === 'secondary' && styles.buttonSecondary,
+      style
+    ]}
+  />
+)
 
-  ${({ variant, theme }) => {
-    if (variant === 'primary') {
-      return css`
-        background: ${theme.colors.primary400.mode1};
-        border: 1px solid ${theme.colors.primary300.mode1};
-      `
-    }
+export const ButtonText = ({ variant, style, ...rest }) => (
+  <Text
+    {...rest}
+    style={[
+      styles.buttonText,
+      variant === 'primary'
+        ? styles.buttonTextPrimary
+        : styles.buttonTextSecondary,
+      style
+    ]}
+  />
+)
 
-    if (variant === 'secondary') {
-      return css`
-        background: ${theme.colors.black.mode1};
-        border: 1px solid ${theme.colors.black.mode1};
-      `
-    }
-  }};
-`
-
-export const ButtonText = styled.Text`
-  font-family: 'Inter';
-  font-size: 16px;
-  font-weight: 400;
-  color: ${({ variant, theme }) =>
-    variant === 'primary'
-      ? theme.colors.black.mode1
-      : theme.colors.primary400.mode1};
-`
+const styles = StyleSheet.create({
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+    gap: 10
+  },
+  borderSm: {
+    borderRadius: 15,
+    padding: 10
+  },
+  borderMd: {
+    borderRadius: 25,
+    padding: 7
+  },
+  buttonPrimary: {
+    backgroundColor: colors.primary400.mode1,
+    borderWidth: 1,
+    borderColor: colors.primary300.mode1
+  },
+  buttonSecondary: {
+    backgroundColor: colors.black.mode1,
+    borderWidth: 1,
+    borderColor: colors.black.mode1
+  },
+  buttonText: {
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '400'
+  },
+  buttonTextPrimary: {
+    color: colors.black.mode1
+  },
+  buttonTextSecondary: {
+    color: colors.primary400.mode1
+  }
+})

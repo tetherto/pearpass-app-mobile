@@ -1,199 +1,119 @@
+//
+//  VaultPasswordView.swift
+//  PearPassAutoFillExtension
+//
+//  per-vault password unlock screen — visual + binding shell that
+//  VaultPassword view in the new design. Not wired into
+//  HostView routing yet because the backend doesn't support per-vault
+//  passwords on the autofill path. Kept ready so reconnecting the flow
+//  doesn't require redesigning the screen when the feature lands.
+//
+
 import SwiftUI
 
 struct VaultPasswordView: View {
-    @ObservedObject var viewModel: ExtensionViewModel
-    let vault: Vault
-    let onCancel: () -> Void
-    let vaultClient: PearPassVaultClient?
 
-    @State private var isLoading: Bool = false
-    @State private var errorMessage: String?
-    @State private var keyboardHeight: CGFloat = 0
-    
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                SharedBackgroundView()
-                
-                VStack(spacing: 0) {
-                    CancelHeader {
-                        onCancel()
-                    }
+    var headerTitle: String = NSLocalizedString("Sign in", comment: "sheet header — credential assertion")
+    /// Rendered as the localized "Unlock with the X Vault password" title —
+    /// caller passes the selected vault's display name.
+    var vaultName: String = ""
 
-                    GeometryReader { contentGeometry in
-                        ScrollView {
-                            VStack(spacing: 32) {
-                                Spacer()
-                                    .frame(height: max(50, (contentGeometry.size.height - keyboardHeight - 450) / 2.5))
+    @Binding var password: String
 
-                                Text(String(format: NSLocalizedString("Unlock with the %@ Vault password", comment: "Vault unlock prompt"), vault.name))
-                                    .font(.system(size: 20, weight: .medium))
-                                    .foregroundColor(.white)
-                                    .multilineTextAlignment(.center)
+    /// Inline auth-error message shown under the password field (invalid
+    /// vault password, vault locked, etc.). Cleared by the caller when a
+    /// new attempt starts.
+    var errorMessage: String? = nil
+    /// Disables Continue / Select Vaults and swaps the Continue label to
+    /// "Authenticating..." while the unlock is in flight.
+    var isAuthenticating: Bool = false
 
-                                VStack(spacing: 20) {
-                                    if let error = errorMessage {
-                                        Text(error)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.red)
-                                            .multilineTextAlignment(.center)
-                                            .padding(.horizontal, 16)
-                                    }
+    var onClose: () -> Void = {}
+    var onContinue: () -> Void = {}
+    /// Sends the user back to vault selection so they can pick a different
+    /// vault instead of guessing the password.
+    var onSelectVaults: () -> Void = {}
 
-                                    PasswordInput(password: $viewModel.vaultPassword)
-
-                                    Button(action: {
-                                        unlockVault()
-                                    }) {
-                                        if isLoading {
-                                            ProgressView()
-                                                .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                                                .frame(maxWidth: .infinity)
-                                                .padding(.vertical, 12)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                                        .fill(Constants.Colors.primaryGreen)
-                                                )
-                                        } else {
-                                            Text(NSLocalizedString("Continue", comment: "Continue button"))
-                                                .font(.system(size: 16, weight: .semibold))
-                                                .foregroundColor(.black)
-                                                .frame(maxWidth: .infinity)
-                                                .padding(.vertical, 12)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                                        .fill(Constants.Colors.primaryGreen)
-                                                )
-                                        }
-                                    }
-                                    .disabled(viewModel.vaultPassword.isEmpty || isLoading)
-                                    .opacity(viewModel.vaultPassword.isEmpty || isLoading ? 0.6 : 1.0)
-
-                                    Button(action: {
-                                        viewModel.goBackToVaultSelection()
-                                    }) {
-                                        Text(NSLocalizedString("Select Vaults", comment: "Select vaults button"))
-                                            .font(.system(size: 16, weight: .medium))
-                                            .foregroundColor(Constants.Colors.primaryGreen)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 12)
-                                            .background(
-                                                RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                                    .stroke(Constants.Colors.primaryGreen, lineWidth: 2)
-                                            )
-                                    }
-                                }
-                                .padding(.horizontal, 24)
-
-                                Spacer()
-                                    .frame(height: 50)
-                            }
-                        }
-                    }
-                    .animation(.easeInOut(duration: 0.3), value: keyboardHeight)
-                }
-            }
-        }
-        .onAppear {
-            // Clear password when view appears
-            viewModel.vaultPassword = ""
-            errorMessage = nil
-
-            // Listen for keyboard notifications
-            NotificationCenter.default.addObserver(
-                forName: UIResponder.keyboardWillShowNotification,
-                object: nil,
-                queue: .main
-            ) { notification in
-                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                    keyboardHeight = keyboardFrame.height
-                }
-            }
-
-            NotificationCenter.default.addObserver(
-                forName: UIResponder.keyboardWillHideNotification,
-                object: nil,
-                queue: .main
-            ) { _ in
-                keyboardHeight = 0
-            }
-        }
-        .onDisappear {
-            // Remove keyboard observers
-            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-            NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
-        }
+    private var continueButtonTitle: String {
+        isAuthenticating
+            ? NSLocalizedString("Authenticating...", comment: "Authentication in progress")
+            : NSLocalizedString("Continue", comment: "Continue button")
     }
 
-    // MARK: - Private Methods
+    private var continueEnabled: Bool {
+        !password.isEmpty && !isAuthenticating
+    }
 
-    private func unlockVault() {
-        print("VaultPasswordView: Unlocking vault \(vault.name) with password")
+    private var titleText: String {
+        String(
+            format: NSLocalizedString("Unlock with the %@ Vault password", comment: "Vault unlock prompt"),
+            vaultName
+        )
+    }
 
-        guard let client = vaultClient else {
-            print("VaultPasswordView: Vault client not available, using fallback method")
-            viewModel.authenticateWithVaultPassword()
-            return
-        }
+    var body: some View {
+        VStack(spacing: 0) {
+            PPSheetHeader(
+                title: headerTitle,
+                showLogo: true,
+                showClose: true,
+                onClose: onClose
+            )
 
-        guard !viewModel.vaultPassword.isEmpty else {
-            print("VaultPasswordView: Password is empty")
-            errorMessage = NSLocalizedString("Password is required", comment: "Empty password error")
-            return
-        }
+            PPContentCard {
+                VStack(spacing: 0) {
+                    VStack(spacing: 0) {
+                        Text(titleText)
+                            .font(PPTypography.title)
+                            .foregroundColor(PPColors.textPrimary)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, PPSpacing.s16)
 
-        // Capture password and clear from viewModel immediately
-        let password = viewModel.vaultPassword
-        viewModel.vaultPassword = ""
+                        Spacer().frame(height: PPSpacing.s46)
 
-        isLoading = true
-        errorMessage = nil
+                        PPPasswordField(
+                            label: NSLocalizedString("Password", comment: "password input label"),
+                            text: $password,
+                            placeholder: NSLocalizedString("Vault password", comment: "Vault password placeholder")
+                        )
 
-        Task {
-            // Convert password string to Data buffer
-            var passwordBuffer = Utils.stringToBuffer(password)
-            defer {
-                // Securely clear the password buffer after use
-                Utils.clearBuffer(&passwordBuffer)
-            }
+                        if let errorMessage = errorMessage, !errorMessage.isEmpty {
+                            Text(errorMessage)
+                                .font(PPTypography.caption)
+                                .foregroundColor(PPColors.surfaceError)
+                                .multilineTextAlignment(.leading)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, PPSpacing.s8)
+                        }
 
-            do {
-                print("VaultPasswordView: Attempting to unlock vault \(vault.name) (ID: \(vault.id)) with password (buffer)")
+                        Spacer()
+                    }
+                    .padding(.horizontal, PPSpacing.s16)
+                    .padding(.top, PPSpacing.s24)
 
-                // This matches the RN app's refetchVault -> fetchVault -> getVaultById pattern
-                // Using the Data-based version of getVaultById
-                let vaultData = try await client.getVaultById(
-                    vaultId: vault.id,
-                    password: passwordBuffer
-                )
+                    Rectangle()
+                        .fill(PPColors.borderPrimary)
+                        .frame(height: 1)
 
-                print("VaultPasswordView: Successfully unlocked vault \(vault.name)")
-                print("VaultPasswordView: Vault data received: \(vaultData)")
+                    VStack(spacing: PPSpacing.s8) {
+                        PPButton(
+                            title: continueButtonTitle,
+                            variant: .primary,
+                            isEnabled: continueEnabled,
+                            action: onContinue
+                        )
 
-                await MainActor.run {
-                    self.isLoading = false
-                    // Navigate to credentials list - vault is now active and ready
-                    viewModel.currentFlow = .credentialsList(vault: vault)
-                    print("VaultPasswordView: Navigated to credentials list")
-                }
-
-            } catch PearPassVaultError.decryptionFailed {
-                print("VaultPasswordView: Decryption failed - invalid password")
-                await MainActor.run {
-                    self.isLoading = false
-                    self.errorMessage = NSLocalizedString("Invalid vault password", comment: "Invalid vault password error")
-                }
-            } catch PearPassVaultError.locked {
-                print("VaultPasswordView: Vault is locked")
-                await MainActor.run {
-                    self.isLoading = false
-                    self.errorMessage = NSLocalizedString("Vault is locked. Please try again.", comment: "Vault locked error")
-                }
-            } catch {
-                print("VaultPasswordView: Failed to unlock vault: \(error.localizedDescription)")
-                await MainActor.run {
-                    self.isLoading = false
-                    self.errorMessage = NSLocalizedString("Failed to unlock vault. Please check your password and try again.", comment: "Generic vault unlock error")
+                        PPButton(
+                            title: NSLocalizedString("Select Vaults", comment: "Select vaults button"),
+                            variant: .secondary,
+                            isEnabled: !isAuthenticating,
+                            action: onSelectVaults
+                        )
+                    }
+                    .padding(.horizontal, PPSpacing.s16)
+                    .padding(.top, PPSpacing.s16)
+                    .padding(.bottom, PPSpacing.s12)
                 }
             }
         }

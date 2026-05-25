@@ -1,17 +1,27 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Container = styled.View`
-  padding-top: 25px;
-  padding-bottom: 25px;
-  gap: 20px;
-  align-items: center;
-  align-self: center;
-`
+export const Container = (props) => (
+  <View {...props} style={[styles.container, props.style]} />
+)
 
-export const Title = styled.Text`
-  color: ${({ theme }) => theme.colors.white.mode1};
-  text-align: center;
-  font-family: 'Inter';
-  font-size: 16px;
-  font-weight: 600;
-`
+export const Title = (props) => (
+  <Text {...props} style={[styles.title, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 25,
+    paddingBottom: 25,
+    gap: 20,
+    alignItems: 'center',
+    alignSelf: 'center'
+  },
+  title: {
+    color: colors.white.mode1,
+    textAlign: 'center',
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '600'
+  }
+})

@@ -39,7 +39,7 @@ exports[`ListItem renders correctly with provided vault data 1`] = `
   <View
     testID="vault-info"
   >
-    LockCircleIcon
+    LockFilled
     <View
       testID="vault-description"
     >
@@ -60,9 +60,9 @@ exports[`ListItem renders correctly with provided vault data 1`] = `
   <View
     testID="vault-actions"
   >
-    ShareIcon
-    BrushIcon
-    DeleteIcon
+    Share
+    PaletteOutlined
+    TrashOutlined
   </View>
 </View>
 `;

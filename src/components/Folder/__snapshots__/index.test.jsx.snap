@@ -45,13 +45,15 @@ exports[`Folder component renders active folder with check icon 1`] = `
 >
   <View
     style={
-      {
-        "alignItems": "center",
-        "display": "flex",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "width": "100%",
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "width": "100%",
+        },
+        undefined,
+      ]
     }
   >
     <View
@@ -59,37 +61,41 @@ exports[`Folder component renders active folder with check icon 1`] = `
     />
     <View
       style={
-        {
-          "color": "#fff",
-          "flexBasis": 0,
-          "flexGrow": 1,
-          "flexShrink": 1,
-          "fontFamily": "Inter",
-          "fontSize": 20,
-          "paddingLeft": 16,
-        }
+        [
+          {
+            "flex": 1,
+            "paddingLeft": 16,
+          },
+          undefined,
+        ]
       }
     >
       <Text
         ellipsizeMode="tail"
         numberOfLines={1}
         style={
-          {
-            "color": "#fff",
-            "fontFamily": "Inter",
-            "fontSize": 20,
-          }
+          [
+            {
+              "color": "#fff",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+            },
+            undefined,
+          ]
         }
       >
         Test Folder
       </Text>
       <Text
         style={
-          {
-            "color": "#BABABA",
-            "fontFamily": "Inter",
-            "fontSize": 14,
-          }
+          [
+            {
+              "color": "#BABABA",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+            },
+            undefined,
+          ]
         }
       >
         5
@@ -97,9 +103,9 @@ exports[`Folder component renders active folder with check icon 1`] = `
         items
       </Text>
     </View>
-    CheckIcon
+    Check
   </View>
-  KebabMenuIcon
+  MoreVert
 </View>
 `;
 
@@ -149,13 +155,15 @@ exports[`Folder component renders create new folder option without count 1`] = `
 >
   <View
     style={
-      {
-        "alignItems": "center",
-        "display": "flex",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "width": "100%",
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "width": "100%",
+        },
+        undefined,
+      ]
     }
   >
     <View
@@ -163,33 +171,34 @@ exports[`Folder component renders create new folder option without count 1`] = `
     />
     <View
       style={
-        {
-          "color": "#fff",
-          "flexBasis": 0,
-          "flexGrow": 1,
-          "flexShrink": 1,
-          "fontFamily": "Inter",
-          "fontSize": 20,
-          "paddingLeft": 16,
-        }
+        [
+          {
+            "flex": 1,
+            "paddingLeft": 16,
+          },
+          undefined,
+        ]
       }
     >
       <Text
         ellipsizeMode="tail"
         numberOfLines={1}
         style={
-          {
-            "color": "#fff",
-            "fontFamily": "Inter",
-            "fontSize": 20,
-          }
+          [
+            {
+              "color": "#fff",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+            },
+            undefined,
+          ]
         }
       >
         Create New Folder
       </Text>
     </View>
   </View>
-  KebabMenuIcon
+  MoreVert
 </View>
 `;
 
@@ -238,13 +247,15 @@ exports[`Folder component renders folder correctly 1`] = `
 >
   <View
     style={
-      {
-        "alignItems": "center",
-        "display": "flex",
-        "flexDirection": "row",
-        "justifyContent": "space-between",
-        "width": "100%",
-      }
+      [
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "width": "100%",
+        },
+        undefined,
+      ]
     }
   >
     <View
@@ -252,37 +263,41 @@ exports[`Folder component renders folder correctly 1`] = `
     />
     <View
       style={
-        {
-          "color": "#fff",
-          "flexBasis": 0,
-          "flexGrow": 1,
-          "flexShrink": 1,
-          "fontFamily": "Inter",
-          "fontSize": 20,
-          "paddingLeft": 16,
-        }
+        [
+          {
+            "flex": 1,
+            "paddingLeft": 16,
+          },
+          undefined,
+        ]
       }
     >
       <Text
         ellipsizeMode="tail"
         numberOfLines={1}
         style={
-          {
-            "color": "#fff",
-            "fontFamily": "Inter",
-            "fontSize": 20,
-          }
+          [
+            {
+              "color": "#fff",
+              "fontFamily": "Inter",
+              "fontSize": 20,
+            },
+            undefined,
+          ]
         }
       >
         Test Folder
       </Text>
       <Text
         style={
-          {
-            "color": "#BABABA",
-            "fontFamily": "Inter",
-            "fontSize": 14,
-          }
+          [
+            {
+              "color": "#BABABA",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+            },
+            undefined,
+          ]
         }
       >
         5
@@ -291,6 +306,6 @@ exports[`Folder component renders folder correctly 1`] = `
       </Text>
     </View>
   </View>
-  KebabMenuIcon
+  MoreVert
 </View>
 `;

@@ -34,20 +34,15 @@ exports[`ButtonThin Component matches snapshot 1`] = `
       "alignItems": "center",
       "alignSelf": "flex-start",
       "backgroundColor": "#050B06",
-      "borderBottomLeftRadius": 20,
-      "borderBottomRightRadius": 20,
       "borderColor": "#050B06",
-      "borderTopLeftRadius": 20,
-      "borderTopRightRadius": 20,
+      "borderRadius": 20,
       "borderWidth": 1,
       "flexDirection": "row",
       "gap": 10,
       "justifyContent": "center",
       "opacity": 1,
-      "paddingBottom": 10,
-      "paddingLeft": 15,
-      "paddingRight": 15,
-      "paddingTop": 10,
+      "paddingHorizontal": 15,
+      "paddingVertical": 10,
     }
   }
 >
@@ -58,12 +53,15 @@ exports[`ButtonThin Component matches snapshot 1`] = `
   </Text>
   <Text
     style={
-      {
-        "color": "#BADE5B",
-        "fontFamily": "Inter",
-        "fontSize": 16,
-        "fontWeight": "400",
-      }
+      [
+        {
+          "color": "#BADE5B",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "400",
+        },
+        undefined,
+      ]
     }
   >
     Thin Button

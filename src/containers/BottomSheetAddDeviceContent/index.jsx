@@ -3,11 +3,11 @@ import { useState } from 'react'
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useLingui } from '@lingui/react/macro'
 import {
-  ArrowLeftIcon,
-  YellowErrorIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+  KeyboardArrowLeftOutlined,
+  ReportProblem
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { PairAnotherDeviceContent } from './PairAnotherDeviceContent'
 import { PairThisDeviceContent } from './PairThisDeviceContent'
@@ -42,7 +42,11 @@ const BottomSheetAddDeviceContentBase = () => {
           activeOpacity={0.5}
           onPress={handleBack}
         >
-          <ArrowLeftIcon size={24} color={colors.primary400.mode1} />
+          <KeyboardArrowLeftOutlined
+            width={24}
+            height={24}
+            color={colors.primary400.mode1}
+          />
         </TouchableOpacity>
         <Text style={styles.itemHeaderLabel}>{t`Add a device`}</Text>
         <View style={styles.placeholder} />
@@ -107,7 +111,7 @@ const BottomSheetAddDeviceContentBase = () => {
       {activeTab === TAB.PAIR_THIS && (
         <View style={styles.cautionContainer}>
           <View style={styles.cautionIcon}>
-            <YellowErrorIcon size={14} />
+            <ReportProblem width={14} height={14} />
           </View>
           <Text style={styles.cautionText}>
             {t`Keep this code private. Anyone with it can connect a device to your vault.`}

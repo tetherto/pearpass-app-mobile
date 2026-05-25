@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
-import { PasteFromClipboardIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { ContentPaste } from '@tetherto/pearpass-lib-ui-kit/icons'
 import * as Clipboard from 'expo-clipboard'
 import Toast from 'react-native-toast-message'
+import { colors } from 'src/utils/colors'
 /**
  * Hook for pasting text from clipboard with toast notifications
  * @returns {{
@@ -32,9 +32,7 @@ export const usePasteFromClipboard = () => {
       Toast.show({
         type: 'baseToast',
         text1: t`Pasted from clipboard!`,
-        renderLeadingIcon: () => (
-          <PasteFromClipboardIcon color={colors.black.mode1} />
-        ),
+        renderLeadingIcon: () => <ContentPaste color={colors.black.mode1} />,
         position: 'bottom',
         bottomOffset: 100
       })

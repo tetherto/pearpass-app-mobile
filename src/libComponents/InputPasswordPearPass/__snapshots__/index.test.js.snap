@@ -32,20 +32,15 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
   style={
     {
       "alignItems": "center",
-      "backgroundColor": "'transparent'",
-      "borderBottomLeftRadius": 10,
-      "borderBottomRightRadius": 10,
+      "backgroundColor": "transparent",
       "borderColor": "#BABABA",
-      "borderTopLeftRadius": 10,
-      "borderTopRightRadius": 10,
+      "borderRadius": 10,
       "borderWidth": 1,
       "flexDirection": "row",
       "gap": 15,
       "opacity": 1,
-      "paddingBottom": 5,
-      "paddingLeft": 10,
-      "paddingRight": 10,
-      "paddingTop": 5,
+      "paddingHorizontal": 10,
+      "paddingVertical": 5,
       "position": "relative",
       "width": "100%",
     }
@@ -53,9 +48,12 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
 >
   <View
     style={
-      {
-        "flexShrink": 0,
-      }
+      [
+        {
+          "flexShrink": 0,
+        },
+        undefined,
+      ]
     }
   >
     <RNSVGSvgView
@@ -68,7 +66,6 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
       meetOrSlice={0}
       minX={0}
       minY={0}
-      size="21"
       style={
         [
           {
@@ -83,9 +80,8 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
         ]
       }
       vbHeight={24}
-      vbWidth={25}
+      vbWidth={24}
       width="21"
-      xmlns="http://www.w3.org/2000/svg"
     >
       <RNSVGGroup
         fill={null}
@@ -96,11 +92,10 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
         }
       >
         <RNSVGPath
-          d="M12.5033 21C11.2587 21 10.0887 20.7638 8.993 20.2915C7.8975 19.8192 6.9445 19.1782 6.134 18.3685C5.3235 17.5588 4.68192 16.6067 4.20925 15.512C3.73642 14.4175 3.5 13.2479 3.5 12.0033C3.5 10.7587 3.73617 9.58867 4.2085 8.493C4.68083 7.3975 5.32183 6.4445 6.1315 5.634C6.94117 4.8235 7.89333 4.18192 8.988 3.70925C10.0825 3.23642 11.2521 3 12.4967 3C13.7413 3 14.9113 3.23617 16.007 3.7085C17.1025 4.18083 18.0555 4.82183 18.866 5.6315C19.6765 6.44117 20.3181 7.39333 20.7908 8.488C21.2636 9.5825 21.5 10.7521 21.5 11.9967C21.5 13.2413 21.2638 14.4113 20.7915 15.507C20.3192 16.6025 19.6782 17.5555 18.8685 18.366C18.0588 19.1765 17.1067 19.8181 16.012 20.2908C14.9175 20.7636 13.7479 21 12.5033 21ZM12.5 20C14.7333 20 16.625 19.225 18.175 17.675C19.725 16.125 20.5 14.2333 20.5 12C20.5 9.76667 19.725 7.875 18.175 6.325C16.625 4.775 14.7333 4 12.5 4C10.2667 4 8.375 4.775 6.825 6.325C5.275 7.875 4.5 9.76667 4.5 12C4.5 14.2333 5.275 16.125 6.825 17.675C8.375 19.225 10.2667 20 12.5 20Z"
+          d="M18 8.5h-1v-2c0-2.76-2.24-5-5-5s-5 2.24-5 5v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-10c0-1.1-.9-2-2-2m-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2m3.1-9H8.9v-2c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1z"
           fill={
             {
-              "payload": 4294375158,
-              "type": 0,
+              "type": 2,
             }
           }
           propList={
@@ -109,65 +104,18 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
             ]
           }
         />
-        <RNSVGPath
-          d="M12.5 12.75C13.7426 12.75 14.75 11.7426 14.75 10.5C14.75 9.25736 13.7426 8.25 12.5 8.25C11.2574 8.25 10.25 9.25736 10.25 10.5C10.25 11.7426 11.2574 12.75 12.5 12.75Z"
-          fill={
-            {
-              "payload": 4278190080,
-              "type": 0,
-            }
-          }
-          propList={
-            [
-              "stroke",
-              "strokeLinecap",
-              "strokeLinejoin",
-            ]
-          }
-          stroke={
-            {
-              "payload": 4294375158,
-              "type": 0,
-            }
-          }
-          strokeLinecap={1}
-          strokeLinejoin={1}
-        />
-        <RNSVGPath
-          d="M12.553 12.75V15.75"
-          fill={
-            {
-              "payload": 4278190080,
-              "type": 0,
-            }
-          }
-          propList={
-            [
-              "stroke",
-              "strokeLinecap",
-              "strokeLinejoin",
-            ]
-          }
-          stroke={
-            {
-              "payload": 4294375158,
-              "type": 0,
-            }
-          }
-          strokeLinecap={2}
-          strokeLinejoin={1}
-        />
       </RNSVGGroup>
     </RNSVGSvgView>
   </View>
   <View
     style={
-      {
-        "flexBasis": 0,
-        "flexDirection": "column",
-        "flexGrow": 1,
-        "flexShrink": 1,
-      }
+      [
+        {
+          "flex": 1,
+          "flexDirection": "column",
+        },
+        undefined,
+      ]
     }
   >
     <TextInput
@@ -180,24 +128,30 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
       placeholderTextColor="#BABABA"
       secureTextEntry={true}
       style={
-        {
-          "color": "#F6F6F6",
-          "fontFamily": "Inter",
-          "fontSize": 16,
-          "fontWeight": "400",
-        }
+        [
+          {
+            "color": "#F6F6F6",
+            "fontFamily": "Inter",
+            "fontSize": 16,
+            "fontWeight": "400",
+          },
+          undefined,
+        ]
       }
       type="text"
       value="snapshot"
     />
     <View
       style={
-        {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "gap": 5,
-          "marginTop": 2,
-        }
+        [
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "gap": 5,
+            "marginTop": 2,
+          },
+          undefined,
+        ]
       }
     >
       <RNSVGSvgView
@@ -210,7 +164,6 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="10"
         style={
           [
             {
@@ -224,10 +177,9 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
             },
           ]
         }
-        vbHeight={20}
-        vbWidth={20}
+        vbHeight={24}
+        vbWidth={24}
         width="10"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -238,32 +190,10 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
           }
         >
           <RNSVGPath
-            d="M10 19C14.9706 19 19 14.9706 19 10C19 5.02944 14.9706 1 10 1C5.02944 1 1 5.02944 1 10C1 14.9706 5.02944 19 10 19Z"
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z"
             fill={
               {
-                "payload": 4292238430,
-                "type": 0,
-              }
-            }
-            propList={
-              [
-                "fill",
-                "stroke",
-              ]
-            }
-            stroke={
-              {
-                "payload": 4291902269,
-                "type": 0,
-              }
-            }
-          />
-          <RNSVGPath
-            d="M11.2984 4.64795L11.0613 11.97H8.94356L8.70653 4.64795H11.2984ZM9.99986 15.3502C9.6323 15.3502 9.31627 15.2196 9.05176 14.9585C8.79069 14.6975 8.66016 14.3814 8.66016 14.0104C8.66016 13.6463 8.79069 13.3354 9.05176 13.0778C9.31627 12.8167 9.6323 12.6862 9.99986 12.6862C10.3537 12.6862 10.6646 12.8167 10.9325 13.0778C11.2039 13.3354 11.3396 13.6463 11.3396 14.0104C11.3396 14.2578 11.276 14.4828 11.1489 14.6855C11.0253 14.8881 10.8621 15.0496 10.6594 15.1698C10.4602 15.29 10.2403 15.3502 9.99986 15.3502Z"
-            fill={
-              {
-                "payload": 4294375158,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={
@@ -276,12 +206,15 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
       </RNSVGSvgView>
       <Text
         style={
-          {
-            "color": "#D65C5E",
-            "fontFamily": "Inter",
-            "fontSize": 10,
-            "fontWeight": "500",
-          }
+          [
+            {
+              "color": "#D65C5E",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "500",
+            },
+            undefined,
+          ]
         }
       >
          
@@ -292,13 +225,16 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
   </View>
   <View
     style={
-      {
-        "alignItems": "center",
-        "alignSelf": "center",
-        "flexDirection": "row",
-        "gap": 10,
-        "justifyContent": "flex-end",
-      }
+      [
+        {
+          "alignItems": "center",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "gap": 10,
+          "justifyContent": "flex-end",
+        },
+        undefined,
+      ]
     }
   >
     <View
@@ -334,21 +270,14 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
           "alignItems": "center",
           "alignSelf": "flex-start",
           "backgroundColor": "#050B06",
-          "borderBottomLeftRadius": 25,
-          "borderBottomRightRadius": 25,
           "borderColor": "#050B06",
-          "borderStyle": "solid",
-          "borderTopLeftRadius": 25,
-          "borderTopRightRadius": 25,
+          "borderRadius": 25,
           "borderWidth": 1,
           "flexDirection": "row",
           "gap": 10,
           "justifyContent": "center",
           "opacity": 1,
-          "paddingBottom": 7,
-          "paddingLeft": 7,
-          "paddingRight": 7,
-          "paddingTop": 7,
+          "padding": 7,
         }
       }
     >
@@ -363,7 +292,6 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
         meetOrSlice={0}
         minX={0}
         minY={0}
-        size="21"
         style={
           [
             {
@@ -377,10 +305,9 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
             },
           ]
         }
-        vbHeight={25}
+        vbHeight={24}
         vbWidth={24}
         width="21"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <RNSVGGroup
           fill={null}
@@ -391,11 +318,10 @@ exports[`InputPasswordPearPass Component matches snapshot 1`] = `
           }
         >
           <RNSVGPath
-            d="M12.0046 16.1538C13.0208 16.1538 13.8831 15.7981 14.5914 15.0868C15.2997 14.3754 15.6539 13.5117 15.6539 12.4955C15.6539 11.4793 15.2982 10.6171 14.5869 9.90875C13.8756 9.20042 13.0118 8.84625 11.9956 8.84625C10.9795 8.84625 10.1172 9.20192 9.4089 9.91325C8.70057 10.6246 8.3464 11.4883 8.3464 12.5045C8.3464 13.5207 8.70207 14.3829 9.4134 15.0913C10.1247 15.7996 10.9885 16.1538 12.0046 16.1538ZM12.0001 15.2C11.2501 15.2 10.6126 14.9375 10.0876 14.4125C9.56265 13.8875 9.30015 13.25 9.30015 12.5C9.30015 11.75 9.56265 11.1125 10.0876 10.5875C10.6126 10.0625 11.2501 9.8 12.0001 9.8C12.7501 9.8 13.3876 10.0625 13.9126 10.5875C14.4376 11.1125 14.7001 11.75 14.7001 12.5C14.7001 13.25 14.4376 13.8875 13.9126 14.4125C13.3876 14.9375 12.7501 15.2 12.0001 15.2ZM12.0029 19C9.8369 19 7.8629 18.4106 6.0809 17.2317C4.2989 16.0529 2.96432 14.4757 2.07715 12.5C2.96432 10.5243 4.29798 8.94708 6.07815 7.76825C7.85831 6.58942 9.8314 6 11.9974 6C14.1634 6 16.1374 6.58942 17.9194 7.76825C19.7014 8.94708 21.036 10.5243 21.9231 12.5C21.036 14.4757 19.7023 16.0529 17.9221 17.2317C16.142 18.4106 14.1689 19 12.0029 19ZM12.0001 18C13.8835 18 15.6126 17.5042 17.1876 16.5125C18.7626 15.5208 19.9668 14.1833 20.8001 12.5C19.9668 10.8167 18.7626 9.47917 17.1876 8.4875C15.6126 7.49583 13.8835 7 12.0001 7C10.1168 7 8.38765 7.49583 6.81265 8.4875C5.23765 9.47917 4.03348 10.8167 3.20015 12.5C4.03348 14.1833 5.23765 15.5208 6.81265 16.5125C8.38765 17.5042 10.1168 18 12.0001 18Z"
+            d="M12 6.5a9.77 9.77 0 0 1 8.82 5.5A9.76 9.76 0 0 1 12 17.5 9.76 9.76 0 0 1 3.18 12 9.77 9.77 0 0 1 12 6.5m0-2C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 5a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0-5m0-2c-2.48 0-4.5 2.02-4.5 4.5s2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5-2.02-4.5-4.5-4.5"
             fill={
               {
-                "payload": 4290436699,
-                "type": 0,
+                "type": 2,
               }
             }
             propList={

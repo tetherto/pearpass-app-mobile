@@ -4,13 +4,13 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { AUTHENTICATOR_ENABLED } from '@tetherto/pearpass-lib-constants'
 import {
-  FolderIcon,
-  LockIcon,
-  PlusIcon,
-  StarIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+  Folder as FolderIcon,
+  LockOutlined,
+  Add,
+  StarFilled
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useFolders, useRecordCountsByType } from '@tetherto/pearpass-lib-vault'
+import { colors } from 'src/utils/colors'
 
 import { FoldersContainer } from './styles'
 import { Folder } from '../../components/Folder'
@@ -44,12 +44,14 @@ export const FolderList = ({
       otherFolders?.map((folder) => ({
         name: folder.name,
         count: folder.records.filter((record) => !!record.data).length,
-        icon: <FolderIcon size="26" color={colors.primary400.mode1} />
+        icon: (
+          <FolderIcon width="26" height="26" color={colors.primary400.mode1} />
+        )
       })) || []
 
     customFolders.push({
       name: t`Create new`,
-      icon: <PlusIcon size="26" color={colors.primary400.mode1} />,
+      icon: <Add width="26" height="26" color={colors.primary400.mode1} />,
       isCreateNew: true
     })
 
@@ -65,7 +67,7 @@ export const FolderList = ({
           name: t`Favorites`,
           id: 'favorite',
           count: folders?.favorites?.records.length || 0,
-          icon: <StarIcon size="26" />
+          icon: <StarFilled width="26" height="26" />
         },
         ...customFolders,
         ...(AUTHENTICATOR_ENABLED
@@ -73,7 +75,13 @@ export const FolderList = ({
               {
                 name: t`Authenticator`,
                 id: 'authenticator',
-                icon: <LockIcon size="26" color={colors.primary400.mode1} />,
+                icon: (
+                  <LockOutlined
+                    width="26"
+                    height="26"
+                    color={colors.primary400.mode1}
+                  />
+                ),
                 isAuthenticator: true
               }
             ]

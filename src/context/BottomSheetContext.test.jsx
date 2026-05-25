@@ -22,7 +22,7 @@ jest.mock('../components/BottomSheetBackdrop', () => ({
   BackDrop: () => <div testID="backdrop" />
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     grey500: { mode1: '#333333' },
     primary100: { mode1: '#cccccc' }

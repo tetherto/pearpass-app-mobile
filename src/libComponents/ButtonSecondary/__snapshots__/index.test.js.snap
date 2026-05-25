@@ -34,34 +34,31 @@ exports[`ButtonSecondary Component matches snapshot 1`] = `
       "alignItems": "center",
       "alignSelf": "stretch",
       "backgroundColor": "#232323",
-      "borderBottomLeftRadius": 20,
-      "borderBottomRightRadius": 20,
       "borderColor": "#BADE5B",
-      "borderTopLeftRadius": 20,
-      "borderTopRightRadius": 20,
+      "borderRadius": 20,
       "borderWidth": 2,
-      "display": "inline-flex",
       "flexGrow": 0,
       "justifyContent": "center",
       "opacity": 1,
-      "paddingBottom": 10,
-      "paddingLeft": 40,
-      "paddingRight": 40,
-      "paddingTop": 10,
+      "paddingHorizontal": 40,
+      "paddingVertical": 10,
       "width": "100%",
     }
   }
 >
   <Text
-    size="md"
     style={
-      {
-        "color": "#F6F6F6",
-        "fontFamily": "Inter",
-        "fontSize": 16,
-        "fontStyle": "normal",
-        "fontWeight": "500",
-      }
+      [
+        {
+          "color": "#F6F6F6",
+          "fontFamily": "Inter",
+        },
+        {
+          "fontSize": 16,
+          "fontWeight": "500",
+        },
+        undefined,
+      ]
     }
   >
     Secondary Button

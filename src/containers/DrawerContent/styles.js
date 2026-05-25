@@ -1,61 +1,98 @@
-import styled from 'styled-components/native'
+import {
+  ScrollView as RNScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const DrawerContainer = styled.View`
-  flex: 1;
-  background-color: ${({ theme }) => theme.colors.grey500.mode1};
-  padding-top: 25%;
-  padding-bottom: 25px;
-  padding-left: 20px;
-  padding-right: 20px;
-  gap: 15px;
-  height: 100%;
-`
+export const DrawerContainer = (props) => (
+  <View {...props} style={[styles.drawerContainer, props.style]} />
+)
 
-export const LoadingWrapper = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`
+export const LoadingWrapper = (props) => (
+  <View {...props} style={[styles.loadingWrapper, props.style]} />
+)
 
-export const DrawerTitle = styled.Text`
-  padding-top: 5%;
-  padding-left: 16px;
-  line-height: 24px;
-  text-align: justify;
-  color: #f6f6f6;
-  font-family: 'Inter';
-  font-weight: 600;
-  font-size: 32px;
-`
+export const DrawerTitle = (props) => (
+  <Text {...props} style={[styles.drawerTitle, props.style]} />
+)
 
-export const ScrollContainer = styled.View`
-  flex: 1;
-`
+export const ScrollContainer = (props) => (
+  <View {...props} style={[styles.scrollContainer, props.style]} />
+)
 
-export const ScrollView = styled.ScrollView.attrs({
-  contentContainerStyle: { flexGrow: 1 }
-})`
-  flex: 1;
-`
+export const ScrollView = (props) => (
+  <RNScrollView
+    contentContainerStyle={{ flexGrow: 1 }}
+    {...props}
+    style={[styles.scrollView, props.style]}
+  />
+)
 
-export const ActionsContainer = styled.View`
-  gap: 15px;
-`
+export const ActionsContainer = (props) => (
+  <View {...props} style={[styles.actionsContainer, props.style]} />
+)
 
-export const AddDevice = styled.TouchableOpacity`
-  left: 24px;
-  background-color: #050b06;
-  width: 160px;
-  height: 40px;
-  border-radius: 20px;
-  justify-content: center;
-  align-items: center;
-  padding: 10px 15px;
-  flex-direction: row;
-  gap: 10px;
-`
+export const AddDevice = (props) => (
+  <TouchableOpacity {...props} style={[styles.addDevice, props.style]} />
+)
 
-export const AddDeviceText = styled.Text`
-  color: ${({ theme }) => theme.colors.primary400.mode1};
-  padding-top: 2px;
-`
+export const AddDeviceText = (props) => (
+  <Text {...props} style={[styles.addDeviceText, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  drawerContainer: {
+    flex: 1,
+    backgroundColor: colors.grey500.mode1,
+    paddingTop: '25%',
+    paddingBottom: 25,
+    paddingLeft: 20,
+    paddingRight: 20,
+    gap: 15,
+    height: '100%'
+  },
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  drawerTitle: {
+    paddingTop: '5%',
+    paddingLeft: 16,
+    lineHeight: 24,
+    textAlign: 'justify',
+    color: '#f6f6f6',
+    fontFamily: 'Inter',
+    fontWeight: '600',
+    fontSize: 32
+  },
+  scrollContainer: {
+    flex: 1
+  },
+  scrollView: {
+    flex: 1
+  },
+  actionsContainer: {
+    gap: 15
+  },
+  addDevice: {
+    left: 24,
+    backgroundColor: '#050b06',
+    width: 160,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    gap: 10
+  },
+  addDeviceText: {
+    color: colors.primary400.mode1,
+    paddingTop: 2
+  }
+})

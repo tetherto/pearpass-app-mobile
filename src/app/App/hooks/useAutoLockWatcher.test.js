@@ -47,9 +47,6 @@ jest.mock('../../../utils/autoLockStorage', () => ({
 jest.mock('../../../utils/filesCache', () => ({
   clearAllFileCache: jest.fn()
 }))
-jest.mock('../../../utils/designVersion', () => ({
-  isV2: jest.fn(() => false)
-}))
 jest.mock('../../../utils/unsupportedFeatures', () => ({
   unsupportedFeaturesEnabled: jest.fn(() => false)
 }))
@@ -169,12 +166,7 @@ describe('useAutoLockWatcher', () => {
     expect(clearAllFileCache).toHaveBeenCalled()
     expect(resetMock).toHaveBeenCalledWith({
       index: 0,
-      routes: [
-        {
-          name: 'Welcome',
-          params: { state: 'enterMasterPassword' }
-        }
-      ]
+      routes: [{ name: 'AuthMasterPassword' }]
     })
     expect(resetStateMock).toHaveBeenCalled()
   })

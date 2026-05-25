@@ -1,145 +1,167 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { useVault } from '@tetherto/pearpass-lib-vault'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import {
+  Button,
+  PageHeader,
+  rawTokens,
+  useTheme,
+  Text
+} from '@tetherto/pearpass-lib-ui-kit'
+import { Add } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
+import { StyleSheet, View } from 'react-native'
+import { Layout } from 'src/containers/Layout'
+import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 
-import { CardSingleSetting } from '../../../components/CardSingleSetting'
-import { ListItem } from '../../../components/ListItem'
-import { BottomSheetAddDeviceContent } from '../../../containers/BottomSheetAddDeviceContent'
-import { useBottomSheet } from '../../../context/BottomSheetContext'
-import { ButtonCreate, ButtonLittle } from '../../../libComponents'
-import { ExportSection } from '../TabExport'
-import { ImportSection } from '../TabImport'
-import { VaultsManageSection } from '../TabVaultsSettings'
-
-const getDeviceDisplayName = (deviceName) => {
-  const { t } = useLingui()
-  if (!deviceName) return deviceName
-
-  const lowerName = deviceName.toLowerCase()
-
-  if (lowerName.startsWith('ios')) {
-    return t`Iphone`
-  }
-
-  if (lowerName.startsWith('android')) {
-    return t`Android`
-  }
-
-  return deviceName
-}
-
-const getDeviceTypeKey = (deviceName) => {
-  if (!deviceName) return 'Unknown'
-  const lowerName = deviceName.toLowerCase()
-  if (lowerName.startsWith('ios')) return 'iOS'
-  if (lowerName.startsWith('android')) return 'Android'
-  return deviceName
-}
+import { VaultRow } from './VaultRow'
+import { NAVIGATION_ROUTES } from '../../../constants/navigation'
+import { VAULT_ACTION } from '../../../constants/vaultActions'
+import { ModifyVaultModalContent } from '../../../containers/Modal/ModifyVaultModalContent'
+import { useModal } from '../../../context/ModalContext'
+import { useVaultSwitch } from '../../../hooks/useVaultSwitch'
 
 export const Vaults = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const { expand } = useBottomSheet()
-  const { data, refetch: refetchVault } = useVault()
+  const { theme } = useTheme()
+  const { openModal } = useModal()
+  const { data: currentVault, refetch: refetchVault } = useVault()
+  const { switchVault } = useVaultSwitch()
+  const { data: allVaults } = useVaults()
 
   useEffect(() => {
     refetchVault()
   }, [])
 
-  const handleAddDevice = () => {
-    expand({
-      children: <BottomSheetAddDeviceContent />,
-      snapPoints: ['10%', '50%', '90%']
-    })
+  const otherVaults = useMemo(
+    () => allVaults?.filter((vault) => vault?.id !== currentVault?.id) ?? [],
+    [allVaults, currentVault]
+  )
+
+  const handleAddMember = () => {
+    navigation.navigate('ShareVault')
   }
 
-  return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <View style={styles.header}>
-        <ButtonLittle
-          startIcon={BackIcon}
-          variant="secondary"
-          borderRadius="md"
-          onPress={() => navigation.goBack()}
+  const handleCreateNewVault = () => {
+    navigation.navigate('Welcome', { state: NAVIGATION_ROUTES.CREDENTIALS })
+  }
+
+  const buildVaultActions = (vault) => ({
+    onRename: () =>
+      navigation.navigate('VaultRenameScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      }),
+    onViewPairedDevices: () => navigation.navigate('PairedDevicesScreen'),
+    onSetPassword: () =>
+      openModal(
+        <ModifyVaultModalContent
+          vaultId={vault.id}
+          vaultName={vault.name}
+          action={VAULT_ACTION.PASSWORD}
         />
-        <Text style={styles.screenTitle}>{t`Vaults`}</Text>
-      </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <VaultsManageSection />
-        {(data?.devices?.length ?? 0) > 0 && (
-          <CardSingleSetting title={t`Linked devices`}>
-            <View style={styles.sectionContent}>
-              <Text style={styles.description}>
-                {t`These are the devices currently synced with this vault.`}
-              </Text>
-              <View style={styles.deviceList}>
-                {data?.devices?.map((device, index) => (
-                  <ListItem
-                    key={device.name + index}
-                    name={getDeviceDisplayName(device?.name)}
-                    date={device.createdAt}
-                    testID={`${getDeviceTypeKey(device?.name)} Linked Device`}
-                    accessibilityLabel={`${getDeviceTypeKey(device?.name)} Linked Device`}
-                    nameTestID="linked-device-name"
-                    nameAccessibilityLabel="Linked Device Name"
-                    dateTestID="linked-device-date"
-                    dateAccessibilityLabel="Linked Device Date"
-                  />
-                ))}
-              </View>
-              <ButtonCreate onPress={handleAddDevice}>
-                {t`Add device`}
-              </ButtonCreate>
-            </View>
-          </CardSingleSetting>
-        )}
-        <ExportSection />
-        <ImportSection />
-      </ScrollView>
-    </SafeAreaView>
+      ),
+    onDelete: () =>
+      navigation.navigate('VaultDeleteScreen', {
+        vaultId: vault.id,
+        vaultName: vault.name
+      })
+  })
+
+  const renderVaultItem = (
+    vault,
+    showDivider = false,
+    isCurrentVault = false
+  ) => (
+    <VaultRow
+      key={vault.id}
+      vault={vault}
+      showDivider={showDivider}
+      onAddMember={handleAddMember}
+      isCurrentVault={isCurrentVault}
+      vaultActions={buildVaultActions(vault)}
+      onClick={() => (!isCurrentVault ? switchVault(vault) : null)}
+    />
+  )
+
+  return (
+    <Layout
+      scrollable
+      header={
+        <BackScreenHeader
+          title={t`Settings`}
+          onBack={() => navigation.goBack()}
+        />
+      }
+      contentStyle={styles.content}
+      footer={
+        <Button
+          variant="primary"
+          iconBefore={<Add />}
+          fullWidth
+          onClick={handleCreateNewVault}
+        >
+          {t`Create New Vault`}
+        </Button>
+      }
+    >
+      <PageHeader
+        title={t`Your Vaults`}
+        subtitle={t`Manage your vaults. Select the vault you want to apply changes to.`}
+      />
+
+      {currentVault && (
+        <View style={styles.section}>
+          <Text variant="caption" color={theme.colors.colorTextSecondary}>
+            {t`Current Vault`}
+          </Text>
+          <View
+            style={[
+              styles.card,
+              { borderColor: theme.colors.colorBorderSecondary }
+            ]}
+          >
+            {renderVaultItem(currentVault, false, true)}
+          </View>
+        </View>
+      )}
+
+      {otherVaults.length > 0 && (
+        <View style={styles.section}>
+          <Text variant="caption" color={theme.colors.colorTextSecondary}>
+            {t`Other Vaults`}
+          </Text>
+          <View
+            style={[
+              styles.card,
+              { borderColor: theme.colors.colorBorderSecondary }
+            ]}
+          >
+            {otherVaults.map((vault, index) =>
+              renderVaultItem(vault, index < otherVaults.length - 1)
+            )}
+          </View>
+        </View>
+      )}
+    </Layout>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-    paddingHorizontal: 20,
-    paddingBottom: 0,
-    height: '100%',
-    gap: 20,
-    backgroundColor: colors.grey500.mode1
+  content: {
+    padding: rawTokens.spacing16,
+    paddingTop: rawTokens.spacing24,
+    gap: rawTokens.spacing20,
+    flexGrow: 1
   },
-  header: {
-    flexDirection: 'row',
-    gap: 20,
-    alignItems: 'center'
+  section: {
+    gap: rawTokens.spacing8
   },
-  screenTitle: {
-    color: colors.white.mode1,
-    fontFamily: 'Inter',
-    fontSize: 20,
-    fontWeight: '700'
-  },
-  scrollContent: {
-    gap: 20,
-    paddingBottom: 40
-  },
-  sectionContent: {
-    gap: 15
-  },
-  description: {
-    color: colors.white.mode1,
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '400'
-  },
-  deviceList: {
-    gap: 15
+  card: {
+    borderWidth: 1,
+    borderRadius: rawTokens.radius8,
+    overflow: 'hidden'
   }
 })

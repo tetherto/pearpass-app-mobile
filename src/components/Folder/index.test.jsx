@@ -1,8 +1,8 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View } from 'react-native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { Folder } from './index'
 import messages from '../../locales/en/messages'
@@ -16,9 +16,9 @@ jest.mock('@lingui/react/macro', () => ({
   })
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  CheckIcon: () => 'CheckIcon',
-  KebabMenuIcon: () => 'KebabMenuIcon'
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  Check: () => 'Check',
+  MoreVert: () => 'MoreVert'
 }))
 
 const mockCollapse = jest.fn()

@@ -14,7 +14,7 @@ import Animated, {
   Easing
 } from 'react-native-reanimated'
 
-import { AvatarRecordV2 } from '../../components/AvatarRecordV2'
+import { AvatarRecord } from '../../components/AvatarRecord'
 
 type VaultWebsite = string | { website?: string }
 
@@ -143,7 +143,7 @@ export const VaultPreviewCard = ({
               <ListItem
                 key={record.id}
                 icon={
-                  <AvatarRecordV2
+                  <AvatarRecord
                     record={record}
                     size="md"
                     websiteDomain={websiteDomain}

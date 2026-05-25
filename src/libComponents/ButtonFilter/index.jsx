@@ -1,4 +1,4 @@
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { colors } from 'src/utils/colors'
 
 import { Button, ButtonText } from './styles'
 
@@ -30,7 +30,8 @@ export const ButtonFilter = ({
     >
       {Icon && (
         <Icon
-          size="21"
+          width="21"
+          height="21"
           color={
             variant === 'primary'
               ? colors.secondary400.mode1

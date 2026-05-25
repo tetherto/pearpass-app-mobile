@@ -11,9 +11,9 @@ jest.mock('@tetherto/pearpass-utils-password-check', () => ({
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { fireEvent, render } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { checkPasswordStrength } from '@tetherto/pearpass-utils-password-check'
 import { Text } from 'react-native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { PasswordField } from './index'
 import messages from '../../locales/en/messages'

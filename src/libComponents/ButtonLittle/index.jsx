@@ -1,4 +1,4 @@
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { colors } from 'src/utils/colors'
 
 import { Button, ButtonText } from './styles'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
@@ -51,7 +51,8 @@ export const ButtonLittle = ({
     >
       {Icon && (
         <Icon
-          size="21"
+          width="21"
+          height="21"
           color={
             variant === 'primary' ? colors.black.mode1 : colors.primary400.mode1
           }

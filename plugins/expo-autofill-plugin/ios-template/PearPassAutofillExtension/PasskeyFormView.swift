@@ -2,252 +2,268 @@
 //  PasskeyFormView.swift
 //  PearPassAutoFillExtension
 //
-//  Editable form for passkey credential creation/editing.
-//  Matches the main React Native app's validation and data structure.
+//  passkey form screen. Mirrors android-template/res/layout/fragment_passkey_form.xml.
+//  Sheet header (back + close + "Create Passkey") + scrollable form + bottom buttons.
 //
 
 import SwiftUI
-import UniformTypeIdentifiers
 
-/// File attachment model
-struct AttachmentFile: Identifiable {
-    let id: String
-    let name: String
-    let data: Data
-}
-
-@available(iOS 17.0, *)
 struct PasskeyFormView: View {
-    let request: PasskeyRegistrationRequest
-    let vaultClient: PearPassVaultClient?
-    let selectedVault: Vault?
-    let existingRecord: VaultRecord?
-    let preloadedFolders: [String]
-    let onSave: (PasskeyFormData) -> Void
-    let onCancel: () -> Void
 
-    // Form state
-    @State private var title: String = ""
-    @State private var username: String = ""
-    @State private var website: String = ""
-    @State private var comment: String = ""
-    @State private var selectedFolder: String? = nil
-    @State private var attachments: [AttachmentFile] = []
-    @State private var existingAttachments: [AttachmentMetadata] = []
-    @State private var passkeyCreatedAt: Int64 = 0
+    var headerTitle: String = NSLocalizedString("Create Passkey", comment: "sheet header — passkey registration")
 
-    // Validation errors (set on submit, cleared on edit)
-    @State private var titleError: String? = nil
-    @State private var websiteError: String? = nil
+    @Binding var titleText: String
+    @Binding var username: String
+    @Binding var passkeyDate: String
+    @Binding var websites: [String]
+    @Binding var comment: String
 
-    // UI state
-    @State private var isSaving = false
-    @State private var saveError: String? = nil
-    @State private var showFolderPicker = false
-    @State private var showFilePicker = false
-    @State private var fileSizeError: String? = nil
+    /// Selected folder name (nil if user hasn't picked one). Driven by the
+    /// confirmation dialog opened from the folder row.
+    @Binding var selectedFolder: String?
+    /// Folder names available in the active vault. Pulled in HostView via
+    /// `client.listFolders()` after master-password unlock.
+    var availableFolders: [String] = []
 
-    // Existing record tracking
-    private var isUpdatingExisting: Bool { existingRecord != nil }
+    /// New attachments queued for upload (added via document picker, not yet
+    /// persisted). User can remove rows individually before save.
+    @Binding var attachments: [AttachmentFile]
+    /// Attachments already on the existing record. Removing a row excludes
+    /// it from `keepAttachmentIds` so UPDATE_PASSKEY drops it.
+    @Binding var existingAttachments: [AttachmentMetadata]
+    /// Inline error from the file picker — fires when an upload exceeds the
+    /// 6 MB cap. Cleared on a fresh successful upload.
+    @Binding var fileSizeError: String?
+    /// Inline error under the websites card on URL validation failure.
+    @Binding var websiteError: String?
+
+    var saveError: String? = nil
+    /// Disables Save/Discard while the passkey is being generated and the
+    /// ADD/UPDATE job is being written so the user cannot fire the save
+    /// twice or dismiss mid-flight.
+    var isSaving: Bool = false
+
+    @State private var showFolderPicker: Bool = false
+    @State private var showFilePicker: Bool = false
+
+    var onBack: () -> Void = {}
+    var onClose: () -> Void = {}
+    var onSave: () -> Void = {}
+    var onDiscard: () -> Void = {}
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header: folder selector (left) + Cancel button (right)
-            headerView
+            PPSheetHeaderBack(
+                title: headerTitle,
+                onBack: onBack,
+                onClose: onClose
+            )
 
-            ScrollView {
-                VStack(spacing: 12) {
-                    // Title field (required)
-                    fieldCard {
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Title*")
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.6))
-                            TextField(NSLocalizedString("Insert title", comment: "Title placeholder"), text: $title)
-                                .font(.system(size: 16))
-                                .foregroundColor(.white)
-                                .autocorrectionDisabled()
-                                .onChange(of: title) { _ in
-                                    titleError = nil
-                                }
-                        }
-                        if let error = titleError {
-                            errorLabel(error)
-                        }
-                    }
-
-                    // Email or username field
-                    fieldCard {
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.fill")
-                                .foregroundColor(.white.opacity(0.5))
-                                .frame(width: 24)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(NSLocalizedString("Email or username", comment: "Username label"))
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.6))
-                                TextField(NSLocalizedString("Email or username", comment: "Username placeholder"), text: $username)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-                                    .autocorrectionDisabled()
-                                    .textInputAutocapitalization(.never)
-                            }
-                        }
-                    }
-
-                    // Passkey info (read-only)
-                    fieldCard {
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.badge.key.fill")
-                                .foregroundColor(.white.opacity(0.5))
-                                .frame(width: 24)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(NSLocalizedString("Passkey", comment: "Passkey label"))
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.6))
-                                Text(formatPasskeyDate(passkeyCreatedAt))
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-                            }
-                            Spacer()
-                        }
-                    }
-
-                    // Website field
-                    fieldCard {
-                        HStack(spacing: 12) {
-                            Image(systemName: "globe")
-                                .foregroundColor(.white.opacity(0.5))
-                                .frame(width: 24)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(NSLocalizedString("Website", comment: "Website label"))
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.6))
-                                TextField("https://", text: $website)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-                                    .autocorrectionDisabled()
-                                    .textInputAutocapitalization(.never)
-                                    .keyboardType(.URL)
-                                    .onChange(of: website) { _ in
-                                        websiteError = nil
-                                    }
-                            }
-                        }
-                        if let error = websiteError {
-                            errorLabel(error)
-                        }
-                    }
-
-                    // Comment field
-                    fieldCard {
-                        HStack(spacing: 12) {
-                            Image(systemName: "doc.text.fill")
-                                .foregroundColor(.white.opacity(0.5))
-                                .frame(width: 24)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(NSLocalizedString("Comment", comment: "Comment label"))
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.6))
-                                TextField("", text: $comment, prompt: Text(NSLocalizedString("Add comment", comment: "Comment placeholder")).foregroundColor(.white.opacity(0.3)))
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-                            }
-                        }
-                    }
-
-                    // Existing attachments display (read-only, from the record)
-                    if !existingAttachments.isEmpty {
-                        VStack(spacing: 12) {
-                            ForEach(existingAttachments, id: \.id) { attachment in
-                                existingAttachmentRow(attachment)
-                            }
-                        }
-                    }
-
-                    // New attachments display
-                    if !attachments.isEmpty {
-                        VStack(spacing: 12) {
-                            ForEach(attachments) { attachment in
-                                attachmentRow(attachment)
-                            }
-                        }
-                    }
-
-                    Spacer().frame(height: 16)
-                }
-                .padding(.horizontal, Constants.Layout.horizontalPadding)
-            }
-
-            // Bottom buttons (pinned)
-            VStack(spacing: 8) {
-                // Error messages
-                if let error = saveError {
-                    Text(error)
-                        .font(.system(size: 13))
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 8)
-                }
-
-                if let error = fileSizeError {
-                    Text(error)
-                        .font(.system(size: 13))
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 8)
-                }
-
-                // Save button
-                Button(action: handleSave) {
-                    if isSaving {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                    .fill(Constants.Colors.primaryGreen)
+            PPContentCard {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                            // Title
+                            PPInputField(
+                                label: NSLocalizedString("Title", comment: "passkey form field"),
+                                text: $titleText,
+                                placeholder: NSLocalizedString("Title", comment: "passkey form field")
                             )
-                    } else {
-                        Text(NSLocalizedString("Save", comment: "Save button"))
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                                .fill(Constants.Colors.primaryGreen)
-                        )
-                    }
-                }
-                .disabled(isSaving)
-                .opacity(isSaving ? 0.6 : 1.0)
 
-                // Upload File button
-                Button(action: { showFilePicker = true }) {
-                    Text(NSLocalizedString("Upload File", comment: "Upload file button"))
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Constants.Colors.primaryGreen)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: Constants.Layout.cornerRadius)
-                            .stroke(Constants.Colors.primaryGreen, lineWidth: 2)
-                    )
+                            // Section: Credentials
+                            sectionHeader(NSLocalizedString("Credentials", comment: "passkey form section"))
+                                .padding(.top, PPSpacing.s24)
+                                .padding(.bottom, PPSpacing.s8)
+
+                            // Email/Username read-only — user can't edit the
+                            // username they're registering the passkey for; it
+                            // comes from the relying party's request.
+                            PPInputField(
+                                label: NSLocalizedString("Email / Username", comment: "passkey form field"),
+                                text: $username,
+                                placeholder: NSLocalizedString("Email / Username", comment: "passkey form field"),
+                                isEditable: false
+                            )
+
+                            Spacer().frame(height: PPSpacing.s8)
+
+                            PPInputField(
+                                label: NSLocalizedString("Passkey", comment: "passkey form field"),
+                                text: $passkeyDate,
+                                placeholder: NSLocalizedString("Date", comment: "passkey form placeholder"),
+                                isEditable: false
+                            )
+
+                            // Section: Details
+                            sectionHeader(NSLocalizedString("Details", comment: "passkey form section"))
+                                .padding(.top, PPSpacing.s24)
+                                .padding(.bottom, PPSpacing.s8)
+
+                            // Unified websites card — rows + "+ Add Another Website" share one border.
+                            VStack(spacing: 0) {
+                                ForEach(websites.indices, id: \.self) { idx in
+                                    if idx > 0 { websitesDivider }
+                                    websiteRow(index: idx)
+                                }
+
+                                websitesDivider
+
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        websites.append("")
+                                    }
+                                }) {
+                                    HStack(spacing: PPSpacing.s4) {
+                                        Image(systemName: "plus")
+                                            .font(.system(size: PPFontSizes.s14, weight: .medium))
+                                        Text(NSLocalizedString("Add Another Website", comment: "add another website link"))
+                                            .font(PPTypography.labelEmphasized)
+                                    }
+                                    .foregroundColor(PPColors.primary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .contentShape(Rectangle())
+                                    .padding(PPSpacing.s12)
+                                }
+                                .buttonStyle(.plain)
+                                .disabled(isSaving)
+                            }
+                            .background(
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: PPRadii.r8)
+                                        .fill(PPColors.surfacePrimary)
+                                    RoundedRectangle(cornerRadius: PPRadii.r8)
+                                        .strokeBorder(PPColors.borderPrimary, lineWidth: 1)
+                                }
+                            )
+
+                            if let websiteError = websiteError {
+                                Text(websiteError)
+                                    .font(PPTypography.caption)
+                                    .foregroundColor(PPColors.surfaceError)
+                                    .padding(.top, PPSpacing.s4)
+                            }
+
+                            Spacer().frame(height: PPSpacing.s16)
+
+                            // Folder picker — single folder per record (the
+                            // backend RecordData.folder is a single optional
+                            // string). Visually mirrors PPInputField with a
+                            // chevron-down trailing icon; tapping opens the
+                            // confirmation dialog with the available folders.
+                            // "None" clears the selection.
+                            folderPickerRow
+                            .confirmationDialog(
+                                NSLocalizedString("Select Folder", comment: "folder picker dialog title"),
+                                isPresented: $showFolderPicker,
+                                titleVisibility: .visible
+                            ) {
+                                ForEach(availableFolders, id: \.self) { folder in
+                                    Button(folder) { selectedFolder = folder }
+                                }
+                                if selectedFolder != nil {
+                                    Button(NSLocalizedString("None", comment: "folder clear option"), role: .destructive) {
+                                        selectedFolder = nil
+                                    }
+                                }
+                                Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) {}
+                            }
+
+                            Spacer().frame(height: PPSpacing.s8)
+
+                            PPInputField(
+                                label: NSLocalizedString("Comment", comment: "passkey form field"),
+                                text: $comment,
+                                placeholder: NSLocalizedString("Optional", comment: "comment placeholder")
+                            )
+
+                            Spacer().frame(height: PPSpacing.s16)
+
+                            PPButton(
+                                title: NSLocalizedString("Upload File", comment: "upload file button"),
+                                variant: .secondary,
+                                isEnabled: !isSaving,
+                                action: { showFilePicker = true }
+                            )
+
+                            if !existingAttachments.isEmpty || !attachments.isEmpty {
+                                Spacer().frame(height: PPSpacing.s16)
+
+                                VStack(spacing: PPSpacing.s8) {
+                                    ForEach(existingAttachments, id: \.id) { attachment in
+                                        attachmentRow(
+                                            name: attachment.name,
+                                            onDelete: {
+                                                existingAttachments.removeAll { $0.id == attachment.id }
+                                            }
+                                        )
+                                    }
+                                    ForEach(attachments) { attachment in
+                                        attachmentRow(
+                                            name: attachment.name,
+                                            onDelete: {
+                                                attachments.removeAll { $0.id == attachment.id }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                    }
+                    .padding(PPSpacing.s16)
                 }
-                .disabled(isSaving)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    // Pinned footer — divider + Save/Discard. `safeAreaInset`
+                    // reserves space at the ScrollView's bottom edge so the
+                    // focused input scrolls into view above the footer when
+                    // the keyboard appears.
+                    VStack(spacing: 0) {
+                        Rectangle()
+                            .fill(PPColors.borderPrimary)
+                            .frame(height: 1)
+                            .padding(.horizontal, PPSpacing.s12)
+
+                        VStack(spacing: 0) {
+                            if let saveError = saveError {
+                                Text(saveError)
+                                    .font(PPTypography.caption)
+                                    .foregroundColor(PPColors.surfaceError)
+                                    .multilineTextAlignment(.center)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.bottom, PPSpacing.s8)
+                            }
+
+                            if let fileSizeError = fileSizeError {
+                                Text(fileSizeError)
+                                    .font(PPTypography.caption)
+                                    .foregroundColor(PPColors.surfaceError)
+                                    .multilineTextAlignment(.center)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.bottom, PPSpacing.s8)
+                            }
+
+                            PPButton(
+                                title: NSLocalizedString("Save & Add Login", comment: "save button"),
+                                variant: .primary,
+                                isEnabled: !isSaving,
+                                isLoading: isSaving,
+                                action: onSave
+                            )
+
+                            PPButton(
+                                title: NSLocalizedString("Discard", comment: "discard button"),
+                                variant: .secondary,
+                                isEnabled: !isSaving,
+                                action: onDiscard
+                            )
+                            .padding(.top, PPSpacing.s8)
+                        }
+                        .padding(.horizontal, PPSpacing.s16)
+                        .padding(.top, PPSpacing.s16)
+                        .padding(.bottom, PPSpacing.s12)
+                    }
+                    .background(PPColors.surfacePrimary)
+                }
             }
-            .padding(.horizontal, Constants.Layout.horizontalPadding)
-            .padding(.bottom, 16)
         }
-        .onAppear {
-            initializeForm()
-        }
-        .sheet(isPresented: $showFolderPicker) {
-            folderPickerSheet
-        }
+        .background(PPColors.surfacePrimary)
         .sheet(isPresented: $showFilePicker) {
             DocumentPickerView { url in
                 handleFileSelected(url: url)
@@ -255,361 +271,143 @@ struct PasskeyFormView: View {
         }
     }
 
-    // MARK: - Header
-
-    private var headerView: some View {
-        HStack {
-            // Folder selector on the left
-            Button(action: { showFolderPicker = true }) {
-                HStack(spacing: 4) {
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 10))
-                    Text(selectedFolder ?? NSLocalizedString("No folder", comment: "No folder label"))
-                        .font(.system(size: 14))
-                }
-                .foregroundColor(preloadedFolders.isEmpty ? .gray : .white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(
-                    RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                        .fill(Color.white.opacity(0.1))
-                )
-            }
-            .disabled(preloadedFolders.isEmpty)
-
-            Spacer()
-
-            // Cancel button on the right (matching CancelHeader pattern)
-            Button(action: onCancel) {
-                Text("Cancel")
-                    .font(.system(size: 16))
-                    .foregroundColor(Constants.Colors.primaryGreen)
-            }
-        }
-        .padding(.horizontal, Constants.Layout.horizontalPadding)
-        .padding(.top, 16)
-        .padding(.bottom, 8)
-    }
-
-    // MARK: - Folder Picker
-
-    private var folderPickerSheet: some View {
-        NavigationView {
-            List {
-                Button(action: {
-                    selectedFolder = nil
-                    showFolderPicker = false
-                }) {
-                    HStack {
-                        Text(NSLocalizedString("No folder", comment: "No folder option"))
-                            .foregroundColor(.primary)
-                        Spacer()
-                        if selectedFolder == nil {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(Color(red: 0xB0/255, green: 0xD9/255, blue: 0x44/255))
-                        }
-                    }
-                }
-
-                ForEach(preloadedFolders, id: \.self) { folder in
-                    Button(action: {
-                        selectedFolder = folder
-                        showFolderPicker = false
-                    }) {
-                        HStack {
-                            Text(folder)
-                                .foregroundColor(.primary)
-                            Spacer()
-                            if selectedFolder == folder {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(Color(red: 0xB0/255, green: 0xD9/255, blue: 0x44/255))
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle(NSLocalizedString("Select Folder", comment: "Folder picker title"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(NSLocalizedString("Done", comment: "Done button")) {
-                        showFolderPicker = false
-                    }
-                }
-            }
-        }
-        .presentationDetents([.medium])
-    }
-
-    // MARK: - Field Components
-
-    private func fieldCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            content()
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                .fill(Color.white.opacity(0.05))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
-        )
-    }
-
-    private func errorLabel(_ message: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: "exclamationmark.circle.fill")
-                .font(.system(size: 10))
-            Text(message)
-                .font(.system(size: 11, weight: .medium))
-        }
-        .foregroundColor(.red)
-        .padding(.top, 2)
-    }
-
-    private func existingAttachmentRow(_ attachment: AttachmentMetadata) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: isImageFile(attachment.name) ? "photo" : "doc.fill")
-                .foregroundColor(.white.opacity(0.5))
+    /// Attachment row — file icon + filename + delete button. Mirrors V1
+    /// PasskeyFormView.{existing,}attachmentRow.
+    private func attachmentRow(name: String, onDelete: @escaping () -> Void) -> some View {
+        HStack(spacing: PPSpacing.s12) {
+            Image(systemName: isImageFile(name) ? "photo" : "doc.fill")
+                .foregroundColor(PPColors.textSecondary)
                 .frame(width: 24)
-            Text(attachment.name)
-                .font(.system(size: 14))
-                .foregroundColor(.white)
+            Text(name)
+                .font(PPTypography.label)
+                .foregroundColor(PPColors.textPrimary)
                 .lineLimit(1)
+                .truncationMode(.middle)
             Spacer()
-            Button(action: {
-                existingAttachments.removeAll { $0.id == attachment.id }
-            }) {
+            Button(action: onDelete) {
                 Image(systemName: "trash.fill")
                     .font(.system(size: 14))
-                    .foregroundColor(.red.opacity(0.7))
+                    .foregroundColor(PPColors.surfaceError)
             }
+            .buttonStyle(.plain)
         }
-        .padding(12)
+        .padding(PPSpacing.s12)
         .background(
-            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                .fill(Color.white.opacity(0.05))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
-        )
-    }
-
-    private func attachmentRow(_ attachment: AttachmentFile) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: isImageFile(attachment.name) ? "photo" : "doc.fill")
-                .foregroundColor(.white.opacity(0.5))
-                .frame(width: 24)
-            Text(attachment.name)
-                .font(.system(size: 14))
-                .foregroundColor(.white)
-                .lineLimit(1)
-            Spacer()
-            Button(action: {
-                attachments.removeAll { $0.id == attachment.id }
-            }) {
-                Image(systemName: "trash.fill")
-                    .font(.system(size: 14))
-                    .foregroundColor(.red.opacity(0.7))
+            ZStack {
+                RoundedRectangle(cornerRadius: PPRadii.r8)
+                    .fill(PPColors.surfacePrimary)
+                RoundedRectangle(cornerRadius: PPRadii.r8)
+                    .strokeBorder(PPColors.borderPrimary, lineWidth: 1)
             }
-        }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                .fill(Color.white.opacity(0.05))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: Constants.Layout.smallCornerRadius)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
     }
 
-    // MARK: - Initialization
-
-    private func initializeForm() {
-        // Always use current time since this is a new passkey being created
-        passkeyCreatedAt = Int64(Date().timeIntervalSince1970 * 1000)
-
-        if let record = existingRecord {
-            // Pre-populate from existing record
-            let data = record.data
-            title = data?.title ?? ""
-            username = data?.username ?? ""
-            let websites = data?.websites ?? []
-            website = websites.first ?? ""
-            comment = data?.note ?? ""
-            selectedFolder = record.folder
-            existingAttachments = data?.attachments ?? []
-        } else {
-            // Pre-populate from passkey request
-            title = request.rpName
-            username = request.userName
-            website = "https://\(request.rpId)"
-            comment = ""
-            selectedFolder = nil
-        }
+    private func isImageFile(_ name: String) -> Bool {
+        let lower = name.lowercased()
+        return lower.hasSuffix(".png") || lower.hasSuffix(".jpg")
+            || lower.hasSuffix(".jpeg") || lower.hasSuffix(".gif")
+            || lower.hasSuffix(".heic") || lower.hasSuffix(".webp")
     }
 
-    // MARK: - Validation (matches main app rules)
-
-    private func validate() -> Bool {
-        var isValid = true
-
-        // Title: required
-        if title.trimmingCharacters(in: .whitespaces).isEmpty {
-            titleError = NSLocalizedString("Title is required", comment: "Title validation error")
-            isValid = false
-        }
-
-        // Website: optional, but if provided must be valid URL
-        let trimmedWebsite = website.trimmingCharacters(in: .whitespaces)
-        if !trimmedWebsite.isEmpty {
-            let urlString = addHttps(trimmedWebsite)
-            if let url = URL(string: urlString),
-               let host = url.host,
-               host.contains(".") {
-                // Valid URL
-            } else {
-                websiteError = NSLocalizedString("Wrong format of website", comment: "Website validation error")
-                isValid = false
-            }
-        }
-
-        return isValid
-    }
-
-    // MARK: - Save
-
-    private func handleSave() {
-        guard !isSaving else { return }
-
-        // Run validation
-        guard validate() else { return }
-
-        isSaving = true
-        saveError = nil
-
-        // Normalize website
-        let trimmedWebsite = website.trimmingCharacters(in: .whitespaces)
-        var websites: [String] = []
-        if !trimmedWebsite.isEmpty {
-            websites.append(addHttps(trimmedWebsite))
-        }
-
-        let formData = PasskeyFormData(
-            title: title.trimmingCharacters(in: .whitespaces),
-            username: username,
-            websites: websites,
-            note: comment,
-            folder: selectedFolder,
-            attachments: attachments,
-            keepAttachmentIds: existingAttachments.map { $0.id },
-            passkeyCreatedAt: passkeyCreatedAt,
-            existingRecord: existingRecord
-        )
-
-        onSave(formData)
-    }
-
-    // MARK: - File Handling
-
+    /// Reads the picked file, enforces the 6 MB cap, and appends it to
+    /// `attachments`. Mirrors V1 PasskeyFormView.handleFileSelected.
     private func handleFileSelected(url: URL) {
         guard url.startAccessingSecurityScopedResource() else { return }
         defer { url.stopAccessingSecurityScopedResource() }
 
         do {
             let fileData = try Data(contentsOf: url)
-
-            // Validate file size: max 6 MB
             let sizeMB = Double(fileData.count) / (1024.0 * 1024.0)
             if sizeMB > 6.0 {
-                fileSizeError = NSLocalizedString("Your file is too large. Please upload one that's 6 MB or smaller.", comment: "File size error")
+                fileSizeError = NSLocalizedString(
+                    "Your file is too large. Please upload one that's 6 MB or smaller.",
+                    comment: "file size error"
+                )
                 return
             }
-
             fileSizeError = nil
-            let fileName = url.lastPathComponent
-            let attachment = AttachmentFile(
-                id: UUID().uuidString,
-                name: fileName,
-                data: fileData
+            attachments.append(
+                AttachmentFile(id: UUID().uuidString, name: url.lastPathComponent, data: fileData)
             )
-            attachments.append(attachment)
         } catch {
-            print("[PasskeyFormView] Error reading file: \(error)")
+            NSLog("[PasskeyFormView] file read error: \(error)")
         }
     }
 
-    // MARK: - Helpers
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(PPTypography.caption)
+            .foregroundColor(PPColors.textSecondary)
+    }
 
-    private func addHttps(_ urlString: String) -> String {
-        let lower = urlString.lowercased()
-        if lower.hasPrefix("http://") || lower.hasPrefix("https://") {
-            return lower
+    /// Folder picker row styled like PPInputField — caption-sized "Folder"
+    /// label on top, body value below ("Choose Folder" placeholder when
+    /// nothing is selected), with a chevron-down on the right indicating
+    /// the dropdown affordance. Tap opens the confirmation dialog wired
+    /// up at the call site.
+    private var folderPickerRow: some View {
+        Button(action: { showFolderPicker = true }) {
+            HStack(alignment: .center, spacing: PPSpacing.s4) {
+                VStack(alignment: .leading, spacing: PPSpacing.s4) {
+                    Text(NSLocalizedString("Folder", comment: "folder picker label"))
+                        .font(PPTypography.caption)
+                        .foregroundColor(PPColors.textPrimary)
+
+                    Text(selectedFolder ?? NSLocalizedString("Choose Folder", comment: "folder picker placeholder"))
+                        .font(PPTypography.labelEmphasized)
+                        .foregroundColor(selectedFolder == nil ? PPColors.textSecondary : PPColors.textPrimary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image("Icons/ChevronDown", bundle: .main)
+                    .renderingMode(.template)
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                    .foregroundColor(PPColors.textPrimary)
+            }
+            .padding(PPSpacing.s12)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: PPRadii.r8)
+                        .fill(PPColors.surfacePrimary)
+                    RoundedRectangle(cornerRadius: PPRadii.r8)
+                        .strokeBorder(PPColors.borderPrimary, lineWidth: 1)
+                }
+            )
+            .contentShape(Rectangle())
         }
-        return "https://\(lower)"
+        .buttonStyle(.plain)
     }
 
-    private func formatPasskeyDate(_ timestamp: Int64) -> String {
-        let date = Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000.0)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy HH:mm"
-        return "Created on \(formatter.string(from: date))"
+    /// 1pt divider used between rows and above "+ Add Another Website".
+    private var websitesDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.08))
+            .frame(maxWidth: .infinity, minHeight: 1, maxHeight: 1)
     }
 
-    private func isImageFile(_ name: String) -> Bool {
-        let imageExtensions = ["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg"]
-        let ext = (name as NSString).pathExtension.lowercased()
-        return imageExtensions.contains(ext)
-    }
-}
+    /// Single website row inside the unified websites card. No own border —
+    /// the surrounding VStack carries the rounded-rect background, and a
+    /// 1pt divider sits below each row to separate it from the next.
+    private func websiteRow(index: Int) -> some View {
+        VStack(alignment: .leading, spacing: PPSpacing.s4) {
+            Text(NSLocalizedString("Website", comment: "passkey form field"))
+                .font(PPTypography.caption)
+                .foregroundColor(PPColors.textPrimary)
 
-// MARK: - Form Data Model
-
-struct PasskeyFormData {
-    let title: String
-    let username: String
-    let websites: [String]
-    let note: String
-    let folder: String?
-    let attachments: [AttachmentFile]
-    let keepAttachmentIds: [String]
-    let passkeyCreatedAt: Int64
-    let existingRecord: VaultRecord?
-}
-
-// MARK: - Document Picker
-
-struct DocumentPickerView: UIViewControllerRepresentable {
-    let onPick: (URL) -> Void
-
-    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [UTType.item])
-        picker.allowsMultipleSelection = false
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onPick: onPick)
-    }
-
-    class Coordinator: NSObject, UIDocumentPickerDelegate {
-        let onPick: (URL) -> Void
-
-        init(onPick: @escaping (URL) -> Void) {
-            self.onPick = onPick
+            TextField(
+                "",
+                text: $websites[index],
+                prompt: Text(NSLocalizedString("Enter Website", comment: "website placeholder"))
+                    .foregroundColor(PPColors.textSecondary)
+            )
+            .font(PPTypography.labelEmphasized)
+            .foregroundColor(PPColors.textPrimary)
+            .keyboardType(.URL)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled(true)
         }
-
-        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-            guard let url = urls.first else { return }
-            onPick(url)
-        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(PPSpacing.s12)
     }
 }

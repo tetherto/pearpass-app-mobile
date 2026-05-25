@@ -1,90 +1,153 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { i18n } from '@lingui/core'
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { BackIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import {
+  ContextMenu,
+  PageHeader,
+  Radio,
+  rawTokens,
+  Text,
+  useBottomSheetClose,
+  useTheme
+} from '@tetherto/pearpass-lib-ui-kit'
+import { ExpandMore } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { StyleSheet, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { CardSingleSetting } from '../../../components/CardSingleSetting'
-import { SelectInput } from '../../../components/SelectInput'
+import { SheetHeader } from '../../../containers/BottomSheet/SheetHeader'
+import { Layout } from '../../../containers/Layout'
+import { BackScreenHeader } from '../../../containers/ScreenHeader/BackScreenHeader'
 import { useLanguageOptions } from '../../../hooks/useLanguageOptions'
-import { ButtonLittle } from '../../../libComponents'
+
+const LanguagePickerSheet = ({ options, selectedValue, onSelect }) => {
+  const { t } = useLingui()
+  const collapse = useBottomSheetClose()
+  const { bottom } = useSafeAreaInsets()
+
+  const handleSelect = (value) => {
+    onSelect(value)
+    collapse()
+  }
+
+  return (
+    <Layout
+      mode="sheet"
+      contentStyle={{
+        paddingHorizontal: rawTokens.spacing16,
+        paddingBottom: bottom + rawTokens.spacing24
+      }}
+      header={<SheetHeader title={t`App Language`} onClose={collapse} />}
+    >
+      <Radio options={options} value={selectedValue} onChange={handleSelect} />
+    </Layout>
+  )
+}
 
 export const Appearance = () => {
   const { t } = useLingui()
   const navigation = useNavigation()
+  const { theme } = useTheme()
   const { languageOptions } = useLanguageOptions()
 
   const [language, setLanguage] = useState(i18n.locale)
 
-  const handleChangeLanguage = async (newLang) => {
-    await setLanguage(() => newLang)
+  const currentLabel = useMemo(
+    () =>
+      languageOptions.find((option) => option.value === language)?.label ??
+      language,
+    [language, languageOptions]
+  )
+
+  const handleSelect = (newLang) => {
+    setLanguage(newLang)
     i18n.activate(newLang)
   }
 
+  const styles = getStyles(theme)
+
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <View style={styles.header}>
-        <ButtonLittle
-          startIcon={BackIcon}
-          variant="secondary"
-          borderRadius="md"
-          onPress={() => navigation.goBack()}
+    <Layout
+      scrollable
+      hideFooter
+      header={
+        <BackScreenHeader
+          title={t`Settings`}
+          onBack={() => navigation.goBack()}
         />
-        <Text style={styles.screenTitle}>{t`Appearance`}</Text>
+      }
+      contentStyle={styles.scrollContent}
+    >
+      <PageHeader
+        title={t`Language`}
+        subtitle={t`Choose the language of the app.`}
+      />
+
+      <View
+        style={[styles.card, { borderColor: theme.colors.colorBorderPrimary }]}
+      >
+        <View style={styles.textBlock}>
+          <Text variant="bodyEmphasized">{t`App Language`}</Text>
+          <Text variant="label" color={theme.colors.colorTextSecondary}>
+            {t`Select the language used throughout PearPass.`}
+          </Text>
+        </View>
+
+        <ContextMenu
+          trigger={
+            <View
+              style={[
+                styles.selector,
+                { borderColor: theme.colors.colorBorderPrimary }
+              ]}
+              testID="language-selector"
+              accessibilityLabel="Language Selector"
+            >
+              <Text variant="body">{currentLabel}</Text>
+              <ExpandMore color={theme.colors.colorTextPrimary} />
+            </View>
+          }
+        >
+          <LanguagePickerSheet
+            options={languageOptions}
+            selectedValue={language}
+            onSelect={handleSelect}
+          />
+        </ContextMenu>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <CardSingleSetting title={t`Language`}>
-          <View style={styles.sectionContent}>
-            <Text style={styles.description}>
-              {t`Choose the language of the app.`}
-            </Text>
-            <SelectInput
-              value={language}
-              onChange={handleChangeLanguage}
-              options={languageOptions}
-            />
-          </View>
-        </CardSingleSetting>
-      </ScrollView>
-    </SafeAreaView>
+    </Layout>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-    paddingHorizontal: 20,
-    paddingBottom: 0,
-    height: '100%',
-    gap: 20,
-    backgroundColor: colors.grey500.mode1
-  },
-  header: {
-    flexDirection: 'row',
-    gap: 20,
-    alignItems: 'center'
-  },
-  screenTitle: {
-    color: colors.white.mode1,
-    fontFamily: 'Inter',
-    fontSize: 20,
-    fontWeight: '700'
-  },
-  scrollContent: {
-    gap: 20,
-    paddingBottom: 40
-  },
-  sectionContent: {
-    gap: 15
-  },
-  description: {
-    color: colors.white.mode1,
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '400'
-  }
-})
+const getStyles = (theme) =>
+  StyleSheet.create({
+    scrollContent: {
+      paddingTop: rawTokens.spacing24,
+      gap: rawTokens.spacing20,
+      flexGrow: 1
+    },
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: rawTokens.spacing12,
+      padding: rawTokens.spacing16,
+      borderWidth: 1,
+      borderRadius: rawTokens.spacing12,
+      backgroundColor: theme.colors.colorSurfacePrimary
+    },
+    textBlock: {
+      flex: 1,
+      gap: rawTokens.spacing4
+    },
+    selector: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: rawTokens.spacing8,
+      paddingHorizontal: rawTokens.spacing12,
+      paddingVertical: rawTokens.spacing8,
+      borderWidth: 1,
+      borderRadius: rawTokens.spacing8
+    }
+  })

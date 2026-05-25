@@ -36,15 +36,15 @@ jest.mock('./styles', () => {
   }
 })
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  BrushIcon: () => 'BrushIcon',
-  CheckIcon: () => 'CheckIcon',
-  DeleteIcon: () => 'DeleteIcon',
-  LockCircleIcon: () => 'LockCircleIcon',
-  ShareIcon: () => 'ShareIcon'
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  PaletteOutlined: () => 'PaletteOutlined',
+  Check: () => 'Check',
+  TrashOutlined: () => 'TrashOutlined',
+  LockFilled: () => 'LockFilled',
+  Share: () => 'Share'
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     primary400: { mode1: '#000000' },
     black: { mode1: '#000000' },
@@ -108,7 +108,7 @@ describe('ListItem', () => {
     expect(hasNoChildren).toBeTruthy()
   })
 
-  it('renders CheckIcon when isSelected is true', () => {
+  it('renders Check when isSelected is true', () => {
     const { getByTestId } = render(
       <ListItem {...mockProps} isSelected={true} />
     )

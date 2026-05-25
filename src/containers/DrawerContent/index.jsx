@@ -2,16 +2,16 @@ import { useMemo, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import {
-  ExitIcon,
-  FullBodyIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+  Logout,
+  AccountCircleOutlined
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import {
   closeAllInstances,
   useVault,
   useVaults
 } from '@tetherto/pearpass-lib-vault'
 import { ActivityIndicator } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import {
   ActionsContainer,
@@ -169,7 +169,7 @@ export const DrawerContent = ({ navigation }) => {
         />
         <ButtonThin
           onPress={addDevice}
-          startIcon={FullBodyIcon}
+          startIcon={AccountCircleOutlined}
           testID="sidebar-add-device-button"
           textTestID="sidebar-add-device-text"
         >
@@ -178,7 +178,7 @@ export const DrawerContent = ({ navigation }) => {
 
         <ButtonThin
           onPress={closeVault}
-          startIcon={ExitIcon}
+          startIcon={Logout}
           testID="sidebar-close-vault-button"
           textTestID="sidebar-close-vault-text"
         >

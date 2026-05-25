@@ -1,24 +1,70 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Button = styled.TouchableOpacity`
-  display: inline-flex;
-  padding: ${({ size }) => (size === 'sm' ? '10px 15px' : '10px 40px')};
-  align-self: ${({ stretch }) => (stretch ? 'stretch' : 'flex-start')};
-  width: ${({ stretch }) => (stretch ? '100%' : 'auto')};
-  justify-content: center;
-  align-items: center;
-  flex-grow: 0;
-  border-radius: ${({ size }) => (size === 'sm' ? '10px' : '20px')};
-  border-width: ${({ size }) => (size === 'sm' ? '1px' : '2px')};
-  border-color: ${({ theme }) => theme.colors.primary400.mode1};
-  background: ${({ theme }) => theme.colors.grey500.mode1};
-  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
-`
+export const Button = ({ size, stretch, disabled, style, ...rest }) => (
+  <TouchableOpacity
+    disabled={disabled}
+    {...rest}
+    style={[
+      styles.button,
+      size === 'sm' ? styles.sm : styles.md,
+      stretch && styles.stretch,
+      disabled && styles.disabled,
+      style
+    ]}
+  />
+)
 
-export const ButtonText = styled.Text`
-  color: ${({ theme }) => theme.colors.white.mode1};
-  font-family: 'Inter';
-  font-size: ${({ size }) => (size === 'sm' ? '12px' : '16px')};
-  font-style: normal;
-  font-weight: ${({ size }) => (size === 'sm' ? '600' : '500')};
-`
+export const ButtonText = ({ size, style, ...rest }) => (
+  <Text
+    {...rest}
+    style={[
+      styles.buttonText,
+      size === 'sm' ? styles.textSm : styles.textMd,
+      style
+    ]}
+  />
+)
+
+const styles = StyleSheet.create({
+  button: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexGrow: 0,
+    borderColor: colors.primary400.mode1,
+    backgroundColor: colors.grey500.mode1,
+    alignSelf: 'flex-start',
+    width: 'auto'
+  },
+  sm: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    borderWidth: 1
+  },
+  md: {
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+    borderWidth: 2
+  },
+  stretch: {
+    alignSelf: 'stretch',
+    width: '100%'
+  },
+  disabled: {
+    opacity: 0.6
+  },
+  buttonText: {
+    color: colors.white.mode1,
+    fontFamily: 'Inter'
+  },
+  textSm: {
+    fontSize: 12,
+    fontWeight: '600'
+  },
+  textMd: {
+    fontSize: 16,
+    fontWeight: '500'
+  }
+})

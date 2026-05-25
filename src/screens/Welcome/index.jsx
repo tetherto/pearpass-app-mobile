@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react'
 
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { useUserData } from '@tetherto/pearpass-lib-vault'
 import { ActivityIndicator, View, Image } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { NAVIGATION_ROUTES } from '../../constants/navigation'
 import { CreatePassword } from '../../containers/Auth/CreatePassword'
 import { EnterPassword } from '../../containers/Auth/EnterPassword'
 import { LoadVault } from '../../containers/Auth/LoadVault'
 import { LockedScreen } from '../../containers/Auth/LockedScreen'
-import { LockedScreenV2 } from '../../containers/Auth/LockedScreenV2'
 import { SelectVaultType } from '../../containers/Auth/SelectVaultType'
 import { UnlockVault } from '../../containers/Auth/UnlockVault'
 import { VaultWizard } from '../../containers/Auth/VaultWizard'
 import { useBackHandler } from '../../hooks/useBackHandler'
-import { isV2 } from '../../utils/designVersion'
 import { logger } from '../../utils/logger'
 
 const getWelcomeScreenContent = (state, vaultId) => {
@@ -32,7 +30,7 @@ const getWelcomeScreenContent = (state, vaultId) => {
     case NAVIGATION_ROUTES.CREDENTIALS:
       return <VaultWizard />
     case NAVIGATION_ROUTES.SCREEN_LOCKED:
-      return isV2() ? <LockedScreenV2 /> : <LockedScreen />
+      return <LockedScreen />
     default:
       return null
   }

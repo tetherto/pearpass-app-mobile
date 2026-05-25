@@ -20,7 +20,7 @@ import {
 } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useEffect, useState } from 'react'
 import { Linking, Pressable, View } from 'react-native'
-import { BottomSheetQrScannerContentV2 } from 'src/containers/BottomSheetQrScannerContent/BottomSheetQrScannerContentV2'
+import { BottomSheetQrScannerSheet } from 'src/containers/BottomSheetQrScannerContent/Sheet'
 import { Layout } from 'src/containers/Layout'
 import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { ScanResultsView } from './ScanResultsView'
@@ -102,7 +102,7 @@ export const ImportCodes = () => {
     if (files.length === 0) {
       return (
         <View style={{ gap: rawTokens.spacing12 }}>
-          <BottomSheetQrScannerContentV2
+          <BottomSheetQrScannerSheet
             open={isScannerOpen}
             onOpenChange={setIsScannerOpen}
             title={t`Scan QR to import 2FA codes`}

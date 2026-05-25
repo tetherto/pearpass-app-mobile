@@ -25,10 +25,8 @@ jest.mock('../../../utils/SplashScreen', () => ({
   hideAsync: jest.fn(),
   preventAutoHideAsync: jest.fn()
 }))
-
-let mockIsV2 = false
-jest.mock('../../../utils/designVersion', () => ({
-  isV2: () => mockIsV2
+jest.mock('../../../utils/unsupportedFeatures', () => ({
+  unsupportedFeaturesEnabled: jest.fn(() => false)
 }))
 
 const mockRefetchUserData = jest.fn()
@@ -36,42 +34,30 @@ const mockRefetchUserData = jest.fn()
 describe('useRedirect', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockIsV2 = false
     useUserData.mockReturnValue({ refetch: mockRefetchUserData })
     hasOrphanedVaultData.mockResolvedValue(false)
   })
 
-  it('should set initialRouteName to "Intro" if user has not set password (v1)', async () => {
+  it('should set initialRouteName to "Onboarding" if user has not set password', async () => {
     mockRefetchUserData.mockResolvedValue({ hasPasswordSet: false })
     const { result } = renderHook(() => useRedirect())
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    expect(result.current.initialRouteName).toBe('Intro')
+    expect(result.current.initialRouteName).toBe('Onboarding')
   })
 
-  it('should set initialRouteName to "OnboardingV2" if user has not set password (v2)', async () => {
-    mockIsV2 = true
-    mockRefetchUserData.mockResolvedValue({ hasPasswordSet: false })
-    const { result } = renderHook(() => useRedirect())
-
-    await waitFor(() => expect(result.current.isLoading).toBe(false))
-
-    expect(result.current.initialRouteName).toBe('OnboardingV2')
-  })
-
-  it('should set initialRouteName to "Welcome" if acceptedTerms is true (v1)', async () => {
+  it('should set initialRouteName to "AuthMasterPassword" if user has password and is not locked', async () => {
     mockRefetchUserData.mockResolvedValue({ hasPasswordSet: true })
     mockGetItemAsync.mockResolvedValue('true')
     const { result } = renderHook(() => useRedirect())
 
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
-    expect(result.current.initialRouteName).toBe('Welcome')
+    expect(result.current.initialRouteName).toBe('AuthMasterPassword')
   })
 
-  it('should set initialRouteName to "Welcome" if user is locked (v2)', async () => {
-    mockIsV2 = true
+  it('should set initialRouteName to "Welcome" if user is locked', async () => {
     mockRefetchUserData.mockResolvedValue({
       hasPasswordSet: true,
       masterPasswordStatus: { isLocked: true, lockoutRemainingMs: 60000 }
@@ -106,7 +92,7 @@ describe('useRedirect', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false))
 
     expect(hasOrphanedVaultData).not.toHaveBeenCalled()
-    expect(result.current.initialRouteName).toBe('Welcome')
+    expect(result.current.initialRouteName).toBe('AuthMasterPassword')
   })
 
   it('should set initialRouteName to "Error" if an error occurs', async () => {

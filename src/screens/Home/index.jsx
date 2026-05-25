@@ -1,19 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { FolderIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
 import { useRecords, useVault } from '@tetherto/pearpass-lib-vault'
-import { isV2 } from 'src/utils/designVersion'
 
-import { Container, CurrentFolder, FolderName } from './styles'
 import { SORT_BY_TYPE } from '../../constants/sortOptions'
-import { Categories } from '../../containers/Categories'
 import { ContentHeader } from '../../containers/ContentHeader'
 import { EmptyCollectionView } from '../../containers/EmptyCollectionView'
-import { EmptyCollectionViewV2 } from '../../containers/EmptyCollectionViewV2'
 import { EmptyResultsView } from '../../containers/EmptyResultsView'
 import { Header } from '../../containers/Header'
 import { ItemList } from '../../containers/ItemList'
-import { ItemListV2 } from '../../containers/ItemListV2'
 import { Layout } from '../../containers/Layout'
 import { MultiSelectBar } from '../../containers/MultiSelectBar'
 import {
@@ -87,61 +81,9 @@ export const Home = () => {
   }, [selectedFolder, state.isFavorite])
 
   const sections = useMemo(
-    () => (isV2() ? groupRecordsByTimePeriod(records, sort) : []),
+    () => groupRecordsByTimePeriod(records, sort),
     [records, sort]
   )
-
-  if (isV2()) {
-    const headerProps = {
-      setIsMultiSelectOn,
-      isMultiSelectOn,
-      setSearchValue: handleSearch,
-      selectedRecords,
-      setSelectedRecords,
-      searchValue,
-      itemsFound: records?.length,
-      recordType
-    }
-
-    return (
-      <Layout
-        header={<Header {...headerProps} />}
-        contentStyle={{ padding: 0 }}
-        isBuiltin={false}
-      >
-        <ContentHeader
-          isMultiSelectOn={isMultiSelectOn}
-          recordType={recordType}
-          onCategoryChange={handleRecordType}
-        />
-
-        {isMultiSelectOn && (
-          <MultiSelectBar
-            selectedRecords={selectedRecords}
-            setSelectedRecords={setSelectedRecords}
-            setIsMultiSelectOn={setIsMultiSelectOn}
-            records={records}
-          />
-        )}
-
-        {!!records.length && (
-          <ItemListV2
-            sections={sections}
-            isMultiSelectOn={isMultiSelectOn}
-            selectedRecords={selectedRecords}
-            setSelectedRecords={setSelectedRecords}
-            setIsMultiSelectOn={setIsMultiSelectOn}
-          />
-        )}
-
-        {!records.length && !searchValue.length && (
-          <EmptyCollectionViewV2 recordType={recordType} />
-        )}
-
-        {!records.length && !!searchValue.length && <EmptyResultsView />}
-      </Layout>
-    )
-  }
 
   const headerProps = {
     setIsMultiSelectOn,
@@ -150,36 +92,46 @@ export const Home = () => {
     selectedRecords,
     setSelectedRecords,
     searchValue,
-    itemsFound: records?.length
+    itemsFound: records?.length,
+    recordType
   }
 
   return (
-    <Container>
-      <Header {...headerProps} />
+    <Layout
+      header={<Header {...headerProps} />}
+      contentStyle={{ padding: 0 }}
+      isBuiltin={false}
+    >
+      <ContentHeader
+        isMultiSelectOn={isMultiSelectOn}
+        recordType={recordType}
+        onCategoryChange={handleRecordType}
+      />
 
-      <Categories setRecordType={handleRecordType} recordType={recordType} />
-
-      {state?.folder && state?.folder !== 'allFolder' && (
-        <CurrentFolder>
-          <FolderIcon />
-          <FolderName>{state?.folder}</FolderName>
-        </CurrentFolder>
-      )}
-
-      {!!records.length && (
-        <ItemList
-          isMultiSelectOn={isMultiSelectOn}
+      {isMultiSelectOn && (
+        <MultiSelectBar
           selectedRecords={selectedRecords}
           setSelectedRecords={setSelectedRecords}
+          setIsMultiSelectOn={setIsMultiSelectOn}
           records={records}
         />
       )}
 
+      {!!records.length && (
+        <ItemList
+          sections={sections}
+          isMultiSelectOn={isMultiSelectOn}
+          selectedRecords={selectedRecords}
+          setSelectedRecords={setSelectedRecords}
+          setIsMultiSelectOn={setIsMultiSelectOn}
+        />
+      )}
+
       {!records.length && !searchValue.length && (
-        <EmptyCollectionView selectedRecordType={recordType} />
+        <EmptyCollectionView recordType={recordType} />
       )}
 
       {!records.length && !!searchValue.length && <EmptyResultsView />}
-    </Container>
+    </Layout>
   )
 }

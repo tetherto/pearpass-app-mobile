@@ -24,8 +24,7 @@
     "ios",
     "build",
     "dist",
-    "e2e-mobile-tests",
-    "e2e-mobile-newdesign",
+    "e2e",
     "**/*.test.ts",
     "**/*.test.tsx"
   ],

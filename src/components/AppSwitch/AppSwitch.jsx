@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { Pressable, StyleSheet } from 'react-native'
 import Animated, {
   interpolate,
@@ -9,6 +8,7 @@ import Animated, {
   useSharedValue,
   withTiming
 } from 'react-native-reanimated'
+import { colors } from 'src/utils/colors'
 
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
 

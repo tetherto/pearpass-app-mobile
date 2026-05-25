@@ -1,52 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/autofill_background"
-    android:fitsSystemWindows="true">
+    android:background="@color/pp_background"
+    android:orientation="vertical">
 
-    <!-- Header with folder selector and Cancel -->
-    <RelativeLayout
+    <include
+        android:id="@+id/formSheetHeader"
+        layout="@layout/include_pp_sheet_header_back" />
+
+    
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingBottom="8dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/pp_content_card_bg"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/folderSelector"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:text="No folder"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:background="@drawable/search_input_background"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/cancelButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:text="Cancel"
-            android:textColor="#B0D944"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
-    </RelativeLayout>
-
-    <!-- Scrollable form content -->
+    
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -57,228 +30,223 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingBottom="16dp">
+            android:paddingStart="@dimen/pp_spacing_s16"
+            android:paddingEnd="@dimen/pp_spacing_s16"
+            android:paddingTop="@dimen/pp_spacing_s16"
+            android:paddingBottom="@dimen/pp_spacing_s16">
 
-            <!-- Title field -->
+            
+            <include
+                android:id="@+id/formTitleField"
+                layout="@layout/include_pp_input_field" />
+
+            <TextView
+                android:id="@+id/formTitleError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_spacing_s4"
+                android:textAppearance="@style/TextAppearance.PearPass.Caption"
+                android:textColor="@color/pp_surface_error"
+                android:visibility="gone"
+                tools:text="Title is required"
+                tools:visibility="visible" />
+
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_spacing_s24"
+                android:layout_marginBottom="@dimen/pp_spacing_s8"
+                android:text="Credentials"
+                android:textAppearance="@style/TextAppearance.PearPass.Caption"
+                android:textColor="@color/pp_text_primary" />
+
+            <include
+                android:id="@+id/formUsernameField"
+                layout="@layout/include_pp_input_field" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/pp_spacing_s8" />
+
+            <include
+                android:id="@+id/formPasskeyField"
+                layout="@layout/include_pp_input_field" />
+
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_spacing_s24"
+                android:layout_marginBottom="@dimen/pp_spacing_s8"
+                android:text="Details"
+                android:textAppearance="@style/TextAppearance.PearPass.Caption"
+                android:textColor="@color/pp_text_primary" />
+
+            <!-- Unified websites card. Rows added by PasskeyFormFragment. -->
             <LinearLayout
+                android:id="@+id/formWebsitesCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/search_input_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
+                android:addStatesFromChildren="true"
+                android:background="@drawable/pp_input_bg"
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Title*"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/titleInput"
+                <LinearLayout
+                    android:id="@+id/formWebsitesRowContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Insert title"
-                    android:textColorHint="#4DFFFFFF"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:background="@null"
-                    android:inputType="text"
-                    android:layout_marginTop="4dp" />
+                    android:orientation="vertical" />
 
-                <TextView
-                    android:id="@+id/titleError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FF4444"
-                    android:textSize="11sp"
-                    android:visibility="gone"
-                    android:layout_marginTop="2dp" />
-            </LinearLayout>
+                <!-- Divider above "+ Add Another Website". -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#14FFFFFF" />
 
-            <!-- Username field -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/search_input_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Email or username"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/usernameInput"
+                <LinearLayout
+                    android:id="@+id/formAddWebsiteButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email or username"
-                    android:textColorHint="#4DFFFFFF"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:background="@null"
-                    android:inputType="textEmailAddress"
-                    android:layout_marginTop="4dp" />
+                    android:background="?android:attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/pp_spacing_s12"
+                    android:paddingEnd="@dimen/pp_spacing_s12"
+                    android:paddingTop="@dimen/pp_spacing_s12"
+                    android:paddingBottom="@dimen/pp_spacing_s12">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_marginEnd="@dimen/pp_spacing_s4"
+                        android:contentDescription="@null"
+                        android:src="@drawable/pp_ic_plus"
+                        app:tint="@color/pp_primary"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add Another Website"
+                        android:textAppearance="@style/TextAppearance.PearPass.LabelEmphasized"
+                        android:textColor="@color/pp_primary" />
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- Passkey info (read-only) -->
+            <TextView
+                android:id="@+id/formWebsiteError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_spacing_s4"
+                android:textAppearance="@style/TextAppearance.PearPass.Caption"
+                android:textColor="@color/pp_surface_error"
+                android:visibility="gone"
+                tools:text="Wrong format of website"
+                tools:visibility="visible" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/pp_spacing_s8" />
+
+            <include
+                android:id="@+id/formCommentField"
+                layout="@layout/include_pp_input_field" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/pp_spacing_s8" />
+
+            
+            <include
+                android:id="@+id/formFolderSelector"
+                layout="@layout/include_pp_list_item" />
+
             <LinearLayout
+                android:id="@+id/formAttachmentsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/search_input_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Passkey"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/passkeyDateText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Website field -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/search_input_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Website"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/websiteInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="https://"
-                    android:textColorHint="#4DFFFFFF"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:background="@null"
-                    android:inputType="textUri"
-                    android:layout_marginTop="4dp" />
-
-                <TextView
-                    android:id="@+id/websiteError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FF4444"
-                    android:textSize="11sp"
-                    android:visibility="gone"
-                    android:layout_marginTop="2dp" />
-            </LinearLayout>
-
-            <!-- Comment field -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/search_input_background"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Comment"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/commentInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Add comment"
-                    android:textColorHint="#4DFFFFFF"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:background="@null"
-                    android:inputType="textMultiLine"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Attachments list -->
-            <LinearLayout
-                android:id="@+id/attachmentsContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_spacing_s8"
                 android:orientation="vertical"
                 android:visibility="gone" />
 
+            <TextView
+                android:id="@+id/formFileSizeError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_spacing_s4"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.PearPass.Caption"
+                android:textColor="@color/pp_surface_error"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/formUploadFileButton"
+                style="@style/Button.PearPass.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/pp_spacing_s12"
+                android:text="Upload File" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom buttons -->
+    
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="@dimen/pp_spacing_s12"
+        android:layout_marginEnd="@dimen/pp_spacing_s12"
+        android:background="@color/pp_border_primary" />
+
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingBottom="16dp">
+        android:paddingStart="@dimen/pp_spacing_s16"
+        android:paddingEnd="@dimen/pp_spacing_s16"
+        android:paddingTop="@dimen/pp_spacing_s16"
+        android:paddingBottom="@dimen/pp_spacing_s16">
 
         <TextView
-            android:id="@+id/saveError"
+            android:id="@+id/formSaveError"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FF4444"
-            android:textSize="13sp"
+            android:layout_marginBottom="@dimen/pp_spacing_s8"
             android:gravity="center"
-            android:visibility="gone"
-            android:layout_marginBottom="8dp" />
+            android:textAppearance="@style/TextAppearance.PearPass.Caption"
+            android:textColor="@color/pp_surface_error"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/fileSizeError"
+        <!-- Save button + spinner overlay. -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#FF4444"
-            android:textSize="13sp"
-            android:gravity="center"
-            android:visibility="gone"
-            android:layout_marginBottom="8dp" />
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/formSaveButton"
+                style="@style/Button.PearPass.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save &amp; Add Login" />
+
+            <ProgressBar
+                android:id="@+id/formSaveProgress"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/pp_on_primary"
+                android:visibility="gone" />
+        </FrameLayout>
 
         <Button
-            android:id="@+id/saveButton"
+            android:id="@+id/formDiscardButton"
+            style="@style/Button.PearPass.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:background="@drawable/primary_button"
-            android:paddingVertical="12dp" />
-
-        <Button
-            android:id="@+id/uploadFileButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Upload File"
-            android:textColor="#B0D944"
-            android:textSize="16sp"
-            android:background="@drawable/secondary_button"
-            android:paddingVertical="12dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="@dimen/pp_spacing_s8"
+            android:text="Discard" />
     </LinearLayout>
-
+    </LinearLayout>
 </LinearLayout>

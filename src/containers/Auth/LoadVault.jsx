@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
-import { QrCodeIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { QrCode } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { usePair, useVault } from '@tetherto/pearpass-lib-vault'
 import {
   ActivityIndicator,
@@ -15,6 +14,7 @@ import {
   Pressable,
   StyleSheet
 } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useBottomSheet } from '../../context/BottomSheetContext'
@@ -147,7 +147,11 @@ export const LoadVault = () => {
                     }
                     testID="load-vault-scan-qr-button"
                   >
-                    <QrCodeIcon size="21" color={colors.primary400.mode1} />
+                    <QrCode
+                      width="21"
+                      height="21"
+                      color={colors.primary400.mode1}
+                    />
                     <Text style={styles.qrCodeText}>{t`Scan QR Code`}</Text>
                   </Pressable>
                 </>

@@ -1,13 +1,13 @@
 import { formatDate } from '@tetherto/pear-apps-utils-date'
 import {
-  BrushIcon,
-  CheckIcon,
-  DeleteIcon,
-  LockCircleIcon,
-  ShareIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+  PaletteOutlined,
+  Check,
+  TrashOutlined,
+  LockFilled,
+  Share
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { ActivityIndicator } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import {
   SelectedListItemIconContainer,
@@ -66,10 +66,10 @@ export const ListItem = ({
         <ActivityIndicator size="small" color={colors.primary400.mode1} />
       ) : isSelected ? (
         <SelectedListItemIconContainer>
-          <CheckIcon color={colors.black.mode1} size="21" />
+          <Check color={colors.black.mode1} width="21" height="21" />
         </SelectedListItemIconContainer>
       ) : (
-        <LockCircleIcon size="21" />
+        <LockFilled width="21" height="21" />
       )}
 
       <ListItemDescription>
@@ -90,9 +90,9 @@ export const ListItem = ({
       </ListItemDescription>
     </ListItemInfo>
     <ListItemActions>
-      {onShareClick && <ShareIcon onPress={onShareClick} />}
-      {onEditClick && <BrushIcon onPress={onEditClick} />}
-      {onDeleteClick && <DeleteIcon onPress={onDeleteClick} />}
+      {onShareClick && <Share onPress={onShareClick} />}
+      {onEditClick && <PaletteOutlined onPress={onEditClick} />}
+      {onDeleteClick && <TrashOutlined onPress={onDeleteClick} />}
     </ListItemActions>
   </ListItemContainer>
 )

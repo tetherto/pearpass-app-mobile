@@ -2,7 +2,7 @@ import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render } from '@testing-library/react-native'
 import * as LocalAuthentication from 'expo-local-authentication'
-import { ThemeProvider } from 'styled-components/native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { BiometricWithIconAndText } from '..'
 
@@ -18,18 +18,19 @@ beforeAll(() => {
 })
 
 // Mock icon components to simple test components
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  FaceIdIcon: (props) => <mock-FaceIdIcon testID="face-icon" {...props} />,
-  FingerprintIcon: (props) => (
-    <mock-FingerprintIcon testID="fingerprint-icon" {...props} />
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  FaceId: (props) => <mock-FaceId testID="face-icon" {...props} />,
+  Fingerprint: (props) => (
+    <mock-Fingerprint testID="fingerprint-icon" {...props} />
   )
 }))
 
 // Mock theme provider colors usage to a simple object if needed
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     primary400: { mode1: '#000' }
-  }
+  },
+  ThemeProvider: ({ children }) => children
 }))
 
 describe('BiometricWithIconAndText', () => {

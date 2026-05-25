@@ -8,7 +8,7 @@ jest.mock('expo-local-authentication', () => ({
   }
 }))
 import * as LocalAuthentication from 'expo-local-authentication'
-import { ThemeProvider } from 'styled-components/native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { ButtonBiometricLogin } from '..'
 

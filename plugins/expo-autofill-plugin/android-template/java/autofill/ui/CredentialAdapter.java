@@ -13,8 +13,8 @@ import com.pears.pass.autofill.data.CredentialItem;
 
 import java.util.List;
 
-public class CredentialAdapter extends BaseItemAdapter<CredentialItem, CredentialAdapter.CredentialViewHolder> {
-    private OnCredentialClickListener listener;
+public class CredentialAdapter extends BaseItemAdapter<CredentialItem, CredentialAdapter.ViewHolder> {
+    private final OnCredentialClickListener listener;
 
     public interface OnCredentialClickListener {
         void onCredentialClick(CredentialItem credential);
@@ -27,66 +27,57 @@ public class CredentialAdapter extends BaseItemAdapter<CredentialItem, Credentia
 
     @NonNull
     @Override
-    public CredentialViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_credential, parent, false);
-        return new CredentialViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    protected void onBindItem(@NonNull CredentialViewHolder holder, CredentialItem credential) {
-        holder.bind(credential);
+    protected void onBindItem(@NonNull ViewHolder holder, CredentialItem item) {
+        holder.bind(item);
     }
 
-    class CredentialViewHolder extends RecyclerView.ViewHolder {
-        private TextView titleText;
-        private TextView usernameText;
-        private TextView initialsText;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        private final TextView title;
+        private final TextView username;
+        private final TextView initials;
 
-        CredentialViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleText = itemView.findViewById(R.id.credential_title);
-            usernameText = itemView.findViewById(R.id.credential_username);
-            initialsText = itemView.findViewById(R.id.initials_text);
+            title = itemView.findViewById(R.id.credentialTitle);
+            username = itemView.findViewById(R.id.credentialUsername);
+            initials = itemView.findViewById(R.id.credentialInitials);
 
             itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onCredentialClick(getItem(position));
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onCredentialClick(getItem(pos));
                 }
             });
         }
 
-        void bind(CredentialItem credential) {
-            titleText.setText(credential.getTitle());
-            usernameText.setText(credential.getUsername());
-
-            // Generate initials from title
-            String initials = getInitials(credential.getTitle());
-            initialsText.setText(initials);
+        void bind(CredentialItem c) {
+            title.setText(c.getTitle());
+            String uname = c.getUsername();
+            if (uname == null || uname.isEmpty()) {
+                username.setVisibility(View.GONE);
+            } else {
+                username.setVisibility(View.VISIBLE);
+                username.setText(uname);
+            }
+            initials.setText(computeInitials(c.getTitle()));
         }
 
-        private String getInitials(String title) {
-            if (title == null || title.isEmpty()) {
-                return "?";
-            }
-
-            String[] words = title.trim().split("\\s+");
-            StringBuilder initials = new StringBuilder();
-
-            // Take first letter of first two words
+        private String computeInitials(String t) {
+            if (t == null || t.isEmpty()) return "?";
+            String[] words = t.trim().split("\\s+");
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < Math.min(2, words.length); i++) {
-                if (!words[i].isEmpty()) {
-                    initials.append(Character.toUpperCase(words[i].charAt(0)));
-                }
+                if (!words[i].isEmpty()) sb.append(Character.toUpperCase(words[i].charAt(0)));
             }
-
-            // If only one word, take first two letters
-            if (initials.length() == 1 && title.length() > 1) {
-                initials.append(Character.toUpperCase(title.charAt(1)));
-            }
-
-            return initials.toString();
+            if (sb.length() == 1 && t.length() > 1) sb.append(Character.toUpperCase(t.charAt(1)));
+            return sb.toString();
         }
     }
 }

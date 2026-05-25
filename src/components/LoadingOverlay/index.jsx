@@ -1,5 +1,5 @@
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, ActivityIndicator, StyleSheet } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 export const LoadingOverlay = () => (
   <View style={styles.container}>

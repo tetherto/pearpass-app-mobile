@@ -37,22 +37,22 @@ jest.mock('@tetherto/pear-apps-utils-qr', () => ({
   generateQRCodeSVG: jest.fn(() => Promise.resolve('<svg />'))
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  ArrowDownIcon: (props) => {
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  KeyboardArrowBottom: (props) => {
     const { View } = require('react-native')
     return <View {...props} testID="arrow-down-icon" />
   },
-  BackIcon: (props) => {
+  ArrowBackOutined: (props) => {
     const { View } = require('react-native')
     return <View {...props} testID="back-icon" />
   },
-  CopyIcon: (props) => {
+  ContentCopy: (props) => {
     const { View } = require('react-native')
     return <View {...props} testID="copy-icon" />
   }
 }))
 
-jest.mock('@tetherto/pearpass-lib-ui-theme-provider/native', () => ({
+jest.mock('src/utils/colors', () => ({
   colors: {
     black: { mode1: '#000000' },
     primary400: { mode1: '#B0D944' },

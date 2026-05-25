@@ -26,7 +26,7 @@ import { useRegisterVaultSelectorOpener } from '../../context/VaultSelectorConte
 import { useRecordMenuItems } from '../../hooks/useRecordMenuItems'
 import { BottomSheetCategorySelectorContent } from '../BottomSheetCategorySelectorContent'
 import { BottomSheetFolderSelectorContent } from '../BottomSheetFolderSelectorContent'
-import { BottomSheetSortContentV2 } from '../BottomSheetSortContentV2'
+import { BottomSheetSortContent } from '../BottomSheetSortContent'
 import { BottomSheetVaultSelectorContent } from '../BottomSheetVaultSelectorContent'
 
 const BreadcrumbFade = ({ side, bgColor }) => {
@@ -234,7 +234,7 @@ export const ContentHeader = ({
             />
           }
         >
-          <BottomSheetSortContentV2 />
+          <BottomSheetSortContent />
         </ContextMenu>
       </View>
     </View>

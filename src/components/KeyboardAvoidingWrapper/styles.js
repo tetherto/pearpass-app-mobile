@@ -1,5 +1,14 @@
-import styled from 'styled-components/native'
+import { KeyboardAvoidingView, StyleSheet } from 'react-native'
 
-export const KeyboardAvoid = styled.KeyboardAvoidingView`
-  flex: 1;
-`
+export const KeyboardAvoid = (props) => (
+  <KeyboardAvoidingView
+    {...props}
+    style={[styles.keyboardAvoid, props.style]}
+  />
+)
+
+const styles = StyleSheet.create({
+  keyboardAvoid: {
+    flex: 1
+  }
+})

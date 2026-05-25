@@ -1,31 +1,12 @@
 import { ConfigPlugin, withAndroidManifest as withAndroidManifestMod } from '@expo/config-plugins';
-import * as fs from 'fs';
-import * as path from 'path';
 import { AutofillPluginOptions } from '../index';
 
-function readDesignVersion(projectRoot: string): number {
-  const flagsPath = path.join(
-    projectRoot,
-    'node_modules/@tetherto/pearpass-lib-constants/src/constants/flags.js'
-  );
-  if (!fs.existsSync(flagsPath)) return 1;
-  const source = fs.readFileSync(flagsPath, 'utf-8');
-  const match = source.match(/export\s+const\s+DESIGN_VERSION\s*=\s*(\d+)/);
-  if (!match) return 1;
-  const parsed = parseInt(match[1], 10);
-  return Number.isNaN(parsed) ? 1 : parsed;
-}
+const AUTOFILL_THEME = '@style/Theme.PearPass.Autofill.Fullscreen';
 
 export const withAndroidManifest: ConfigPlugin<AutofillPluginOptions> = (config, _options) => {
   return withAndroidManifestMod(config, (cfg) => {
     const mainApplication = cfg.modResults.manifest.application?.[0];
     if (!mainApplication) return cfg;
-
-    const designVersion = readDesignVersion((cfg as any).modRequest?.projectRoot ?? process.cwd());
-    const autofillTheme =
-      designVersion === 2
-        ? '@style/Theme.PearPass.Autofill.Fullscreen.V2'
-        : '@style/Theme.PearPass.Autofill.Fullscreen';
 
     // Add Autofill Service
     mainApplication.service = mainApplication.service || [];
@@ -62,12 +43,12 @@ export const withAndroidManifest: ConfigPlugin<AutofillPluginOptions> = (config,
     );
 
     if (authActivity) {
-      authActivity.$['android:theme'] = autofillTheme;
+      authActivity.$['android:theme'] = AUTOFILL_THEME;
     } else {
       mainApplication.activity.push({
         $: {
           'android:name': '.autofill.ui.AuthenticationActivity',
-          'android:theme': autofillTheme,
+          'android:theme': AUTOFILL_THEME,
           'android:taskAffinity': '',
           'android:excludeFromRecents': 'true',
           'android:exported': 'false',
@@ -83,12 +64,12 @@ export const withAndroidManifest: ConfigPlugin<AutofillPluginOptions> = (config,
     );
 
     if (passkeyActivity) {
-      passkeyActivity.$['android:theme'] = autofillTheme;
+      passkeyActivity.$['android:theme'] = AUTOFILL_THEME;
     } else {
       mainApplication.activity.push({
         $: {
           'android:name': '.autofill.ui.PasskeyRegistrationActivity',
-          'android:theme': autofillTheme,
+          'android:theme': AUTOFILL_THEME,
           'android:taskAffinity': '',
           'android:excludeFromRecents': 'true',
           'android:exported': 'false',

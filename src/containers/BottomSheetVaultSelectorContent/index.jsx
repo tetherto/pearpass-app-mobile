@@ -23,11 +23,11 @@ import { VAULT_ACTION } from 'src/constants/vaultActions'
 import { createStyles } from './styles'
 import { useModal } from '../../context/ModalContext'
 import { useVaultSwitch } from '../../hooks/useVaultSwitch'
-import { isModifyVaultModalV2Enabled } from '../../utils/modifyVaultModalV2Flag'
+import { isModifyVaultModalEnabled } from '../../utils/modifyVaultModalFlag'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 import { BottomSheetVaultAction } from '../BottomSheetVaultAction'
 import { Layout } from '../Layout'
-import { ModifyVaultModalContentV2 } from '../Modal/ModifyVaultModalContentV2'
+import { ModifyVaultModalContent } from '../Modal/ModifyVaultModalContent'
 
 export const BottomSheetVaultSelectorContent = ({
   onCreateVault,
@@ -69,7 +69,7 @@ export const BottomSheetVaultSelectorContent = ({
 
   const openModifyVaultModal = (vault, action) => {
     openModal(
-      <ModifyVaultModalContentV2
+      <ModifyVaultModalContent
         vaultId={vault.id}
         vaultName={vault.name}
         action={action}
@@ -86,7 +86,7 @@ export const BottomSheetVaultSelectorContent = ({
 
   const buildVaultActions = (vault) => ({
     onRename: () => {
-      if (isModifyVaultModalV2Enabled()) {
+      if (isModifyVaultModalEnabled()) {
         openModifyVaultModal(vault, VAULT_ACTION.NAME)
         return
       }
@@ -97,7 +97,7 @@ export const BottomSheetVaultSelectorContent = ({
       })
     },
     onPassword: () => {
-      if (isModifyVaultModalV2Enabled()) {
+      if (isModifyVaultModalEnabled()) {
         openModifyVaultModal(vault, VAULT_ACTION.PASSWORD)
         return
       }
@@ -115,7 +115,7 @@ export const BottomSheetVaultSelectorContent = ({
       onNavigate?.('PairedDevicesScreen')
     },
     onDelete: () => {
-      onNavigate?.('VaultDeleteScreenV2', {
+      onNavigate?.('VaultDeleteScreen', {
         vaultId: vault.id,
         vaultName: vault.name
       })

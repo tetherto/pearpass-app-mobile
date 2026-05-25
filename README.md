@@ -150,52 +150,11 @@ Run unit tests with Jest:
 npm test
 ```
 
-### End-to-End Testing with Maestro
+### End-to-End Testing
 
-PearPass uses Maestro for end-to-end testing. Maestro allows you to write UI tests in simple YAML format.
+PearPass uses WebdriverIO + Appium for end-to-end testing on Android and iOS, with optional BrowserStack execution and Qase test management.
 
-#### Install Maestro
-
-```bash
-# macOS
-brew tap mobile-dev-inc/tap
-brew install maestro
-```
-
-Verify the installation:
-
-```bash
-maestro --version
-```
-
-#### Run E2E Tests
-
-Run a specific flow:
-
-```bash
-maestro test e2e/welcome/passwordCreate.yaml
-```
-
-Run all flows:
-
-```bash
-maestro test -e e2e/
-```
-
-#### Test file format
-
-Each test file requires an `appId` block and a `---` separator before the commands:
-
-```yaml
-appId: com.pears.pass
----
-- launchApp
-- assertVisible: "Master password"
-- tapOn:
-    text: "Master password"
-```
-
-For more information, see the [Maestro documentation](https://maestro.mobile.dev/).
+See [`e2e/SETUP_AND_RUN_GUIDE.md`](e2e/SETUP_AND_RUN_GUIDE.md) for the full setup and run instructions, and [`e2e/AUTOMATED_TEST_CASES.md`](e2e/AUTOMATED_TEST_CASES.md) for the test catalog.
 
 ---
 
@@ -205,7 +164,6 @@ For more information, see the [Maestro documentation](https://maestro.mobile.dev
 - [Expo](https://expo.dev/)
 - [React](https://reactjs.org/)
 - [React Navigation](https://reactnavigation.org/)
-- [Styled Components](https://styled-components.com/)
 - [Lingui](https://lingui.dev/)
 - [Redux](https://redux.js.org/)
 

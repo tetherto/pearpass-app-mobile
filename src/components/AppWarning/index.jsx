@@ -1,6 +1,6 @@
-import { YellowErrorIcon } from '@tetherto/pearpass-lib-ui-react-native-components'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
+import { ReportProblem } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { View, Text, StyleSheet } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 /**
  * @param {{
@@ -20,7 +20,7 @@ export const AppWarning = ({
   textTestID
 }) => (
   <View style={[styles.warningContainer, containerStyles]} testID={testID}>
-    <YellowErrorIcon width={14} height={14} />
+    <ReportProblem width={14} height={14} />
     <Text testID={textTestID} style={[styles.warningText, textStyles]}>
       {warning}
     </Text>

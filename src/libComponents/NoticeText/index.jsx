@@ -1,8 +1,8 @@
 import {
-  ErrorIcon,
-  OkayIcon,
-  YellowErrorIcon
-} from '@tetherto/pearpass-lib-ui-react-native-components'
+  ErrorFilled,
+  Check,
+  ReportProblem
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 
 import { NoticeTextComponent, NoticeTextWrapper } from './styles'
 
@@ -17,11 +17,11 @@ export const NoticeText = ({ text, type = 'success', testID }) => {
   const getIconByType = () => {
     switch (type) {
       case 'success':
-        return <OkayIcon size="14" />
+        return <Check width="14" height="14" />
       case 'error':
-        return <ErrorIcon size="14" />
+        return <ErrorFilled width="14" height="14" />
       case 'warning':
-        return <YellowErrorIcon size="14" />
+        return <ReportProblem width="14" height="14" />
       default:
         return null
     }

@@ -1,40 +1,28 @@
-import styled from 'styled-components/native'
+import { rawTokens } from '@tetherto/pearpass-lib-ui-kit'
 
-export const ScrollWrapper = styled.ScrollView`
-  flex: 1;
-`
-
-export const Container = styled.View`
-  padding-top: 25px;
-  padding-bottom: 25px;
-  gap: 20px;
-  align-items: center;
-  align-self: center;
-`
-
-export const CaptionsContainer = styled.View`
-  gap: 5px;
-  align-items: center;
-  align-self: center;
-`
-
-export const Title = styled.Text`
-  color: ${({ theme }) => theme.colors.white.mode1};
-  text-align: center;
-  font-family: 'Inter';
-  font-size: 16px;
-  font-weight: 600;
-`
-
-export const SubTitle = styled.Text`
-  color: ${({ theme }) => theme.colors.white.mode1};
-  text-align: center;
-  font-family: 'Inter';
-  font-size: 14px;
-  font-weight: 400;
-`
-
-export const OptionsContainer = styled.View`
-  width: 100%;
-  gap: 12px;
-`
+export const createStyles = () => ({
+  scroll: {
+    flex: 1
+  },
+  container: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: rawTokens.spacing16,
+    paddingBottom: rawTokens.spacing40
+  },
+  title: {
+    marginTop: rawTokens.spacing24,
+    marginBottom: rawTokens.spacing12
+  },
+  description: {
+    marginBottom: rawTokens.spacing24
+  },
+  textCenter: {
+    textAlign: 'center'
+  },
+  buttonsContainer: {
+    width: '100%',
+    gap: rawTokens.spacing8
+  }
+})

@@ -37,7 +37,6 @@ exports[`TextAreaReport Component matches snapshot 1`] = `
 >
   <TextInput
     editable={true}
-    isFocused={false}
     multiline={true}
     onBlur={[Function]}
     onChangeText={[Function]}
@@ -45,25 +44,24 @@ exports[`TextAreaReport Component matches snapshot 1`] = `
     placeholder="Enter report text"
     placeholderTextColor="#BABABA"
     style={
-      {
-        "borderBottomLeftRadius": 10,
-        "borderBottomRightRadius": 10,
-        "borderColor": "#BABABA",
-        "borderTopLeftRadius": 10,
-        "borderTopRightRadius": 10,
-        "borderWidth": 1,
-        "color": "#F6F6F6",
-        "fontFamily": "Inter",
-        "fontSize": 12,
-        "fontWeight": "600",
-        "height": 70,
-        "paddingBottom": 11,
-        "paddingLeft": 12,
-        "paddingRight": 12,
-        "paddingTop": 11,
-        "pointerEvents": "auto",
-        "width": "100%",
-      }
+      [
+        {
+          "borderRadius": 10,
+          "borderWidth": 1,
+          "color": "#F6F6F6",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600",
+          "height": 70,
+          "paddingHorizontal": 12,
+          "paddingVertical": 11,
+          "width": "100%",
+        },
+        {
+          "borderColor": "#BABABA",
+        },
+        undefined,
+      ]
     }
     textAlignVertical="top"
     value="snapshot value"

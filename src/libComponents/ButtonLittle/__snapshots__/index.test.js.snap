@@ -34,21 +34,14 @@ exports[`ButtonLittle Component matches snapshot 1`] = `
       "alignItems": "center",
       "alignSelf": "flex-start",
       "backgroundColor": "#BADE5B",
-      "borderBottomLeftRadius": 15,
-      "borderBottomRightRadius": 15,
       "borderColor": "#A3BB62",
-      "borderStyle": "solid",
-      "borderTopLeftRadius": 15,
-      "borderTopRightRadius": 15,
+      "borderRadius": 15,
       "borderWidth": 1,
       "flexDirection": "row",
       "gap": 10,
       "justifyContent": "center",
       "opacity": 1,
-      "paddingBottom": 10,
-      "paddingLeft": 10,
-      "paddingRight": 10,
-      "paddingTop": 10,
+      "padding": 10,
     }
   }
 >
@@ -59,14 +52,18 @@ exports[`ButtonLittle Component matches snapshot 1`] = `
   </Text>
   <Text
     style={
-      {
-        "color": "#050B06",
-        "fontFamily": "Inter",
-        "fontSize": 16,
-        "fontWeight": "400",
-      }
+      [
+        {
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "400",
+        },
+        {
+          "color": "#050B06",
+        },
+        undefined,
+      ]
     }
-    variant="primary"
   >
     Little Button
   </Text>

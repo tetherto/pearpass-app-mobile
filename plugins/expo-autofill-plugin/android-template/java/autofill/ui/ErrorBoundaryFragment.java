@@ -62,9 +62,6 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            return inflater.inflate(R.layout.fragment_error_boundary_v2, container, false);
-        }
         return inflater.inflate(R.layout.fragment_error_boundary, container, false);
     }
 
@@ -72,57 +69,10 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // v2 layout uses a static icon + different ids;
-        if (getResources().getInteger(R.integer.design_version) == 2) {
-            onViewCreatedV2(view);
-            return;
-        }
-
-        TextView errorIcon = view.findViewById(R.id.errorIcon);
         TextView errorTitle = view.findViewById(R.id.errorTitle);
         TextView errorSubtitle = view.findViewById(R.id.errorSubtitle);
         TextView errorMessage = view.findViewById(R.id.errorMessage);
-        TextView cancelButton = view.findViewById(R.id.cancelButton);
-        Button goBackButton = view.findViewById(R.id.goBackButton);
-
-        // Get error details from arguments
-        Bundle args = getArguments();
-        if (args != null) {
-            // Check for custom error details first
-            if (args.containsKey(ARG_ERROR_ICON)) {
-                errorIcon.setText(args.getString(ARG_ERROR_ICON));
-            }
-            if (args.containsKey(ARG_ERROR_TITLE)) {
-                errorTitle.setText(args.getString(ARG_ERROR_TITLE));
-            }
-            if (args.containsKey(ARG_ERROR_SUBTITLE)) {
-                errorSubtitle.setText(args.getString(ARG_ERROR_SUBTITLE));
-            }
-            if (args.containsKey(ARG_ERROR_MESSAGE)) {
-                String message = args.getString(ARG_ERROR_MESSAGE);
-                if (message != null && !message.isEmpty()) {
-                    errorMessage.setText(message);
-                    errorMessage.setVisibility(View.VISIBLE);
-                }
-            }
-
-            // Otherwise use predefined error type
-            if (args.containsKey(ARG_ERROR_TYPE)) {
-                String errorTypeStr = args.getString(ARG_ERROR_TYPE);
-                ErrorType errorType = ErrorType.valueOf(errorTypeStr);
-                configureErrorType(errorType, errorIcon, errorTitle, errorSubtitle, errorMessage);
-            }
-        }
-
-        setupCancelButton(cancelButton);
-        setupCancelButton(goBackButton);
-    }
-
-    private void onViewCreatedV2(View view) {
-        TextView errorTitle = view.findViewById(R.id.errorV2Title);
-        TextView errorSubtitle = view.findViewById(R.id.errorV2Subtitle);
-        TextView errorMessage = view.findViewById(R.id.errorV2Message);
-        Button goBackButton = view.findViewById(R.id.errorV2GoBackButton);
+        Button goBackButton = view.findViewById(R.id.errorGoBackButton);
 
         View sheetHeader = view.findViewById(R.id.errorSheetHeader);
         if (sheetHeader != null) {
@@ -154,7 +104,7 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
             if (args.containsKey(ARG_ERROR_TYPE)) {
                 String errorTypeStr = args.getString(ARG_ERROR_TYPE);
                 ErrorType errorType = ErrorType.valueOf(errorTypeStr);
-                configureErrorTypeV2(errorType, errorTitle, errorSubtitle, errorMessage);
+                configureErrorType(errorType, errorTitle, errorSubtitle, errorMessage);
             }
         }
 
@@ -164,56 +114,7 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
     /**
      * Configure UI based on error type
      */
-    private void configureErrorType(ErrorType errorType, TextView icon, TextView title,
-                                   TextView subtitle, TextView message) {
-        switch (errorType) {
-            case INITIALIZATION_FAILED:
-                icon.setText("⚠️");
-                title.setText("Initialization Failed");
-                subtitle.setText("Unable to start autofill service");
-                message.setText("The autofill service failed to initialize. Please try again.");
-                message.setVisibility(View.VISIBLE);
-                break;
-
-            case VAULT_CLIENT_ERROR:
-                icon.setText("🔒");
-                title.setText("Vault Error");
-                subtitle.setText("Unable to access vault");
-                message.setText("There was an error accessing the vault. Please close and reopen the app.");
-                message.setVisibility(View.VISIBLE);
-                break;
-
-            case VAULT_LOCKED_ERROR:
-                icon.setText("🔒");
-                title.setText("Vault In Use");
-                subtitle.setText("PearPass is already running");
-                message.setText("The vault is locked by the PearPass app. Please close PearPass and try again.");
-                message.setVisibility(View.VISIBLE);
-                break;
-
-            case TIMEOUT_ERROR:
-                icon.setText("⏱️");
-                title.setText("Timeout");
-                subtitle.setText("Autofill took too long to start");
-                message.setText("The autofill service is taking longer than expected. Please try again.");
-                message.setVisibility(View.VISIBLE);
-                break;
-
-            case GENERIC_ERROR:
-            default:
-                icon.setText("⚠️");
-                title.setText("Autofill Error");
-                subtitle.setText("Unable to initialize autofill");
-                message.setText("An unexpected error occurred. Please try again.");
-                message.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
-
-    /**
-     * v2 uses a static drawable icon, no TextView
-     */
-    private void configureErrorTypeV2(ErrorType errorType, TextView title, TextView subtitle, TextView message) {
+    private void configureErrorType(ErrorType errorType, TextView title, TextView subtitle, TextView message) {
         switch (errorType) {
             case INITIALIZATION_FAILED:
                 title.setText("Initialization Failed");

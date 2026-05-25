@@ -1,8 +1,0 @@
-appId: com.pears.pass
----
-- runFlow: passwordEnter.yaml
-- assertVisible: 
-    id: "vault-0"
-- tapOn:
-    id: "vault-0"
-- assertVisible: "Search..."

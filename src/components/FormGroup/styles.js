@@ -1,20 +1,34 @@
-import styled from 'styled-components/native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
-export const Wrapper = styled.View`
-  width: 100%;
-  flex-direction: column;
-  gap: 10px;
-`
+export const Wrapper = (props) => (
+  <View {...props} style={[styles.wrapper, props.style]} />
+)
 
-export const TitleWrapper = styled.TouchableOpacity`
-  flex-direction: row;
-  gap: 6px;
-  align-items: center;
-`
-export const Title = styled.Text`
-  color: ${({ theme }) => theme.colors.grey100.mode1};
-  font-family: 'Inter';
-  font-size: 12px;
-  font-weight: 400;
-  align-self: flex-start;
-`
+export const TitleWrapper = (props) => (
+  <TouchableOpacity {...props} style={[styles.titleWrapper, props.style]} />
+)
+
+export const Title = (props) => (
+  <Text {...props} style={[styles.title, props.style]} />
+)
+
+const styles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+    flexDirection: 'column',
+    gap: 10
+  },
+  titleWrapper: {
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center'
+  },
+  title: {
+    color: colors.grey100.mode1,
+    fontFamily: 'Inter',
+    fontSize: 12,
+    fontWeight: '400',
+    alignSelf: 'flex-start'
+  }
+})

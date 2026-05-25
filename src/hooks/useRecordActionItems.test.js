@@ -21,10 +21,6 @@ jest.mock('@react-navigation/native', () => ({
   })
 }))
 
-jest.mock('../utils/designVersion', () => ({
-  isV2: () => true
-}))
-
 jest.mock('@tetherto/pearpass-lib-vault', () => {
   const deleteRecordsMock = jest.fn(() => Promise.resolve())
 
@@ -49,6 +45,10 @@ jest.mock('@tetherto/pearpass-lib-vault', () => {
 
 jest.mock('@tetherto/pearpass-lib-ui-kit', () => ({
   useBottomSheetClose: () => jest.fn()
+}))
+
+jest.mock('../containers/BottomSheetSortContent', () => ({
+  BottomSheetSortContent: () => null
 }))
 
 jest.mock('./useCopyToClipboard', () => ({

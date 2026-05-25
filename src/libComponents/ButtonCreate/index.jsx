@@ -1,5 +1,5 @@
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View } from 'react-native'
+import { colors } from 'src/utils/colors'
 
 import { Button, ButtonText } from './styles'
 import { useHapticFeedback } from '../../hooks/useHapticFeedback'
@@ -35,7 +35,7 @@ export const ButtonCreate = ({
       testID={testID}
       hasIcon={!!Icon}
     >
-      {Icon && <Icon size="21" color={colors.black.mode1} />}
+      {Icon && <Icon width="21" height="21" color={colors.black.mode1} />}
       {children && <ButtonText testID={textTestID}>{children}</ButtonText>}
       {Icon && <View />}
     </Button>

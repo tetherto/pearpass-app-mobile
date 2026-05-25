@@ -1,12 +1,12 @@
 import { render, fireEvent } from '@testing-library/react-native'
-import { ThemeProvider } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 import { View, Text } from 'react-native'
+import { ThemeProvider } from 'src/utils/colors'
 
 import { FormGroup } from './index'
 
-jest.mock('@tetherto/pearpass-lib-ui-react-native-components', () => ({
-  ArrowDownIcon: () => 'ArrowDownIcon',
-  ArrowUpIcon: () => 'ArrowUpIcon'
+jest.mock('@tetherto/pearpass-lib-ui-kit/icons', () => ({
+  KeyboardArrowBottom: () => 'KeyboardArrowBottom',
+  UnfoldMoreOutlined: () => 'UnfoldMoreOutlined'
 }))
 
 const TestChild = ({ isFirst, isLast, index, focusedIndex, onFocus }) => (
