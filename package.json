@@ -37,7 +37,8 @@
     "fdroid:patches:prebuild": "node scripts/fdroid/apply-patches.mjs prebuild",
     "fdroid:patches:build": "node scripts/fdroid/apply-patches.mjs build",
     "eas-build-pre-install": "node -v && npm -v && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
-    "eas-build-post-install": "npx patch-package && npm run build-plugins && npm run barekit:link-ios-addons && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile"
+    "eas-build-post-install": "npx patch-package && npm run build-plugins && npm run barekit:link-ios-addons && npm run bundle-bare && npm run lingui:extract && npm run lingui:compile",
+    "knip": "knip"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
@@ -132,6 +133,7 @@
     "@testing-library/react-native": "13.2.0",
     "@tetherto/tether-dev-docs": "git+https://github.com/tetherto/tether-dev-docs.git",
     "@types/jest": "^30.0.0",
+    "@types/node": "^25.9.1",
     "@types/react": "^19.2.4",
     "babel-jest": "29.7.0",
     "babel-plugin-macros": "3.1.0",
@@ -144,6 +146,7 @@
     "husky": "^9.1.7",
     "jest": "29.7.0",
     "jest-environment-jsdom": "^30.2.0",
+    "knip": "^6.14.1",
     "patch-package": "^8.0.1",
     "prettier": "^3.8.1",
     "react-test-renderer": "19.0.0",

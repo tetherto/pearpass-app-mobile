@@ -7,18 +7,14 @@ import {
   AuthV2MasterPasswordScreen,
   AuthV2PinScreen
 } from '../../screens/AuthV2'
-import { CreateFolder } from '../../screens/CreateFolder'
 import { CreateFolderV2 } from '../../screens/CreateFolder/CreateFolderV2'
 import { CreateRecord } from '../../screens/CreateRecord'
 import { CreatePasswordItemV2 } from '../../screens/CreateRecord/v2/CreatePasswordItemV2'
 import { ErrorScreen } from '../../screens/ErrorScreen'
-import { ImagePreview } from '../../screens/ImagePreview'
 import { ImagePreviewV2 } from '../../screens/ImagePreview/ImagePreviewV2'
 import { ImportVault } from '../../screens/ImportVault'
-import { Intro } from '../../screens/Intro'
 import { MultiSelectDelete } from '../../screens/MultiSelectDelete'
 import { MultiSelectMove } from '../../screens/MultiSelectMove'
-import { Onboarding } from '../../screens/Onboarding'
 import {
   OnboardingV2Autofill,
   OnboardingV2Biometrics,
@@ -35,16 +31,13 @@ import { Feedback } from '../../screens/Settings/Feedback'
 import { MasterPassword } from '../../screens/Settings/MasterPassword'
 import { PairedDevicesScreen } from '../../screens/Settings/PairedDevicesScreen'
 import { BlindPeeringSectionV2 } from '../../screens/Settings/TabPrivacy/BlindPeeringSectionV2'
-import { VaultDeleteScreen } from '../../screens/Settings/VaultDeleteScreen'
 import { VaultDeleteScreenV2 } from '../../screens/Settings/VaultDeleteScreenV2'
 import { VaultPasswordScreen } from '../../screens/Settings/VaultPasswordScreen'
 import { VaultRenameScreen } from '../../screens/Settings/VaultRenameScreen'
 import { VaultsV2 } from '../../screens/Settings/Vaults2'
-import { VaultSettingsScreen } from '../../screens/Settings/VaultSettingsScreen'
 import { VaultShareScreen } from '../../screens/Settings/VaultShareScreen'
 import { ShareVault } from '../../screens/ShareVault'
 import { Welcome } from '../../screens/Welcome'
-import { isV2 } from '../../utils/designVersion'
 import { TabNavigator } from '../TabNavigator'
 
 const Stack = createNativeStackNavigator()
@@ -65,12 +58,6 @@ export const Navigation = ({ initialRouteName }) => (
     })}
   >
     <Stack.Screen name="Error" component={ErrorScreen} options={noGesture} />
-    <Stack.Screen name="Intro" component={Intro} options={noGesture} />
-    <Stack.Screen
-      name="Onboarding"
-      component={Onboarding}
-      options={noGesture}
-    />
     <Stack.Screen
       name="OnboardingV2"
       component={OnboardingV2DataLocal}
@@ -113,16 +100,10 @@ export const Navigation = ({ initialRouteName }) => (
       options={noGesture}
     />
     <Stack.Screen name="RecordDetails" component={RecordDetails} />
-    <Stack.Screen
-      name="ImagePreview"
-      component={isV2() ? ImagePreviewV2 : ImagePreview}
-    />
+    <Stack.Screen name="ImagePreview" component={ImagePreviewV2} />
     <Stack.Screen name="CreatePasswordItem" component={CreatePasswordItemV2} />
     <Stack.Screen name="CreateRecord" component={CreateRecord} />
-    <Stack.Screen
-      name="CreateFolder"
-      component={isV2() ? CreateFolderV2 : CreateFolder}
-    />
+    <Stack.Screen name="CreateFolder" component={CreateFolderV2} />
     <Stack.Screen name="AppPreferences" component={AppPreferences} />
     <Stack.Screen name="MasterPassword" component={MasterPassword} />
     <Stack.Screen name="BlindPeering" component={BlindPeeringSectionV2} />
@@ -138,10 +119,8 @@ export const Navigation = ({ initialRouteName }) => (
     <Stack.Screen name="Vaults2" component={VaultsV2} />
     <Stack.Screen name="ExportItems" component={ExportItems} />
     <Stack.Screen name="DeleteFolder" component={DeleteFolderV2} />
-    <Stack.Screen name="VaultSettingsScreen" component={VaultSettingsScreen} />
     <Stack.Screen name="VaultRenameScreen" component={VaultRenameScreen} />
     <Stack.Screen name="VaultPasswordScreen" component={VaultPasswordScreen} />
-    <Stack.Screen name="VaultDeleteScreen" component={VaultDeleteScreen} />
     <Stack.Screen name="VaultDeleteScreenV2" component={VaultDeleteScreenV2} />
     <Stack.Screen name="PairedDevicesScreen" component={PairedDevicesScreen} />
     <Stack.Screen name="VaultShareScreen" component={VaultShareScreen} />

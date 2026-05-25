@@ -21,10 +21,6 @@ jest.mock('@react-navigation/native', () => ({
   })
 }))
 
-jest.mock('../utils/designVersion', () => ({
-  isV2: () => true
-}))
-
 jest.mock('@tetherto/pearpass-lib-vault', () => {
   const deleteRecordsMock = jest.fn(() => Promise.resolve())
 

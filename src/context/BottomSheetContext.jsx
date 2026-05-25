@@ -10,10 +10,8 @@ import {
 
 import BottomSheet from '@gorhom/bottom-sheet'
 import { rawTokens, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { colors } from '@tetherto/pearpass-lib-ui-theme-provider/native'
 
 import { BackDrop } from '../components/BottomSheetBackdrop'
-import { isV2 } from '../utils/designVersion'
 
 export const BottomSheetContext = createContext()
 
@@ -76,17 +74,13 @@ export const BottomSheetProvider = ({
           backdropComponent={renderBackdrop}
           onChange={handleSheetchanges}
           backgroundStyle={{
-            backgroundColor: isV2()
-              ? theme.colors.colorSurfacePrimary
-              : colors.grey500.mode1,
+            backgroundColor: theme.colors.colorSurfacePrimary,
             borderTopLeftRadius: rawTokens.spacing16,
             borderTopRightRadius: rawTokens.spacing16,
             overflow: 'hidden',
             borderWidth: 1,
             borderBottomWidth: 0,
-            borderColor: isV2()
-              ? theme.colors.colorSurfaceDisabled
-              : colors.primary100.mode1
+            borderColor: theme.colors.colorSurfaceDisabled
           }}
         >
           {options.children}

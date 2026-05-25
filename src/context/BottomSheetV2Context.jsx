@@ -13,7 +13,6 @@ import { Animated, View, useWindowDimensions } from 'react-native'
 
 import { BottomSheetContext } from './BottomSheetContext'
 import { BackDrop } from '../components/BottomSheetBackdrop'
-import { isV2 } from '../utils/designVersion'
 
 const BACKDROP_DURATION = 200
 
@@ -106,47 +105,41 @@ export const BottomSheetV2Provider = ({ children }) => {
 
   return (
     <BottomSheetV2Context.Provider value={ctx}>
-      {isV2() ? (
-        <BottomSheetContext.Provider value={ctx}>
-          {children}
-        </BottomSheetContext.Provider>
-      ) : (
-        children
-      )}
-      {isV2() && (
-        <BottomSheet
-          ref={ref}
-          index={-1}
-          snapPoints={snapPoints}
-          handleComponent={null}
-          backdropComponent={renderBackdrop}
-          enablePanDownToClose={!locked}
-          onChange={handleSheetChange}
-          onClose={() => {
-            if (isExpanding.current) return
-            pendingOpen.current = false
-            backdropAnim.setValue(0)
-            setContent(null)
-            setSnapPoints([1])
-            setLocked(false)
-          }}
-          backgroundStyle={{
-            backgroundColor: theme.colors.colorSurfacePrimary,
-            borderTopLeftRadius: rawTokens.spacing16,
-            borderTopRightRadius: rawTokens.spacing16,
-            overflow: 'hidden',
-            borderWidth: 1,
-            borderBottomWidth: 0,
-            borderColor: theme.colors.colorSurfaceDisabled
-          }}
-        >
-          <BottomSheetView>
-            <View key={expandCount} onLayout={handleContentLayout}>
-              {content}
-            </View>
-          </BottomSheetView>
-        </BottomSheet>
-      )}
+      <BottomSheetContext.Provider value={ctx}>
+        {children}
+      </BottomSheetContext.Provider>
+      <BottomSheet
+        ref={ref}
+        index={-1}
+        snapPoints={snapPoints}
+        handleComponent={null}
+        backdropComponent={renderBackdrop}
+        enablePanDownToClose={!locked}
+        onChange={handleSheetChange}
+        onClose={() => {
+          if (isExpanding.current) return
+          pendingOpen.current = false
+          backdropAnim.setValue(0)
+          setContent(null)
+          setSnapPoints([1])
+          setLocked(false)
+        }}
+        backgroundStyle={{
+          backgroundColor: theme.colors.colorSurfacePrimary,
+          borderTopLeftRadius: rawTokens.spacing16,
+          borderTopRightRadius: rawTokens.spacing16,
+          overflow: 'hidden',
+          borderWidth: 1,
+          borderBottomWidth: 0,
+          borderColor: theme.colors.colorSurfaceDisabled
+        }}
+      >
+        <BottomSheetView>
+          <View key={expandCount} onLayout={handleContentLayout}>
+            {content}
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </BottomSheetV2Context.Provider>
   )
 }

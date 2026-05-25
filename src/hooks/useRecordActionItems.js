@@ -7,13 +7,9 @@ import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { SORT_KEYS } from '../constants/sortOptions'
-import { BottomSheetFolderListContent } from '../containers/BottomSheetFolderListContent'
 import { BottomSheetSortContent } from '../containers/BottomSheetSortContent'
-import { ConfirmModalContent } from '../containers/Modal/ConfirmModalContent'
 import { useBottomSheet } from '../context/BottomSheetContext'
-import { useModal } from '../context/ModalContext'
 import { useSharedFilter } from '../context/SharedFilterContext'
-import { isV2 } from '../utils/designVersion'
 
 /**
  * @param {{
@@ -44,7 +40,6 @@ export const useRecordActionItems = ({
 } = {}) => {
   const { t } = useLingui()
   const navigation = useNavigation()
-  const { openModal, closeModal } = useModal()
   const v2Collapse = useBottomSheetClose()
   const { collapse: v1Collapse, expand } = useBottomSheet()
 
@@ -55,15 +50,7 @@ export const useRecordActionItems = ({
   }, [v1Collapse, v2Collapse])
 
   const { copyToClipboard } = useCopyToClipboard()
-  const { deleteRecords, updateFavoriteState, updateFolder } = useRecords({
-    onCompleted: () => {
-      if (!isV2()) {
-        closeModal()
-        v1Collapse?.()
-        onDelete?.()
-      }
-    }
-  })
+  const { updateFavoriteState } = useRecords()
   const { setState } = useSharedFilter()
 
   // RECORD_TYPES.OTP is `undefined` (used as a route-state sentinel for the
@@ -73,39 +60,14 @@ export const useRecordActionItems = ({
     isOtpContext && record?.type === RECORD_TYPES.LOGIN
 
   const handleDelete = useCallback(() => {
-    if (isV2()) {
-      collapse?.()
-      navigation.navigate('MultiSelectDelete', {
-        selectedRecordIds: [record?.id],
-        selectedRecordObjects: [record],
-        onComplete: onDelete,
-        isOtpContext: false
-      })
-    } else {
-      v1Collapse?.()
-      openModal(
-        <ConfirmModalContent
-          title="Delete item"
-          text="Are you sure that you want to delete this item?"
-          secondaryAction={closeModal}
-          primaryAction={async () => {
-            await deleteRecords([record?.id])
-          }}
-        />
-      )
-    }
-  }, [
-    record,
-    recordType,
-    isOtpContextProp,
-    onDelete,
-    collapse,
-    v1Collapse,
-    navigation,
-    openModal,
-    closeModal,
-    deleteRecords
-  ])
+    collapse?.()
+    navigation.navigate('MultiSelectDelete', {
+      selectedRecordIds: [record?.id],
+      selectedRecordObjects: [record],
+      onComplete: onDelete,
+      isOtpContext: false
+    })
+  }, [record, onDelete, collapse, navigation])
 
   const handleFavoriteToggle = useCallback(() => {
     updateFavoriteState([record?.id], !record?.isFavorite)
@@ -119,34 +81,15 @@ export const useRecordActionItems = ({
       selectedFolder: record.folder
     })
     collapse?.()
-  }, [record, recordType, isOtpContextProp, navigation, collapse])
-
-  const handleFolderMoveSelect = useCallback(
-    async (folder) => {
-      await updateFolder([record?.id], folder.name)
-    },
-    [record, updateFolder]
-  )
+  }, [record, isAuthenticatorLoginRecord, navigation, collapse])
 
   const handleMoveClick = useCallback(() => {
-    if (isV2()) {
-      collapse?.()
-      navigation.navigate('MultiSelectMove', {
-        selectedRecordIds: [record?.id],
-        selectedRecordObjects: [record]
-      })
-    } else {
-      collapse?.()
-      expand({
-        children: (
-          <BottomSheetFolderListContent
-            onFolderSelect={handleFolderMoveSelect}
-          />
-        ),
-        snapPoints: ['10%', '25%', '25%']
-      })
-    }
-  }, [record, navigation, collapse, expand, handleFolderMoveSelect])
+    collapse?.()
+    navigation.navigate('MultiSelectMove', {
+      selectedRecordIds: [record?.id],
+      selectedRecordObjects: [record]
+    })
+  }, [record, navigation, collapse])
 
   const handleCopy = useCallback(
     (value) => {

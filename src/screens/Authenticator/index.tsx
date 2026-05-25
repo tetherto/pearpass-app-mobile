@@ -33,8 +33,6 @@ import {
   Text,
   View
 } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { isV2 } from 'src/utils/designVersion'
 
 import { RecordItemIcon } from '../../components/RecordItemIcon'
 import { TimerCircle } from '../../components/TimerCircle'
@@ -260,54 +258,42 @@ export const Authenticator = () => {
   }
 
   const headerEl = (
-    <Header
-      setSearchValue={setSearchValue}
-      searchValue={searchValue}
-      itemsFound={otpRecords.length}
-      setIsMultiSelectOn={() => {}}
-      isMultiSelectOn={false}
-      setSelectedRecords={() => {}}
-      selectedRecords={[]}
-    />
+    <Header setSearchValue={setSearchValue} searchValue={searchValue} />
   )
 
   const body = (
     <>
-      {isV2() && (
+      <View
+        style={[
+          styles.screenTitleBar,
+          { borderColor: theme.colors.colorBorderPrimary }
+        ]}
+      >
+        <View style={styles.screenTitleTextWrapper}>
+          <UIKitText variant="labelEmphasized" numberOfLines={1}>
+            {t`Authenticator`}
+          </UIKitText>
+        </View>
         <View
           style={[
-            styles.screenTitleBar,
-            { borderColor: theme.colors.colorBorderPrimary }
+            styles.screenTitleSortSection,
+            { borderLeftColor: theme.colors.colorBorderPrimary }
           ]}
         >
-          <View style={styles.screenTitleTextWrapper}>
-            <UIKitText variant="labelEmphasized" numberOfLines={1}>
-              {t`Authenticator`}
-            </UIKitText>
-          </View>
-          <View
-            style={[
-              styles.screenTitleSortSection,
-              { borderLeftColor: theme.colors.colorBorderPrimary }
-            ]}
+          <ContextMenu
+            trigger={
+              <Button
+                variant="tertiary"
+                iconBefore={<SwapVert color={theme.colors.colorTextPrimary} />}
+                aria-label={t`Sort items`}
+                data-testid="authenticator-sort-button"
+              />
+            }
           >
-            <ContextMenu
-              trigger={
-                <Button
-                  variant="tertiary"
-                  iconBefore={
-                    <SwapVert color={theme.colors.colorTextPrimary} />
-                  }
-                  aria-label={t`Sort items`}
-                  data-testid="authenticator-sort-button"
-                />
-              }
-            >
-              <BottomSheetSortContentV2 />
-            </ContextMenu>
-          </View>
+            <BottomSheetSortContentV2 />
+          </ContextMenu>
         </View>
-      )}
+      </View>
 
       {otpRecords.length === 0 && !searchValue.length && (
         <ScrollView
@@ -375,24 +361,10 @@ export const Authenticator = () => {
     </>
   )
 
-  if (isV2()) {
-    return (
-      <Layout header={headerEl} contentStyle={{ padding: 0 }} isBuiltin={false}>
-        {body}
-      </Layout>
-    )
-  }
-
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.colorSurfacePrimary }
-      ]}
-    >
-      {headerEl}
+    <Layout header={headerEl} contentStyle={{ padding: 0 }} isBuiltin={false}>
       {body}
-    </SafeAreaView>
+    </Layout>
   )
 }
 
