@@ -44,6 +44,10 @@ public class UpdatePasskeyPayload {
     private final String vaultId;
 
     // User-edited fields
+    private final String title;
+    private final String username;
+    private final List<String> websites;
+    private final String folder;
     private final String note;
     private final List<JobAttachment> attachments;
     private final List<String> keepAttachmentIds;
@@ -56,6 +60,10 @@ public class UpdatePasskeyPayload {
                                 String authenticatorData,
                                 int algorithm, long createdAt, List<String> transports,
                                 String vaultId,
+                                String title,
+                                String username,
+                                List<String> websites,
+                                String folder,
                                 String note,
                                 List<JobAttachment> attachments,
                                 List<String> keepAttachmentIds) {
@@ -75,6 +83,10 @@ public class UpdatePasskeyPayload {
         this.createdAt = createdAt;
         this.transports = transports != null ? transports : new ArrayList<>();
         this.vaultId = vaultId;
+        this.title = title;
+        this.username = username;
+        this.websites = websites != null ? websites : new ArrayList<>();
+        this.folder = folder;
         this.note = note;
         this.attachments = attachments != null ? attachments : new ArrayList<>();
         this.keepAttachmentIds = keepAttachmentIds != null ? keepAttachmentIds : new ArrayList<>();
@@ -98,6 +110,10 @@ public class UpdatePasskeyPayload {
     public long getCreatedAt() { return createdAt; }
     public List<String> getTransports() { return transports; }
     public String getVaultId() { return vaultId; }
+    public String getTitle() { return title; }
+    public String getUsername() { return username; }
+    public List<String> getWebsites() { return websites; }
+    public String getFolder() { return folder; }
     public String getNote() { return note; }
     public List<JobAttachment> getAttachments() { return attachments; }
     public List<String> getKeepAttachmentIds() { return keepAttachmentIds; }
@@ -139,19 +155,27 @@ public class UpdatePasskeyPayload {
 
         json.put("vaultId", vaultId);
 
-        if (note != null) {
-            json.put("note", note);
-        }
+        json.put("title", title != null ? title : JSONObject.NULL);
+        json.put("username", username != null ? username : JSONObject.NULL);
+        json.put("folder", folder != null ? folder : JSONObject.NULL);
 
-        JSONArray attachmentsArray = new JSONArray();
+        JSONArray websitesArray = new JSONArray();
+        for (String website : websites) {
+            websitesArray.put(website);
+        }
+        json.put("websites", websitesArray);
+
+        json.put("note", note != null ? note : JSONObject.NULL);
+
+        JSONArray attachmentsJsonArray = new JSONArray();
         for (JobAttachment attachment : attachments) {
             JSONObject attachmentJson = new JSONObject();
             attachmentJson.put("id", attachment.getId());
             attachmentJson.put("name", attachment.getName());
             attachmentJson.put("relativePath", attachment.getRelativePath());
-            attachmentsArray.put(attachmentJson);
+            attachmentsJsonArray.put(attachmentJson);
         }
-        json.put("attachments", attachmentsArray);
+        json.put("attachments", attachmentsJsonArray);
 
         JSONArray keepIdsArray = new JSONArray();
         for (String id : keepAttachmentIds) {
@@ -198,6 +222,15 @@ public class UpdatePasskeyPayload {
             }
         }
 
+        // Websites
+        List<String> websites = new ArrayList<>();
+        JSONArray websitesArray = json.optJSONArray("websites");
+        if (websitesArray != null) {
+            for (int i = 0; i < websitesArray.length(); i++) {
+                websites.add(websitesArray.getString(i));
+            }
+        }
+
         return new UpdatePasskeyPayload(
                 json.getString("existingRecordId"),
                 json.getString("rpId"),
@@ -215,7 +248,11 @@ public class UpdatePasskeyPayload {
                 json.getLong("createdAt"),
                 transports,
                 json.getString("vaultId"),
-                json.optString("note", null),
+                json.isNull("title") ? null : json.optString("title", null),
+                json.isNull("username") ? null : json.optString("username", null),
+                websites,
+                json.isNull("folder") ? null : json.optString("folder", null),
+                json.isNull("note") ? null : json.optString("note", null),
                 attachments,
                 keepAttachmentIds
         );

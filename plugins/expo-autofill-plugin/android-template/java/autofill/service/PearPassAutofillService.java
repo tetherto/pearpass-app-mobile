@@ -52,9 +52,10 @@ public class PearPassAutofillService extends AutofillService {
 
         boolean hasSpecificFields = parsedFields != null
                 && (parsedFields.hasUsernameField() || parsedFields.hasPasswordField());
+        boolean hasCardFields = parsedFields != null && parsedFields.hasCardField();
         boolean hasFallbackFields = parsedFields != null && parsedFields.hasAnyFallbackField();
 
-        if (!hasSpecificFields && !hasFallbackFields) {
+        if (!hasSpecificFields && !hasCardFields && !hasFallbackFields) {
             callback.onSuccess(null);
             return;
         }
@@ -77,6 +78,12 @@ public class PearPassAutofillService extends AutofillService {
         Intent authIntent = new Intent(this, AuthenticationActivity.class);
         authIntent.putExtra("username_id", parsedFields.getUsernameId());
         authIntent.putExtra("password_id", parsedFields.getPasswordId());
+        authIntent.putExtra("card_number_id", parsedFields.getCardNumberId());
+        authIntent.putExtra("card_expiry_date_id", parsedFields.getCardExpiryDateId());
+        authIntent.putExtra("card_expiry_month_id", parsedFields.getCardExpiryMonthId());
+        authIntent.putExtra("card_expiry_year_id", parsedFields.getCardExpiryYearId());
+        authIntent.putExtra("card_security_code_id", parsedFields.getCardSecurityCodeId());
+        authIntent.putExtra("cardholder_name_id", parsedFields.getCardholderNameId());
 
         // Pass domain/package information for credential filtering
         String webDomain = parsedFields.getWebDomain();
@@ -129,105 +136,51 @@ public class PearPassAutofillService extends AutofillService {
         }
 
         FillResponse.Builder responseBuilder = new FillResponse.Builder();
-
-        // Create a single dataset with BOTH fields so they fill together
         Dataset.Builder datasetBuilder = new Dataset.Builder();
 
-        if (parsedFields.hasUsernameField() && parsedFields.hasPasswordField()) {
-            // Both fields present - add both to the same dataset
-            if (inlinePresentation != null) {
-                datasetBuilder.setValue(
-                    parsedFields.getUsernameId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation,
-                    inlinePresentation
-                );
-                datasetBuilder.setValue(
-                    parsedFields.getPasswordId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation,
-                    inlinePresentation
-                );
-            } else {
-                datasetBuilder.setValue(
-                    parsedFields.getUsernameId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation
-                );
-                datasetBuilder.setValue(
-                    parsedFields.getPasswordId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation
-                );
-            }
-
-            datasetBuilder.setAuthentication(sender);
-            responseBuilder.addDataset(datasetBuilder.build());
-        } else if (parsedFields.hasUsernameField()) {
-            // Only username field
-            if (inlinePresentation != null) {
-                datasetBuilder.setValue(
-                    parsedFields.getUsernameId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation,
-                    inlinePresentation
-                );
-            } else {
-                datasetBuilder.setValue(
-                    parsedFields.getUsernameId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation
-                );
-            }
-
-            datasetBuilder.setAuthentication(sender);
-            responseBuilder.addDataset(datasetBuilder.build());
-        } else if (parsedFields.hasPasswordField()) {
-            // Only password field
-            if (inlinePresentation != null) {
-                datasetBuilder.setValue(
-                    parsedFields.getPasswordId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation,
-                    inlinePresentation
-                );
-            } else {
-                datasetBuilder.setValue(
-                    parsedFields.getPasswordId(),
-                    AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
-                    presentation
-                );
-            }
-
-            datasetBuilder.setAuthentication(sender);
-            responseBuilder.addDataset(datasetBuilder.build());
+        java.util.List<AutofillId> targetIds = new java.util.ArrayList<>();
+        if (parsedFields.hasUsernameField() || parsedFields.hasPasswordField() || hasCardFields) {
+            addIfNotNull(targetIds, parsedFields.getUsernameId());
+            addIfNotNull(targetIds, parsedFields.getPasswordId());
+            addIfNotNull(targetIds, parsedFields.getCardNumberId());
+            addIfNotNull(targetIds, parsedFields.getCardExpiryDateId());
+            addIfNotNull(targetIds, parsedFields.getCardExpiryMonthId());
+            addIfNotNull(targetIds, parsedFields.getCardExpiryYearId());
+            addIfNotNull(targetIds, parsedFields.getCardSecurityCodeId());
+            addIfNotNull(targetIds, parsedFields.getCardholderNameId());
         } else if (hasFallbackFields) {
-            // Fallback: no specific username/password fields detected, but editable text
-            // fields exist. This handles the case where the browser hasn't fully populated
-            // the AssistStructure on the first field tap (common with Chrome compatibility mode).
-            for (AutofillId fallbackId : parsedFields.getFallbackFieldIds()) {
+            // Fallback: no specific fields detected, but editable text fields exist.
+            // Browsers sometimes leave the AssistStructure underpopulated on the first tap.
+            targetIds.addAll(parsedFields.getFallbackFieldIds());
+        }
+
+        if (!targetIds.isEmpty()) {
+            for (AutofillId targetId : targetIds) {
                 if (inlinePresentation != null) {
                     datasetBuilder.setValue(
-                        fallbackId,
+                        targetId,
                         AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
                         presentation,
                         inlinePresentation
                     );
                 } else {
                     datasetBuilder.setValue(
-                        fallbackId,
+                        targetId,
                         AutofillValue.forText(AutofillConstants.PLACEHOLDER_PASSWORD),
                         presentation
                     );
                 }
             }
-
             datasetBuilder.setAuthentication(sender);
             responseBuilder.addDataset(datasetBuilder.build());
         }
 
         FillResponse response = responseBuilder.build();
         callback.onSuccess(response);
+    }
+
+    private static void addIfNotNull(java.util.List<AutofillId> ids, AutofillId id) {
+        if (id != null) ids.add(id);
     }
 
     @Override

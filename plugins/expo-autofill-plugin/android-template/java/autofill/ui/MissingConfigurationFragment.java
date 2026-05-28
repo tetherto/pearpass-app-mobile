@@ -35,7 +35,7 @@ public class MissingConfigurationFragment extends BaseAutofillFragment {
                 if (navigationListener != null) navigationListener.onCancel();
             });
         }
-        Button goBackButton = view.findViewById(R.id.missingGoBackButton);
+        Button goBackButton = view.findViewById(R.id.missingV2GoBackButton);
         setupCancelButton(goBackButton);
     }
 }

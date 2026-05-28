@@ -186,6 +186,108 @@ describe('handleUpdatePasskey', () => {
     )
   })
 
+  it('should update title/username/websites when payload includes them', async () => {
+    const payload = {
+      existingRecordId: 'rec-1',
+      credentialId: 'new-cred',
+      title: 'New Title',
+      username: 'new-user@example.com',
+      websites: ['https://new.example.com', 'NEW2.example.com']
+    }
+
+    await handleUpdatePasskey(payload, deps)
+
+    expect(mockUpdateRecord).toHaveBeenCalledWith(
+      'rec-1',
+      expect.objectContaining({
+        data: expect.objectContaining({
+          title: 'New Title',
+          username: 'new-user@example.com',
+          websites: ['https://new.example.com', 'https://new2.example.com']
+        })
+      })
+    )
+  })
+
+  it('should ignore an empty title to keep the existing one', async () => {
+    const payload = {
+      existingRecordId: 'rec-1',
+      credentialId: 'new-cred',
+      title: ''
+    }
+
+    await handleUpdatePasskey(payload, deps)
+
+    expect(mockUpdateRecord).toHaveBeenCalledWith(
+      'rec-1',
+      expect.objectContaining({
+        data: expect.objectContaining({
+          title: 'Existing Record'
+        })
+      })
+    )
+  })
+
+  it('should update folder at the top level when payload includes it', async () => {
+    mockGetRecord.mockResolvedValue({
+      ...existingRecord,
+      folder: 'OldFolder',
+      data: { ...existingRecord.data }
+    })
+
+    const payload = {
+      existingRecordId: 'rec-1',
+      credentialId: 'new-cred',
+      folder: 'NewFolder'
+    }
+
+    await handleUpdatePasskey(payload, deps)
+
+    expect(mockUpdateRecord).toHaveBeenCalledWith(
+      'rec-1',
+      expect.objectContaining({ folder: 'NewFolder' })
+    )
+  })
+
+  it('should clear folder when payload sends null', async () => {
+    mockGetRecord.mockResolvedValue({
+      ...existingRecord,
+      folder: 'OldFolder',
+      data: { ...existingRecord.data }
+    })
+
+    const payload = {
+      existingRecordId: 'rec-1',
+      credentialId: 'new-cred',
+      folder: null
+    }
+
+    await handleUpdatePasskey(payload, deps)
+
+    expect(mockUpdateRecord).toHaveBeenCalledWith(
+      'rec-1',
+      expect.objectContaining({ folder: null })
+    )
+  })
+
+  it('should not touch folder when payload omits it (iOS path)', async () => {
+    mockGetRecord.mockResolvedValue({
+      ...existingRecord,
+      folder: 'KeepFolder',
+      data: { ...existingRecord.data }
+    })
+
+    const payload = {
+      existingRecordId: 'rec-1',
+      credentialId: 'new-cred'
+    }
+
+    await handleUpdatePasskey(payload, deps)
+
+    const updates = mockUpdateRecord.mock.calls[0][1]
+    expect('folder' in updates).toBe(false)
+  })
+
   it('should keep only specified existing attachments', async () => {
     const record = {
       data: {

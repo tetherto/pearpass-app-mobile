@@ -174,7 +174,7 @@ const withSplashFiles: ConfigPlugin = (config) => {
     // Override ic_launcher_background.xml to use custom_splash_screen
     const launcherBgPath = path.join(drawableDir, 'ic_launcher_background.xml');
     const launcherBgContent = `<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:drawable="@color/splashscreen_background"/>
+  <item android:drawable="@color/splash_background"/>
   <item>
     <bitmap android:gravity="fill" android:src="@drawable/custom_splash_screen"/>
   </item>

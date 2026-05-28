@@ -59,14 +59,28 @@ public class CredentialAdapter extends BaseItemAdapter<CredentialItem, Credentia
 
         void bind(CredentialItem c) {
             title.setText(c.getTitle());
-            String uname = c.getUsername();
-            if (uname == null || uname.isEmpty()) {
+            String subtitle;
+            if (c.isCreditCard()) {
+                subtitle = formatCardSubtitle(c);
+            } else {
+                subtitle = c.getUsername();
+            }
+            if (subtitle == null || subtitle.isEmpty()) {
                 username.setVisibility(View.GONE);
             } else {
                 username.setVisibility(View.VISIBLE);
-                username.setText(uname);
+                username.setText(subtitle);
             }
             initials.setText(computeInitials(c.getTitle()));
+        }
+
+        private String formatCardSubtitle(CredentialItem c) {
+            String number = c.getCardNumber();
+            if (number == null) return "";
+            String digits = number.replaceAll("\\D", "");
+            if (digits.isEmpty()) return "";
+            String last4 = digits.length() >= 4 ? digits.substring(digits.length() - 4) : digits;
+            return "•••• " + last4;
         }
 
         private String computeInitials(String t) {

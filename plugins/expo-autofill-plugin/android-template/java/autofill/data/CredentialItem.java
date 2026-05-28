@@ -5,13 +5,23 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class CredentialItem {
+    public static final String TYPE_LOGIN = "login";
+    public static final String TYPE_CREDIT_CARD = "creditCard";
+
     private String id;
+    private String recordType = TYPE_LOGIN;
     private String title;
     private String username;
     private String password;
     private String url;
     private String notes;
     private List<String> websites;
+
+    // Credit card fields
+    private String cardNumber;
+    private String cardExpireDate;
+    private String cardSecurityCode;
+    private String cardholderName;
 
     // Passkey fields
     private boolean hasPasskey;
@@ -114,6 +124,30 @@ public class CredentialItem {
     public void setWebsites(List<String> websites) {
         this.websites = websites != null ? websites : new ArrayList<>();
     }
+
+    public String getRecordType() {
+        return recordType;
+    }
+
+    public void setRecordType(String recordType) {
+        this.recordType = recordType != null ? recordType : TYPE_LOGIN;
+    }
+
+    public boolean isCreditCard() {
+        return TYPE_CREDIT_CARD.equals(recordType);
+    }
+
+    public String getCardNumber() { return cardNumber; }
+    public void setCardNumber(String cardNumber) { this.cardNumber = cardNumber; }
+
+    public String getCardExpireDate() { return cardExpireDate; }
+    public void setCardExpireDate(String cardExpireDate) { this.cardExpireDate = cardExpireDate; }
+
+    public String getCardSecurityCode() { return cardSecurityCode; }
+    public void setCardSecurityCode(String cardSecurityCode) { this.cardSecurityCode = cardSecurityCode; }
+
+    public String getCardholderName() { return cardholderName; }
+    public void setCardholderName(String cardholderName) { this.cardholderName = cardholderName; }
 
     // Passkey getters and setters
 

@@ -219,6 +219,8 @@ public class PasskeyFormFragment extends Fragment {
         List<String> initialWebsites = new ArrayList<>();
 
         if (existingRecord != null) {
+            saveButton.setText("Save");
+
             Map<String, Object> data = null;
             if (existingRecord.containsKey("data") && existingRecord.get("data") instanceof Map) {
                 data = (Map<String, Object>) existingRecord.get("data");
