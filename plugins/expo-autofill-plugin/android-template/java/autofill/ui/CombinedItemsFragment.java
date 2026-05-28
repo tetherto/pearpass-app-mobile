@@ -627,6 +627,11 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             String id = (String) record.get("id");
             if (id == null) continue;
 
+            Object recordType = record.get("type");
+            if (!(recordType instanceof String) || !"login".equals(recordType)) {
+                continue;
+            }
+
             Map<String, Object> data;
             if (record.containsKey("data") && record.get("data") instanceof Map) {
                 data = (Map<String, Object>) record.get("data");
