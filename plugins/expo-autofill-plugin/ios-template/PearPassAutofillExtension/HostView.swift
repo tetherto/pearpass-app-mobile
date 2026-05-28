@@ -1205,6 +1205,7 @@ struct HostView: View {
         if mode == .registration { return records }
         let isPasskeyAssertion = (passkeyRpId?.isEmpty == false)
         return records.filter { record in
+            guard record.type == "login" else { return false }
             let isPasskey = record.data?.credential != nil
             return isPasskeyAssertion ? isPasskey : !isPasskey
         }
