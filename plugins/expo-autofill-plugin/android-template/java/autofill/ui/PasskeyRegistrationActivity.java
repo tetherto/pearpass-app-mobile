@@ -898,6 +898,5 @@ public class PasskeyRegistrationActivity extends AppCompatActivity implements Na
         storedNonce = null;
         storedHashedPassword = null;
         clearSelectedVaultPasswordBuffer();
-        clearPendingPasswordBuffer();
     }
 }

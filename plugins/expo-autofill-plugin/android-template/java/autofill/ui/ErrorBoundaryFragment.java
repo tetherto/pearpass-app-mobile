@@ -69,10 +69,10 @@ public class ErrorBoundaryFragment extends BaseAutofillFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView errorTitle = view.findViewById(R.id.errorTitle);
-        TextView errorSubtitle = view.findViewById(R.id.errorSubtitle);
-        TextView errorMessage = view.findViewById(R.id.errorMessage);
-        Button goBackButton = view.findViewById(R.id.errorGoBackButton);
+        TextView errorTitle = view.findViewById(R.id.errorV2Title);
+        TextView errorSubtitle = view.findViewById(R.id.errorV2Subtitle);
+        TextView errorMessage = view.findViewById(R.id.errorV2Message);
+        Button goBackButton = view.findViewById(R.id.errorV2GoBackButton);
 
         View sheetHeader = view.findViewById(R.id.errorSheetHeader);
         if (sheetHeader != null) {
