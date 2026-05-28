@@ -19,18 +19,22 @@ import androidx.fragment.app.FragmentActivity;
 import com.pears.pass.R;
 import com.pears.pass.autofill.data.PearPassVaultClient;
 import com.pears.pass.autofill.utils.BiometricAuthHelper;
+import com.pears.pass.autofill.utils.RateLimitManager;
 import com.pears.pass.autofill.utils.SecureLog;
 
 import java.util.concurrent.CompletableFuture;
 
 public class MasterPasswordFragment extends BaseAutofillFragment {
     private BiometricAuthHelper biometricHelper;
+    private RateLimitManager rateLimit;
     private EditText passwordInput;
     private Button unlockButton;
     private TextView biometricButton;
+    private TextView errorText;
     private ImageView togglePasswordVisibility;
     private boolean isAuthenticatingBiometric = false;
     private boolean isPasswordVisible = false;
+    private android.os.CountDownTimer lockoutTimer;
     // Spinner overlay shown over Continue while auth is in flight.
     private android.widget.ProgressBar continueProgress;
 
@@ -38,6 +42,7 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         biometricHelper = BiometricAuthHelper.getInstance(context);
+        rateLimit = new RateLimitManager(context);
     }
 
     @Override
@@ -68,6 +73,7 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
         unlockButton = view.findViewById(R.id.masterPwdContinue);
         togglePasswordVisibility = view.findViewById(R.id.ppPasswordToggle);
         biometricButton = view.findViewById(R.id.masterPwdBiometricButton);
+        errorText = view.findViewById(R.id.masterPwdError);
         continueProgress = view.findViewById(R.id.masterPwdContinueProgress);
 
         TextView passwordLabel = view.findViewById(R.id.ppPasswordLabel);
@@ -97,10 +103,91 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             authenticateWithMasterPassword(password);
         });
 
+        passwordInput.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(android.text.Editable s) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (errorText != null && errorText.getVisibility() == View.VISIBLE
+                        && unlockButton.isEnabled()) {
+                    errorText.setVisibility(View.GONE);
+                }
+            }
+        });
+
         setupPasswordVisibilityToggle();
         setupBiometricButton();
+        refreshRateLimitStatus();
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (lockoutTimer != null) {
+            lockoutTimer.cancel();
+            lockoutTimer = null;
+        }
+        super.onDestroyView();
+    }
+
+    private void refreshRateLimitStatus() {
+        if (rateLimit == null) return;
+        applyRateLimitStatus(rateLimit.getStatus());
+    }
+
+    private void applyRateLimitStatus(RateLimitManager.Status status) {
+        if (errorText == null || unlockButton == null || passwordInput == null) return;
+
+        if (status.isLocked && status.lockoutRemainingMs > 0) {
+            startLockoutCountdown(status.lockoutRemainingMs);
+            return;
+        }
+
+        if (lockoutTimer != null) {
+            lockoutTimer.cancel();
+            lockoutTimer = null;
+        }
+        unlockButton.setEnabled(true);
+        passwordInput.setEnabled(true);
+    }
+
+    private void startLockoutCountdown(long remainingMs) {
+        if (errorText == null || unlockButton == null || passwordInput == null) return;
+
+        unlockButton.setEnabled(false);
+        passwordInput.setEnabled(false);
+        passwordInput.setText("");
+        errorText.setVisibility(View.VISIBLE);
+        errorText.setText(formatLockoutMessage(remainingMs));
+
+        if (lockoutTimer != null) lockoutTimer.cancel();
+        lockoutTimer = new android.os.CountDownTimer(remainingMs, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                errorText.setText(formatLockoutMessage(millisUntilFinished));
+            }
+            @Override
+            public void onFinish() {
+                lockoutTimer = null;
+                refreshRateLimitStatus();
+            }
+        }.start();
+    }
+
+    private String formatLockoutMessage(long remainingMs) {
+        long totalSeconds = Math.max(1, (remainingMs + 999) / 1000);
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        String when;
+        if (minutes > 0 && seconds > 0) {
+            when = minutes + "m " + seconds + "s";
+        } else if (minutes > 0) {
+            when = minutes + "m";
+        } else {
+            when = seconds + "s";
+        }
+        return "Too many attempts. Try again in " + when + ".";
     }
 
     /**
@@ -128,6 +215,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                     throw new Exception("Invalid master password - vault remains locked");
                 }
 
+                if (rateLimit != null) rateLimit.reset();
+
                 try {
                     PearPassVaultClient.MasterPasswordEncryption masterEnc =
                         vaultClient.getMasterPasswordEncryption(vaultStatus).get();
@@ -151,12 +240,26 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
             } catch (Exception e) {
                 SecureLog.e("MasterPasswordFragment", "Authentication failed: " + e.getMessage());
 
+                if (rateLimit != null) rateLimit.recordFailure();
+                final RateLimitManager.Status status = rateLimit != null ? rateLimit.getStatus() : null;
+
                 getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getContext(), "Invalid master password", Toast.LENGTH_SHORT).show();
                     unlockButton.setEnabled(true);
                     unlockButton.setText("Continue");
                     if (continueProgress != null) continueProgress.setVisibility(View.GONE);
                     passwordInput.setText("");
+
+                    if (status != null && status.isLocked && status.lockoutRemainingMs > 0) {
+                        startLockoutCountdown(status.lockoutRemainingMs);
+                    } else if (status != null) {
+                        errorText.setVisibility(View.VISIBLE);
+                        String attemptWord = status.remainingAttempts == 1 ? "attempt" : "attempts";
+                        errorText.setText("Incorrect password. You have "
+                                + status.remainingAttempts + " " + attemptWord
+                                + " before the app will be temporarily locked.");
+                    } else {
+                        Toast.makeText(getContext(), "Invalid master password", Toast.LENGTH_SHORT).show();
+                    }
                 });
             } finally {
                 com.pears.pass.autofill.utils.SecureBufferUtils.clearBuffer(passwordBuffer);
@@ -296,6 +399,8 @@ public class MasterPasswordFragment extends BaseAutofillFragment {
                 if (vaultStatus.isLocked) {
                     throw new Exception("Invalid credentials - vault remains locked");
                 }
+
+                if (rateLimit != null) rateLimit.reset();
 
                 if (getActivity() instanceof PasskeyRegistrationActivity) {
                     ((PasskeyRegistrationActivity) getActivity()).onCredentialsObtained(
