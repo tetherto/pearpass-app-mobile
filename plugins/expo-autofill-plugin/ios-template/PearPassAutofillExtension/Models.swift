@@ -51,6 +51,24 @@ struct AttachmentMetadata: Equatable {
     let name: String
 }
 
+struct AttachmentFile: Equatable {
+    let id: String
+    let name: String
+    let data: Data
+}
+
+struct PasskeyFormData {
+    let title: String
+    let username: String
+    let websites: [String]
+    let note: String
+    let folder: String?
+    let attachments: [AttachmentFile]
+    let keepAttachmentIds: [String]
+    let passkeyCreatedAt: Int64
+    let existingRecord: VaultRecord?
+}
+
 struct RecordData {
     let title: String
     let username: String
