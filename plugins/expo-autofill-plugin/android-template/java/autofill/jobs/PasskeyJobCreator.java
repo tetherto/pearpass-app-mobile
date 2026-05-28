@@ -158,7 +158,6 @@ public class PasskeyJobCreator {
         long createdAt = System.currentTimeMillis();
 
         // 2. Build the payload
-        String note = formData.getNote();
         UpdatePasskeyPayload payload = new UpdatePasskeyPayload(
                 existingRecordId,
                 rpId, rpName,
@@ -173,7 +172,11 @@ public class PasskeyJobCreator {
                 createdAt,
                 credential.getResponse().getTransports(),
                 vaultId,
-                (note != null && !note.isEmpty()) ? note : null,
+                formData.getTitle(),
+                formData.getUsername(),
+                formData.getWebsites(),
+                formData.getFolder(),
+                formData.getNote() != null ? formData.getNote() : "",
                 attachments,
                 formData.getKeepAttachmentIds()
         );

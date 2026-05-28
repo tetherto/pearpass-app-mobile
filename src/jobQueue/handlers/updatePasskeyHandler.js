@@ -3,6 +3,17 @@ import * as FileSystem from 'expo-file-system'
 import { logger } from '../../utils/logger'
 import { getAttachmentsFolderPath } from '../JobFileReader'
 
+const formatWebsites = (urls) =>
+  urls
+    .filter((w) => w && w.trim())
+    .map((w) => {
+      const lower = w.toLowerCase()
+      if (lower.startsWith('http://') || lower.startsWith('https://')) {
+        return lower
+      }
+      return `https://${lower}`
+    })
+
 /**
  * Reads attachment files from pearpass_jobs/attachments/ and converts to { name, buffer }.
  * @param {Array} attachments - Array of { id, name, relativePath } from job payload.
@@ -107,6 +118,10 @@ export const handleUpdatePasskey = async (
     algorithm,
     createdAt,
     transports,
+    title,
+    username,
+    websites,
+    folder,
     note,
     keepAttachmentIds,
     attachments: jobAttachments
@@ -149,11 +164,19 @@ export const handleUpdatePasskey = async (
     ...existingRecord.data,
     credential,
     passkeyCreatedAt: createdAt || Date.now(),
-    ...(note !== null && note !== undefined && { note }),
+    ...(title !== undefined && title !== null && title !== '' && { title }),
+    ...(username !== undefined && { username: username ?? '' }),
+    ...(websites !== undefined && { websites: formatWebsites(websites || []) }),
+    ...(note !== undefined && { note: note ?? '' }),
     attachments: [...keptAttachments, ...newAttachments]
   }
 
-  await updateRecord(existingRecordId, { data: updatedData })
+  const updates = { data: updatedData }
+  if (folder !== undefined) {
+    updates.folder = folder
+  }
+
+  await updateRecord(existingRecordId, updates)
 
   await cleanupJobAttachments(jobAttachments || [])
 }
