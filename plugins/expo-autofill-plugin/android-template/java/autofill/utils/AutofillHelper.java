@@ -20,9 +20,22 @@ public class AutofillHelper {
     private static final String[] PASSWORD_HINTS = {"password", "pswd", "pwd"};
     private static final String[] IGNORED_HINTS = {"search", "find", "recipient", "edit"};
 
+    private static final String[] CARD_NUMBER_KEYWORDS = {"cardnumber", "ccnumber", "cc-number", "card-number", "creditcard"};
+    private static final String[] CARD_EXPIRY_KEYWORDS = {"expir", "exp-date", "cc-exp", "ccexp"};
+    private static final String[] CARD_EXPIRY_MONTH_KEYWORDS = {"exp-month", "expmonth", "cc-exp-month", "ccexpmonth"};
+    private static final String[] CARD_EXPIRY_YEAR_KEYWORDS = {"exp-year", "expyear", "cc-exp-year", "ccexpyear"};
+    private static final String[] CARD_SECURITY_KEYWORDS = {"cvc", "cvv", "csc", "securitycode", "security-code", "cardcode"};
+    private static final String[] CARDHOLDER_KEYWORDS = {"ccname", "cc-name", "cardholder", "card-holder", "cardholdername", "nameoncard"};
+
     public static class ParsedFields {
         private AutofillId usernameId;
         private AutofillId passwordId;
+        private AutofillId cardNumberId;
+        private AutofillId cardExpiryDateId;
+        private AutofillId cardExpiryMonthId;
+        private AutofillId cardExpiryYearId;
+        private AutofillId cardSecurityCodeId;
+        private AutofillId cardholderNameId;
         private String packageName;
         private String webDomain;
         private final List<AutofillId> fallbackFieldIds = new ArrayList<>();
@@ -35,6 +48,15 @@ public class AutofillHelper {
             return passwordId != null;
         }
 
+        public boolean hasCardField() {
+            return cardNumberId != null
+                    || cardExpiryDateId != null
+                    || cardExpiryMonthId != null
+                    || cardExpiryYearId != null
+                    || cardSecurityCodeId != null
+                    || cardholderNameId != null;
+        }
+
         public AutofillId getUsernameId() {
             return usernameId;
         }
@@ -42,6 +64,13 @@ public class AutofillHelper {
         public AutofillId getPasswordId() {
             return passwordId;
         }
+
+        public AutofillId getCardNumberId() { return cardNumberId; }
+        public AutofillId getCardExpiryDateId() { return cardExpiryDateId; }
+        public AutofillId getCardExpiryMonthId() { return cardExpiryMonthId; }
+        public AutofillId getCardExpiryYearId() { return cardExpiryYearId; }
+        public AutofillId getCardSecurityCodeId() { return cardSecurityCodeId; }
+        public AutofillId getCardholderNameId() { return cardholderNameId; }
 
         public String getPackageName() {
             return packageName;
@@ -101,7 +130,25 @@ public class AutofillHelper {
             fields.webDomain = webDomain;
         }
 
-        if (autofillId != null && isUsernameField(autofillHints, inputType, node) && fields.usernameId == null) {
+        if (autofillId != null && isCardNumberField(autofillHints, node) && fields.cardNumberId == null) {
+            fields.cardNumberId = autofillId;
+            SecureLog.d(TAG, "Found card number field");
+        } else if (autofillId != null && isCardExpiryMonthField(autofillHints, node) && fields.cardExpiryMonthId == null) {
+            fields.cardExpiryMonthId = autofillId;
+            SecureLog.d(TAG, "Found card expiry month field");
+        } else if (autofillId != null && isCardExpiryYearField(autofillHints, node) && fields.cardExpiryYearId == null) {
+            fields.cardExpiryYearId = autofillId;
+            SecureLog.d(TAG, "Found card expiry year field");
+        } else if (autofillId != null && isCardExpiryDateField(autofillHints, node) && fields.cardExpiryDateId == null) {
+            fields.cardExpiryDateId = autofillId;
+            SecureLog.d(TAG, "Found card expiry date field");
+        } else if (autofillId != null && isCardSecurityCodeField(autofillHints, node) && fields.cardSecurityCodeId == null) {
+            fields.cardSecurityCodeId = autofillId;
+            SecureLog.d(TAG, "Found card security code field");
+        } else if (autofillId != null && isCardholderNameField(autofillHints, node) && fields.cardholderNameId == null) {
+            fields.cardholderNameId = autofillId;
+            SecureLog.d(TAG, "Found cardholder name field");
+        } else if (autofillId != null && isUsernameField(autofillHints, inputType, node) && fields.usernameId == null) {
             fields.usernameId = autofillId;
             SecureLog.d(TAG, "Found username field");
         } else if (autofillId != null && isPasswordField(autofillHints, inputType, node) && fields.passwordId == null) {
@@ -204,6 +251,92 @@ public class AutofillHelper {
 
         // Check HTML info for web content
         return hasPasswordHtmlAttributes(node);
+    }
+
+    private static boolean matchesCardSignal(String[] hints, AssistStructure.ViewNode node,
+                                             String androidHint, String[] htmlAutocompleteValues,
+                                             String[] keywords) {
+        if (hints != null) {
+            for (String h : hints) {
+                if (h == null) continue;
+                if (androidHint != null && androidHint.equalsIgnoreCase(h)) return true;
+                String hLower = h.toLowerCase();
+                if (htmlAutocompleteValues != null) {
+                    for (String v : htmlAutocompleteValues) {
+                        if (hLower.equals(v)) return true;
+                    }
+                }
+            }
+        }
+
+        String autocomplete = getHtmlAttributeValue(node, "autocomplete");
+        if (autocomplete != null) {
+            String lower = autocomplete.toLowerCase();
+            if (htmlAutocompleteValues != null) {
+                for (String v : htmlAutocompleteValues) {
+                    if (lower.equals(v) || lower.endsWith(" " + v)) return true;
+                }
+            }
+        }
+
+        String hintText = node.getHint() != null ? node.getHint().toString().toLowerCase() : "";
+        String idEntry = node.getIdEntry() != null ? node.getIdEntry().toLowerCase() : "";
+        String name = getHtmlAttributeValue(node, "name");
+        String nameLower = name != null ? name.toLowerCase() : "";
+
+        return containsAnyTerm(hintText, keywords)
+                || containsAnyTerm(idEntry, keywords)
+                || containsAnyTerm(nameLower, keywords);
+    }
+
+    private static boolean isCardNumberField(String[] hints, AssistStructure.ViewNode node) {
+        return matchesCardSignal(hints, node,
+                android.view.View.AUTOFILL_HINT_CREDIT_CARD_NUMBER,
+                new String[]{"cc-number"},
+                CARD_NUMBER_KEYWORDS);
+    }
+
+    private static boolean isCardExpiryDateField(String[] hints, AssistStructure.ViewNode node) {
+        return matchesCardSignal(hints, node,
+                android.view.View.AUTOFILL_HINT_CREDIT_CARD_EXPIRATION_DATE,
+                new String[]{"cc-exp"},
+                CARD_EXPIRY_KEYWORDS);
+    }
+
+    private static boolean isCardExpiryMonthField(String[] hints, AssistStructure.ViewNode node) {
+        return matchesCardSignal(hints, node,
+                android.view.View.AUTOFILL_HINT_CREDIT_CARD_EXPIRATION_MONTH,
+                new String[]{"cc-exp-month"},
+                CARD_EXPIRY_MONTH_KEYWORDS);
+    }
+
+    private static boolean isCardExpiryYearField(String[] hints, AssistStructure.ViewNode node) {
+        return matchesCardSignal(hints, node,
+                android.view.View.AUTOFILL_HINT_CREDIT_CARD_EXPIRATION_YEAR,
+                new String[]{"cc-exp-year"},
+                CARD_EXPIRY_YEAR_KEYWORDS);
+    }
+
+    private static boolean isCardSecurityCodeField(String[] hints, AssistStructure.ViewNode node) {
+        return matchesCardSignal(hints, node,
+                android.view.View.AUTOFILL_HINT_CREDIT_CARD_SECURITY_CODE,
+                new String[]{"cc-csc"},
+                CARD_SECURITY_KEYWORDS);
+    }
+
+    private static boolean isCardholderNameField(String[] hints, AssistStructure.ViewNode node) {
+        return matchesCardSignal(hints, node,
+                null,
+                new String[]{"cc-name"},
+                CARDHOLDER_KEYWORDS);
+    }
+
+    private static String getHtmlAttributeValue(AssistStructure.ViewNode node, String attrName) {
+        ViewStructure.HtmlInfo htmlInfo = node.getHtmlInfo();
+        if (htmlInfo == null) return null;
+        List<Pair<String, String>> attrs = htmlInfo.getAttributes();
+        if (attrs == null) return null;
+        return getHtmlAttribute(attrs, attrName);
     }
 
     /**

@@ -67,12 +67,14 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
     private static final String ARG_PACKAGE_NAME = "package_name";
     private static final String ARG_RP_ID = "rp_id";
     private static final String ARG_USER_NAME = "user_name";
+    private static final String ARG_RECORD_TYPE = "record_type";
 
     private String mode;
     private String webDomain;
     private String packageName;
     private String rpId;
     private String userName;
+    private String recordTypeFilter = CredentialItem.TYPE_LOGIN;
 
     // Views
     private TextView sheetTitle;
@@ -107,6 +109,15 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
                                                     String packageName,
                                                     String rpId,
                                                     String userName) {
+        return newInstance(mode, webDomain, packageName, rpId, userName, CredentialItem.TYPE_LOGIN);
+    }
+
+    public static CombinedItemsFragment newInstance(String mode,
+                                                    String webDomain,
+                                                    String packageName,
+                                                    String rpId,
+                                                    String userName,
+                                                    String recordType) {
         CombinedItemsFragment f = new CombinedItemsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_MODE, mode);
@@ -114,6 +125,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
         args.putString(ARG_PACKAGE_NAME, packageName);
         args.putString(ARG_RP_ID, rpId);
         args.putString(ARG_USER_NAME, userName);
+        args.putString(ARG_RECORD_TYPE, recordType);
         f.setArguments(args);
         return f;
     }
@@ -127,6 +139,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             packageName = getArguments().getString(ARG_PACKAGE_NAME);
             rpId = getArguments().getString(ARG_RP_ID);
             userName = getArguments().getString(ARG_USER_NAME);
+            recordTypeFilter = getArguments().getString(ARG_RECORD_TYPE, CredentialItem.TYPE_LOGIN);
         }
         if (mode == null) mode = MODE_ASSERTION;
     }
@@ -472,6 +485,10 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
     }
 
     private List<CredentialItem> filterInitial(List<CredentialItem> all) {
+        // Credit cards don't carry a website list, so they aren't domain-filterable.
+        if (CredentialItem.TYPE_CREDIT_CARD.equals(recordTypeFilter)) {
+            return new ArrayList<>(all);
+        }
         // In registration mode, prefer records matching rpId/userName; else fall through.
         if (MODE_REGISTRATION.equals(mode) && rpId != null && !rpId.isEmpty()) {
             List<CredentialItem> matches = new ArrayList<>();
@@ -598,6 +615,9 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
 
             emptyState.setText(span);
             emptyState.setMovementMethod(LinkMovementMethod.getInstance());
+        } else if (CredentialItem.TYPE_CREDIT_CARD.equals(recordTypeFilter)) {
+            emptyState.setText("No credit cards in this vault");
+            emptyState.setMovementMethod(null);
         } else {
             emptyState.setText("No matching items in this vault");
             emptyState.setMovementMethod(null);
@@ -628,7 +648,7 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             if (id == null) continue;
 
             Object recordType = record.get("type");
-            if (!(recordType instanceof String) || !"login".equals(recordType)) {
+            if (!(recordType instanceof String) || !recordTypeFilter.equals(recordType)) {
                 continue;
             }
 
@@ -646,6 +666,18 @@ public class CombinedItemsFragment extends BaseAutofillFragment {
             String name = (String) data.get("title");
             if (name == null) name = (String) data.get("name");
             if (name == null || name.isEmpty()) continue;
+
+            if (CredentialItem.TYPE_CREDIT_CARD.equals(recordTypeFilter)) {
+                CredentialItem cardItem = new CredentialItem(id, name, "", "");
+                cardItem.setRecordType(CredentialItem.TYPE_CREDIT_CARD);
+                cardItem.setCardNumber((String) data.get("number"));
+                cardItem.setCardExpireDate((String) data.get("expireDate"));
+                cardItem.setCardSecurityCode((String) data.get("securityCode"));
+                cardItem.setCardholderName((String) data.get("name"));
+                credentials.add(cardItem);
+                rawRecordsById.put(id, record);
+                continue;
+            }
 
             String uname = (String) data.get("username");
             if (uname == null) uname = (String) data.get("email");

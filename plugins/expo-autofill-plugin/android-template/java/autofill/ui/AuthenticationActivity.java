@@ -43,6 +43,12 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
     private AutofillId usernameId;
     private AutofillId passwordId;
+    private AutofillId cardNumberId;
+    private AutofillId cardExpiryDateId;
+    private AutofillId cardExpiryMonthId;
+    private AutofillId cardExpiryYearId;
+    private AutofillId cardSecurityCodeId;
+    private AutofillId cardholderNameId;
     private String webDomain;
     private String packageName;
 
@@ -88,6 +94,12 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         Intent intent = getIntent();
         usernameId = intent.getParcelableExtra("username_id");
         passwordId = intent.getParcelableExtra("password_id");
+        cardNumberId = intent.getParcelableExtra("card_number_id");
+        cardExpiryDateId = intent.getParcelableExtra("card_expiry_date_id");
+        cardExpiryMonthId = intent.getParcelableExtra("card_expiry_month_id");
+        cardExpiryYearId = intent.getParcelableExtra("card_expiry_year_id");
+        cardSecurityCodeId = intent.getParcelableExtra("card_security_code_id");
+        cardholderNameId = intent.getParcelableExtra("cardholder_name_id");
         webDomain = intent.getStringExtra("web_domain");
         packageName = intent.getStringExtra("package_name");
 
@@ -168,9 +180,19 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
     @Override
     public void navigateToVaultSelection() {
+        String recordType = hasCardFields() ? CredentialItem.TYPE_CREDIT_CARD : CredentialItem.TYPE_LOGIN;
         replaceFragment(CombinedItemsFragment.newInstance(
                 CombinedItemsFragment.MODE_ASSERTION,
-                webDomain, packageName, null, null), true);
+                webDomain, packageName, null, null, recordType), true);
+    }
+
+    private boolean hasCardFields() {
+        return cardNumberId != null
+                || cardExpiryDateId != null
+                || cardExpiryMonthId != null
+                || cardExpiryYearId != null
+                || cardSecurityCodeId != null
+                || cardholderNameId != null;
     }
 
     // 85% height sheet anchored to bottom, with a dim backdrop.
@@ -217,20 +239,24 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
         RemoteViews presentation = new RemoteViews(getPackageName(), android.R.layout.simple_list_item_1);
         presentation.setTextViewText(android.R.id.text1, credential.getTitle());
 
-        if (usernameId != null) {
-            datasetBuilder.setValue(
-                usernameId,
-                AutofillValue.forText(credential.getUsername()),
-                presentation
-            );
-        }
+        if (credential.isCreditCard()) {
+            applyCardValues(datasetBuilder, credential, presentation);
+        } else {
+            if (usernameId != null) {
+                datasetBuilder.setValue(
+                    usernameId,
+                    AutofillValue.forText(credential.getUsername()),
+                    presentation
+                );
+            }
 
-        if (passwordId != null) {
-            datasetBuilder.setValue(
-                passwordId,
-                AutofillValue.forText(credential.getPassword()),
-                presentation
-            );
+            if (passwordId != null) {
+                datasetBuilder.setValue(
+                    passwordId,
+                    AutofillValue.forText(credential.getPassword()),
+                    presentation
+                );
+            }
         }
 
         Intent replyIntent = new Intent();
@@ -238,6 +264,52 @@ public class AuthenticationActivity extends AppCompatActivity implements Navigat
 
         setResult(Activity.RESULT_OK, replyIntent);
         finish();
+    }
+
+    private void applyCardValues(Dataset.Builder builder, CredentialItem credential, RemoteViews presentation) {
+        if (cardNumberId != null) {
+            String digits = credential.getCardNumber() != null
+                    ? credential.getCardNumber().replaceAll("\\s", "")
+                    : "";
+            builder.setValue(cardNumberId, AutofillValue.forText(digits), presentation);
+        }
+
+        String expire = credential.getCardExpireDate();
+        String[] expiryParts = splitExpiry(expire);
+        if (cardExpiryDateId != null && expire != null) {
+            builder.setValue(cardExpiryDateId, AutofillValue.forText(expire), presentation);
+        }
+        if (cardExpiryMonthId != null && expiryParts[0] != null) {
+            builder.setValue(cardExpiryMonthId, AutofillValue.forText(expiryParts[0]), presentation);
+        }
+        if (cardExpiryYearId != null && expiryParts[1] != null) {
+            builder.setValue(cardExpiryYearId, AutofillValue.forText(expiryParts[1]), presentation);
+        }
+        if (cardSecurityCodeId != null && credential.getCardSecurityCode() != null) {
+            builder.setValue(cardSecurityCodeId,
+                    AutofillValue.forText(credential.getCardSecurityCode()), presentation);
+        }
+        if (cardholderNameId != null && credential.getCardholderName() != null) {
+            builder.setValue(cardholderNameId,
+                    AutofillValue.forText(credential.getCardholderName()), presentation);
+        }
+    }
+
+    private static String[] splitExpiry(String expire) {
+        String[] out = new String[]{null, null};
+        if (expire == null) return out;
+        String trimmed = expire.trim();
+        if (trimmed.isEmpty()) return out;
+        String[] parts = trimmed.split("[/\\-\\s]");
+        if (parts.length >= 2) {
+            out[0] = parts[0];
+            out[1] = parts[1];
+            if (out[1].length() == 2) out[1] = "20" + out[1];
+        } else if (trimmed.length() == 4) {
+            out[0] = trimmed.substring(0, 2);
+            out[1] = "20" + trimmed.substring(2);
+        }
+        return out;
     }
 
     @Override
