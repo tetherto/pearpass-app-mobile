@@ -51,7 +51,7 @@ struct AttachmentMetadata: Equatable {
     let name: String
 }
 
-struct AttachmentFile: Equatable {
+struct AttachmentFile: Equatable, Identifiable {
     let id: String
     let name: String
     let data: Data
