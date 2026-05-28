@@ -11,6 +11,7 @@ import { useRedirect } from './hooks/useRedirect'
 import { ToastCard } from '../../components/ToastCard'
 import { UpdateModalContent } from '../../containers/Modal/UpdateModalContent'
 import { useBottomSheet } from '../../context/BottomSheetContext'
+import { useTrackLastAccessedVault } from '../../hooks/useTrackLastAccessedVault'
 import { useVaultAccessRevoked } from '../../hooks/useVaultAccessRevoked'
 import { useVersionCheck } from '../../hooks/useVersionCheck'
 
@@ -28,6 +29,7 @@ export const App = () => {
   }, [needsUpdate])
 
   useVaultAccessRevoked()
+  useTrackLastAccessedVault()
 
   const { initialRouteName, isLoading } = useRedirect()
 
