@@ -197,7 +197,11 @@ enum PasskeyJobCreator {
             createdAt: Double(passkeyCreatedAt),
             transports: credential.response.transports,
             vaultId: vaultId,
-            note: formData.note.isEmpty ? nil : formData.note,
+            title: formData.title,
+            username: formData.username,
+            websites: formData.websites,
+            folder: formData.folder,
+            note: formData.note,
             attachments: jobAttachments,
             keepAttachmentIds: formData.keepAttachmentIds
         )
