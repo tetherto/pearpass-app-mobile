@@ -42,6 +42,9 @@ struct PasskeyFormView: View {
     /// ADD/UPDATE job is being written so the user cannot fire the save
     /// twice or dismiss mid-flight.
     var isSaving: Bool = false
+    /// True when attaching a passkey to an already-existing Login record.
+    /// Drives the primary button label.
+    var isExistingRecord: Bool = false
 
     @State private var showFolderPicker: Bool = false
     @State private var showFilePicker: Bool = false
@@ -240,7 +243,9 @@ struct PasskeyFormView: View {
                             }
 
                             PPButton(
-                                title: NSLocalizedString("Save & Add Login", comment: "save button"),
+                                title: isExistingRecord
+                                    ? NSLocalizedString("Save", comment: "save button — existing record")
+                                    : NSLocalizedString("Save & Add Login", comment: "save button"),
                                 variant: .primary,
                                 isEnabled: !isSaving,
                                 isLoading: isSaving,

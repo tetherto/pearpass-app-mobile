@@ -312,6 +312,7 @@ struct HostView: View {
             websiteError: $formWebsiteError,
             saveError: formSaveError,
             isSaving: isSavingPasskey,
+            isExistingRecord: selectedExistingRecord != nil,
             onBack: { showPasskeyForm = false },
             onClose: handleClose,
             onSave: handleFormSave,
