@@ -51,6 +51,12 @@ struct HostView: View {
     /// password screen — invalid password, missing keychain data, biometric
     /// cancel, etc. Cleared when a new auth attempt starts.
     @State private var masterPasswordError: String? = nil
+    /// Rate limiter for the master-password screen — counts failed unlocks and
+    /// applies an exponential lockout so the extension can't be brute-forced.
+    private let rateLimit = RateLimitManager()
+    @State private var rateLimitMessage: String? = nil
+    @State private var isRateLimited: Bool = false
+    @State private var lockoutCountdownTask: Task<Void, Never>? = nil
     /// Sticky once the user has typed any non-empty query; clearing the search
     /// after that point shows the full vault instead of re-applying the
     /// initial domain filter (mirrors Android behavior).
@@ -245,11 +251,15 @@ struct HostView: View {
                     : NSLocalizedString("Sign in", comment: "sheet header — credential assertion"),
                 password: bindingFor(\.masterPassword),
                 isAuthenticating: isAuthenticating,
+                rateLimitMessage: rateLimitMessage,
+                isRateLimited: isRateLimited,
                 onClose: handleClose,
                 onContinue: handleMasterPasswordContinue,
                 onFaceIDLogin: handleFaceIDLogin,
                 onPasskeyLogin: handlePasskeyLogin
             )
+            .onAppear { applyRateLimitStatus(rateLimit.getStatus()) }
+            .onDisappear { lockoutCountdownTask?.cancel(); lockoutCountdownTask = nil }
 
         case .vaultSelection, .vaultPassword, .credentialsList:
             CombinedItemsView(
@@ -312,6 +322,7 @@ struct HostView: View {
             websiteError: $formWebsiteError,
             saveError: formSaveError,
             isSaving: isSavingPasskey,
+            isExistingRecord: selectedExistingRecord != nil,
             onBack: { showPasskeyForm = false },
             onClose: handleClose,
             onSave: handleFormSave,
@@ -413,6 +424,7 @@ struct HostView: View {
         }
         let password = viewModel.masterPassword
         guard !password.isEmpty else { return }
+        if isRateLimited { return }
 
         isAuthenticating = true
         masterPasswordError = nil
@@ -427,6 +439,9 @@ struct HostView: View {
                 let vaults = try await client.listVaults()
 
                 await MainActor.run {
+                    rateLimit.reset()
+                    rateLimitMessage = nil
+                    isRateLimited = false
                     isAuthenticating = false
                     let sortedVaults = sortedByMostRecent(vaults)
                     viewModel.vaults = sortedVaults
@@ -439,12 +454,66 @@ struct HostView: View {
                 }
             } catch {
                 NSLog("[HostView] master-password unlock error: \(error)")
+                rateLimit.recordFailure()
+                let status = rateLimit.getStatus()
                 await MainActor.run {
                     isAuthenticating = false
-                    showAuthErrorToast(NSLocalizedString("Invalid master password", comment: "Invalid master password error"))
+                    viewModel.masterPassword = ""
+                    applyRateLimitStatus(status, justFailed: true)
                 }
             }
         }
+    }
+
+    private func applyRateLimitStatus(_ status: RateLimitManager.Status, justFailed: Bool = false) {
+        if status.isLocked && status.lockoutRemainingMs > 0 {
+            isRateLimited = true
+            startLockoutCountdown(remainingMs: status.lockoutRemainingMs)
+            return
+        }
+
+        lockoutCountdownTask?.cancel()
+        lockoutCountdownTask = nil
+        isRateLimited = false
+
+        if justFailed {
+            let word = status.remainingAttempts == 1 ? "attempt" : "attempts"
+            rateLimitMessage = "Incorrect password. You have \(status.remainingAttempts) \(word) before the app will be temporarily locked."
+        } else {
+            rateLimitMessage = nil
+        }
+    }
+
+    private func startLockoutCountdown(remainingMs: Int64) {
+        lockoutCountdownTask?.cancel()
+        rateLimitMessage = formatLockoutMessage(remainingMs)
+
+        lockoutCountdownTask = Task { @MainActor in
+            var remaining = remainingMs
+            while remaining > 0 && !Task.isCancelled {
+                rateLimitMessage = formatLockoutMessage(remaining)
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                remaining -= 1000
+            }
+            if !Task.isCancelled {
+                applyRateLimitStatus(rateLimit.getStatus())
+            }
+        }
+    }
+
+    private func formatLockoutMessage(_ remainingMs: Int64) -> String {
+        let totalSeconds = max(1, (remainingMs + 999) / 1000)
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        let when: String
+        if minutes > 0 && seconds > 0 {
+            when = "\(minutes)m \(seconds)s"
+        } else if minutes > 0 {
+            when = "\(minutes)m"
+        } else {
+            when = "\(seconds)s"
+        }
+        return "Too many attempts. Try again in \(when)."
     }
 
     /// Mirrors V1 MasterPasswordView.handleFaceIDLogin — fetch the keychain
@@ -487,6 +556,9 @@ struct HostView: View {
                 let vaults = try await client.listVaults()
 
                 await MainActor.run {
+                    rateLimit.reset()
+                    rateLimitMessage = nil
+                    isRateLimited = false
                     isAuthenticating = false
                     let sortedVaults = sortedByMostRecent(vaults)
                     viewModel.vaults = sortedVaults
@@ -1204,6 +1276,7 @@ struct HostView: View {
         if mode == .registration { return records }
         let isPasskeyAssertion = (passkeyRpId?.isEmpty == false)
         return records.filter { record in
+            guard record.type == "login" else { return false }
             let isPasskey = record.data?.credential != nil
             return isPasskeyAssertion ? isPasskey : !isPasskey
         }

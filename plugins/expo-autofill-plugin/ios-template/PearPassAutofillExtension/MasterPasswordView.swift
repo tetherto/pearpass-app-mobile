@@ -19,6 +19,13 @@ struct MasterPasswordView: View {
     /// are surfaced via the toast overlay rendered in HostView, not inline.
     var isAuthenticating: Bool = false
 
+    /// Inline message shown below the password field — either "X attempts
+    /// remaining" or the lockout countdown.
+    var rateLimitMessage: String? = nil
+    /// When true, the Continue button + password input are disabled because
+    /// the rate limiter has locked the screen.
+    var isRateLimited: Bool = false
+
     var onClose: () -> Void = {}
     var onContinue: () -> Void = {}
     /// Fired when the user taps the biometric button. Hidden when biometrics
@@ -78,7 +85,7 @@ struct MasterPasswordView: View {
     }
 
     private var continueEnabled: Bool {
-        !password.isEmpty && !isAuthenticating
+        !password.isEmpty && !isAuthenticating && !isRateLimited
     }
 
     var body: some View {
@@ -115,6 +122,15 @@ struct MasterPasswordView: View {
                             text: $password,
                             placeholder: NSLocalizedString("Enter Master Password", comment: "password input placeholder")
                         )
+
+                        if let rateLimitMessage = rateLimitMessage, !rateLimitMessage.isEmpty {
+                            Text(rateLimitMessage)
+                                .font(PPTypography.label)
+                                .foregroundColor(PPColors.surfaceError)
+                                .multilineTextAlignment(.leading)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.top, PPSpacing.s8)
+                        }
 
                         Spacer()
 

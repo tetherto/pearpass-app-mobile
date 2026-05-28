@@ -120,6 +120,10 @@ struct UpdatePasskeyPayload: Codable {
     let createdAt: Double
     let transports: [String]
     let vaultId: String
+    var title: String?
+    var username: String?
+    var websites: [String]?
+    var folder: String?
     var note: String?
     var attachments: [JobAttachment] = []
     var keepAttachmentIds: [String] = []
