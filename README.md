@@ -21,6 +21,8 @@
 - [Dependencies](#dependencies)
 - [Related Projects](#related-projects)
 - [Contributing](#contributing)
+- [Logging](#logging)
+- [Error reporting](#error-reporting)
 - [License](#license)
 
 ---
