@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
   AttachmentField,
-  InputField,
   MultiSlotInput,
   PasswordField,
   Text,
+  TextArea,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
@@ -118,14 +118,13 @@ export const NoteRecordDetailsForm = ({
             </Text>
 
             <MultiSlotInput testID="comments-multi-slot-input">
-              <InputField
+              <TextArea
                 label={t`Note`}
                 value={values.note}
                 placeholder={t`Enter Note`}
                 readOnly
                 copyable
                 onCopy={copyToClipboard}
-                isGrouped
                 testID="comments-multi-slot-input-slot-0"
               />
             </MultiSlotInput>

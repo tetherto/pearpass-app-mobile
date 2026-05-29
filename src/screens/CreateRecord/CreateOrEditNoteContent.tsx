@@ -2,20 +2,22 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import { Validator } from '@tetherto/pear-apps-utils-validator'
-import { RECORD_TYPES, useCreateRecord, useRecords } from '@tetherto/pearpass-lib-vault'
+import {
+  RECORD_TYPES,
+  useCreateRecord,
+  useRecords
+} from '@tetherto/pearpass-lib-vault'
 import {
   Button,
   InputField,
   MultiSlotInput,
   PasswordField,
   Text,
+  TextArea,
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import {
-  Add,
-  TrashOutlined
-} from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
@@ -111,15 +113,15 @@ export const CreateOrEditNoteContent = ({
 
   const { handleSubmit, registerArray, values, setValue, errors } =
     useForm<FormValues>({
-    initialValues: {
-      title: initialRecord?.data?.title ?? '',
-      note: initialRecord?.data?.note ?? '',
-      customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder ?? '',
-      attachments: initialRecord?.attachments ?? []
-    },
-    validate: (formValues) => schema.validate(formValues)
-  })
+      initialValues: {
+        title: initialRecord?.data?.title ?? '',
+        note: initialRecord?.data?.note ?? '',
+        customFields: initialRecord?.data?.customFields ?? [],
+        folder: selectedFolder ?? initialRecord?.folder ?? '',
+        attachments: initialRecord?.attachments ?? []
+      },
+      validate: (formValues) => schema.validate(formValues)
+    })
 
   useGetMultipleFiles({
     fieldNames: ['attachments'],
@@ -158,7 +160,9 @@ export const CreateOrEditNoteContent = ({
       data: {
         title: formValues.title,
         note: formValues.note,
-        customFields: formValues.customFields.filter((f) => f.note?.trim().length),
+        customFields: formValues.customFields.filter(
+          (f) => f.note?.trim().length
+        ),
         attachments: convertBase64FilesToUint8(
           formValues.attachments.filter(isUploadedNoteAttachment)
         )
@@ -189,7 +193,10 @@ export const CreateOrEditNoteContent = ({
     setValue('attachments', [...values.attachments, file])
   }
 
-  const handleAttachmentReplace = (index: number, file?: NoteAttachment | null) => {
+  const handleAttachmentReplace = (
+    index: number,
+    file?: NoteAttachment | null
+  ) => {
     if (!file) {
       return
     }
@@ -246,11 +253,11 @@ export const CreateOrEditNoteContent = ({
           {t`Details`}
         </Text>
 
-        <InputField
+        <TextArea
           label={t`Note`}
           value={values.note}
           placeholder={t`Enter Note`}
-          onChangeText={(value) => setValue('note', value)}
+          onChange={(value) => setValue('note', value)}
           testID="note-field"
         />
       </View>
@@ -292,34 +299,32 @@ export const CreateOrEditNoteContent = ({
           testID="hidden-messages-multi-slot-input"
         >
           {customFieldsList.length ? (
-            customFieldsList.map(
-              (field, index) => (
-                <PasswordField
-                  key={`${field.type}-${index}`}
-                  label={t`Hidden Message`}
-                  value={field.note ?? ''}
-                  placeholder={t`Enter Hidden Message`}
-                  onChangeText={(value) =>
-                    setValue(`customFields[${index}].note`, value)
-                  }
-                  isGrouped
-                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                  rightSlot={
-                    customFieldsList.length > 1 ? (
-                      <Button
-                        size="small"
-                        variant="tertiary"
-                        aria-label="Delete hidden message"
-                        iconBefore={
-                          <TrashOutlined color={theme.colors.colorTextPrimary} />
-                        }
-                        onClick={() => removeCustomField(index)}
-                      />
-                    ) : undefined
-                  }
-                />
-              )
-            )
+            customFieldsList.map((field, index) => (
+              <PasswordField
+                key={`${field.type}-${index}`}
+                label={t`Hidden Message`}
+                value={field.note ?? ''}
+                placeholder={t`Enter Hidden Message`}
+                onChangeText={(value) =>
+                  setValue(`customFields[${index}].note`, value)
+                }
+                isGrouped
+                testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                rightSlot={
+                  customFieldsList.length > 1 ? (
+                    <Button
+                      size="small"
+                      variant="tertiary"
+                      aria-label="Delete hidden message"
+                      iconBefore={
+                        <TrashOutlined color={theme.colors.colorTextPrimary} />
+                      }
+                      onClick={() => removeCustomField(index)}
+                    />
+                  ) : undefined
+                }
+              />
+            ))
           ) : (
             <PasswordField
               label={t`Hidden Message`}
