@@ -36,6 +36,7 @@ import {
   handleExportCSVPerVault,
   handleExportJsonPerVault
 } from '../Settings/TabExport/utils/exportVaults'
+import { ExportCancelledError } from '../Settings/TabExport/utils/shareExportFile'
 
 export const ExportItems = () => {
   const navigation = useNavigation()
@@ -151,6 +152,12 @@ export const ExportItems = () => {
           })
         }
       } catch (error: unknown) {
+        // The user dismissed the share sheet / save dialog — not a failure,
+        // so don't show any message.
+        if (error instanceof ExportCancelledError) {
+          return
+        }
+
         Toast.show({
           type: 'error',
           text1: t`Export failed`,
