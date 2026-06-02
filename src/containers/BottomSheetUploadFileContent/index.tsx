@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
 import { MAX_FILE_SIZE_MB } from '@tetherto/pearpass-lib-constants'
@@ -12,8 +12,11 @@ import {
 import { Close } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 
-import { withAutoLockBypass } from '../../HOCs'
-import { handleChooseFile, handleChooseMedia } from '../../utils/handleChooseFile'
+import { useAutoLockContext } from '../../context/AutoLockContext'
+import {
+  handleChooseFile,
+  handleChooseMedia
+} from '../../utils/handleChooseFile'
 
 type AttachmentFile = {
   base64: string
@@ -51,10 +54,7 @@ const BottomSheetUploadFileBodyContent = ({
     setIsFileSizeWarning(true)
   }
 
-  const launchPicker = (
-    action: PickerAction,
-    picker: () => Promise<void>
-  ) => {
+  const launchPicker = (action: PickerAction, picker: () => Promise<void>) => {
     setLoadingAction(action)
 
     requestAnimationFrame(() => {
@@ -148,12 +148,26 @@ const BottomSheetUploadFileBodyContent = ({
   )
 }
 
-export const BottomSheetUploadFileBody = withAutoLockBypass(
-  BottomSheetUploadFileBodyContent
-)
+export const BottomSheetUploadFileBody = BottomSheetUploadFileBodyContent
 
-export const BottomSheetUploadFileContent = withAutoLockBypass(
-  ({ onFileSelect, trigger, open, onOpenChange, testID }: Props) => (
+export const BottomSheetUploadFileContent = ({
+  onFileSelect,
+  trigger,
+  open,
+  onOpenChange,
+  testID
+}: Props) => {
+  const { setShouldBypassAutoLock } = useAutoLockContext() as {
+    setShouldBypassAutoLock: (value: boolean) => void
+  }
+
+  useEffect(() => {
+    if (!open) return
+    setShouldBypassAutoLock(true)
+    return () => setShouldBypassAutoLock(false)
+  }, [open, setShouldBypassAutoLock])
+
+  return (
     <ContextMenu
       trigger={trigger}
       open={open}
@@ -166,7 +180,7 @@ export const BottomSheetUploadFileContent = withAutoLockBypass(
       />
     </ContextMenu>
   )
-)
+}
 
 const styles = StyleSheet.create({
   sheetContent: {
