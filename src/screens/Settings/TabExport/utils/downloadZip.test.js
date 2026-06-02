@@ -1,8 +1,8 @@
 import * as FileSystem from 'expo-file-system'
-import * as Sharing from 'expo-sharing'
 import JSZip from 'jszip'
 
 import { downloadZip } from './downloadZip'
+import { ExportCancelledError, shareExportFile } from './shareExportFile'
 
 jest.mock('expo-file-system', () => ({
   documentDirectory: '/mock-dir/',
@@ -10,10 +10,13 @@ jest.mock('expo-file-system', () => ({
   EncodingType: { Base64: 'base64' }
 }))
 
-jest.mock('expo-sharing', () => ({
-  isAvailableAsync: jest.fn(),
-  shareAsync: jest.fn()
-}))
+jest.mock('./shareExportFile', () => {
+  class ExportCancelledError extends Error {}
+  return {
+    ExportCancelledError,
+    shareExportFile: jest.fn()
+  }
+})
 
 jest.mock('jszip')
 
@@ -34,9 +37,8 @@ describe('downloadZip', () => {
     { filename: 'file2.txt', data: 'data2' }
   ]
 
-  it('creates a zip, writes it as base64, and shares if available', async () => {
+  it('creates a zip and shares it as base64', async () => {
     mockGenerateAsync.mockResolvedValue('base64content')
-    Sharing.isAvailableAsync.mockResolvedValue(true)
 
     await downloadZip(files)
 
@@ -45,32 +47,21 @@ describe('downloadZip', () => {
     expect(mockFile).toHaveBeenCalledWith('file2.txt', 'data2')
     expect(mockGenerateAsync).toHaveBeenCalledWith({ type: 'base64' })
 
-    const fileUriArg = FileSystem.writeAsStringAsync.mock.calls[0][0]
-    expect(fileUriArg).toMatch(/\/mock-dir\/PearPass_Export_.*\.zip/)
-
-    expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
-      expect.stringContaining('/mock-dir/PearPass_Export_'),
-      'base64content',
-      { encoding: FileSystem.EncodingType.Base64 }
-    )
-    expect(Sharing.shareAsync).toHaveBeenCalledWith(fileUriArg)
+    expect(shareExportFile).toHaveBeenCalledWith({
+      filename: expect.stringMatching(/PearPass_Export_.*\.zip/),
+      content: 'base64content',
+      encoding: FileSystem.EncodingType.Base64,
+      mimeType: 'application/zip'
+    })
   })
 
-  it('throws an error if sharing is not available', async () => {
+  it('rethrows cancellation so callers stay silent', async () => {
     mockGenerateAsync.mockResolvedValue('base64content')
-    Sharing.isAvailableAsync.mockResolvedValue(false)
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    shareExportFile.mockRejectedValueOnce(new ExportCancelledError())
 
-    await downloadZip(files)
-
-    expect(FileSystem.writeAsStringAsync).toHaveBeenCalled()
-    expect(Sharing.shareAsync).not.toHaveBeenCalled()
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Error creating or saving zip:',
-      new Error('Sharing is not available on this platform')
+    await expect(downloadZip(files)).rejects.toBeInstanceOf(
+      ExportCancelledError
     )
-
-    errorSpy.mockRestore()
   })
 
   it('logs error if something fails', async () => {

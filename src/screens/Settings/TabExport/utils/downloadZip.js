@@ -1,7 +1,7 @@
 import * as FileSystem from 'expo-file-system'
-import * as Sharing from 'expo-sharing'
 import JSZip from 'jszip'
 
+import { ExportCancelledError, shareExportFile } from './shareExportFile'
 import { logger } from '../../../../utils/logger'
 
 export const downloadZip = async (files) => {
@@ -14,25 +14,22 @@ export const downloadZip = async (files) => {
 
     const content = await zip.generateAsync({ type: 'base64' })
 
-    const fileUri = `${FileSystem.documentDirectory}PearPass_Export_${new Date()
+    const filename = `PearPass_Export_${new Date()
       .toISOString()
       .replace(/[:.-]/g, '_')}.zip`
 
-    await FileSystem.writeAsStringAsync(fileUri, content, {
-      encoding: FileSystem.EncodingType.Base64
+    await shareExportFile({
+      filename,
+      content,
+      encoding: FileSystem.EncodingType.Base64,
+      mimeType: 'application/zip'
     })
-
-    if (await Sharing.isAvailableAsync()) {
-      try {
-        await Sharing.shareAsync(fileUri)
-      } catch (error) {
-        throw error
-      }
-      return
-    }
-
-    throw new Error('Sharing is not available on this platform')
   } catch (error) {
+    // Let cancellation propagate so callers can stay silent instead of
+    // showing a success message.
+    if (error instanceof ExportCancelledError) {
+      throw error
+    }
     logger.error('Error creating or saving zip:', error)
   }
 }
