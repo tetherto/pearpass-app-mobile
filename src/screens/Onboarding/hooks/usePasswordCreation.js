@@ -28,7 +28,7 @@ import {
 
 export const usePasswordCreation = () => {
   const { t } = useLingui()
-  const { createMasterPassword, logIn } = useUserData()
+  const { createMasterPassword, logIn, refetch: refetchUser } = useUserData()
   const { initVaults } = useVaults()
   const { createVault } = useCreateVault()
   const { addDevice } = useVault()
@@ -164,6 +164,7 @@ export const usePasswordCreation = () => {
       // Create the default "Personal" vault right after master password setup
       const loginBuffer = stringToBuffer(password)
       await logIn({ password: loginBuffer })
+      await refetchUser()
       await initVaults({ password: loginBuffer })
       await createVault({ name: t`Personal` })
       await addDevice()

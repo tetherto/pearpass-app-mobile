@@ -11,7 +11,7 @@ import {
 import { Dimensions, Keyboard, StyleSheet, View } from 'react-native'
 import { Camera } from 'react-native-vision-camera'
 
-import { withAutoLockBypass } from '../../HOCs'
+import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useQRScanner } from '../../hooks/useQRScanner'
 import { SheetHeader } from '../BottomSheet/SheetHeader'
 
@@ -60,17 +60,10 @@ const BottomSheetQrScannerBodyContent = ({
       <View style={styles.body}>
         {hasPermission === false || hasPermission === null ? (
           <View style={styles.permissionContainer}>
-            <Text
-              variant="body"
-              color={theme.colors.colorTextSecondary}
-            >
+            <Text variant="body" color={theme.colors.colorTextSecondary}>
               {t`Camera access is required to scan QR codes.`}
             </Text>
-            <Button
-              variant="primary"
-              fullWidth
-              onClick={requestPermission}
-            >
+            <Button variant="primary" fullWidth onClick={requestPermission}>
               {t`Allow Access`}
             </Button>
           </View>
@@ -104,9 +97,7 @@ const BottomSheetQrScannerBodyContent = ({
   )
 }
 
-const BottomSheetQrScannerBody = withAutoLockBypass(
-  BottomSheetQrScannerBodyContent
-)
+const BottomSheetQrScannerBody = BottomSheetQrScannerBodyContent
 
 type Props = {
   onScanned: (data: string) => void
@@ -116,26 +107,40 @@ type Props = {
   onOpenChange?: (open: boolean) => void
 }
 
-export const BottomSheetQrScannerSheet = withAutoLockBypass(
-  ({ onScanned, title, trigger, open, onOpenChange }: Props) => {
-    const { t } = useLingui()
-    const sheetTitle = title ?? t`Scan Authenticator QR Code`
-
-    useEffect(() => {
-      if (open) Keyboard.dismiss()
-    }, [open])
-
-    return (
-      <ContextMenu trigger={trigger} open={open} onOpenChange={onOpenChange}>
-        <BottomSheetQrScannerBody
-          title={sheetTitle}
-          onScanned={onScanned}
-          onClose={() => onOpenChange?.(false)}
-        />
-      </ContextMenu>
-    )
+export const BottomSheetQrScannerSheet = ({
+  onScanned,
+  title,
+  trigger,
+  open,
+  onOpenChange
+}: Props) => {
+  const { t } = useLingui()
+  const sheetTitle = title ?? t`Scan Authenticator QR Code`
+  const { setShouldBypassAutoLock } = useAutoLockContext() as {
+    setShouldBypassAutoLock: (value: boolean) => void
+    [key: string]: unknown
   }
-)
+
+  useEffect(() => {
+    if (open) Keyboard.dismiss()
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
+    setShouldBypassAutoLock(true)
+    return () => setShouldBypassAutoLock(false)
+  }, [open, setShouldBypassAutoLock])
+
+  return (
+    <ContextMenu trigger={trigger} open={open} onOpenChange={onOpenChange}>
+      <BottomSheetQrScannerBody
+        title={sheetTitle}
+        onScanned={onScanned}
+        onClose={() => onOpenChange?.(false)}
+      />
+    </ContextMenu>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {

@@ -60,6 +60,12 @@ export const useCopyToClipboard = () => {
   const copyToClipboard = useCallback(
     async (text) => {
       if (!isCopyToClipboardEnabled) {
+        Toast.show({
+          type: 'baseToast',
+          text1: t`Please turn on the Copy to clipboard action from your settings`,
+          position: 'bottom',
+          bottomOffset: 100
+        })
         return false
       }
 
