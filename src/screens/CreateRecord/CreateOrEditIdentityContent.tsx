@@ -495,6 +495,7 @@ export const CreateOrEditIdentityContent = ({
             placeholder={t`Enter Email Address`}
             onChangeText={(val) => setValue('email', val)}
             error={(errors as Record<string, string | undefined>)?.email}
+            inputType="email"
             testID="email-input-field"
           />
           <InputField
