@@ -10,6 +10,7 @@ i18n.activate('en')
 
 const mockCreateMasterPassword = jest.fn()
 const mockLogIn = jest.fn()
+const mockRefetchUser = jest.fn()
 const mockInitVaults = jest.fn()
 const mockCreateVault = jest.fn()
 const mockAddDevice = jest.fn()
@@ -100,7 +101,8 @@ jest.mock('@tetherto/pearpass-lib-vault', () => ({
   }),
   useUserData: () => ({
     createMasterPassword: mockCreateMasterPassword,
-    logIn: mockLogIn
+    logIn: mockLogIn,
+    refetch: mockRefetchUser
   }),
   useVault: () => ({
     addDevice: mockAddDevice
@@ -151,6 +153,7 @@ describe('usePasswordCreation', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLogIn.mockResolvedValue(undefined)
+    mockRefetchUser.mockResolvedValue(undefined)
     mockInitVaults.mockResolvedValue(undefined)
     mockCreateVault.mockResolvedValue(undefined)
     mockAddDevice.mockResolvedValue(undefined)
@@ -185,6 +188,7 @@ describe('usePasswordCreation', () => {
     })
 
     expect(mockLogIn).toHaveBeenCalledTimes(1)
+    expect(mockRefetchUser).toHaveBeenCalledTimes(1)
     expect(mockInitVaults).toHaveBeenCalledTimes(1)
     expect(mockCreateVault).toHaveBeenCalledTimes(1)
     expect(mockAddDevice).toHaveBeenCalledTimes(1)
