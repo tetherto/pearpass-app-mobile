@@ -30,6 +30,7 @@ export interface CreditCardData {
   pinCode?: string
   note?: string
   customFields?: CustomField[]
+  attachments?: Attachment[]
 }
 export type CreditCardRecord = BaseRecord<CreditCardData>
 
@@ -99,11 +100,13 @@ export type WifiPasswordRecord = BaseRecord<WifiPasswordData>
 export interface CustomRecordData {
   note?: string
   customFields?: CustomField[]
+  attachments?: Attachment[]
 }
 export type CustomRecord = BaseRecord<CustomRecordData>
 
 export interface NoteRecordData {
   note?: string
   customFields?: CustomField[]
+  attachments?: Attachment[]
 }
 export type NoteRecord = BaseRecord<NoteRecordData>

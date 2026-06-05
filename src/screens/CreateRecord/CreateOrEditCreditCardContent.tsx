@@ -25,6 +25,7 @@ import { Layout } from '../../containers/Layout'
 import { useLoadingContext } from '../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
 import { convertBase64FilesToUint8 } from '../../utils/convertBase64FilesToUint8'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
 import { AttachmentFields } from '../../components/AttachmentFields'
 import { FolderSelectField } from '../../components/FolderSelectField'
@@ -137,7 +138,7 @@ export const CreateOrEditCreditCardContent = ({
         note: initialRecord?.data?.note ?? '',
         customFields: initialRecord?.data?.customFields ?? [],
         folder: selectedFolder ?? initialRecord?.folder,
-        attachments: initialRecord?.attachments ?? []
+        attachments: getRecordAttachments(initialRecord)
       },
       validate: (formValues) => schema.validate(formValues)
     })
