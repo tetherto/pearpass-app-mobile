@@ -91,6 +91,7 @@ export type IdentityRecord = BaseRecord<IdentityData>
 
 export interface WifiPasswordData {
   title?: string
+  name?: string
   password?: string
   note?: string
   customFields?: CustomField[]

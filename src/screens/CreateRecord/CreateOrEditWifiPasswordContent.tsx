@@ -30,6 +30,7 @@ import { getPasswordIndicatorVariant } from '../../utils/passwordPolicy'
 type WifiRecord = {
   data?: {
     title?: string
+    name?: string
     password?: string
     note?: string
     customFields?: Array<{ type: string; note: string }>
@@ -53,6 +54,7 @@ type CreatePasswordItemNavigation = {
 
 type FormValues = {
   title: string
+  name: string
   password: string
   note: string
   customFields: Array<{ type: string; note: string }>
@@ -79,7 +81,8 @@ export const CreateOrEditWifiPasswordContent = ({
   })
 
   const schema = Validator.object({
-    title: Validator.string().required(t`Name is required`),
+    title: Validator.string().required(t`Title is required`),
+    name: Validator.string().required(t`Name is required`),
     password: Validator.string().required(t`Password is required`),
     note: Validator.string(),
     customFields: Validator.array().items(
@@ -94,6 +97,8 @@ export const CreateOrEditWifiPasswordContent = ({
     useForm({
       initialValues: {
         title: initialRecord?.data?.title ?? '',
+        name:
+          initialRecord?.data?.name ?? initialRecord?.data?.title ?? '',
         password: initialRecord?.data?.password ?? '',
         note: initialRecord?.data?.note ?? '',
         customFields: initialRecord?.data?.customFields ?? [],
@@ -122,6 +127,7 @@ export const CreateOrEditWifiPasswordContent = ({
       isFavorite: initialRecord?.isFavorite,
       data: {
         title: formValues.title,
+        name: formValues.name,
         password: formValues.password,
         note: formValues.note,
         customFields: formValues.customFields.filter((f) => f.note?.trim().length)
@@ -176,13 +182,28 @@ export const CreateOrEditWifiPasswordContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading || !values.title.trim() || !values.password.trim()}
+          disabled={
+            isLoading ||
+            !values.title.trim() ||
+            !values.name.trim() ||
+            !values.password.trim()
+          }
           onClick={handleSubmit(onSubmit)}
         >
           {actionLabel}
         </Button>
       }
     >
+      <View>
+        <InputField
+          label={t`Title`}
+          value={values.title}
+          placeholder={t`Enter Title`}
+          onChangeText={(val) => setValue('title', val)}
+          testID="title-field"
+        />
+      </View>
+
       <View style={styles.section}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Details`}
@@ -202,9 +223,9 @@ export const CreateOrEditWifiPasswordContent = ({
         >
           <InputField
             label={t`Wi-Fi Name`}
-            value={values.title}
+            value={values.name}
             placeholder={t`Enter Name of Network`}
-            onChangeText={(val) => setValue('title', val)}
+            onChangeText={(val) => setValue('name', val)}
             testID="wifi-name-input-field"
           />
           <PasswordField
