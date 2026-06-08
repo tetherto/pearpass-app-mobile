@@ -12,7 +12,6 @@ import {
 import {
   Button,
   InputField,
-  DateField,
   MultiSlotInput,
   PasswordField,
   Text,
@@ -31,6 +30,7 @@ import { convertBase64FilesToUint8 } from '../../utils/convertBase64FilesToUint8
 import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
 import { AttachmentFields } from '../../components/AttachmentFields'
+import { ClearableDateField as DateField } from '../../components/ClearableDateField'
 import { FolderSelectField } from '../../components/FolderSelectField'
 
 type AttachmentFile = {
