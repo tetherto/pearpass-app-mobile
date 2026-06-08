@@ -18,6 +18,7 @@ import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
 import { getMimeType } from '../../utils/getMimeType'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { handleDownloadFile } from '../../utils/handleDownloadFile'
 import { Attachment, CreditCardRecord, CustomField } from './types'
 import { toReadOnlyFieldProps } from './utils'
@@ -61,6 +62,11 @@ export const CreditCardRecordDetailsForm = ({
   }
   const { copyToClipboard } = useCopyToClipboard()
 
+  const recordAttachments = useMemo(
+    () => getRecordAttachments(initialRecord),
+    [initialRecord]
+  )
+
   const initialValues = useMemo<CreditCardRecordDetailsFormValues>(
     () => ({
       name: initialRecord?.data?.name ?? '',
@@ -71,9 +77,9 @@ export const CreditCardRecordDetailsForm = ({
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.attachments ?? []
+      attachments: recordAttachments
     }),
-    [initialRecord, selectedFolder]
+    [initialRecord, selectedFolder, recordAttachments]
   )
 
   const { register, setValues, values, setValue } =
@@ -98,7 +104,10 @@ export const CreditCardRecordDetailsForm = ({
   const hasPinCode = !!values.pinCode.length
   const hasNote = !!values.note.length
   const hasCustomFields = !!values.customFields.length
-  const hasAttachments = !!values.attachments.length
+  const hasAttachments =
+    values.attachments.length > 0 || recordAttachments.length > 0
+  const attachmentsToDisplay =
+    values.attachments.length > 0 ? values.attachments : recordAttachments
 
   const handleAttachmentPress = async (attachment: Attachment) => {
     if (getMimeType(attachment.name).startsWith('image/')) {
@@ -203,7 +212,7 @@ export const CreditCardRecordDetailsForm = ({
 
         {hasAttachments && (
           <MultiSlotInput testID="attachments-multi-slot-input">
-            {values.attachments.map((attachment, index) => (
+            {attachmentsToDisplay.map((attachment, index) => (
               <AttachmentField
                 key={attachment?.id || attachment.name}
                 label={t`Attachment`}

@@ -18,6 +18,7 @@ import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
 import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
 import { getMimeType } from '../../utils/getMimeType'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { handleDownloadFile } from '../../utils/handleDownloadFile'
 import { Attachment, IdentityRecord } from './types'
 import { toReadOnlyFieldProps } from './utils'
@@ -149,7 +150,7 @@ export const IdentityRecordDetailsForm = ({
       drivingLicenseExpiryDate: initialRecord?.data?.drivingLicenseExpiryDate ?? '',
       drivingLicenseIssuingCountry: initialRecord?.data?.drivingLicenseIssuingCountry ?? '',
       drivingLicensePicture: initialRecord?.data?.drivingLicensePicture ?? [],
-      attachments: initialRecord?.attachments ?? []
+      attachments: getRecordAttachments(initialRecord)
     }),
     [initialRecord, selectedFolder]
   )

@@ -30,6 +30,7 @@ import { useLoadingContext } from '../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
 import { addHttps } from '../../utils/addHttps'
 import { convertBase64FilesToUint8 } from '../../utils/convertBase64FilesToUint8'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { formatPasskeyDate } from '../../utils/formatPasskeyDate'
 import { logger } from '../../utils/logger'
 import { getPasswordIndicatorVariant } from '../../utils/passwordPolicy'
@@ -179,7 +180,7 @@ export const CreateOrEditLoginContent = ({
           : [{ website: '' }],
         customFields: initialRecord?.data?.customFields ?? [],
         folder: selectedFolder ?? initialRecord?.folder,
-        attachments: initialRecord?.attachments ?? [],
+        attachments: getRecordAttachments(initialRecord),
         credential: initialRecord?.data?.credential?.id ?? '',
         passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
       },

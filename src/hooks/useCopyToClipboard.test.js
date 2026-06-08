@@ -87,7 +87,12 @@ describe('useCopyToClipboard', () => {
 
     expect(returnValue).toBe(false)
     expect(Clipboard.setStringAsync).not.toHaveBeenCalled()
-    expect(Toast.show).not.toHaveBeenCalled()
+    expect(Toast.show).toHaveBeenCalledWith({
+      type: 'baseToast',
+      text1: 'Please turn on the Copy to clipboard action from your settings',
+      position: 'bottom',
+      bottomOffset: 100
+    })
     expect(result.current.isCopied).toBe(false)
   })
 

@@ -226,7 +226,7 @@ export const AttachmentFields = <T extends AttachmentLike>({
             closeUploadSheet()
           }
         }}
-        onFileSelect={(file) => handleUploadSelect(file as T | null)}
+        onFileSelect={(file) => handleUploadSelect(file as unknown as T)}
       />
     </View>
   )

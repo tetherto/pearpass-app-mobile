@@ -26,6 +26,7 @@ import { usePasswordChangeReminder } from '../../hooks/usePasswordChangeReminder
 import { addHttps } from '../../utils/addHttps'
 import { formatPasskeyDate } from '../../utils/formatPasskeyDate'
 import { getMimeType } from '../../utils/getMimeType'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { handleDownloadFile } from '../../utils/handleDownloadFile'
 import { Attachment, CustomField, LoginRecord } from './types'
 import { toReadOnlyFieldProps } from './utils'
@@ -71,6 +72,11 @@ export const LoginRecordDetailsForm = ({
 
   const websites = initialRecord?.data?.websites ?? []
 
+  const recordAttachments = useMemo(
+    () => getRecordAttachments(initialRecord),
+    [initialRecord]
+  )
+
   const initialValues = useMemo<LoginRecordDetailsFormValues>(
     () => ({
       username: initialRecord?.data?.username ?? '',
@@ -78,11 +84,11 @@ export const LoginRecordDetailsForm = ({
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder,
-      attachments: initialRecord?.attachments ?? [],
+      attachments: recordAttachments,
       credential: initialRecord?.data?.credential?.id ?? '',
       passkeyCreatedAt: initialRecord?.data?.passkeyCreatedAt ?? null
     }),
-    [initialRecord?.id, initialRecord?.updatedAt, selectedFolder]
+    [initialRecord?.id, initialRecord?.updatedAt, selectedFolder, recordAttachments]
   )
 
   const { register, setValues, values, setValue } =
@@ -106,7 +112,10 @@ export const LoginRecordDetailsForm = ({
   const hasWebsites = websites.length > 0
   const hasNote = !!values.note.length
   const hasCustomFields = !!values.customFields.length
-  const hasAttachments = !!values.attachments.length
+  const hasAttachments =
+    values.attachments.length > 0 || recordAttachments.length > 0
+  const attachmentsToDisplay =
+    values.attachments.length > 0 ? values.attachments : recordAttachments
 
   const isPasswordSixMonthsOld = () => {
     const { passwordUpdatedAt } = initialRecord?.data || {}
@@ -229,7 +238,7 @@ export const LoginRecordDetailsForm = ({
 
         {hasAttachments && (
           <MultiSlotInput testID="attachments-multi-slot-input">
-            {values.attachments.map((attachment, index) => (
+            {attachmentsToDisplay.map((attachment, index) => (
               <AttachmentField
                 key={attachment?.id || attachment.name}
                 label={t`Attachment`}
