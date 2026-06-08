@@ -739,45 +739,40 @@ export const CreateOrEditIdentityContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note?: string }>).length
-            ? (values.customFields as Array<{ type: string; note?: string }>).map(
-                (field, index) => (
-                  <PasswordField
-                    key={`${field.type}-${index}`}
-                    label={t`Hidden Message`}
-                    value={field.note ?? ''}
-                    placeholder={t`Enter Hidden Message`}
-                    onChangeText={(val) =>
-                      setValue(`customFields[${index}].note`, val)
+          {((values.customFields as Array<{ type: string; note?: string }>)
+            .length
+            ? (values.customFields as Array<{ type: string; note?: string }>)
+            : [{ type: 'note', note: '' }]
+          ).map((field, index) => (
+            <PasswordField
+              key={`${field.type}-${index}`}
+              label={t`Hidden Message`}
+              value={field.note ?? ''}
+              placeholder={t`Enter Hidden Message`}
+              onChangeText={(val) =>
+                (values.customFields as Array<{ type: string; note?: string }>)
+                  .length
+                  ? setValue(`customFields[${index}].note`, val)
+                  : handleFirstHiddenMessageChange(val)
+              }
+              isGrouped
+              testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              rightSlot={
+                (values.customFields as Array<{ type: string; note?: string }>)
+                  .length > 1 ? (
+                  <Button
+                    size="small"
+                    variant="tertiary"
+                    aria-label="Delete hidden message"
+                    iconBefore={
+                      <TrashOutlined color={theme.colors.colorTextPrimary} />
                     }
-                    isGrouped
-                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                    rightSlot={
-                      (values.customFields as Array<{ type: string; note?: string }>).length > 1 ? (
-                        <Button
-                          size="small"
-                          variant="tertiary"
-                          aria-label="Delete hidden message"
-                          iconBefore={
-                            <TrashOutlined color={theme.colors.colorTextPrimary} />
-                          }
-                          onClick={() => removeCustomField(index)}
-                        />
-                      ) : undefined
-                    }
+                    onClick={() => removeCustomField(index)}
                   />
-                )
-              )
-            : (
-              <PasswordField
-                label={t`Hidden Message`}
-                value=""
-                placeholder={t`Enter Hidden Message`}
-                onChangeText={handleFirstHiddenMessageChange}
-                isGrouped
-                testID="hidden-messages-multi-slot-input-slot-0"
-              />
-            )}
+                ) : undefined
+              }
+            />
+          ))}
         </MultiSlotInput>
       </View>
     </Layout>

@@ -505,39 +505,35 @@ export const CreateOrEditLoginContent = ({
           errorMessage={(errors as Record<string, { error?: { note?: string } }[]>)?.customFields?.find(Boolean)?.error?.note}
           testID="hidden-messages-multi-slot-input"
         >
-          {values.customFields.length
-            ? values.customFields.map((field, index) => (
-              <PasswordField
-                key={index}
-                label={t`Hidden Message`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Hidden Message`}
-                onChangeText={(val) => setValue(`customFields[${index}].note`, val)}
-                isGrouped
-                testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                rightSlot={
-                  values.customFields.length > 1 ? (
-                    <Button
-                      size='small'
-                      variant="tertiary"
-                      aria-label="Delete hidden message"
-                      iconBefore={<TrashOutlined color={theme.colors.colorTextPrimary} />}
-                      onClick={() => removeCustomField(index)}
-                    />
-                  ) : undefined
-                }
-              />
-            ))
-            : (
-              <PasswordField
-                label={t`Hidden Message`}
-                value=""
-                placeholder={t`Enter Hidden Message`}
-                onChangeText={handleFirstHiddenMessageChange}
-                isGrouped
-                testID="hidden-messages-multi-slot-input-slot-0"
-              />
-            )}
+          {(values.customFields.length
+            ? values.customFields
+            : [{ type: 'note', note: '' }]
+          ).map((field, index) => (
+            <PasswordField
+              key={index}
+              label={t`Hidden Message`}
+              value={field.note ?? ''}
+              placeholder={t`Enter Hidden Message`}
+              onChangeText={(val) =>
+                values.customFields.length
+                  ? setValue(`customFields[${index}].note`, val)
+                  : handleFirstHiddenMessageChange(val)
+              }
+              isGrouped
+              testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              rightSlot={
+                values.customFields.length > 1 ? (
+                  <Button
+                    size='small'
+                    variant="tertiary"
+                    aria-label="Delete hidden message"
+                    iconBefore={<TrashOutlined color={theme.colors.colorTextPrimary} />}
+                    onClick={() => removeCustomField(index)}
+                  />
+                ) : undefined
+              }
+            />
+          ))}
         </MultiSlotInput>
       </View>
     </Layout>

@@ -299,43 +299,37 @@ export const CreateOrEditNoteContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {customFieldsList.length ? (
-            customFieldsList.map((field, index) => (
-              <PasswordField
-                key={`${field.type}-${index}`}
-                label={t`Hidden Message`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Hidden Message`}
-                onChangeText={(value) =>
-                  setValue(`customFields[${index}].note`, value)
-                }
-                isGrouped
-                testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                rightSlot={
-                  customFieldsList.length > 1 ? (
-                    <Button
-                      size="small"
-                      variant="tertiary"
-                      aria-label="Delete hidden message"
-                      iconBefore={
-                        <TrashOutlined color={theme.colors.colorTextPrimary} />
-                      }
-                      onClick={() => removeCustomField(index)}
-                    />
-                  ) : undefined
-                }
-              />
-            ))
-          ) : (
+          {(customFieldsList.length
+            ? customFieldsList
+            : [{ type: 'note', note: '' }]
+          ).map((field, index) => (
             <PasswordField
+              key={`${field.type}-${index}`}
               label={t`Hidden Message`}
-              value=""
+              value={field.note ?? ''}
               placeholder={t`Enter Hidden Message`}
-              onChangeText={handleFirstCustomFieldChange}
+              onChangeText={(value) =>
+                customFieldsList.length
+                  ? setValue(`customFields[${index}].note`, value)
+                  : handleFirstCustomFieldChange(value)
+              }
               isGrouped
-              testID="hidden-messages-multi-slot-input-slot-0"
+              testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              rightSlot={
+                customFieldsList.length > 1 ? (
+                  <Button
+                    size="small"
+                    variant="tertiary"
+                    aria-label="Delete hidden message"
+                    iconBefore={
+                      <TrashOutlined color={theme.colors.colorTextPrimary} />
+                    }
+                    onClick={() => removeCustomField(index)}
+                  />
+                ) : undefined
+              }
             />
-          )}
+          ))}
         </MultiSlotInput>
       </View>
     </Layout>
