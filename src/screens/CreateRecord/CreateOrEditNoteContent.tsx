@@ -30,6 +30,7 @@ import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
 import { AttachmentFields } from '../../components/AttachmentFields'
 import { FolderSelectField } from '../../components/FolderSelectField'
+import { useScrollToError } from '../../hooks/useScrollToError'
 
 type UploadedNoteAttachment = {
   base64: string
@@ -216,9 +217,21 @@ export const CreateOrEditNoteContent = ({
     setValue('attachments', updatedAttachments)
   }
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+
+    scrollToFirstError([{ hasError: !!validationErrors.title, key: 'title' }])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -233,13 +246,13 @@ export const CreateOrEditNoteContent = ({
           fullWidth
           isLoading={isLoading}
           disabled={isLoading || !values.title.trim()}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           value={values.title}
@@ -299,43 +312,37 @@ export const CreateOrEditNoteContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {customFieldsList.length ? (
-            customFieldsList.map((field, index) => (
-              <PasswordField
-                key={`${field.type}-${index}`}
-                label={t`Hidden Message`}
-                value={field.note ?? ''}
-                placeholder={t`Enter Hidden Message`}
-                onChangeText={(value) =>
-                  setValue(`customFields[${index}].note`, value)
-                }
-                isGrouped
-                testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                rightSlot={
-                  customFieldsList.length > 1 ? (
-                    <Button
-                      size="small"
-                      variant="tertiary"
-                      aria-label="Delete hidden message"
-                      iconBefore={
-                        <TrashOutlined color={theme.colors.colorTextPrimary} />
-                      }
-                      onClick={() => removeCustomField(index)}
-                    />
-                  ) : undefined
-                }
-              />
-            ))
-          ) : (
+          {(customFieldsList.length
+            ? customFieldsList
+            : [{ type: 'note', note: '' }]
+          ).map((field, index) => (
             <PasswordField
+              key={`${field.type}-${index}`}
               label={t`Hidden Message`}
-              value=""
+              value={field.note ?? ''}
               placeholder={t`Enter Hidden Message`}
-              onChangeText={handleFirstCustomFieldChange}
+              onChangeText={(value) =>
+                customFieldsList.length
+                  ? setValue(`customFields[${index}].note`, value)
+                  : handleFirstCustomFieldChange(value)
+              }
               isGrouped
-              testID="hidden-messages-multi-slot-input-slot-0"
+              testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              rightSlot={
+                customFieldsList.length > 1 ? (
+                  <Button
+                    size="small"
+                    variant="tertiary"
+                    aria-label="Delete hidden message"
+                    iconBefore={
+                      <TrashOutlined color={theme.colors.colorTextPrimary} />
+                    }
+                    onClick={() => removeCustomField(index)}
+                  />
+                ) : undefined
+              }
             />
-          )}
+          ))}
         </MultiSlotInput>
       </View>
     </Layout>

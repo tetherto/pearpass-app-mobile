@@ -12,7 +12,6 @@ import {
 import {
   Button,
   InputField,
-  DateField,
   MultiSlotInput,
   PasswordField,
   Text,
@@ -31,7 +30,9 @@ import { convertBase64FilesToUint8 } from '../../utils/convertBase64FilesToUint8
 import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
 import { AttachmentFields } from '../../components/AttachmentFields'
+import { ClearableDateField as DateField } from '../../components/ClearableDateField'
 import { FolderSelectField } from '../../components/FolderSelectField'
+import { useScrollToError } from '../../hooks/useScrollToError'
 
 type AttachmentFile = {
   base64: string
@@ -297,6 +298,8 @@ export const CreateOrEditIdentityContent = ({
     validate: (formValues: Record<string, unknown>) => schema.validate(formValues)
   })
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
   useGetMultipleFiles({
     fieldNames: ['attachments', 'passportPicture', 'idCardPicture', 'drivingLicensePicture'],
     updateValues: setValue,
@@ -444,9 +447,22 @@ export const CreateOrEditIdentityContent = ({
     }
   }
 
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+
+    scrollToFirstError([
+      { hasError: !!validationErrors.title, key: 'title' },
+      { hasError: !!validationErrors.email, key: 'personal' }
+    ])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -461,13 +477,13 @@ export const CreateOrEditIdentityContent = ({
           fullWidth
           isLoading={isLoading}
           disabled={isLoading || !values.title.trim()}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           value={values.title}
@@ -477,7 +493,7 @@ export const CreateOrEditIdentityContent = ({
         />
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={registerAnchor('personal')}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Personal Information`}
         </Text>
@@ -739,45 +755,40 @@ export const CreateOrEditIdentityContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note?: string }>).length
-            ? (values.customFields as Array<{ type: string; note?: string }>).map(
-                (field, index) => (
-                  <PasswordField
-                    key={`${field.type}-${index}`}
-                    label={t`Hidden Message`}
-                    value={field.note ?? ''}
-                    placeholder={t`Enter Hidden Message`}
-                    onChangeText={(val) =>
-                      setValue(`customFields[${index}].note`, val)
+          {((values.customFields as Array<{ type: string; note?: string }>)
+            .length
+            ? (values.customFields as Array<{ type: string; note?: string }>)
+            : [{ type: 'note', note: '' }]
+          ).map((field, index) => (
+            <PasswordField
+              key={`${field.type}-${index}`}
+              label={t`Hidden Message`}
+              value={field.note ?? ''}
+              placeholder={t`Enter Hidden Message`}
+              onChangeText={(val) =>
+                (values.customFields as Array<{ type: string; note?: string }>)
+                  .length
+                  ? setValue(`customFields[${index}].note`, val)
+                  : handleFirstHiddenMessageChange(val)
+              }
+              isGrouped
+              testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              rightSlot={
+                (values.customFields as Array<{ type: string; note?: string }>)
+                  .length > 1 ? (
+                  <Button
+                    size="small"
+                    variant="tertiary"
+                    aria-label="Delete hidden message"
+                    iconBefore={
+                      <TrashOutlined color={theme.colors.colorTextPrimary} />
                     }
-                    isGrouped
-                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                    rightSlot={
-                      (values.customFields as Array<{ type: string; note?: string }>).length > 1 ? (
-                        <Button
-                          size="small"
-                          variant="tertiary"
-                          aria-label="Delete hidden message"
-                          iconBefore={
-                            <TrashOutlined color={theme.colors.colorTextPrimary} />
-                          }
-                          onClick={() => removeCustomField(index)}
-                        />
-                      ) : undefined
-                    }
+                    onClick={() => removeCustomField(index)}
                   />
-                )
-              )
-            : (
-              <PasswordField
-                label={t`Hidden Message`}
-                value=""
-                placeholder={t`Enter Hidden Message`}
-                onChangeText={handleFirstHiddenMessageChange}
-                isGrouped
-                testID="hidden-messages-multi-slot-input-slot-0"
-              />
-            )}
+                ) : undefined
+              }
+            />
+          ))}
         </MultiSlotInput>
       </View>
     </Layout>

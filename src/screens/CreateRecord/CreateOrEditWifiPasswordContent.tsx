@@ -21,6 +21,7 @@ import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { FolderSelectField } from '../../components/FolderSelectField'
+import { useScrollToError } from '../../hooks/useScrollToError'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../containers/Layout'
 import { useLoadingContext } from '../../context/LoadingContext'
@@ -30,6 +31,7 @@ import { getPasswordIndicatorVariant } from '../../utils/passwordPolicy'
 type WifiRecord = {
   data?: {
     title?: string
+    name?: string
     password?: string
     note?: string
     customFields?: Array<{ type: string; note: string }>
@@ -53,6 +55,7 @@ type CreatePasswordItemNavigation = {
 
 type FormValues = {
   title: string
+  name: string
   password: string
   note: string
   customFields: Array<{ type: string; note: string }>
@@ -79,7 +82,8 @@ export const CreateOrEditWifiPasswordContent = ({
   })
 
   const schema = Validator.object({
-    title: Validator.string().required(t`Name is required`),
+    title: Validator.string().required(t`Title is required`),
+    name: Validator.string().required(t`Name is required`),
     password: Validator.string().required(t`Password is required`),
     note: Validator.string(),
     customFields: Validator.array().items(
@@ -94,6 +98,8 @@ export const CreateOrEditWifiPasswordContent = ({
     useForm({
       initialValues: {
         title: initialRecord?.data?.title ?? '',
+        name:
+          initialRecord?.data?.name ?? initialRecord?.data?.title ?? '',
         password: initialRecord?.data?.password ?? '',
         note: initialRecord?.data?.note ?? '',
         customFields: initialRecord?.data?.customFields ?? [],
@@ -122,6 +128,7 @@ export const CreateOrEditWifiPasswordContent = ({
       isFavorite: initialRecord?.isFavorite,
       data: {
         title: formValues.title,
+        name: formValues.name,
         password: formValues.password,
         note: formValues.note,
         customFields: formValues.customFields.filter((f) => f.note?.trim().length)
@@ -160,9 +167,25 @@ export const CreateOrEditWifiPasswordContent = ({
     })
   }
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+
+    scrollToFirstError([
+      { hasError: !!validationErrors.title, key: 'title' },
+      { hasError: !!validationErrors.name, key: 'details' },
+      { hasError: !!validationErrors.password, key: 'details' }
+    ])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -176,14 +199,29 @@ export const CreateOrEditWifiPasswordContent = ({
           variant="primary"
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading || !values.title.trim() || !values.password.trim()}
-          onClick={handleSubmit(onSubmit)}
+          disabled={
+            isLoading ||
+            !values.title.trim() ||
+            !values.name.trim() ||
+            !values.password.trim()
+          }
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View style={styles.section}>
+      <View onLayout={registerAnchor('title')}>
+        <InputField
+          label={t`Title`}
+          value={values.title}
+          placeholder={t`Enter Title`}
+          onChangeText={(val) => setValue('title', val)}
+          testID="title-field"
+        />
+      </View>
+
+      <View style={styles.section} onLayout={registerAnchor('details')}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Details`}
         </Text>
@@ -202,9 +240,9 @@ export const CreateOrEditWifiPasswordContent = ({
         >
           <InputField
             label={t`Wi-Fi Name`}
-            value={values.title}
+            value={values.name}
             placeholder={t`Enter Name of Network`}
-            onChangeText={(val) => setValue('title', val)}
+            onChangeText={(val) => setValue('name', val)}
             testID="wifi-name-input-field"
           />
           <PasswordField
@@ -254,46 +292,40 @@ export const CreateOrEditWifiPasswordContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note: string }>).length
-            ? (values.customFields as Array<{ type: string; note: string }>).map(
-              (field, index) => (
-                <PasswordField
-                  key={index}
-                  label={t`Hidden Message`}
-                  value={field.note ?? ''}
-                  placeholder={t`Enter Hidden Message`}
-                  onChangeText={(val) =>
-                    setValue(`customFields[${index}].note`, val)
-                  }
-                  isGrouped
-                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                  rightSlot={
-                    (values.customFields as Array<{ type: string; note: string }>)
-                      .length > 1 ? (
-                      <Button
-                        size="small"
-                        variant="tertiary"
-                        aria-label="Delete hidden message"
-                        iconBefore={
-                          <TrashOutlined color={theme.colors.colorTextPrimary} />
-                        }
-                        onClick={() => removeCustomField(index)}
-                      />
-                    ) : undefined
-                  }
-                />
-              )
-            )
-            : (
-              <PasswordField
-                label={t`Hidden Message`}
-                value=""
-                placeholder={t`Enter Hidden Message`}
-                onChangeText={handleFirstHiddenMessageChange}
-                isGrouped
-                testID="hidden-messages-multi-slot-input-slot-0"
-              />
-            )}
+          {((values.customFields as Array<{ type: string; note: string }>)
+            .length
+            ? (values.customFields as Array<{ type: string; note: string }>)
+            : [{ type: 'note', note: '' }]
+          ).map((field, index) => (
+            <PasswordField
+              key={index}
+              label={t`Hidden Message`}
+              value={field.note ?? ''}
+              placeholder={t`Enter Hidden Message`}
+              onChangeText={(val) =>
+                (values.customFields as Array<{ type: string; note: string }>)
+                  .length
+                  ? setValue(`customFields[${index}].note`, val)
+                  : handleFirstHiddenMessageChange(val)
+              }
+              isGrouped
+              testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              rightSlot={
+                (values.customFields as Array<{ type: string; note: string }>)
+                  .length > 1 ? (
+                  <Button
+                    size="small"
+                    variant="tertiary"
+                    aria-label="Delete hidden message"
+                    iconBefore={
+                      <TrashOutlined color={theme.colors.colorTextPrimary} />
+                    }
+                    onClick={() => removeCustomField(index)}
+                  />
+                ) : undefined
+              }
+            />
+          ))}
         </MultiSlotInput>
       </View>
     </Layout>

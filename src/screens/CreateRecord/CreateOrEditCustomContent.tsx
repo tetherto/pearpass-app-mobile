@@ -20,6 +20,7 @@ import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader
 import { Layout } from '../../containers/Layout'
 import { useLoadingContext } from '../../context/LoadingContext'
 import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
+import { useScrollToError } from '../../hooks/useScrollToError'
 import { convertBase64FilesToUint8 } from '../../utils/convertBase64FilesToUint8'
 import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
@@ -208,9 +209,21 @@ export const CreateOrEditCustomContent = ({
     )
   }
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+
+    scrollToFirstError([{ hasError: !!validationErrors.title, key: 'title' }])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -225,13 +238,13 @@ export const CreateOrEditCustomContent = ({
           fullWidth
           isLoading={isLoading}
           disabled={isLoading || !values.title.trim()}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           value={values.title}
@@ -285,47 +298,37 @@ export const CreateOrEditCustomContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {values.customFields.length
-            ? values.customFields.map(
-                (field, index) => (
-                  <PasswordField
-                    key={`${field.type}-${index}`}
-                    label={t`Hidden Message`}
-                    value={field.note ?? ''}
-                    placeholder={t`Enter Hidden Message`}
-                    onChangeText={(value) =>
-                      setValue(`customFields[${index}].note`, value)
+          {(values.customFields.length
+            ? values.customFields
+            : [{ type: 'note', note: '' }]
+          ).map((field, index) => (
+            <PasswordField
+              key={`${field.type}-${index}`}
+              label={t`Hidden Message`}
+              value={field.note ?? ''}
+              placeholder={t`Enter Hidden Message`}
+              onChangeText={(value) =>
+                values.customFields.length
+                  ? setValue(`customFields[${index}].note`, value)
+                  : handleFirstCustomFieldChange(value)
+              }
+              isGrouped
+              testID={`hidden-messages-multi-slot-input-slot-${index}`}
+              rightSlot={
+                values.customFields.length > 1 ? (
+                  <Button
+                    size="small"
+                    variant="tertiary"
+                    aria-label="Delete hidden message"
+                    iconBefore={
+                      <TrashOutlined color={theme.colors.colorTextPrimary} />
                     }
-                    isGrouped
-                    testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                    rightSlot={
-                      values.customFields.length > 1 ? (
-                        <Button
-                          size="small"
-                          variant="tertiary"
-                          aria-label="Delete hidden message"
-                          iconBefore={
-                            <TrashOutlined
-                              color={theme.colors.colorTextPrimary}
-                            />
-                          }
-                          onClick={() => removeCustomField(index)}
-                        />
-                      ) : undefined
-                    }
+                    onClick={() => removeCustomField(index)}
                   />
-                )
-              )
-            : (
-                <PasswordField
-                  label={t`Hidden Message`}
-                  value=""
-                  placeholder={t`Enter Hidden Message`}
-                  onChangeText={handleFirstCustomFieldChange}
-                  isGrouped
-                  testID="hidden-messages-multi-slot-input-slot-0"
-                />
-              )}
+                ) : undefined
+              }
+            />
+          ))}
         </MultiSlotInput>
       </View>
     </Layout>

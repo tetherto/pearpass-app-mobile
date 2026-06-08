@@ -24,6 +24,7 @@ interface WifiPasswordDetailsFormProps {
 
 interface WifiPasswordDetailsFormValues {
   title: string
+  name: string
   password: string
   note: string
   customFields: CustomField[]
@@ -41,6 +42,7 @@ export const WifiPasswordDetailsForm = ({
   const initialValues = useMemo<WifiPasswordDetailsFormValues>(
     () => ({
       title: initialRecord?.data?.title ?? '',
+      name: initialRecord?.data?.name ?? initialRecord?.data?.title ?? '',
       password: initialRecord?.data?.password ?? '',
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
@@ -84,7 +86,7 @@ export const WifiPasswordDetailsForm = ({
             </MultiSlotInput>
 
             <WifiPasswordQRCode
-              ssid={values.title}
+              ssid={values.name || values.title}
               password={values.password}
             />
           </View>

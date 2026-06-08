@@ -7,6 +7,7 @@ import { shareAsync } from 'expo-sharing'
 import { useState } from 'react'
 import {
   Image,
+  Platform,
   Share,
   View,
   type ImageLoadEventData,
@@ -65,17 +66,46 @@ export const ImagePreview = withAutoLockBypass(
 
     const handleShare = async () => {
       try {
+        let fileUri: string | null = null
+
         if (imageUri?.startsWith('data:')) {
-          const fileUri = await convertDataUriToFileUri(
+          fileUri = await convertDataUriToFileUri(
             imageUri,
             currentImageName || 'image.jpg'
           )
-          await shareAsync(fileUri, {
-            mimeType: getMimeType(currentImageName),
-            dialogTitle: 'Share Image'
-          })
         } else if (imageUri?.startsWith('file://')) {
-          await shareAsync(imageUri, {
+          fileUri = imageUri
+        }
+
+        // `expo-sharing`'s `shareAsync` resolves whether the user shares OR
+        // cancels, so it can't tell us when sharing was aborted. On iOS we use
+        // react-native `Share`, which reports `dismissedAction` on cancel, and
+        // only show the success toast on a real share. Android's share intent
+        // never reports completion, so we keep `shareAsync` and show no
+        // (potentially false) toast.
+        if (Platform.OS === 'ios') {
+          const result = fileUri
+            ? await Share.share({ url: fileUri })
+            : await Share.share({
+                title: currentImageName || 'Share Image',
+                message: `${currentImageName || 'Image'}\n\n${imageUri}`
+              })
+
+          if (result.action === Share.dismissedAction) {
+            return
+          }
+
+          Toast.show({
+            type: 'baseToast',
+            text1: t`Shared successfully!`,
+            position: 'bottom',
+            bottomOffset: 100
+          })
+          return
+        }
+
+        if (fileUri) {
+          await shareAsync(fileUri, {
             mimeType: getMimeType(currentImageName),
             dialogTitle: 'Share Image'
           })
@@ -85,12 +115,6 @@ export const ImagePreview = withAutoLockBypass(
             message: `${currentImageName || 'Image'}\n\n${imageUri}`
           })
         }
-        Toast.show({
-          type: 'baseToast',
-          text1: t`Shared successfully!`,
-          position: 'bottom',
-          bottomOffset: 100
-        })
       } catch {
         Toast.show({
           type: 'baseToast',
