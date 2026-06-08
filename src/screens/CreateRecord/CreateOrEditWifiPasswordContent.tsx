@@ -21,6 +21,7 @@ import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { FolderSelectField } from '../../components/FolderSelectField'
+import { useScrollToError } from '../../hooks/useScrollToError'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../containers/Layout'
 import { useLoadingContext } from '../../context/LoadingContext'
@@ -166,9 +167,25 @@ export const CreateOrEditWifiPasswordContent = ({
     })
   }
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+
+    scrollToFirstError([
+      { hasError: !!validationErrors.title, key: 'title' },
+      { hasError: !!validationErrors.name, key: 'details' },
+      { hasError: !!validationErrors.password, key: 'details' }
+    ])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -188,13 +205,13 @@ export const CreateOrEditWifiPasswordContent = ({
             !values.name.trim() ||
             !values.password.trim()
           }
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           value={values.title}
@@ -204,7 +221,7 @@ export const CreateOrEditWifiPasswordContent = ({
         />
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={registerAnchor('details')}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Details`}
         </Text>

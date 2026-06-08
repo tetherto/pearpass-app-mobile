@@ -35,6 +35,7 @@ import { formatPasskeyDate } from '../../utils/formatPasskeyDate'
 import { logger } from '../../utils/logger'
 import { getPasswordIndicatorVariant } from '../../utils/passwordPolicy'
 import { AttachmentFields } from '../../components/AttachmentFields'
+import { useScrollToError } from '../../hooks/useScrollToError'
 import { OtpSecretScanButton } from './OtpSecretScanButton'
 
 type LoginAttachment = {
@@ -309,9 +310,31 @@ export const CreateOrEditLoginContent = ({
     setValue('attachments', updatedAttachments)
   }
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+    const websiteErrors = validationErrors.websites as
+      | { error?: { website?: string } }[]
+      | undefined
+    const websiteHasError =
+      Array.isArray(websiteErrors) &&
+      websiteErrors.some((item) => item?.error?.website)
+
+    scrollToFirstError([
+      { hasError: !!validationErrors.title, key: 'title' },
+      { hasError: !!validationErrors.otpSecret, key: 'credentials' },
+      { hasError: websiteHasError, key: 'websites' }
+    ])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -330,13 +353,13 @@ export const CreateOrEditLoginContent = ({
             !values.title.trim() ||
             !!register('otpSecret').error
           }
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           placeholder={t`Enter Title`}
@@ -345,7 +368,7 @@ export const CreateOrEditLoginContent = ({
         />
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={registerAnchor('credentials')}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Credentials`}
         </Text>
@@ -422,7 +445,7 @@ export const CreateOrEditLoginContent = ({
         )}
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={registerAnchor('websites')}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Details`}
         </Text>

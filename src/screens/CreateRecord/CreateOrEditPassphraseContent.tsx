@@ -21,6 +21,7 @@ import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { FolderSelectField } from '../../components/FolderSelectField'
+import { useScrollToError } from '../../hooks/useScrollToError'
 import { PassPhrase } from '../../containers/PassPhrase'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../containers/Layout'
@@ -90,6 +91,22 @@ export const CreateOrEditPassphraseContent = ({
     folder: Validator.string()
   })
 
+  const validateForm = (formValues: Record<string, unknown>) => {
+    const validationErrors =
+      (schema.validate(formValues) as Record<string, string | undefined>) ?? {}
+    const passphraseWordCount = parsePassphraseText(
+      (formValues.passPhrase as string) ?? ''
+    ).length
+
+    if (!passphraseWordCount) {
+      validationErrors.passPhrase = t`Recovery phrase is required`
+    } else if (!VALID_WORD_COUNTS.includes(passphraseWordCount)) {
+      validationErrors.passPhrase = t`Recovery phrase must contain 12 or 24 words`
+    }
+
+    return validationErrors
+  }
+
   const { handleSubmit, registerArray, values, setValue, errors } = useForm({
     initialValues: {
       title: initialRecord?.data?.title ?? '',
@@ -98,23 +115,10 @@ export const CreateOrEditPassphraseContent = ({
       customFields: initialRecord?.data?.customFields ?? [],
       folder: selectedFolder ?? initialRecord?.folder
     },
-    validate: (formValues) => {
-      const validationErrors =
-        (schema.validate(formValues) as Record<string, string | undefined>) ??
-        {}
-      const passphraseWordCount = parsePassphraseText(
-        formValues.passPhrase ?? ''
-      ).length
-
-      if (!passphraseWordCount) {
-        validationErrors.passPhrase = t`Recovery phrase is required`
-      } else if (!VALID_WORD_COUNTS.includes(passphraseWordCount)) {
-        validationErrors.passPhrase = t`Recovery phrase must contain 12 or 24 words`
-      }
-
-      return validationErrors
-    }
+    validate: validateForm
   })
+
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
 
   const onError = (error: Error) => {
     Toast.show({
@@ -163,9 +167,21 @@ export const CreateOrEditPassphraseContent = ({
     removeItem: removeCustomField
   } = registerArray('customFields')
 
+  const handleSave = (event?: unknown) => {
+    const validationErrors = validateForm(values) || {}
+
+    scrollToFirstError([
+      { hasError: !!validationErrors.title, key: 'title' },
+      { hasError: !!validationErrors.passPhrase, key: 'passphrase' }
+    ])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -184,13 +200,13 @@ export const CreateOrEditPassphraseContent = ({
           fullWidth
           isLoading={isLoading}
           disabled={isLoading || !values.title.trim() || !values.passPhrase.trim()}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           value={values.title}
@@ -200,7 +216,7 @@ export const CreateOrEditPassphraseContent = ({
         />
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={registerAnchor('passphrase')}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Details`}
         </Text>

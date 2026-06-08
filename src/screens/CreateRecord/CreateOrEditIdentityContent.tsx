@@ -32,6 +32,7 @@ import { logger } from '../../utils/logger'
 import { AttachmentFields } from '../../components/AttachmentFields'
 import { ClearableDateField as DateField } from '../../components/ClearableDateField'
 import { FolderSelectField } from '../../components/FolderSelectField'
+import { useScrollToError } from '../../hooks/useScrollToError'
 
 type AttachmentFile = {
   base64: string
@@ -297,6 +298,8 @@ export const CreateOrEditIdentityContent = ({
     validate: (formValues: Record<string, unknown>) => schema.validate(formValues)
   })
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
   useGetMultipleFiles({
     fieldNames: ['attachments', 'passportPicture', 'idCardPicture', 'drivingLicensePicture'],
     updateValues: setValue,
@@ -444,9 +447,22 @@ export const CreateOrEditIdentityContent = ({
     }
   }
 
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+
+    scrollToFirstError([
+      { hasError: !!validationErrors.title, key: 'title' },
+      { hasError: !!validationErrors.email, key: 'personal' }
+    ])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -461,13 +477,13 @@ export const CreateOrEditIdentityContent = ({
           fullWidth
           isLoading={isLoading}
           disabled={isLoading || !values.title.trim()}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           value={values.title}
@@ -477,7 +493,7 @@ export const CreateOrEditIdentityContent = ({
         />
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.section} onLayout={registerAnchor('personal')}>
         <Text variant="caption" color={theme.colors.colorTextSecondary}>
           {t`Personal Information`}
         </Text>

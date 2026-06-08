@@ -30,6 +30,7 @@ import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
 import { AttachmentFields } from '../../components/AttachmentFields'
 import { FolderSelectField } from '../../components/FolderSelectField'
+import { useScrollToError } from '../../hooks/useScrollToError'
 
 type UploadedNoteAttachment = {
   base64: string
@@ -216,9 +217,21 @@ export const CreateOrEditNoteContent = ({
     setValue('attachments', updatedAttachments)
   }
 
+  const { scrollRef, registerAnchor, scrollToFirstError } = useScrollToError()
+
+  const handleSave = (event?: unknown) => {
+    const validationErrors =
+      (schema.validate(values) as Record<string, unknown>) || {}
+
+    scrollToFirstError([{ hasError: !!validationErrors.title, key: 'title' }])
+
+    handleSubmit(onSubmit)(event as never)
+  }
+
   return (
     <Layout
       scrollable
+      scrollViewRef={scrollRef}
       style={{ flex: 1 }}
       contentStyle={styles.content}
       header={
@@ -233,13 +246,13 @@ export const CreateOrEditNoteContent = ({
           fullWidth
           isLoading={isLoading}
           disabled={isLoading || !values.title.trim()}
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSave}
         >
           {actionLabel}
         </Button>
       }
     >
-      <View>
+      <View onLayout={registerAnchor('title')}>
         <InputField
           label={t`Title`}
           value={values.title}

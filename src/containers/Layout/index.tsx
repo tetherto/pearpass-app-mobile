@@ -24,6 +24,7 @@ type LayoutProps = {
   footer?: ReactNode
   hideFooter?: boolean
   scrollable?: boolean
+  scrollViewRef?: React.Ref<ScrollView>
   isBuiltin?: boolean
   disableKeyboardAvoidance?: boolean
   style?: StyleProp<ViewStyle>
@@ -36,6 +37,7 @@ export const Layout = ({
   header,
   children,
   scrollable = false,
+  scrollViewRef,
   isBuiltin = true,
   disableKeyboardAvoidance = false,
   style,
@@ -74,6 +76,7 @@ export const Layout = ({
 
       {scrollable ? (
         <ScrollView
+          ref={scrollViewRef}
           style={styles.scrollView}
           contentContainerStyle={[
             styles.scrollContent,
