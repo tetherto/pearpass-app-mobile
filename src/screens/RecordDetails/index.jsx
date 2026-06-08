@@ -3,8 +3,8 @@ import { useEffect, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { generateAvatarInitials } from '@tetherto/pear-apps-utils-avatar-initials'
 import { rawTokens, Text, useTheme } from '@tetherto/pearpass-lib-ui-kit'
-import { useRecordById } from '@tetherto/pearpass-lib-vault'
-import { StyleSheet, View } from 'react-native'
+import { useFavicon, useRecordById } from '@tetherto/pearpass-lib-vault'
+import { Image, StyleSheet, View } from 'react-native'
 
 import { RecordDetailsContent } from './RecordDetailsContentWrapper'
 import { HeaderContent } from './styles'
@@ -23,6 +23,10 @@ export const RecordDetails = ({ route }) => {
       id: recordId
     }
   })
+
+  const websiteDomain =
+    record?.type === 'login' ? record?.data?.websites?.[0] : null
+  const { faviconSrc } = useFavicon({ url: websiteDomain })
 
   const navigation = useNavigation()
 
@@ -69,19 +73,27 @@ export const RecordDetails = ({ route }) => {
                     { backgroundColor: theme.colors.colorSurfaceHover }
                   ]}
                 >
-                  <Text
-                    variant="bodyEmphasized"
-                    style={[
-                      styles.headerIconText,
-                      {
-                        color:
-                          RECORD_COLOR_BY_TYPE[record.type] ||
-                          theme.colors.colorTextPrimary
-                      }
-                    ]}
-                  >
-                    {generateAvatarInitials(record?.data?.title)}
-                  </Text>
+                  {faviconSrc ? (
+                    <Image
+                      source={{ uri: faviconSrc }}
+                      style={styles.headerIconImage}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Text
+                      variant="bodyEmphasized"
+                      style={[
+                        styles.headerIconText,
+                        {
+                          color:
+                            RECORD_COLOR_BY_TYPE[record.type] ||
+                            theme.colors.colorTextPrimary
+                        }
+                      ]}
+                    >
+                      {generateAvatarInitials(record?.data?.title)}
+                    </Text>
+                  )}
                 </View>
 
                 <View style={styles.headerTitleWrapper}>
@@ -113,7 +125,12 @@ const styles = StyleSheet.create({
     height: rawTokens.spacing24,
     borderRadius: rawTokens.spacing6,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    overflow: 'hidden'
+  },
+  headerIconImage: {
+    width: '100%',
+    height: '100%'
   },
   headerTitleRow: {
     flexDirection: 'row',
