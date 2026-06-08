@@ -52,36 +52,33 @@ export const FolderSelectField = ({
   const hasValue = Boolean(value)
 
   return (
-    <MultiSlotInput testID={multiSlotTestID}>
-      <ContextMenu
-        open={open}
-        onOpenChange={handleOpenChange}
-        trigger={
-          <SelectField
-            label={t`Folder`}
-            value={value ?? ''}
-            placeholder={t`Choose Folder`}
-            isGrouped
-            testID={testID}
-            rightSlot={
-              <>
-                {hasValue && (
-                  <Button
-                    size="small"
-                    variant="tertiary"
-                    aria-label={t`Clear folder`}
-                    iconBefore={
-                      <Close color={theme.colors.colorTextPrimary} />
-                    }
-                    onClick={() => onChange('')}
-                  />
-                )}
-                <KeyboardArrowBottom color={theme.colors.colorTextPrimary} />
-              </>
-            }
-          />
-        }
-      >
+    <>
+      <MultiSlotInput testID={multiSlotTestID}>
+        <SelectField
+          label={t`Folder`}
+          value={value ?? ''}
+          placeholder={t`Choose Folder`}
+          isGrouped
+          testID={testID}
+          onClick={() => handleOpenChange(true)}
+          rightSlot={
+            <>
+              {hasValue && (
+                <Button
+                  size="small"
+                  variant="tertiary"
+                  aria-label={t`Clear folder`}
+                  iconBefore={<Close color={theme.colors.colorTextPrimary} />}
+                  onClick={() => onChange('')}
+                />
+              )}
+              <KeyboardArrowBottom color={theme.colors.colorTextPrimary} />
+            </>
+          }
+        />
+      </MultiSlotInput>
+
+      <ContextMenu open={open} onOpenChange={handleOpenChange}>
         <BottomSheetFolderSelectorContent
           selectedFolder={value}
           onSelect={handleSelect}
@@ -89,6 +86,6 @@ export const FolderSelectField = ({
           includeAllFolders={false}
         />
       </ContextMenu>
-    </MultiSlotInput>
+    </>
   )
 }
