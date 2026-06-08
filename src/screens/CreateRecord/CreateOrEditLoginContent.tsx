@@ -367,6 +367,7 @@ export const CreateOrEditLoginContent = ({
             value={values.username}
             placeholder={t`Enter Email / Username`}
             onChangeText={(val) => setValue('username', val)}
+            inputType="email"
             testID="credentials-multi-slot-input-slot-0"
           />
           <PasswordField
