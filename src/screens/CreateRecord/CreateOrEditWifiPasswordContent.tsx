@@ -96,7 +96,9 @@ export const CreateOrEditWifiPasswordContent = ({
         title: initialRecord?.data?.title ?? '',
         password: initialRecord?.data?.password ?? '',
         note: initialRecord?.data?.note ?? '',
-        customFields: initialRecord?.data?.customFields ?? [],
+        customFields: initialRecord?.data?.customFields?.length
+          ? initialRecord.data.customFields
+          : [{ type: 'note', note: '' }],
         folder: selectedFolder ?? initialRecord?.folder
       },
       validate: (formValues) => schema.validate(formValues)
@@ -148,10 +150,6 @@ export const CreateOrEditWifiPasswordContent = ({
     addItem: addCustomField,
     removeItem: removeCustomField
   } = registerArray('customFields')
-
-  const handleFirstHiddenMessageChange = (value: string) => {
-    setValue('customFields', value ? [{ type: 'note', note: value }] : [])
-  }
 
   const openPasswordGenerator = () => {
     Keyboard.dismiss()
@@ -254,46 +252,35 @@ export const CreateOrEditWifiPasswordContent = ({
           }
           testID="hidden-messages-multi-slot-input"
         >
-          {(values.customFields as Array<{ type: string; note: string }>).length
-            ? (values.customFields as Array<{ type: string; note: string }>).map(
-              (field, index) => (
-                <PasswordField
-                  key={index}
-                  label={t`Hidden Message`}
-                  value={field.note ?? ''}
-                  placeholder={t`Enter Hidden Message`}
-                  onChangeText={(val) =>
-                    setValue(`customFields[${index}].note`, val)
-                  }
-                  isGrouped
-                  testID={`hidden-messages-multi-slot-input-slot-${index}`}
-                  rightSlot={
-                    (values.customFields as Array<{ type: string; note: string }>)
-                      .length > 1 ? (
-                      <Button
-                        size="small"
-                        variant="tertiary"
-                        aria-label="Delete hidden message"
-                        iconBefore={
-                          <TrashOutlined color={theme.colors.colorTextPrimary} />
-                        }
-                        onClick={() => removeCustomField(index)}
-                      />
-                    ) : undefined
-                  }
-                />
-              )
-            )
-            : (
+          {(values.customFields as Array<{ type: string; note: string }>).map(
+            (field, index) => (
               <PasswordField
+                key={index}
                 label={t`Hidden Message`}
-                value=""
+                value={field.note ?? ''}
                 placeholder={t`Enter Hidden Message`}
-                onChangeText={handleFirstHiddenMessageChange}
+                onChangeText={(val) =>
+                  setValue(`customFields[${index}].note`, val)
+                }
                 isGrouped
-                testID="hidden-messages-multi-slot-input-slot-0"
+                testID={`hidden-messages-multi-slot-input-slot-${index}`}
+                rightSlot={
+                  (values.customFields as Array<{ type: string; note: string }>)
+                    .length > 1 ? (
+                    <Button
+                      size="small"
+                      variant="tertiary"
+                      aria-label="Delete hidden message"
+                      iconBefore={
+                        <TrashOutlined color={theme.colors.colorTextPrimary} />
+                      }
+                      onClick={() => removeCustomField(index)}
+                    />
+                  ) : undefined
+                }
               />
-            )}
+            )
+          )}
         </MultiSlotInput>
       </View>
     </Layout>
