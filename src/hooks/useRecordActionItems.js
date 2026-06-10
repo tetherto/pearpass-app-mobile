@@ -7,6 +7,7 @@ import { RECORD_TYPES, useRecords } from '@tetherto/pearpass-lib-vault'
 
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { SORT_KEYS } from '../constants/sortOptions'
+import { DeleteItemSheet } from '../containers/BottomSheet/DeleteItemSheet'
 import { BottomSheetSortContent } from '../containers/BottomSheetSortContent'
 import { useBottomSheet } from '../context/BottomSheetContext'
 import { useSharedFilter } from '../context/SharedFilterContext'
@@ -50,7 +51,7 @@ export const useRecordActionItems = ({
   }, [v1Collapse, v2Collapse])
 
   const { copyToClipboard } = useCopyToClipboard()
-  const { updateFavoriteState } = useRecords()
+  const { updateFavoriteState, deleteRecords } = useRecords()
   const { setState } = useSharedFilter()
 
   // RECORD_TYPES.OTP is `undefined` (used as a route-state sentinel for the
@@ -61,13 +62,19 @@ export const useRecordActionItems = ({
 
   const handleDelete = useCallback(() => {
     collapse?.()
-    navigation.navigate('MultiSelectDelete', {
-      selectedRecordIds: [record?.id],
-      selectedRecordObjects: [record],
-      onComplete: onDelete,
-      isOtpContext: false
+    expand({
+      children: (
+        <DeleteItemSheet
+          onClose={v1Collapse}
+          onConfirm={async () => {
+            v1Collapse?.()
+            await deleteRecords([record?.id])
+            onDelete?.()
+          }}
+        />
+      )
     })
-  }, [record, onDelete, collapse, navigation])
+  }, [record, onDelete, collapse, v1Collapse, expand, deleteRecords])
 
   const handleFavoriteToggle = useCallback(() => {
     updateFavoriteState([record?.id], !record?.isFavorite)

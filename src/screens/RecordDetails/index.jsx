@@ -56,7 +56,6 @@ export const RecordDetails = ({ route }) => {
               record={record}
               recordType={record.type}
               excludeTypes={['copy']}
-              onDelete={() => navigation.goBack()}
               isOtpContext={isOtpContext}
             />
           }

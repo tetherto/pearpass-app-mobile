@@ -14,6 +14,8 @@ jest.mock('@lingui/react/macro', () => ({
 }))
 
 const mockNavigate = jest.fn()
+const mockExpand = jest.fn()
+const mockCollapse = jest.fn()
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
@@ -51,6 +53,10 @@ jest.mock('../containers/BottomSheetSortContent', () => ({
   BottomSheetSortContent: () => null
 }))
 
+jest.mock('../containers/BottomSheet/DeleteItemSheet', () => ({
+  DeleteItemSheet: () => null
+}))
+
 jest.mock('./useCopyToClipboard', () => ({
   useCopyToClipboard: () => ({
     copyToClipboard: jest.fn()
@@ -59,8 +65,8 @@ jest.mock('./useCopyToClipboard', () => ({
 
 jest.mock('../context/BottomSheetContext', () => ({
   useBottomSheet: () => ({
-    collapse: jest.fn(),
-    expand: jest.fn()
+    collapse: mockCollapse,
+    expand: mockExpand
   })
 }))
 
@@ -504,9 +510,10 @@ describe('useRecordActionItems', () => {
 
     beforeEach(() => {
       mockNavigate.mockClear()
+      mockExpand.mockClear()
     })
 
-    it('handleDelete passes isOtpContext: false to MultiSelectDelete when isOtpContext=true and record is login', () => {
+    it('handleDelete opens the delete confirmation sheet instead of navigating when isOtpContext=true and record is login', () => {
       const { result } = renderHook(
         () =>
           useRecordActionItems({
@@ -524,13 +531,14 @@ describe('useRecordActionItems', () => {
         deleteAction.click()
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockExpand).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).not.toHaveBeenCalledWith(
         'MultiSelectDelete',
-        expect.objectContaining({ isOtpContext: false })
+        expect.anything()
       )
     })
 
-    it('handleDelete passes isOtpContext: false to MultiSelectDelete when not in OTP context', () => {
+    it('handleDelete opens the delete confirmation sheet instead of navigating when not in OTP context', () => {
       const { result } = renderHook(
         () =>
           useRecordActionItems({
@@ -547,9 +555,10 @@ describe('useRecordActionItems', () => {
         deleteAction.click()
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith(
+      expect(mockExpand).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).not.toHaveBeenCalledWith(
         'MultiSelectDelete',
-        expect.objectContaining({ isOtpContext: false })
+        expect.anything()
       )
     })
 
