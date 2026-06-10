@@ -12,11 +12,8 @@ import {
   Close,
   KeyboardArrowBottom
 } from '@tetherto/pearpass-lib-ui-kit/icons'
-import { Keyboard } from 'react-native'
-
+import { openAfterKeyboardDismiss } from '../../utils/openAfterKeyboardDismiss'
 import { BottomSheetFolderSelectorContent } from '../../containers/BottomSheetFolderSelectorContent'
-
-const KEYBOARD_DISMISS_DELAY_MS = 250
 
 type Props = {
   value?: string
@@ -37,8 +34,7 @@ export const FolderSelectField = ({
 
   const handleOpenChange = (next: boolean) => {
     if (next) {
-      Keyboard.dismiss()
-      setTimeout(() => setOpen(true), KEYBOARD_DISMISS_DELAY_MS)
+      openAfterKeyboardDismiss(() => setOpen(true))
       return
     }
     setOpen(false)
