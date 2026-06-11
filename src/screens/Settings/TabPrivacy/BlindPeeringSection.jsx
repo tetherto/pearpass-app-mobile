@@ -32,6 +32,7 @@ import { BackScreenHeader } from 'src/containers/ScreenHeader/BackScreenHeader'
 import { UnsavedChangesSheet } from '../../../containers/BottomSheet/UnsavedChangesSheet'
 import { useBottomSheet } from '../../../context/BottomSheetContext'
 import { useLoadingContext } from '../../../context/LoadingContext'
+import { openAfterKeyboardDismiss } from '../../../utils/openAfterKeyboardDismiss'
 
 const { DEFAULT, PERSONAL } = BLIND_PEER_TYPE
 
@@ -252,20 +253,22 @@ export const BlindPeeringSection = () => {
           navigation.dispatch(e.data.action)
         }
 
-        expand({
-          children: (
-            <UnsavedChangesSheet
-              description={t`You have unsaved changes to your Blind Peering settings. Would you like to save them before leaving?`}
-              onClose={collapse}
-              onDiscard={proceed}
-              onSave={async () => {
-                collapse()
-                const ok = await performSaveRef.current()
-                if (ok) navigation.dispatch(e.data.action)
-              }}
-            />
-          )
-        })
+        openAfterKeyboardDismiss(() =>
+          expand({
+            children: (
+              <UnsavedChangesSheet
+                description={t`You have unsaved changes to your Blind Peering settings. Would you like to save them before leaving?`}
+                onClose={collapse}
+                onDiscard={proceed}
+                onSave={async () => {
+                  collapse()
+                  const ok = await performSaveRef.current()
+                  if (ok) navigation.dispatch(e.data.action)
+                }}
+              />
+            )
+          })
+        )
       })
 
       return sub
