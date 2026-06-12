@@ -14,6 +14,7 @@ import {
   Text
 } from 'react-native'
 import { colors } from 'src/utils/colors'
+import { setLastOpenedVaultId } from 'src/utils/lastOpenedVaultStorage'
 
 import {
   ButtonPrimary,
@@ -56,6 +57,7 @@ export const UnlockVault = ({ vaultId }) => {
       setIsLoading(true)
 
       await refetchVault(vaultId, { password: values.password })
+      await setLastOpenedVaultId(vaultId)
 
       setIsLoading(false)
       navigation.replace('MainTabNavigator')

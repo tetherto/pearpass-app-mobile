@@ -18,6 +18,7 @@ import Toast from 'react-native-toast-message'
 
 import { TOAST_CONFIG } from '../../../constants/toast'
 import { clearStaleVaultsDir } from '../../../utils/clearStaleVaultsDir'
+import { setLastOpenedVaultId } from '../../../utils/lastOpenedVaultStorage'
 import { logger } from '../../../utils/logger'
 import {
   getPasswordIndicatorVariant,
@@ -166,8 +167,9 @@ export const usePasswordCreation = () => {
       await logIn({ password: loginBuffer })
       await refetchUser()
       await initVaults({ password: loginBuffer })
-      await createVault({ name: t`Personal` })
+      const createdVault = await createVault({ name: t`Personal` })
       await addDevice()
+      await setLastOpenedVaultId(createdVault?.id)
       clearBuffer(loginBuffer)
 
       clearBuffer(passwordBuffer)

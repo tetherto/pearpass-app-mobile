@@ -9,6 +9,7 @@ import Toast from 'react-native-toast-message'
 
 import { StepIdentity } from './StepIdentity'
 import { TOAST_CONFIG } from '../../../constants/toast'
+import { setLastOpenedVaultId } from '../../../utils/lastOpenedVaultStorage'
 import { logger } from '../../../utils/logger'
 
 export const VaultWizard = () => {
@@ -34,11 +35,12 @@ export const VaultWizard = () => {
     try {
       setIsLoading(true)
       setFormData(data)
-      await createVault({
+      const createdVault = await createVault({
         name: data.name,
         password: data.usePassword ? data.password : undefined
       })
       await addDevice()
+      await setLastOpenedVaultId(createdVault?.id)
       Toast.show({
         type: 'baseToast',
         text1: t`Vault created`,

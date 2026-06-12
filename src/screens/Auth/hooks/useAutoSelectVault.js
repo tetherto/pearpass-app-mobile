@@ -4,6 +4,10 @@ import { useNavigation } from '@react-navigation/native'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 
 import { NAVIGATION_ROUTES } from '../../../constants/navigation'
+import {
+  getLastOpenedVaultId,
+  setLastOpenedVaultId
+} from '../../../utils/lastOpenedVaultStorage'
 
 export const useAutoSelectVault = () => {
   const navigation = useNavigation()
@@ -28,18 +32,22 @@ export const useAutoSelectVault = () => {
       return
     }
 
-    const firstVault = vaults[0]
+    // Prefer the vault the user last opened; fall back to the first one.
+    const lastOpenedVaultId = await getLastOpenedVaultId()
+    const targetVault =
+      vaults.find((vault) => vault.id === lastOpenedVaultId) ?? vaults[0]
 
-    const isProtected = await isVaultProtected(firstVault.id)
+    const isProtected = await isVaultProtected(targetVault.id)
     if (isProtected) {
       navigation.replace('Welcome', {
         state: NAVIGATION_ROUTES.UNLOCK,
-        vaultId: firstVault.id
+        vaultId: targetVault.id
       })
       return
     }
 
-    await refetchVault(firstVault.id)
+    await refetchVault(targetVault.id)
+    await setLastOpenedVaultId(targetVault.id)
     navigation.replace('MainTabNavigator')
   }, [refetchVaults, isVaultProtected, refetchVault, navigation])
 
