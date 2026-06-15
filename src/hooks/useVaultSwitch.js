@@ -5,6 +5,7 @@ import { useVault } from '@tetherto/pearpass-lib-vault'
 import { VaultPasswordFormModalContent } from '../containers/Modal/VaultPasswordFormModalContent'
 import { useGlobalLoading } from '../context/LoadingContext'
 import { useModal } from '../context/ModalContext'
+import { setLastOpenedVaultId } from '../utils/lastOpenedVaultStorage'
 
 /**
  * @param {{
@@ -53,6 +54,7 @@ export const useVaultSwitch = ({
                 setIsLoading(true)
                 try {
                   await refetchVault(vault.id, { password })
+                  await setLastOpenedVaultId(vault.id)
                   closeModal()
                   onSwitchComplete?.()
                 } finally {
@@ -63,6 +65,7 @@ export const useVaultSwitch = ({
           )
         } else {
           await refetchVault(vault.id)
+          await setLastOpenedVaultId(vault.id)
           onSwitchComplete?.()
         }
       } finally {
