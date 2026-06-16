@@ -11,6 +11,7 @@ import {
 import {
   Add,
   LockFilled,
+  LockPerson,
   MoreVert,
   PersonAdd
 } from '@tetherto/pearpass-lib-ui-kit/icons'
@@ -161,14 +162,16 @@ export const BottomSheetVaultSelectorContent = ({
             return (
               <ListItem
                 key={vault.id}
-                icon={<LockFilled color={theme.colors.colorTextPrimary} />}
+                icon={
+                  deviceCount > 1 ? (
+                    <LockPerson color={theme.colors.colorTextPrimary} />
+                  ) : (
+                    <LockFilled color={theme.colors.colorTextPrimary} />
+                  )
+                }
                 title={vault.name}
                 subtitle={
-                  deviceCount > 0
-                    ? deviceCount === 1
-                      ? t`${deviceCount} Device`
-                      : t`${deviceCount} Devices`
-                    : undefined
+                  deviceCount > 1 ? t`${deviceCount} Devices` : t`Private`
                 }
                 selected={isSelected}
                 showDivider
