@@ -1,8 +1,10 @@
 import { useEffect, useMemo } from 'react'
 
 import { useLingui } from '@lingui/react/macro'
+import { useNavigation } from '@react-navigation/native'
 import { useForm } from '@tetherto/pear-apps-lib-ui-react-hooks'
 import {
+  AttachmentField,
   InputField,
   MultiSlotInput,
   PasswordField,
@@ -13,8 +15,13 @@ import {
 import { StyleSheet, View } from 'react-native'
 
 import { WifiPasswordQRCode } from '../../components/WifiPasswordQRCode'
+import { useAutoLockContext } from '../../context/AutoLockContext'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
-import { CustomField, WifiPasswordRecord } from './types'
+import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
+import { getMimeType } from '../../utils/getMimeType'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
+import { handleDownloadFile } from '../../utils/handleDownloadFile'
+import { Attachment, CustomField, WifiPasswordRecord } from './types'
 import { toReadOnlyFieldProps } from './utils'
 
 interface WifiPasswordDetailsFormProps {
@@ -28,6 +35,14 @@ interface WifiPasswordDetailsFormValues {
   note: string
   customFields: CustomField[]
   folder?: string
+  attachments: Attachment[]
+}
+
+type ImagePreviewNavigation = {
+  navigate: (
+    screen: 'ImagePreview',
+    params: { imageUri: string; imageName?: string }
+  ) => void
 }
 
 export const WifiPasswordDetailsForm = ({
@@ -35,8 +50,17 @@ export const WifiPasswordDetailsForm = ({
   selectedFolder
 }: WifiPasswordDetailsFormProps) => {
   const { t } = useLingui()
+  const navigation = useNavigation() as ImagePreviewNavigation
   const { theme } = useTheme()
   const { copyToClipboard } = useCopyToClipboard()
+  const { setShouldBypassAutoLock } = useAutoLockContext() as {
+    setShouldBypassAutoLock: (value: boolean) => void
+  }
+
+  const recordAttachments = useMemo(
+    () => getRecordAttachments(initialRecord),
+    [initialRecord]
+  )
 
   const initialValues = useMemo<WifiPasswordDetailsFormValues>(
     () => ({
@@ -44,13 +68,20 @@ export const WifiPasswordDetailsForm = ({
       password: initialRecord?.data?.password ?? '',
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder
+      folder: selectedFolder ?? initialRecord?.folder,
+      attachments: recordAttachments
     }),
-    [initialRecord, selectedFolder]
+    [initialRecord?.id, initialRecord?.updatedAt, selectedFolder, recordAttachments]
   )
 
-  const { register, setValues, values } = useForm<WifiPasswordDetailsFormValues>({
+  const { register, setValues, values, setValue } = useForm<WifiPasswordDetailsFormValues>({
     initialValues
+  })
+
+  useGetMultipleFiles({
+    fieldNames: ['attachments'],
+    updateValues: setValue,
+    initialRecord
   })
 
   useEffect(() => {
@@ -60,6 +91,30 @@ export const WifiPasswordDetailsForm = ({
   const hasPassword = !!values.password.length
   const hasNote = !!values.note.length
   const hasCustomFields = !!values.customFields.length
+  const hasAttachments =
+    values.attachments.length > 0 || recordAttachments.length > 0
+  const attachmentsToDisplay =
+    values.attachments.length > 0 ? values.attachments : recordAttachments
+
+  const handleAttachmentPress = async (attachment: Attachment) => {
+    if (getMimeType(attachment.name ?? '').startsWith('image/')) {
+      const imageUri = attachment.base64
+        ? `data:image/jpeg;base64,${attachment.base64}`
+        : ''
+      navigation.navigate('ImagePreview', { imageUri, imageName: attachment.name })
+      return
+    }
+
+    try {
+      setShouldBypassAutoLock(true)
+      await handleDownloadFile({
+        base64: attachment.base64 ?? '',
+        name: attachment.name ?? ''
+      })
+    } finally {
+      setShouldBypassAutoLock(false)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -88,6 +143,23 @@ export const WifiPasswordDetailsForm = ({
               password={values.password}
             />
           </View>
+        )}
+
+        {hasAttachments && (
+          <MultiSlotInput testID="attachments-multi-slot-input">
+            {attachmentsToDisplay.map((attachment, index) => (
+              <AttachmentField
+                key={attachment?.id || attachment.name}
+                label={t`Attachment`}
+                value={attachment?.name ?? ''}
+                isGrouped
+                testID={`attachment-field-${index}`}
+                onClick={() => {
+                  void handleAttachmentPress(attachment)
+                }}
+              />
+            ))}
+          </MultiSlotInput>
         )}
 
         {(hasNote || hasCustomFields) && (

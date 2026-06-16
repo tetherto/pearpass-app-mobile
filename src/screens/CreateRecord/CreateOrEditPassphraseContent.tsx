@@ -20,13 +20,27 @@ import {
 import { StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
+import { AttachmentFields } from '../../components/AttachmentFields'
 import { FolderSelectField } from '../../components/FolderSelectField'
 import { PassPhrase } from '../../containers/PassPhrase'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../containers/Layout'
 import { useLoadingContext } from '../../context/LoadingContext'
+import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
+import { convertBase64FilesToUint8 } from '../../utils/convertBase64FilesToUint8'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
 import { Add, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
+
+type PassphraseAttachment = {
+  base64?: string
+  id?: string | number
+  name: string
+}
+
+type UploadedPassphraseAttachment = PassphraseAttachment & {
+  base64: string
+}
 
 type PassphraseRecord = {
   data?: {
@@ -34,9 +48,11 @@ type PassphraseRecord = {
     passPhrase?: string
     note?: string
     customFields?: Array<{ type: string; note?: string }>
+    attachments?: PassphraseAttachment[]
   }
   folder?: string
   isFavorite?: boolean
+  attachments?: PassphraseAttachment[]
 }
 
 type Props = {
@@ -50,6 +66,7 @@ type FormValues = {
   note: string
   customFields: Array<{ type: string; note?: string }>
   folder: string
+  attachments: PassphraseAttachment[]
 }
 
 const parsePassphraseText = (text: string) =>
@@ -96,7 +113,8 @@ export const CreateOrEditPassphraseContent = ({
       passPhrase: initialRecord?.data?.passPhrase ?? '',
       note: initialRecord?.data?.note ?? '',
       customFields: initialRecord?.data?.customFields ?? [],
-      folder: selectedFolder ?? initialRecord?.folder
+      folder: selectedFolder ?? initialRecord?.folder,
+      attachments: getRecordAttachments(initialRecord)
     },
     validate: (formValues) => {
       const validationErrors =
@@ -115,6 +133,16 @@ export const CreateOrEditPassphraseContent = ({
       return validationErrors
     }
   })
+
+  useGetMultipleFiles({
+    fieldNames: ['attachments'],
+    updateValues: setValue,
+    initialRecord
+  })
+
+  const isUploadedPassphraseAttachment = (
+    attachment: PassphraseAttachment
+  ): attachment is UploadedPassphraseAttachment => typeof attachment.base64 === 'string'
 
   const onError = (error: Error) => {
     Toast.show({
@@ -138,7 +166,10 @@ export const CreateOrEditPassphraseContent = ({
         title: formValues.title,
         passPhrase: formValues.passPhrase,
         note: formValues.note,
-        customFields: (formValues.customFields as Array<{ type: string; note?: string }>).filter((f) => f.note?.trim().length)
+        customFields: (formValues.customFields as Array<{ type: string; note?: string }>).filter((f) => f.note?.trim().length),
+        attachments: convertBase64FilesToUint8(
+          formValues.attachments.filter(isUploadedPassphraseAttachment)
+        )
       }
     }
 
@@ -162,6 +193,23 @@ export const CreateOrEditPassphraseContent = ({
     addItem: addCustomField,
     removeItem: removeCustomField
   } = registerArray('customFields')
+
+  const handleFileUpload = (file?: PassphraseAttachment | null) => {
+    if (!file) return
+    setValue('attachments', [...values.attachments, file])
+  }
+
+  const handleAttachmentReplace = (index: number, file?: PassphraseAttachment | null) => {
+    if (!file) return
+    setValue(
+      'attachments',
+      values.attachments.map((a, idx) => (idx === index ? file : a))
+    )
+  }
+
+  const handleAttachmentDelete = (index: number) => {
+    setValue('attachments', values.attachments.filter((_, idx) => idx !== index))
+  }
 
   return (
     <Layout
@@ -229,6 +277,14 @@ export const CreateOrEditPassphraseContent = ({
           placeholder={t`Enter Comment`}
           onChangeText={(val) => setValue('note', val)}
           testID="comment-input-field"
+        />
+
+        <AttachmentFields
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
         />
 
         <MultiSlotInput

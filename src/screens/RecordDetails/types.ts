@@ -52,6 +52,7 @@ export interface PassPhraseData {
   passPhrase?: string
   note?: string
   customFields?: CustomField[]
+  attachments?: Attachment[]
 }
 export type PassPhraseRecord = BaseRecord<PassPhraseData>
 
@@ -94,6 +95,7 @@ export interface WifiPasswordData {
   password?: string
   note?: string
   customFields?: CustomField[]
+  attachments?: Attachment[]
 }
 export type WifiPasswordRecord = BaseRecord<WifiPasswordData>
 

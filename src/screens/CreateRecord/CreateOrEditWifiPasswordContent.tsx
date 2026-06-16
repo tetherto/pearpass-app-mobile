@@ -20,12 +20,26 @@ import { Add, SyncLock, TrashOutlined } from '@tetherto/pearpass-lib-ui-kit/icon
 import { Keyboard, StyleSheet, View } from 'react-native'
 import Toast from 'react-native-toast-message'
 
+import { AttachmentFields } from '../../components/AttachmentFields'
 import { FolderSelectField } from '../../components/FolderSelectField'
 import { BackScreenHeader } from '../../containers/ScreenHeader/BackScreenHeader'
 import { Layout } from '../../containers/Layout'
 import { useLoadingContext } from '../../context/LoadingContext'
+import { useGetMultipleFiles } from '../../hooks/useGetMultipleFiles'
+import { convertBase64FilesToUint8 } from '../../utils/convertBase64FilesToUint8'
+import { getRecordAttachments } from '../../utils/getRecordAttachments'
 import { logger } from '../../utils/logger'
 import { getPasswordIndicatorVariant } from '../../utils/passwordPolicy'
+
+type WifiAttachment = {
+  base64?: string
+  id?: string | number
+  name: string
+}
+
+type UploadedWifiAttachment = WifiAttachment & {
+  base64: string
+}
 
 type WifiRecord = {
   data?: {
@@ -33,9 +47,11 @@ type WifiRecord = {
     password?: string
     note?: string
     customFields?: Array<{ type: string; note: string }>
+    attachments?: WifiAttachment[]
   }
   folder?: string
   isFavorite?: boolean
+  attachments?: WifiAttachment[]
 }
 
 type Props = {
@@ -57,6 +73,7 @@ type FormValues = {
   note: string
   customFields: Array<{ type: string; note: string }>
   folder: string
+  attachments: WifiAttachment[]
 }
 
 export const CreateOrEditWifiPasswordContent = ({
@@ -99,10 +116,21 @@ export const CreateOrEditWifiPasswordContent = ({
         customFields: initialRecord?.data?.customFields?.length
           ? initialRecord.data.customFields
           : [{ type: 'note', note: '' }],
-        folder: selectedFolder ?? initialRecord?.folder
+        folder: selectedFolder ?? initialRecord?.folder,
+        attachments: getRecordAttachments(initialRecord)
       },
       validate: (formValues) => schema.validate(formValues)
     })
+
+  useGetMultipleFiles({
+    fieldNames: ['attachments'],
+    updateValues: setValue,
+    initialRecord
+  })
+
+  const isUploadedWifiAttachment = (
+    attachment: WifiAttachment
+  ): attachment is UploadedWifiAttachment => typeof attachment.base64 === 'string'
 
   const onError = (error: Error) => {
     Toast.show({
@@ -126,7 +154,10 @@ export const CreateOrEditWifiPasswordContent = ({
         title: formValues.title,
         password: formValues.password,
         note: formValues.note,
-        customFields: formValues.customFields.filter((f) => f.note?.trim().length)
+        customFields: formValues.customFields.filter((f) => f.note?.trim().length),
+        attachments: convertBase64FilesToUint8(
+          formValues.attachments.filter(isUploadedWifiAttachment)
+        )
       }
     }
 
@@ -150,6 +181,23 @@ export const CreateOrEditWifiPasswordContent = ({
     addItem: addCustomField,
     removeItem: removeCustomField
   } = registerArray('customFields')
+
+  const handleFileUpload = (file?: WifiAttachment | null) => {
+    if (!file) return
+    setValue('attachments', [...values.attachments, file])
+  }
+
+  const handleAttachmentReplace = (index: number, file?: WifiAttachment | null) => {
+    if (!file) return
+    setValue(
+      'attachments',
+      values.attachments.map((a, idx) => (idx === index ? file : a))
+    )
+  }
+
+  const handleAttachmentDelete = (index: number) => {
+    setValue('attachments', values.attachments.filter((_, idx) => idx !== index))
+  }
 
   const openPasswordGenerator = () => {
     Keyboard.dismiss()
@@ -232,6 +280,14 @@ export const CreateOrEditWifiPasswordContent = ({
           placeholder={t`Enter Comment`}
           onChangeText={(val) => setValue('note', val)}
           testID="comments-multi-slot-input-slot-0"
+        />
+
+        <AttachmentFields
+          attachments={values.attachments}
+          isEditing={isEditing}
+          onAdd={handleFileUpload}
+          onReplace={handleAttachmentReplace}
+          onDelete={handleAttachmentDelete}
         />
 
         <MultiSlotInput
