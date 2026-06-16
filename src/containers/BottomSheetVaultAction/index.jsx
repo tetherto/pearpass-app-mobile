@@ -109,7 +109,7 @@ export const BottomSheetVaultAction = ({
   const actions = [
     {
       key: 'rename',
-      label: t`Rename Vault`,
+      label: t`Rename`,
       icon: <EditOutlined color={theme.colors.colorTextPrimary} />,
       onClick: () => closeAndRun(onRename)
     },
