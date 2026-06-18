@@ -5,7 +5,11 @@ import {
   rawTokens,
   useTheme
 } from '@tetherto/pearpass-lib-ui-kit'
-import { LockOutlined, PersonAdd } from '@tetherto/pearpass-lib-ui-kit/icons'
+import {
+  LockOutlined,
+  PersonAdd,
+  LockPerson
+} from '@tetherto/pearpass-lib-ui-kit/icons'
 import { StyleSheet, View } from 'react-native'
 
 import { VaultActionsMenu } from './VaultActionsMenu'
@@ -29,10 +33,7 @@ export const VaultRow = ({
       ? {
           primary:
             itemCount === 1 ? t`${itemCount} Item` : t`${itemCount} Items`,
-          secondary:
-            deviceCount === 1
-              ? t`${deviceCount} Device`
-              : t`${deviceCount} Devices`
+          secondary: deviceCount === 1 ? t`Private` : t`${deviceCount} Devices`
         }
       : undefined
   return (
@@ -42,11 +43,19 @@ export const VaultRow = ({
         platform="mobile"
         icon={
           <View style={styles.iconBadge}>
-            <LockOutlined
-              color={theme.colors.colorPrimary}
-              width={18}
-              height={18}
-            />
+            {deviceCount > 1 ? (
+              <LockPerson
+                color={theme.colors.colorPrimary}
+                width={18}
+                height={18}
+              />
+            ) : (
+              <LockOutlined
+                color={theme.colors.colorPrimary}
+                width={18}
+                height={18}
+              />
+            )}
           </View>
         }
         title={vault?.name ?? vault?.id}
