@@ -9,7 +9,7 @@ import {
   useTheme,
   Text
 } from '@tetherto/pearpass-lib-ui-kit'
-import { Add } from '@tetherto/pearpass-lib-ui-kit/icons'
+import { Add, ImportOutlined } from '@tetherto/pearpass-lib-ui-kit/icons'
 import { useVault, useVaults } from '@tetherto/pearpass-lib-vault'
 import { StyleSheet, View } from 'react-native'
 import { Layout } from 'src/containers/Layout'
@@ -46,6 +46,10 @@ export const Vaults = () => {
 
   const handleCreateNewVault = () => {
     navigation.navigate('Welcome', { state: NAVIGATION_ROUTES.CREDENTIALS })
+  }
+
+  const handleImportVault = () => {
+    navigation.navigate('ImportVault')
   }
 
   const buildVaultActions = (vault) => ({
@@ -97,14 +101,24 @@ export const Vaults = () => {
       }
       contentStyle={styles.content}
       footer={
-        <Button
-          variant="primary"
-          iconBefore={<Add />}
-          fullWidth
-          onClick={handleCreateNewVault}
-        >
-          {t`Create New Vault`}
-        </Button>
+        <View style={styles.footer}>
+          <Button
+            variant="primary"
+            iconBefore={<Add />}
+            fullWidth
+            onClick={handleCreateNewVault}
+          >
+            {t`Create New Vault`}
+          </Button>
+          <Button
+            variant="secondary"
+            iconBefore={<ImportOutlined />}
+            fullWidth
+            onClick={handleImportVault}
+          >
+            {t`Import Vault`}
+          </Button>
+        </View>
       }
     >
       <PageHeader
@@ -163,5 +177,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: rawTokens.radius8,
     overflow: 'hidden'
+  },
+  footer: {
+    gap: rawTokens.spacing8
   }
 })
