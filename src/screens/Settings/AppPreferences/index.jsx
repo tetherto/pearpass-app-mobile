@@ -4,7 +4,8 @@ import { useLingui } from '@lingui/react/macro'
 import { useNavigation } from '@react-navigation/native'
 import {
   AUTO_LOCK_TIMEOUT_OPTIONS,
-  CLIPBOARD_CLEAR_TIMEOUT,
+  CLIPBOARD_CLEAR_TIMEOUT_OPTIONS,
+  DEFAULT_CLIPBOARD_CLEAR_TIMEOUT,
   UNSUPPORTED
 } from '@tetherto/pearpass-lib-constants'
 import {
@@ -61,7 +62,7 @@ export const AppPreferences = () => {
 
   const [isAutofillEnabled, setIsAutofillEnabled] = useState(false)
   const [clipboardClearTimeout, setClipboardClearTimeout] = useState(
-    CLIPBOARD_CLEAR_TIMEOUT
+    DEFAULT_CLIPBOARD_CLEAR_TIMEOUT
   )
   const [isNonSecureAllowed, setIsNonSecureAllowed] = useState(false)
   const [isPinEnabled, setIsPinEnabled] = useState(false)
@@ -70,17 +71,11 @@ export const AppPreferences = () => {
   const appStateRef = useRef(AppState.currentState)
 
   const clipboardTimeoutOptions = useMemo(
-    () => [
-      { label: t`30 Seconds`, value: 30000 },
-      { label: t`1 Minute`, value: 60000 },
-      { label: t`3 Minutes`, value: 180000 },
-      { label: t`5 Minutes`, value: 300000 },
-      { label: t`10 Minutes`, value: 600000 },
-      { label: t`30 Minutes`, value: 1800000 },
-      { label: t`1 Hour`, value: 3600000 },
-      { label: t`3 Hours`, value: 10800000 },
-      { label: t`Never`, value: null }
-    ],
+    () =>
+      Object.values(CLIPBOARD_CLEAR_TIMEOUT_OPTIONS).map((option) => ({
+        label: t(option.label),
+        value: option.value
+      })),
     [t]
   )
 
