@@ -97,8 +97,7 @@ public class VaultInitializer {
                 // Check if password is set
                 boolean hasPasswordSet = encryption != null &&
                         encryption.ciphertext != null &&
-                        encryption.nonce != null &&
-                        encryption.salt != null;
+                        encryption.nonce != null;
 
                 // Check if user is logged in (vault is initialized and unlocked)
                 boolean isLoggedIn = vaultsStatus.isInitialized && !vaultsStatus.isLocked;
@@ -167,8 +166,7 @@ public class VaultInitializer {
                     client.getMasterPasswordEncryption(null).get();
             return encryption != null &&
                     encryption.ciphertext != null &&
-                    encryption.nonce != null &&
-                    encryption.salt != null;
+                    encryption.nonce != null;
         } catch (Exception e) {
             SecureLog.e(TAG, "Could not check password status: " + e.getMessage());
             return false;
