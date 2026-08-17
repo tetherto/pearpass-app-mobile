@@ -871,7 +871,7 @@ public class PearPassVaultClient {
                             String salt = (String) encryptionData.get("salt");
                             String hashedPassword = (String) encryptionData.get("hashedPassword");
 
-                            if (ciphertext != null && nonce != null && salt != null) {
+                            if (ciphertext != null && nonce != null) {
                                 log("Successfully parsed master password encryption from initialized data");
                                 return new MasterPasswordEncryption(ciphertext, nonce, salt, hashedPassword);
                             }
@@ -906,7 +906,7 @@ public class PearPassVaultClient {
                         String salt = (String) encryptionData.get("salt");
                         String hashedPassword = (String) encryptionData.get("hashedPassword");
 
-                        if (ciphertext != null && nonce != null && salt != null) {
+                        if (ciphertext != null && nonce != null) {
                             log("Successfully parsed master password encryption from existing data");
                             return new MasterPasswordEncryption(ciphertext, nonce, salt, hashedPassword);
                         }
@@ -995,7 +995,7 @@ public class PearPassVaultClient {
                     String salt = (String) data.get("salt");
                     String hashedPassword = (String) data.get("hashedPassword");
 
-                    if (ciphertext != null && nonce != null && salt != null) {
+                    if (ciphertext != null && nonce != null) {
                         return new MasterPasswordEncryption(ciphertext, nonce, salt, hashedPassword);
                     }
                     return null;
